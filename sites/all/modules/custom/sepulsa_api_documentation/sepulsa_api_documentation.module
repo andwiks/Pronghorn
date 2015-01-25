@@ -1,0 +1,423 @@
+<?php
+/**
+ * @file
+ * sepulsa_api_documentation.module
+ *
+ * @author andre4s_y
+ * @since January 22nd, 2014
+ *
+ * @todo: bash all notice and warning messages.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources_alter().
+ */
+function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpoint) {
+  // Add documentation callback.
+  $resources['user']['actions']['logout']['documentation callback'] = $resources['user']['actions']['logout']['callback'] . '_doc';
+  $resources['user']['actions']['logout']['args'] = array();
+  $resources['user']['actions']['token']['documentation callback'] = $resources['user']['actions']['token']['callback'] . '_doc';
+  $resources['user']['actions']['token']['args'] = array();
+  $resources['user']['actions']['request_new_password']['documentation callback'] = $resources['user']['actions']['request_new_password']['callback'] . '_doc';
+  $resources['user']['actions']['request_new_password']['args'][0]['source']['param'] = 'name';
+  $resources['user']['actions']['request_new_password']['args'][0]['http_method'] = 'POST';
+  $resources['user']['actions']['register']['documentation callback'] = $resources['user']['actions']['register']['callback'] . '_doc';
+  $resources['user']['operations']['retrieve']['documentation callback'] = $resources['user']['operations']['retrieve']['callback'] . '_doc';
+  $resources['user']['operations']['retrieve']['args'][0]['source']['param'] = 'uid';
+  $resources['user']['operations']['create']['documentation callback'] = $resources['user']['operations']['create']['callback'] . '_doc';
+  $resources['user']['operations']['update']['documentation callback'] = $resources['user']['operations']['update']['callback'] . '_doc';
+  $resources['user']['operations']['update']['args'][0]['source']['param'] = 'uid';
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Documentation callback for user action logout.
+ */
+function _user_resource_logout_doc() {
+  global $base_url;
+  $response = '
+    [
+      true
+    ]
+  ';
+  $element = array(
+    '#name' => t('Logout Service'),
+    '#description' => t('Logout a user session.'),
+    '#auth' => TRUE,
+    '#path' => 'user/logout',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/logout.json<br />POST without data but need header X-CSRF-Token from login/logintoboggan service.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect invalid header X-CSRF-Token or user with token has already logged out.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('Drupal still detect old session from X-CSFR-Token. Maybe you send invalid token or send GET request, suppose to use POST request.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'already_logout' => array(
+        '#question' => '406 Not Acceptable: User is not logged in.',
+        '#description' => t('User has already logged out.'),
+        '#response' => '
+        [
+            "User is not logged in."
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user action token.
+ */
+function _user_resource_get_token_doc() {
+  global $base_url;
+  $response = '
+    {
+        "token": "OsCidaCeSJeXY8rPApDg2KoiPsIPDnCaEaSFgFn9B3s"
+    }
+  ';
+  $element = array(
+    '#name' => t('Token Service'),
+    '#description' => t('Returns the CSRF token.'),
+    '#auth' => FALSE,
+    '#path' => 'user/token',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/token.json<br />POST without data.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('Invalid GET request, suppose to use POST request.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user action request_new_password.
+ */
+function _user_resource_request_new_password_doc() {
+  global $base_url;
+  $response = '
+    [
+      true
+    ]
+  ';
+  $element = array(
+    '#name' => t('Request New Password Service'),
+    '#description' => t('Request a new password, given a user name or email address. Password reset instruction will be sent via email.'),
+    '#auth' => FALSE,
+    '#path' => 'user/request_new_password',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/request_new_password.json<br />POST data x-www-form-urlencoded: name=andreas%40drupal.or.id <br />POST data application/json: {"name": "andreas"}<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'mail_problem' => array(
+        '#question' => '200 OK',
+        '#description' => t('This response means currently system unable to send password reset email.'),
+        '#response' => '
+        [
+            false
+        ]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument name',
+        '#description' => t('Required argument: user name or user email address.'),
+        '#response' => '
+        [
+            "Missing required argument name"
+        ]',
+      ),
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('Invalid GET request, suppose to use POST request.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'invalid_name' => array(
+        '#question' => '406 Not Acceptable: Sorry, %name is not recognized as a user name or an e-mail address.',
+        '#description' => t('Input user is not valid drupal username and user email address.'),
+        '#response' => '
+        [
+            "Sorry, %name is not recognized as a user name or an e-mail address."
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user operations create.
+ */
+function _user_resource_create_doc() {
+  global $base_url;
+  $response = '
+  {
+    "uid": "10",
+    "uri": "http://drupal.or.id/api/user/10"
+  }
+  ';
+  $element = array(
+    '#name' => t('Register/Create User Service'),
+    '#description' => t('Create/Register a new user.'),
+    '#auth' => FALSE,
+    '#path' => 'user/create',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/register.json<br />' . $base_url . '/api/user/create.json<br />POST data x-www-form-urlencoded: account[name]=username&amp;account[mail]=mail%40drupal.or.id <br />POST data application/json: {"account":{"name":"username", "mail":"mail@drupal.or.id"}}<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'missing_argument' => array(
+        '#question' => '401 Unauthorized: Missing required argument account',
+        '#description' => t('Required argument: account as an array.'),
+        '#response' => '
+        [
+            "Missing required argument account"
+        ]',
+      ),
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('Invalid GET request, suppose to use POST request.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'unsupported_request' => array(
+        '#question' => '406 Not Acceptable: Unsupported request content type text/plain.',
+        '#description' => t('Input json must have header Content-Type: application/json.'),
+        '#response' => '
+        [
+            "Unsupported request content type text/plain"
+        ]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '406 Not Acceptable: @field field is required.',
+        '#description' => t('Required argument: user name or user email address.'),
+        '#response' => '
+        {
+            "form_errors": {
+                "@field": "@field_name field is required."
+            }
+        }',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user operations retrieve.
+ */
+function _user_resource_retrieve_doc() {
+  global $base_url;
+  $response = '
+    {
+        "uid": "9",
+        "name": "andreas",
+        "mail": "andreas@drupal.or.id",
+        "theme": "",
+        "signature": "",
+        "signature_format": "filtered_html",
+        "created": "1421914415",
+        "access": "1421935163",
+        "login": "1421935284",
+        "status": "1",
+        "timezone": null,
+        "language": "",
+        "picture": null,
+        "data": false,
+        "roles": {
+            "2": "authenticated user"
+        },
+        "rdf_mapping": {
+            "rdftype": [
+                "sioc:UserAccount"
+            ],
+            "name": {
+                "predicates": [
+                    "foaf:name"
+                ]
+            },
+            "homepage": {
+                "predicates": [
+                    "foaf:page"
+                ],
+                "type": "rel"
+            }
+        }
+    }
+  ';
+  $element = array(
+    '#name' => t('User retrieve Service'),
+    '#description' => t('Retrieve a user.'),
+    '#auth' => TRUE,
+    '#path' => 'user/%uid',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/%uid<br />GET data with user id as input.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('This service only work if user has permission to administer users or access user profiles or access own profiles.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'no_controller' => array(
+        '#question' => '404 Not found: Could not find the controller.',
+        '#description' => t('Service output nothing. Possible missing UID input or POST data (supposed use GET).'),
+        '#response' => '',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user operations update.
+ */
+function _user_resource_update_doc() {
+  global $base_url;
+  $response = '
+    # Example output: PUT without data.
+    {
+        "uid": "9",
+        "roles": {
+            "2": "authenticated user"
+        }
+    }
+    # Example output: update password success.
+    {
+        "current_pass": "1234",
+        "uid": "9",
+        "roles": {
+            "2": "authenticated user"
+        }
+    }
+  ';
+  $element = array(
+    '#name' => t('User update Service'),
+    '#description' => t('Update a user.'),
+    '#auth' => TRUE,
+    '#path' => 'user/%uid',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/user/%uid<br />PUT data x-www-form-urlencoded: data[pass]=1234&amp;data[current_pass]=12345 <br />PUT data application/json: {"data":{"pass":"1234", "current_pass":"12345"}}<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect invalid header X-CSRF-Token or user with token has already logged out.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'access_denied' => array(
+        '#question' => '403 Access denied for user @username',
+        '#description' => t('This service only work if user has permission to administer users or access user profiles or access own profiles.'),
+        '#response' => '
+        [
+            "Access denied for user @username"
+        ]',
+      ),
+      'no_controller' => array(
+        '#question' => '404 Not found: Could not find the controller.',
+        '#description' => t('Service output nothing. This service use HTTP PUT method.'),
+        '#response' => '',
+      ),
+      'missing_requirement' => array(
+        '#question' => '406 Not Acceptable: @field field is required.',
+        '#description' => t('Required argument: user name or user email address.'),
+        '#response' => '
+        {
+            "form_errors": {
+                "@field": "@field_name field is required."
+            }
+        }',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

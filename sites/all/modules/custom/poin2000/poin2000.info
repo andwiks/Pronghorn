@@ -1,0 +1,4 @@
+name = "Poin 2000"
+description = "Integration with Poin 2000"
+core = "7.x"
+package = "Sepulsa"

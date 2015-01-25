@@ -1,0 +1,4 @@
+name = "Sepulsa"
+description = "Provide Sepulsa Custom Template and Functions."
+core = "7.x"
+package = "Sepulsa"

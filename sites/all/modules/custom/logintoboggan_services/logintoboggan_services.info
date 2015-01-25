@@ -1,0 +1,7 @@
+name = "LoginToboggan Services Integration"
+description = "Integrates LoginToboggan with Services module"
+core = "7.x"
+
+dependencies[] = logintoboggan
+dependencies[] = services
+dependencies[] = services_documentation

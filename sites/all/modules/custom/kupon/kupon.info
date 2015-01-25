@@ -1,0 +1,4 @@
+name = Kupon
+description = Some extension related with kupon product for sepulsa
+core = 7.x
+package = Sepulsa

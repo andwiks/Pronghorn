@@ -1,0 +1,12 @@
+<?php
+
+/**
+ * Implements hook_views_api().
+ */
+function kupon_views_api() {
+  return array(
+    'api' => 3, 
+    'path' => drupal_get_path('module', 'kupon'), 
+    'template path' => drupal_get_path('module', 'kupon'),
+  );
+}

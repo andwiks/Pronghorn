@@ -1,7 +1,0 @@
-name = "Sepulsa API Documentation"
-description = "Provide Sepulsa API Documentation."
-core = "7.x"
-package = "Sepulsa"
-
-dependencies[] = services
-dependencies[] = services_documentation

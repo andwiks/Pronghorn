@@ -1,0 +1,17 @@
+name = Social Share
+description =Social Share module - adds social share on a Drupal site!
+package = LoginRadius Unified Social API
+core = 7.x
+files[] = socialloginandsocialshare_share.module
+
+version = "7.x-4.7"
+core = "7.x"
+project = "sociallogin"
+
+
+; Information added by Drupal.org packaging script on 2014-08-05
+version = "7.x-4.8"
+core = "7.x"
+project = "sociallogin"
+datestamp = "1407212935"
+

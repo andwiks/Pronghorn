@@ -214,12 +214,10 @@ function sepulsa_phone_form_validate($form, &$form_state) {
         ) {
           // 5. Validate submit button: human or bot.
           // 5a. Check form operation.
-          // 5b. Check form add input.
-          // 5c. Form operation must the same as form add input.
+          // 5b. Form operation must the same as form add/charge input.
           if (!(isset($form_state['values']['op']) && !empty($form_state['values']['op'])
-            && isset($form_state['values']['add']) && !empty($form_state['values']['add'])
-            && $form_state['values']['op'] == $form_state['values']['add']
-            && $form_state['values']['op'] == t('Add to cart')
+            && ($form_state['values']['op'] == $form_state['values']['add']['cart']
+            || $form_state['values']['op'] == $form_state['values']['add']['charge'])
           )) {
             // Invalid form input.
             form_set_error('packet', t('Illegal form operation.'));
@@ -257,10 +255,10 @@ function sepulsa_phone_form_validate($form, &$form_state) {
 function sepulsa_phone_form_submit($form, &$form_state) {
   // Get global user object.
   global $user;
+
   // Fix phone number using autocorrect mobile prefix.
   $form_state['values']['phone'] = sepulsa_autocorrect_mobile_prefix($form_state['values']['phone']);
-  // Load node pulsa.
-  $pulsa = node_load($form_state['values']['card_type']);
+
   // Load product.
   $product = commerce_product_load($form_state['values']['packet']);
   // Create new line item: mobile_prepaid.
@@ -269,15 +267,40 @@ function sepulsa_phone_form_submit($form, &$form_state) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
   // Set field_phone_number based on user input.
   $line_item_wrapper->field_phone_number->set($form_state['values']['phone']);
+
+  // Check fast charge operation: empty previous cart.
+  if ($form_state['values']['op'] == $form_state['values']['add']['charge']) {
+    // Get cart order.
+    $order = commerce_cart_order_load($user->uid);
+    // Check whether order is not empty.
+    if (!empty($order)) {
+      // Empty the cart.
+      commerce_cart_order_empty($order);
+    }
+  }
+
   // Add the line item to cart.
   commerce_cart_product_add($user->uid, $line_item);
+
+  // Load node pulsa.
+  $pulsa = node_load($form_state['values']['card_type']);
   // Show message to user.
   drupal_set_message(t('@pulsa (@product) has been added to cart.', array(
     '@pulsa' => $pulsa->title,
     '@product' => $product->title,
   )));
+
   // Redirect to coupon page.
-  $form_state['redirect'] = 'coupon';
+  // By default redirection is handled by rules.
+  // Check fast charge operation: redirect to checkout page.
+  if ($form_state['values']['op'] == $form_state['values']['add']['charge']) {
+    // Check rules action go to.
+    if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
+      unset($GLOBALS['_rules_action_drupal_goto_do']);
+    }
+    // Redirect to checkout page.
+    $form_state['redirect'] = 'checkout';
+  }
 }
 
 /**
@@ -375,11 +398,18 @@ function sepulsa_autocomplete_cart($form, &$form_state) {
     && isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])
     && isset($form_state['values']['packet']) && !empty($form_state['values']['packet'])
   ) {
-    // Submit button: add to cart.
-    // This value will be validate at validate function.
     $form['add'] = array(
+      '#tree' => TRUE,
+    );
+    // Submit button: add to cart.
+    $form['add']['cart'] = array(
       '#type' => 'submit',
-      '#value' => t('Add to cart'),
+      '#value' => t('Add to Cart'),
+    );
+    // Submit button: fast charge.
+    $form['add']['charge'] = array(
+      '#type' => 'submit',
+      '#value' => t('Fast Charge'),
     );
   }
   // Return form add: markup or submit button.

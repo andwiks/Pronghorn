@@ -405,11 +405,13 @@ function sepulsa_autocomplete_cart($form, &$form_state) {
     $form['add']['cart'] = array(
       '#type' => 'submit',
       '#value' => t('Add to Cart'),
+      '#attributes' => array('class' => array('btn', 'style1'), 'style' => 'float:right'),
     );
     // Submit button: fast charge.
     $form['add']['charge'] = array(
       '#type' => 'submit',
       '#value' => t('Fast Charge'),
+      '#attributes' => array('class' => array('btn', 'style1'), 'style' => 'float:right'),
     );
   }
   // Return form add: markup or submit button.

@@ -1,0 +1,531 @@
+<?php
+/**
+ * @file
+ * poin2000.module
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_topup_provider_info().
+ */
+function poin2000_topup_provider_info() {
+  $providers = array();
+
+  $providers['poin2000'] = array(
+    'title' => t('Poin 2000'),
+    'description' => t('Poin 2000 Topup Provider Integration'),
+    'status' => TRUE,
+  );
+
+  return $providers;
+}
+
+/**
+ * Implements hook_topup_code_info().
+ */
+function poin2000_topup_code_info() {
+  $codes = array();
+
+  $codes['HXR5'] = array(
+    'price' => 5300,
+    'title' => t('XL Nasional 5 Rb'),
+  );
+  $codes['HXR10'] = array(
+    'price' => 10350,
+    'title' => t('XL Nasional 10 Rb'),
+  );
+  $codes['HXR25'] = array(
+    'price' => 24650,
+    'title' => t('XL Nasional 25 Rb'),
+  );
+  $codes['HXR50'] = array(
+    'price' => 49375,
+    'title' => t('XL Nasional 50 Rb'),
+  );
+  $codes['HXR100'] = array(
+    'price' => 98750,
+    'title' => t('XL Nasional 100 Rb'),
+  );
+
+  $codes['HN5'] = array(
+    'price' => 5250,
+    'title' => t('AXIS 5 Rb'),
+  );
+
+  $codes['HN10'] = array(
+    'price' => 10250,
+    'title' => t('AXIS 10 Rb'),
+  );
+
+  $codes['HN25'] = array(
+    'price' => 24700,
+    'title' => t('AXIS 25 Rb'),
+  );
+
+  $codes['HN50'] = array(
+    'price' => 49375,
+    'title' => t('AXIS 50 Rb'),
+  );
+
+  $codes['HN100'] = array(
+    'price' => 98750,
+    'title' => t('AXIS 100 Rb'),
+  );
+
+  $codes['HS5'] = array(
+    'price' => 5650,
+    'title' => t('Telkomsel Nasional 5 Rb'),
+  );
+
+  $codes['HS10'] = array(
+    'price' => 10400,
+    'title' => t('Telkomsel Nasional 10 Rb'),
+  );
+
+  $codes['HS20'] = array(
+    'price' => 20000,
+    'title' => t('Telkomsel Nasional 20 Rb'),
+  );
+
+  $codes['HS25'] = array(
+    'price' => 24925,
+    'title' => t('Telkomsel Nasional 25 Rb'),
+  );
+
+  $codes['HS50'] = array(
+    'price' => 49300,
+    'title' => t('Telkomsel Nasional 50 Rb'),
+  );
+
+  $codes['HS100'] = array(
+    'price' => 97300,
+    'title' => t('Telkomsel Nasional 100 Rb'),
+  );
+
+  $codes['HSP5'] = array(
+    'price' => 5600,
+    'title' => t('Telkomsel Nasional 5 Rb'),
+  );
+
+  $codes['HSP10'] = array(
+    'price' => 10300,
+    'title' => t('Telkomsel Nasional 10 Rb'),
+  );
+
+  $codes['HSP20'] = array(
+    'price' => 19925,
+    'title' => t('Telkomsel Nasional 20 Rb'),
+  );
+
+  $codes['HSP25'] = array(
+    'price' => 24750,
+    'title' => t('Telkomsel Nasional 25 Rb'),
+  );
+
+  $codes['HSP50'] = array(
+    'price' => 48550,
+    'title' => t('Telkomsel Nasional 50 Rb'),
+  );
+
+  $codes['HSP100'] = array(
+    'price' => 96800,
+    'title' => t('Telkomsel Nasional 100 Rb'),
+  );
+  return $codes;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function poin2000_settings_form().
+ *
+ * Topup provider callback: settings form.
+ *
+ * @param array $settings
+ *   Setting form array.
+ *
+ * @return array
+ *   Form array.
+ */
+function poin2000_settings_form($settings = array()) {
+  $form = array();
+
+  // Environment: dev or prod.
+  $form['environment'] = array(
+    '#type' => 'select',
+    '#title' => t('Environment'),
+    '#options' => array(
+      'dev' => t('Development'),
+      'prod' => t('Production'),
+    ),
+    '#default_value' => isset($settings['environment']) ? $settings['environment'] : 'dev',
+    '#description' => t('Development environment will not send real data and get response with dummy data.'),
+  );
+
+  // API Endpoint.
+  $form['endpoint'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint'),
+    '#default_value' => isset($settings['endpoint']) ? $settings['endpoint'] : '',
+    '#size' => 60,
+    '#maxlength' => 60,
+    '#description' => t('Poin 2000 endpoint. Please input using full url.'),
+    '#required' => TRUE,
+  );
+
+  $form['timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint Timeout'),
+    '#default_value' => isset($settings['timeout']) ? $settings['timeout'] : 30,
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#description' => t('Poin 2000 endpoint timeout.'),
+    '#field_suffix' => t('s'),
+    '#required' => TRUE,
+  );
+
+  // MSISDN number.
+  $form['msisdn'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MSISDN'),
+    '#default_value' => isset($settings['msisdn']) ? $settings['msisdn'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('Registered number at Poin 2000 system.'),
+    '#required' => TRUE,
+  );
+  // PIN number.
+  $form['pin'] = array(
+    '#type' => 'textfield',
+    '#title' => t('PIN'),
+    '#default_value' => isset($settings['pin']) ? $settings['pin'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('PIN for top up transaction.'),
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+/**
+ * Function poin2000_topup_process().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function poin2000_topup_process($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = $request_id = poin2000_generate_request_id($topup);
+
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall></methodCall>');
+  $xml->addChild('methodName', 'topUpRequest');
+  $params = $xml->addChild('params');
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $struct = $value->addChild('struct');
+  // Add member: MSISDN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'MSISDN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['msisdn']);
+  // Add member: REQUESTID.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'REQUESTID');
+  $value = $member->addChild('value');
+  $value->addChild('string', $request_id);
+  // Add member: PIN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'PIN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['pin']);
+  // Add member: NOHP.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOHP');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_phone_number']);
+  // Add member: NOM.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOM');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_code']);
+  // Generate xml.
+  $xml = $xml->asXML();
+
+  // Send xml data.
+  return poin2000_send($xml, $settings, $topup);
+}
+
+/**
+ * Function poin2000_topup_query().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function poin2000_topup_query($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = $request_id = poin2000_generate_request_id($topup);
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall></methodCall>');
+  $xml->addChild('methodName', 'topUpInquiry');
+  $params = $xml->addChild('params');
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $struct = $value->addChild('struct');
+  // Add member: REQUESTID.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'REQUESTID');
+  $value = $member->addChild('value');
+  $value->addChild('string', $request_id);
+  // Add member: MSISDN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'MSISDN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['msisdn']);
+  // Add member: PIN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'PIN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['pin']);
+  // Add member: NOHP.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOHP');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_phone_number']);
+  // Generate xml.
+  $xml = $xml->asXML();
+
+  // Add request id to topup data.
+  $topup['request_id'] = $request_id;
+
+  // Send xml data.
+  return poin2000_send($xml, $settings, $topup);
+}
+
+/**
+ * Private Functions.
+ */
+
+/**
+ * Function poin2000_send().
+ *
+ * @param string $data
+ *   XML post data.
+ * @param array $settings
+ *   Post settings.
+ * @param array $topup
+ *   Optional topup data for debug.
+ *
+ * @return mixed
+ *   Object if success, and FALSE otherwise.
+ */
+function poin2000_send($data, $settings, $topup = array()) {
+  // Define default endpoint.
+  $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
+  // Define return value flag.
+  $return = FALSE;
+
+  // Define option for http request.
+  $http_options = array(
+    'headers' => array(
+      'Content-Type' => 'application/xml',
+    ),
+    'max_redirects' => 0,
+    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 10.0,
+    'method' => 'POST',
+    'data' => $data,
+  );
+
+  // Only for development.
+  if ($settings['environment'] == 'dev' && !empty($topup)) {
+    // Create XML: Success response.
+    $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+    $params = $xml->addChild('params');
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $struct = $value->addChild('struct');
+    // Add member: response code.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'RESPONSECODE');
+    $value = $member->addChild('value');
+    $value->addChild('string', '00');
+    // Add member: request id.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'REQUESTID');
+    $value = $member->addChild('value');
+    $value->addChild('string', $topup['request_id']);
+    // Add member: message.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'MESSAGE');
+    $value = $member->addChild('value');
+    $value->addChild('string', 'BERHASIL');
+    // Add member: SN.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'SN');
+    $value = $member->addChild('value');
+    $value->addChild('string', '15011960601727');
+    // Add member: TRANSACTIONID.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'TRANSACTIONID');
+    $value = $member->addChild('value');
+    $value->addChild('string', '204576');
+    // Generate xml.
+    $devel[] = $xml->asXML();
+
+    // Create XML: Failed response.
+    $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+    $params = $xml->addChild('params');
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $struct = $value->addChild('struct');
+    // Add member: response code.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'RESPONSECODE');
+    $value = $member->addChild('value');
+    $value->addChild('string', '');
+    // Add member: request id.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'REQUESTID');
+    $value = $member->addChild('value');
+    $value->addChild('string', $topup['request_id']);
+    // Add member: message.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'MESSAGE');
+    $value = $member->addChild('value');
+    $value->addChild('string', 'INVALID');
+    // Add member: TRANSACTIONID.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'TRANSACTIONID');
+    $value = $member->addChild('value');
+    $value->addChild('string', '204576');
+    // Generate xml.
+    $devel[] = $xml->asXML();
+
+    // Create XML: Pending response.
+    $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+    $params = $xml->addChild('params');
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $struct = $value->addChild('struct');
+    // Add member: response code.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'RESPONSECODE');
+    $value = $member->addChild('value');
+    $value->addChild('string', '68');
+    // Add member: request id.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'REQUESTID');
+    $value = $member->addChild('value');
+    $value->addChild('string', $topup['request_id']);
+    // Add member: message.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'MESSAGE');
+    $value = $member->addChild('value');
+    $value->addChild('string', 'PENDING');
+    // Add member: TRANSACTIONID.
+    $member = $struct->addChild('member');
+    $member->addChild('name', 'TRANSACTIONID');
+    $value = $member->addChild('value');
+    $value->addChild('string', '204576');
+    // Generate xml.
+    $devel[] = $xml->asXML();
+
+    // Generate random number.
+    $random = 0;
+
+    // Return random xml response.
+    return TOPUP_FAILED;
+  }
+
+  // Check whether we have endpoint.
+  if (!empty($endpoint)) {
+    // Do HTTP Request: input validation already available.
+    $result = drupal_http_request($endpoint, $http_options);
+
+    // Check the result:
+    // 1. Must have 200 http code.
+    // 2. Must have data.
+    if (isset($result->code) && $result->code == 200
+      && isset($result->data) && !empty($result->data)
+    ) {
+      // Set return value.
+      $return = $result;
+    }
+
+    // Log this condition, everything get log.
+    watchdog('poin2000', 'Send data with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+      '@status' => ($return) ? 'OK' : 'BAD',
+      '!debug' => print_r($result, TRUE),
+      '!options' => print_r($http_options, TRUE),
+    ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Poin2000: Send'), request_path()));
+  }
+
+  // Check return value: has object data.
+  if (!empty($return)) {
+    // Get xml data.
+    $result_xml = simplexml_load_string(trim($return));
+    // Check xml data.
+    if ($result_xml !== FALSE && isset($result_xml->params->param->value->struct)) {
+      // Get XML value.
+      $container = array();
+      foreach ((array) $result_xml->params->param->value->struct->children() as $child) {
+        if (isset($child->name) && isset($child->value->string)) {
+          $container[$child->name->__toString()] = $child->value->string->__toString();
+        }
+      }
+      // Log this container data.
+      watchdog('poin2000', 'TopUp Process Result <pre>@result</pre>', array(
+        '@result' => print_r($container, TRUE),
+      ), WATCHDOG_INFO, l(t('Poin2000: TopUp Process'), request_path()));
+      // Check the value: RESPONSECODE.
+      if (isset($container['RESPONSECODE'])) {
+        switch ($container['RESPONSECODE']) {
+          case '00':
+            // Return: topup success.
+            return TOPUP_SUCCESS;
+
+          case '68':
+            // Return: topup pending.
+            return TOPUP_PENDING;
+        }
+      }
+    }
+  }
+
+  return TOPUP_FAILED;
+}
+
+/**
+ * Function poin2000_generate_request_id().
+ *
+ * @param array $topup
+ *   Topup data.
+ *
+ * @return string
+ *   Request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+ */
+function poin2000_generate_request_id($topup) {
+  // Generate request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+  $request_id = str_pad($topup['line_item_id'], 10, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['topup_id'], 2, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['try'], 2, '0', STR_PAD_LEFT);
+  return $request_id;
+}

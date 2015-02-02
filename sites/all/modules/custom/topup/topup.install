@@ -1,0 +1,37 @@
+<?php
+/**
+ * @file
+ * topup.install
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Implements hook_install().
+ */
+function topup_install() {
+  // Initialize topup variables:
+  // 1. Line item type.
+  variable_set('topup_lineitem_type', 'mobile_prepaid');
+  // 2. Field in line item which provide phone number.
+  variable_set('topup_field_phone_number', 'field_phone_number');
+  // 3. Field in product which provide name of topup provider.
+  variable_set('topup_field_provider', 'field_api_provider');
+  // 4. Field in product which provide topup code.
+  variable_set('topup_field_code', 'field_package_code');
+  // 5. Topup number of request try.
+  variable_set('topup_try', 3);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function topup_uninstall() {
+  // Delete topup variables.
+  variable_del('topup_lineitem_type');
+  variable_del('topup_field_phone_number');
+  variable_del('topup_field_provider');
+  variable_del('topup_field_code');
+  variable_del('topup_try');
+  // @todo: delete variable topup_providers_settings_*
+}

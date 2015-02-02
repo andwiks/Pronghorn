@@ -1,0 +1,369 @@
+<?php
+/**
+ * @file
+ * topup.module
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Top up request is success.
+ */
+define('TOPUP_SUCCESS', 1);
+
+/**
+ * Top up request is pending.
+ */
+define('TOPUP_PENDING', 2);
+
+/**
+ * Top up request is failed.
+ */
+define('TOPUP_FAILED', 0);
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function topup_cron_queue_info() {
+  $queue = array();
+  // Topup queue process.
+  $queues['topup_process'] = array(
+    'worker callback' => 'topup_queue_process',
+    'time' => 120,
+  );
+  // Topup queue query.
+  $queues['topup_query'] = array(
+    'worker callback' => 'topup_queue_query',
+    'time' => 120,
+  );
+  // Return queue array.
+  return $queues;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function topup_menu() {
+  $items = array();
+
+  // Topup settings page.
+  $items['admin/commerce/config/topup'] = array(
+    'title' => 'Top up settings',
+    'description' => 'Top up settings page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('topup_settings_form'),
+    'access arguments' => array('configure store'),
+    'file' => 'topup.admin.inc',
+  );
+
+  // Topup provider page.
+  $items['admin/commerce/config/topup/provider'] = array(
+    'title' => 'Top up Provider',
+    'description' => 'Top up provider page',
+    'page callback' => 'topup_provider_page',
+    'access arguments' => array('configure store'),
+    'file' => 'topup.admin.inc',
+  );
+
+  // Get all topup providers.
+  $providers = topup_providers();
+
+  // Topup provider setting page.
+  foreach ($providers as $provider_id => $provider_data) {
+    $items['admin/commerce/config/topup/provider/' . $provider_id] = array(
+      'title' => $provider_data['title'],
+      'description' => $provider_data['description'],
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('topup_provider_settings_form'),
+      'access arguments' => array('configure store'),
+      'file' => 'topup.admin.inc',
+    );
+
+    $items['admin/commerce/config/topup/provider/' . $provider_id . '/code'] = array(
+      'title' => $provider_data['title'] . ' code',
+      'description' => $provider_data['description'] . ' code settings',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('topup_provider_code_settings_form'),
+      'access arguments' => array('configure store'),
+      'file' => 'topup.admin.inc',
+    );
+
+    $items['admin/commerce/config/topup/provider/' . $provider_id . '/disable'] = array(
+      'title' => $provider_data['title'] . ' disable',
+      'description' => $provider_data['description'] . ' disable',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('topup_provider_status_form'),
+      'access arguments' => array('configure store'),
+      'file' => 'topup.admin.inc',
+    );
+
+    $items['admin/commerce/config/topup/provider/' . $provider_id . '/enable'] = array(
+      'title' => $provider_data['title'] . ' enable',
+      'description' => $provider_data['description'] . ' enable',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('topup_provider_status_form'),
+      'access arguments' => array('configure store'),
+      'file' => 'topup.admin.inc',
+    );
+
+    $items['admin/commerce/config/topup/provider/' . $provider_id . '/callback'] = array(
+      'title' => $provider_data['title'] . ' callback',
+      'description' => $provider_data['description'] . ' callback',
+      'page callback' => 'topup_callback',
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK,
+    );
+  }
+
+  return $items;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function topup_queue_process().
+ *
+ * @param array $topup
+ *   Topup data array.
+ */
+function topup_queue_process($topup = array()) {
+  topup_queue('process', $topup);
+}
+
+/**
+ * Function topup_queue_query().
+ *
+ * @param array $topup
+ *   Topup data array.
+ */
+function topup_queue_query($topup = array()) {
+  topup_queue('query', $topup);
+}
+
+/**
+ * Function topup_callback().
+ */
+function topup_callback() {
+  // Get provider id.
+  $provider_id = arg(5);
+  // Get all providers.
+  $providers = topup_providers();
+  // Check whether provider id is available.
+  if (isset($providers[$provider_id])) {
+    // Get topup callback.
+    $callback = $providers[$provider_id]['base'] . '_topup_callback';
+    // Check topup process callback.
+    if (function_exists($callback) && is_callable($callback)) {
+      call_user_func($callback);
+    }
+  }
+  else {
+    drupal_access_denied();
+  }
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function topup_queue().
+ *
+ * @param string $op
+ *   Queue operation: process|query.
+ * @param array $topup
+ *   Topup data.
+ */
+function topup_queue($op, $topup) {
+  // Get all providers.
+  $providers = topup_providers();
+  // Check topup providers.
+  if (isset($topup['field_topup_provider']) && isset($providers[$topup['field_topup_provider']])) {
+    // Get topup callback.
+    $callback = $providers[$topup['field_topup_provider']]['base'] . '_topup_' . $op;
+    // Check topup process callback.
+    if (function_exists($callback) && is_callable($callback)) {
+      $result = $callback($topup, $providers[$topup['field_topup_provider']]['settings']);
+      // Check result status.
+      switch ($result) {
+        case TOPUP_FAILED:
+          // Check whether topup try has not been reach.
+          if ($topup['try'] < variable_get('topup_try', 3)) {
+            // Add try data.
+            $topup['try'] = $topup['try'] + 1;
+            // Queue it once again.
+            $queue = DrupalQueue::get('topup_process');
+            $queue->createItem($topup);
+          }
+          else {
+            // Load line item wrapper.
+            $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
+            $topup_data = $line_item_wrapper->field_topup_data->value();
+            $topup_data[$topup['topup_id']] = $topup['topup_id'] . ':' . topup_translate_status(TOPUP_FAILED);
+            $line_item_wrapper->field_topup_data->set($topup_data);
+
+            // Check total quantity.
+            if ($topup['topup_total'] == 1) {
+              $failed = 1;
+            }
+            else {
+              $failed = 0;
+              // Check topup data.
+              for ($i = 0; $i < $topup['topup_total']; $i++) {
+                // Check topup data: using $i.
+                if (isset($topup_data[$i]) && $topup_data[$i] == TOPUP_FAILED) {
+                  $failed++;
+                }
+              }
+            }
+
+            // Update topup status if total success >= topup total.
+            if ($failed >= $topup['topup_total']) {
+              $line_item_wrapper->field_topup_status->set(TOPUP_FAILED);
+            }
+
+            // Save line item.
+            $line_item_wrapper->save();
+          }
+          break;
+
+        case TOPUP_PENDING:
+          // Queue it once again.
+          $queue = DrupalQueue::get('topup_query');
+          $queue->createItem($topup);
+          break;
+
+        case TOPUP_SUCCESS:
+          // Load line item wrapper.
+          $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
+          $topup_data = $line_item_wrapper->field_topup_data->value();
+          $topup_data[$topup['topup_id']] = $topup['topup_id'] . ':' . topup_translate_status(TOPUP_SUCCESS);
+          $line_item_wrapper->field_topup_data->set($topup_data);
+
+          // Check total quantity.
+          if ($topup['topup_total'] == 1) {
+            $success = 1;
+          }
+          else {
+            $success = 0;
+            // Check topup data.
+            for ($i = 0; $i < $topup['topup_total']; $i++) {
+              // Check topup data: using $i.
+              if (isset($topup_data[$i]) && $topup_data[$i] == TOPUP_SUCCESS) {
+                $success++;
+              }
+            }
+          }
+
+          // Update topup status if total success >= topup total.
+          if ($success >= $topup['topup_total']) {
+            $line_item_wrapper->field_topup_status->set(TOPUP_SUCCESS);
+          }
+
+          // Save line item.
+          $line_item_wrapper->save();
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * Function topup_providers().
+ *
+ * Get list of all topup providers.
+ *
+ * @return array.
+ */
+function topup_providers() {
+  $providers = &drupal_static(__FUNCTION__);
+
+  if (!isset($providers)) {
+    $providers = array();
+
+    // Build the provider array, including module names for the purpose
+    // of including files if necessary.
+    foreach (module_implements('topup_provider_info') as $module) {
+      foreach (module_invoke($module, 'topup_provider_info') as $base => $provider) {
+        // Get provider list.
+        $ids = variable_get('topup_providers_' . $base, array($base));
+        // Looping for each id.
+        foreach ($ids as $id) {
+          $providers[$id] = $provider;
+          // Get provider status.
+          $providers[$id]['status'] = variable_get('topup_providers_status_' . $id, $providers[$id]['status']);
+          // Get providers base callback name.
+          $providers[$id]['base'] = $base;
+          // Get providers settings.
+          $providers[$id]['settings'] = variable_get('topup_providers_settings_' . $id, array());
+        }
+      }
+    }
+
+    drupal_alter('commerce_payment_method_info', $providers);
+  }
+
+  return $providers;
+}
+
+/**
+ * Function topup_provider_get_all_codes().
+ *
+ * @return array
+ *   Topup code array.
+ */
+function topup_provider_get_all_codes() {
+  $codes = &drupal_static(__FUNCTION__);
+
+  if (!isset($codes)) {
+    $codes = array();
+
+    // Get topup providers.
+    $providers = topup_providers();
+
+    // Looping for each provider.
+    foreach ($providers as $provider_data) {
+      // Check provider code info.
+      $code_info = $provider_data['base'] . '_topup_code_info';
+      if (function_exists($code_info) && is_callable($code_info)) {
+        $provider_codes = $code_info();
+        foreach ($provider_codes as $code => $code_data) {
+          $codes[$provider_data['title']][$code] = $code_data;
+        }
+      }
+    }
+  }
+
+  return $codes;
+}
+
+/**
+ * Function topup_translate_status().
+ *
+ * @param int $status
+ *   Topup status.
+ *
+ * @return string
+ *   Translated topup status.
+ */
+function topup_translate_status($status) {
+  switch ($status) {
+    case TOPUP_SUCCESS:
+      return t('Success');
+
+    case TOPUP_PENDING:
+      return t('Pending');
+
+    case TOPUP_FAILED:
+      return t('Failed');
+
+    default:
+      return t('Unknown');
+  }
+}

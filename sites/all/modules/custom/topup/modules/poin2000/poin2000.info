@@ -1,0 +1,8 @@
+name = "Poin 2000"
+description = "Provide Poin 2000 top up integration."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/commerce/config/topup/provider/poin2000
+
+dependencies[] = topup

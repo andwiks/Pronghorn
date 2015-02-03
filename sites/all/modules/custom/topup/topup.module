@@ -4,6 +4,8 @@
  * topup.module
  *
  * @author andre4s_y
+ *
+ * @todo: 'terminal' => TRUE, handle.
  */
 
 /**
@@ -291,18 +293,13 @@ function topup_providers() {
     // of including files if necessary.
     foreach (module_implements('topup_provider_info') as $module) {
       foreach (module_invoke($module, 'topup_provider_info') as $base => $provider) {
-        // Get provider list.
-        $ids = variable_get('topup_providers_' . $base, array($base));
-        // Looping for each id.
-        foreach ($ids as $id) {
-          $providers[$id] = $provider;
-          // Get provider status.
-          $providers[$id]['status'] = variable_get('topup_providers_status_' . $id, $providers[$id]['status']);
-          // Get providers base callback name.
-          $providers[$id]['base'] = $base;
-          // Get providers settings.
-          $providers[$id]['settings'] = variable_get('topup_providers_settings_' . $id, array());
-        }
+        $providers[$base] = $provider;
+        // Get provider status.
+        $providers[$base]['status'] = variable_get('topup_providers_status_' . $base, $providers[$base]['status']);
+        // Get providers base callback name.
+        $providers[$base]['base'] = $module;
+        // Get providers settings.
+        $providers[$base]['settings'] = variable_get('topup_providers_settings_' . $base, array());
       }
     }
 
@@ -328,13 +325,15 @@ function topup_provider_get_all_codes() {
     $providers = topup_providers();
 
     // Looping for each provider.
-    foreach ($providers as $provider_data) {
+    foreach ($providers as $provider_id => $provider_data) {
       // Check provider code info.
       $code_info = $provider_data['base'] . '_topup_code_info';
       if (function_exists($code_info) && is_callable($code_info)) {
-        $provider_codes = $code_info();
-        foreach ($provider_codes as $code => $code_data) {
-          $codes[$provider_data['title']][$code] = $code_data;
+        $provider_codes = call_user_func($code_info);
+
+        // Check whether provider id is exists or info only provide codes.
+        if (isset($provider_codes[$provider_id])) {
+          $codes[$provider_id] = $provider_codes[$provider_id];
         }
       }
     }

@@ -211,7 +211,7 @@ function topup_settings_form_submit($form, &$form_state) {
     // Update field allowed value settings.
     $allowed_values = array();
     foreach ($providers as $provider_id => $provider_data) {
-      $allowed_values[$provider_id] = $provider_data['title'];
+      $allowed_values[$provider_id] = $provider_data['title'] . ' (' . $provider_id . ')';
     }
     $info['settings']['allowed_values'] = $allowed_values;
     // Save the field.
@@ -219,6 +219,7 @@ function topup_settings_form_submit($form, &$form_state) {
   }
 
   // Check field topup_field_code.
+  // @todo: update package code pattern
   if (isset($properties[$form_state['values']['topup_field_code']])) {
     // Get field info.
     $info = field_info_field($form_state['values']['topup_field_code']);
@@ -316,7 +317,7 @@ function topup_provider_page() {
       // Create tabular rows.
       $rows[] = array(
         'data' => array(
-          'title' => $provider['title'] . '<br />(' . $id . ')',
+          'title' => $provider['title'] . '<br />(' . $provider['base'] . ')',
           'description' => $provider['description'],
           'endpoint' => (isset($provider['settings']['endpoint'])) ? $provider['settings']['endpoint'] : '-',
           'operations' => $operations,

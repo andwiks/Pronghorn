@@ -1,0 +1,8 @@
+name = "Otomax XML RPC"
+description = "Provide Otomax XML RPC top up integration."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/commerce/config/topup/provider/otomax
+
+dependencies[] = topup

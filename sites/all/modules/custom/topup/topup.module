@@ -86,7 +86,7 @@ function topup_menu() {
     );
 
     $items['admin/commerce/config/topup/provider/' . $provider_id . '/code'] = array(
-      'title' => $provider_data['title'] . ' code',
+      'title' => 'Code settings',
       'description' => $provider_data['description'] . ' code settings',
       'page callback' => 'drupal_get_form',
       'page arguments' => array('topup_provider_code_settings_form'),
@@ -101,6 +101,7 @@ function topup_menu() {
       'page arguments' => array('topup_provider_status_form'),
       'access arguments' => array('configure store'),
       'file' => 'topup.admin.inc',
+      'type' => MENU_CALLBACK,
     );
 
     $items['admin/commerce/config/topup/provider/' . $provider_id . '/enable'] = array(
@@ -110,6 +111,7 @@ function topup_menu() {
       'page arguments' => array('topup_provider_status_form'),
       'access arguments' => array('configure store'),
       'file' => 'topup.admin.inc',
+      'type' => MENU_CALLBACK,
     );
 
     $items['admin/commerce/config/topup/provider/' . $provider_id . '/callback'] = array(

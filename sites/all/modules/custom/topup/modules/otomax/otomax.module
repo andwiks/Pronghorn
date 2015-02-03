@@ -94,11 +94,11 @@ function otomax_topup_code_info() {
   $codes['HS50'] = array('price' => 49300, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
   $codes['HS100'] = array('price' => 97300, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
   $codes['HSP5'] = array('price' => 5600, 'title' => t('TELKOMSEL_NASIONAL 5 Rb'),);
-//   $codes['HSP10'] = array('price' => 10300, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
+  $codes['HSP10'] = array('price' => 10300, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
   $codes['HSP20'] = array('price' => 19925, 'title' => t('TELKOMSEL_NASIONAL 20 Rb'),);
-//   $codes['HSP25'] = array('price' => 24750, 'title' => t('TELKOMSEL_NASIONAL 25 Rb'),);
-//   $codes['HSP50'] = array('price' => 48550, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
-//   $codes['HSP100'] = array('price' => 96800, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
+  $codes['HSP25'] = array('price' => 24750, 'title' => t('TELKOMSEL_NASIONAL 25 Rb'),);
+  $codes['HSP50'] = array('price' => 48550, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
+  $codes['HSP100'] = array('price' => 96800, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
   $codes['HT1'] = array('price' => 1000, 'title' => t('THREE 1 Rb'),);
   $codes['HT5'] = array('price' => 4950, 'title' => t('THREE 5 Rb'),);
   $codes['HT10'] = array('price' => 9900, 'title' => t('THREE 10 Rb'),);

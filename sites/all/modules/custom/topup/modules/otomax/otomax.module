@@ -390,7 +390,6 @@ function otomax_send($data, $settings, $topup = array()) {
 
   // Check whether we have endpoint.
   if (!empty($endpoint)) {
-
     // Only for development.
     if ($settings['environment'] == 'dev' && !empty($topup)) {
       // Create XML: Success response.
@@ -512,6 +511,12 @@ function otomax_send($data, $settings, $topup = array()) {
         '!options' => print_r($http_options, TRUE),
       ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Otomax: Send'), request_path()));
     }
+  }
+  else {
+    watchdog('otomax', 'Invalid Otomax Endpoint <pre>!debug</pre> <pre>Options: !options</pre>', array(
+      '!debug' => print_r($settings, TRUE),
+      '!options' => print_r($http_options, TRUE),
+    ), WATCHDOG_ERROR, l(t('Otomax: Settings Error'), request_path()));
   }
 
   // Check return value: has object data.

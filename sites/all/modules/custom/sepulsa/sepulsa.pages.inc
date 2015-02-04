@@ -143,7 +143,7 @@ function sepulsa_phone_form($form, &$form_state) {
     '#ajax' => array(
       'callback' => 'sepulsa_autocomplete_cart',
       'wrapper' => 'sepulsa-autocomplete-cart',
-      'event' => 'ready change click blur',
+      'event' => 'ready change blur',
     ),
     '#prefix' => '<div id="sepulsa-autocomplete-packets">',
     '#suffix' => '</div>',

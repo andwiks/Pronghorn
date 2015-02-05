@@ -7,6 +7,8 @@ regions[page_bottom] = Page bottom
 regions[content] = Content
 regions[footer] = Footer
 
+regions[right] = Right Bar
+
 version = "0.1"
 
 stylesheets[all][] = css/bootstrap.min.css

@@ -1,0 +1,11 @@
+name = "Top Up"
+description = "Provide general functionality for top up integrations."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/commerce/config/topup
+
+dependencies[] = commerce_line_item
+dependencies[] = commerce_line_item_ui
+dependencies[] = commerce_order
+dependencies[] = commerce_order_ui

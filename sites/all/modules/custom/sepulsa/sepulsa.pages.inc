@@ -98,8 +98,8 @@ function sepulsa_phone_form($form, &$form_state) {
 
   // Check whether phone number is available.
   if (!empty($phone)) {
-    // Add operator options based on phone number input.
-    $options += sepulsa_get_card_type($phone);
+    // Add operator options based on operator.
+    $options += (isset($options[$operator])) ? sepulsa_get_card_type(array($operator => $options[$operator])) : array();
     // Define default value for card type.
     $card_type = (isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])) ? $form_state['values']['card_type'] : 0;
     $card_type = intval($card_type);
@@ -143,7 +143,7 @@ function sepulsa_phone_form($form, &$form_state) {
     '#ajax' => array(
       'callback' => 'sepulsa_autocomplete_cart',
       'wrapper' => 'sepulsa-autocomplete-cart',
-      'event' => 'ready change click blur',
+      'event' => 'ready change blur',
     ),
     '#prefix' => '<div id="sepulsa-autocomplete-packets">',
     '#suffix' => '</div>',
@@ -563,7 +563,6 @@ function sepulsa_get_operator($phone) {
 function sepulsa_get_card_type($operator) {
   // Define default options as return value.
   $options = array();
-
   // Get operator term id.
   $tid = key($operator);
 
@@ -601,24 +600,24 @@ function sepulsa_get_card_type($operator) {
 function sepulsa_get_packet($nid) {
   // Define default packet options.
   $options = array();
-  // Load node object: maybe to slow?
-  $node = node_load($nid);
-  // Check node load result.
-  // Check node type: pulsa.
-  // Check available field_product.
-  if (!empty($node) && isset($node->type) && $node->type == 'pulsa'
-    && isset($node->field_product) && !empty($node->field_product)
+
+  // Load node wrapper.
+  $node_wrapper = entity_metadata_wrapper('node', $nid);
+  // Check node type and node status.
+  if ($node_wrapper->type->value() == 'pulsa' && !empty($node_wrapper->status->value())
   ) {
-    // Get all product data.
-    $products = field_get_items('node', $node, 'field_product');
+    // Get product object.
+    $products = $node_wrapper->field_product->value();
     // Looping for each product.
     foreach ($products as $product) {
-      // Load product: maybe to slow?
-      $product_object = commerce_product_load($product['product_id']);
-      // Add it inside options array.
-      $options[$product['product_id']] = $product_object->title;
+      // Check product status.
+      if (!empty($product->status)) {
+        // Add it inside options array.
+        $options[$product->product_id] = $product->title;
+      }
     }
   }
+
   // Return options.
   return $options;
 }

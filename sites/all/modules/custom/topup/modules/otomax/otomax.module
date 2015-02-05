@@ -1,0 +1,578 @@
+<?php
+/**
+ * @file
+ * otomax.module
+ *
+ * @author andre4s_y
+ *
+ * @todo provide callback function for callback.
+ * @todo terminal handler.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_topup_provider_info().
+ */
+function otomax_topup_provider_info() {
+  $providers = array();
+
+  $providers['poin2000'] = array(
+    'title' => t('Poin 2000'),
+    'description' => t('Poin 2000 Topup Provider Integration'),
+    'status' => TRUE,
+  );
+
+  $providers['fastcom'] = array(
+    'title' => t('Fastcom'),
+    'description' => t('Fastcom Topup Provider Integration'),
+    'status' => TRUE,
+  );
+
+  return $providers;
+}
+
+/**
+ * Implements hook_topup_code_info().
+ */
+function otomax_topup_code_info() {
+  $codes = array();
+
+  $codes['HB25'] = array('price' => 24100, 'title' => t('BOLT 25 Rb'),);
+  $codes['HB50'] = array('price' => 48100, 'title' => t('BOLT 50 Rb'),);
+  $codes['HB100'] = array('price' => 96100, 'title' => t('BOLT 100 Rb'),);
+  $codes['HB150'] = array('price' => 144100, 'title' => t('BOLT 150 Rb'),);
+  $codes['HB200'] = array('price' => 192100, 'title' => t('BOLT 200 Rb'),);
+  $codes['HE1'] = array('price' => 950, 'title' => t('ESIA 1 Rb'),);
+  $codes['HE5'] = array('price' => 4700, 'title' => t('ESIA 5 Rb'),);
+  $codes['HE10'] = array('price' => 9600, 'title' => t('ESIA 10 Rb'),);
+  $codes['HE25'] = array('price' => 24400, 'title' => t('ESIA 25 Rb'),);
+  $codes['HE50'] = array('price' => 48500, 'title' => t('ESIA 50 Rb'),);
+  $codes['HE100'] = array('price' => 96800, 'title' => t('ESIA 100 Rb'),);
+  $codes['HEN5'] = array('price' => 5150, 'title' => t('ESIA_NASIONAL 5 Rb'),);
+  $codes['HEN10'] = array('price' => 10150, 'title' => t('ESIA_NASIONAL 10 Rb'),);
+  $codes['HEN25'] = array('price' => 24400, 'title' => t('ESIA_NASIONAL 25 Rb'),);
+  $codes['HEN50'] = array('price' => 48500, 'title' => t('ESIA_NASIONAL 50 Rb'),);
+  $codes['HEN100'] = array('price' => 96800, 'title' => t('ESIA_NASIONAL 100 Rb'),);
+  $codes['HF5'] = array('price' => 4750, 'title' => t('FLEXI_NASIONAL 5 Rb'),);
+  $codes['HF10'] = array('price' => 9500, 'title' => t('FLEXI_NASIONAL 10 Rb'),);
+  $codes['HF20'] = array('price' => 19000, 'title' => t('FLEXI_NASIONAL 20 Rb'),);
+  $codes['HF25'] = array('price' => 23750, 'title' => t('FLEXI_NASIONAL 25 Rb'),);
+  $codes['HF50'] = array('price' => 47500, 'title' => t('FLEXI_NASIONAL 50 Rb'),);
+  $codes['HF100'] = array('price' => 95000, 'title' => t('FLEXI_NASIONAL 100 Rb'),);
+  $codes['HF150'] = array('price' => 145000, 'title' => t('FLEXI_NASIONAL 150  Rb'),);
+  $codes['HI5'] = array('price' => 5400, 'title' => t('INDOSAT_REGULAR_NASIONAL 5 Rb'),);
+  $codes['HI10'] = array('price' => 10400, 'title' => t('INDOSAT_REGULAR_NASIONAL 10 Rb'),);
+  $codes['HI12'] = array('price' => 12150, 'title' => t('INDOSAT_REGULAR_NASIONAL 12 Rb'),);
+  $codes['HI20'] = array('price' => 20300, 'title' => t('INDOSAT_REGULAR_NASIONAL 20 Rb'),);
+  $codes['HI25'] = array('price' => 24850, 'title' => t('INDOSAT_REGULAR_NASIONAL 25 Rb'),);
+  $codes['HI50'] = array('price' => 49350, 'title' => t('INDOSAT_REGULAR_NASIONAL 50 Rb'),);
+  $codes['HI100'] = array('price' => 98000, 'title' => t('INDOSAT_REGULAR_NASIONAL 100 Rb'),);
+//   $codes['HIG5'] = array('price' => 5400, 'title' => t('INDOSAT_GPRS 5 Rb'),);
+//   $codes['HIG10'] = array('price' => 10400, 'title' => t('INDOSAT_GPRS 10 Rb'),);
+//   $codes['HIG25'] = array('price' => 24850, 'title' => t('INDOSAT_GPRS 25 Rb'),);
+//   $codes['HIP5'] = array('price' => 5300, 'title' => t('INDOSAT_REGULAR_NASIONAL 5 Rb'),);
+//   $codes['HIP10'] = array('price' => 10300, 'title' => t('INDOSAT_REGULAR_NASIONAL 10 Rb'),);
+  $codes['HIP25'] = array('price' => 24850, 'title' => t('INDOSAT_REGULAR_NASIONAL 25 Rb'),);
+  $codes['HIP50'] = array('price' => 49350, 'title' => t('INDOSAT_REGULAR_NASIONAL 50 Rb'),);
+  $codes['HIP100'] = array('price' => 98000, 'title' => t('INDOSAT_REGULAR_NASIONAL 100 Rb'),);
+//   $codes['HIS5'] = array('price' => 5400, 'title' => t('INDOSAT_SMS 5 Rb'),);
+//   $codes['HIS10'] = array('price' => 10400, 'title' => t('INDOSAT_SMS 10 Rb'),);
+//   $codes['HIS25'] = array('price' => 24850, 'title' => t('INDOSAT_SMS 25 Rb'),);
+  $codes['HN5'] = array('price' => 5250, 'title' => t('AXIS 5 Rb'),);
+  $codes['HN10'] = array('price' => 10250, 'title' => t('AXIS 10 Rb'),);
+  $codes['HN25'] = array('price' => 24700, 'title' => t('AXIS 25 Rb'),);
+  $codes['HN50'] = array('price' => 49375, 'title' => t('AXIS 50 Rb'),);
+  $codes['HN100'] = array('price' => 98750, 'title' => t('AXIS 100 Rb'),);
+//   $codes[''] = array('price' => , 'title' => t(''),);
+  $codes['HS5'] = array('price' => 5650, 'title' => t('TELKOMSEL_NASIONAL 5 Rb'),);
+  $codes['HS10'] = array('price' => 10400, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
+  $codes['HS20'] = array('price' => 20000, 'title' => t('TELKOMSEL_NASIONAL 20 Rb'),);
+  $codes['HS25'] = array('price' => 24925, 'title' => t('TELKOMSEL_NASIONAL 25 Rb'),);
+  $codes['HS50'] = array('price' => 49300, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
+  $codes['HS100'] = array('price' => 97300, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
+  $codes['HSP5'] = array('price' => 5600, 'title' => t('TELKOMSEL_NASIONAL 5 Rb'),);
+//   $codes['HSP10'] = array('price' => 10300, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
+  $codes['HSP20'] = array('price' => 19925, 'title' => t('TELKOMSEL_NASIONAL 20 Rb'),);
+//   $codes['HSP25'] = array('price' => 24750, 'title' => t('TELKOMSEL_NASIONAL 25 Rb'),);
+//   $codes['HSP50'] = array('price' => 48550, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
+//   $codes['HSP100'] = array('price' => 96800, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
+  $codes['HT1'] = array('price' => 1000, 'title' => t('THREE 1 Rb'),);
+  $codes['HT5'] = array('price' => 4950, 'title' => t('THREE 5 Rb'),);
+  $codes['HT10'] = array('price' => 9900, 'title' => t('THREE 10 Rb'),);
+  $codes['HT20'] = array('price' => 19800, 'title' => t('THREE 20 Rb' ),);
+  $codes['HT30'] = array('price' => 29700, 'title' => t('THREE 30 Rb'),);
+  $codes['HT40'] = array('price' => 39600, 'title' => t('THREE 40 Rb'),);
+  $codes['HT50'] = array('price' => 49350, 'title' => t('THREE 50 Rb'),);
+  $codes['HT100'] = array('price' => 98500, 'title' => t('THREE 100 Rb'),);
+//   $codes['HTD1'] = array('price' => 47500, 'title' => t('THREEDATA_1GB'),);
+//   $codes['HTD2'] = array('price' => 71250, 'title' => t('THREEDATA_2GB'),);
+//   $codes['HTD5'] = array('price' => 118750, 'title' => t('THREEDATA_5GB'),);
+//   $codes['HTD500'] = array('price' => 33250, 'title' => t('THREEDATA_500MB'),);
+  $codes['HTM100'] = array('price' => 80000, 'title' => t('THREE 100 Rb'),);
+  $codes['HTM200'] = array('price' => 140000, 'title' => t('THREE 200 Rb'),);
+  $codes['HXBP25'] = array('price' => 21500, 'title' => t('XL_BAGIPULSA_25RB'),);
+  $codes['HXBP51'] = array('price' => 44000, 'title' => t('XL_BAGIPULSA_51RB'),);
+  $codes['HXBP100'] = array('price' => 86000, 'title' => t('XL_BAGIPULSA_100RB'),);
+  $codes['HXBP101'] = array('price' => 87000, 'title' => t('XL_BAGIPULSA_101RB'),);
+  $codes['HXBP200'] = array('price' => 172000, 'title' => t('XL_BAGIPULSA_200RB'),);
+  $codes['HXR5'] = array('price' => 5300, 'title' => t('XL_NASIONAL 5 Rb'),);
+  $codes['HXR10'] = array('price' => 10350, 'title' => t('XL_NASIONAL 10 Rb'),);
+  $codes['HXR25'] = array('price' => 24650, 'title' => t('XL_NASIONAL 25 Rb'),);
+  $codes['HXR50'] = array('price' => 49375, 'title' => t('XL_NASIONAL 50 Rb'),);
+  $codes['HXR100'] = array('price' => 98750, 'title' => t('XL_NASIONAL 100 Rb'),);
+  $codes['HXR200'] = array('price' => 198000, 'title' => t('XL_NASIONAL 200 Rb'),);
+  $codes['HXRP5'] = array('price' => 5250, 'title' => t('XL_NASIONAL 5 Rb'),);
+//   $codes['HXRP10'] = array('price' => 10250, 'title' => t('XL_NASIONAL 10 Rb'),);
+  $codes['HY5'] = array('price' => 4850, 'title' => t('SMARTFREN 5 Rb'),);
+  $codes['HY10'] = array('price' => 9700, 'title' => t('SMARTFREN 10 Rb'),);
+  $codes['HY20'] = array('price' => 19400, 'title' => t('SMARTFREN 20 Rb'),);
+  $codes['HY25'] = array('price' => 24250, 'title' => t('SMARTFREN 25 Rb'),);
+  $codes['HY50'] = array('price' => 48500, 'title' => t('SMARTFREN 50 Rb'),);
+  $codes['HY100'] = array('price' => 97000, 'title' => t('SMARTFREN 100 Rb'),);
+  $codes['HYN5'] = array('price' => 4875, 'title' => t('SMARTFREN_NASIONAL 5 Rb'),);
+  $codes['HYN10'] = array('price' => 9750, 'title' => t('SMARTFREN_NASIONAL 10 Rb'),);
+  $codes['HYN20'] = array('price' => 19500, 'title' => t('SMARTFREN_NASIONAL 20 Rb'),);
+  $codes['HYN25'] = array('price' => 24375, 'title' => t('SMARTFREN_NASIONAL 25 Rb'),);
+  $codes['HYN50'] = array('price' => 48750, 'title' => t('SMARTFREN_NASIONAL 50 Rb'),);
+  $codes['HYN100'] = array('price' => 97500, 'title' => t('SMARTFREN_NASIONAL 100 Rb'),);
+  $codes['ITP25'] = array('price' => 21000, 'title' => t('INDOSAT_TRANSFER_PULSA 25 Rb'),);
+  $codes['ITP50'] = array('price' => 41000, 'title' => t('INDOSAT_TRANSFER_PULSA 50 Rb'),);
+  $codes['ITP100'] = array('price' => 80000, 'title' => t('INDOSAT_TRANSFER_PULSA 100 Rb'),);
+  $codes['SD5'] = array('price' => 5500, 'title' => t('SIMPATI_DATA_40MB'),);
+  $codes['SD10'] = array('price' => 10500, 'title' => t('SIMPATI_DATA_80MB'),);
+  $codes['SD20'] = array('price' => 20300, 'title' => t('SIMPATI_DATA_340MB'),);
+  $codes['SD25'] = array('price' => 25150, 'title' => t('SIMPATI_DATA_500MB'),);
+  $codes['SD50'] = array('price' => 49350, 'title' => t('SIMPATI_DATA_1GB'),);
+  $codes['SD100'] = array('price' => 97600, 'title' => t('SIMPATI_DATA_3GB'),);
+  $codes['VT100'] = array('price' => 98250, 'title' => t('V-TRI'),);
+  $codes['VT200'] = array('price' => 196500, 'title' => t('V-TRI'),);
+  $codes['VT300'] = array('price' => 294750, 'title' => t('V-TRI'),);
+  $codes['VT400'] = array('price' => 393000, 'title' => t('V-TRI'),);
+  $codes['VT500'] = array('price' => 491250, 'title' => t('V-TRI'),);
+  $codes['VT1000'] = array('price' => 982500, 'title' => t('V-TRI'),);
+  $codes['VT2000'] = array('price' => 1965000, 'title' => t('V-TRI'),);
+  $codes['VT3000'] = array('price' => 2944500, 'title' => t('V-TRI'),);
+  $codes['VT5000'] = array('price' => 4900000, 'title' => t('V-TRI'),);
+  $codes['VT10000'] = array('price' => 9800000, 'title' => t('V-TRI'),);
+  $codes['VTR1'] = array('price' => 1, 'title' => t('V-TRI_REGISTRASI'),);
+  $codes['XBB49'] = array('price' => 41000, 'title' => t('XL_BB_GAUL_BULANAN'),);
+  $codes['XBB50'] = array('price' => 41000, 'title' => t('XL_BB_BIZZ_BULANAN'),);
+  $codes['XBB59'] = array('price' => 41000, 'title' => t('XL_BB_FULL_BIS_LITE_BULANAN'),);
+  $codes['XBF50'] = array('price' => 41000, 'title' => t('XL_BB_FULL_BIS_LITE_FREE_40RB'),);
+  $codes['XIH25'] = array('price' => 21000, 'title' => t('XL_HOTROD_3G+_2.1GB'),);
+  $codes['XIH49'] = array('price' => 41000, 'title' => t('XL_HOTROD_3G+_3GB'),);
+  $codes['XIH99'] = array('price' => 81000, 'title' => t('XL_HOTROD_3G+_5.1GB'),);
+  $codes['XIU49'] = array('price' => 41000, 'title' => t('XL_INTERNET_UNLIMITED'),);
+  $codes['XLF50'] = array('price' => 50000, 'title' => t('XL_FISIK_50RB'),);
+  $codes['XSN55'] = array('price' => 46000, 'title' => t('XL_SUPER_NGEBUT_11GB'),);
+
+  // @todo: improve this.
+  return array('fastcom' => $codes);
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function otomax_settings_form().
+ *
+ * Topup provider callback: settings form.
+ *
+ * @param array $settings
+ *   Setting form array.
+ *
+ * @return array
+ *   Form array.
+ */
+function otomax_settings_form($settings = array()) {
+  $form = array();
+
+  // Environment: dev or prod.
+  $form['environment'] = array(
+    '#type' => 'select',
+    '#title' => t('Environment'),
+    '#options' => array(
+      'dev' => t('Development'),
+      'prod' => t('Production'),
+    ),
+    '#default_value' => isset($settings['environment']) ? $settings['environment'] : 'dev',
+    '#description' => t('Development environment will not send real data and get response with dummy data.'),
+  );
+
+  // API Endpoint.
+  $form['endpoint'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint'),
+    '#default_value' => isset($settings['endpoint']) ? $settings['endpoint'] : '',
+    '#size' => 60,
+    '#maxlength' => 60,
+    '#description' => t('Otomax endpoint. Please input using full url.'),
+    '#required' => TRUE,
+  );
+
+  $form['timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint Timeout'),
+    '#default_value' => isset($settings['timeout']) ? $settings['timeout'] : 30,
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#description' => t('Otomax server endpoint timeout.'),
+    '#field_suffix' => t('s'),
+    '#required' => TRUE,
+  );
+
+  // MSISDN number.
+  $form['msisdn'] = array(
+    '#type' => 'textfield',
+    '#title' => t('MSISDN'),
+    '#default_value' => isset($settings['msisdn']) ? $settings['msisdn'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('Registered number at Otomax server system.'),
+    '#required' => TRUE,
+  );
+  // PIN number.
+  $form['pin'] = array(
+    '#type' => 'textfield',
+    '#title' => t('PIN'),
+    '#default_value' => isset($settings['pin']) ? $settings['pin'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('PIN for top up transaction.'),
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+/**
+ * Function otomax_topup_process().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function otomax_topup_process($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = $request_id = otomax_generate_request_id($topup);
+
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall></methodCall>');
+  $xml->addChild('methodName', 'topUpRequest');
+  $params = $xml->addChild('params');
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $struct = $value->addChild('struct');
+  // Add member: MSISDN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'MSISDN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['msisdn']);
+  // Add member: REQUESTID.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'REQUESTID');
+  $value = $member->addChild('value');
+  $value->addChild('string', $request_id);
+  // Add member: PIN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'PIN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['pin']);
+  // Add member: NOHP.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOHP');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_phone_number']);
+  // Add member: NOM.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOM');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_code']);
+  // Generate xml.
+  $xml = $xml->asXML();
+
+  // Send xml data.
+  return otomax_send($xml, $settings, $topup);
+}
+
+/**
+ * Function otomax_topup_query().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function otomax_topup_query($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = $request_id = otomax_generate_request_id($topup);
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall></methodCall>');
+  $xml->addChild('methodName', 'topUpInquiry');
+  $params = $xml->addChild('params');
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $struct = $value->addChild('struct');
+  // Add member: REQUESTID.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'REQUESTID');
+  $value = $member->addChild('value');
+  $value->addChild('string', $request_id);
+  // Add member: MSISDN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'MSISDN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['msisdn']);
+  // Add member: PIN.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'PIN');
+  $value = $member->addChild('value');
+  $value->addChild('string', $settings['pin']);
+  // Add member: NOHP.
+  $member = $struct->addChild('member');
+  $member->addChild('name', 'NOHP');
+  $value = $member->addChild('value');
+  $value->addChild('string', $topup['field_topup_phone_number']);
+  // Generate xml.
+  $xml = $xml->asXML();
+
+  // Add request id to topup data.
+  $topup['request_id'] = $request_id;
+
+  // Send xml data.
+  return otomax_send($xml, $settings, $topup);
+}
+
+/**
+ * Private Functions.
+ */
+
+/**
+ * Function otomax_send().
+ *
+ * @param string $data
+ *   XML post data.
+ * @param array $settings
+ *   Post settings.
+ * @param array $topup
+ *   Optional topup data for debug.
+ *
+ * @return mixed
+ *   Object if success, and FALSE otherwise.
+ */
+function otomax_send($data, $settings, $topup = array()) {
+  // Define default endpoint.
+  $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
+  // Define return value flag.
+  $return = FALSE;
+
+  // Define option for http request.
+  $http_options = array(
+    'headers' => array(
+      'Content-Type' => 'application/xml',
+    ),
+    'max_redirects' => 0,
+    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 10.0,
+    'method' => 'POST',
+    'data' => $data,
+  );
+
+  // Check whether we have endpoint.
+  if (!empty($endpoint)) {
+    // Only for development.
+    if ($settings['environment'] == 'dev' && !empty($topup)) {
+      // Create XML: Success response.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $struct = $value->addChild('struct');
+      // Add member: response code.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'RESPONSECODE');
+      $value = $member->addChild('value');
+      $value->addChild('string', '00');
+      // Add member: request id.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'REQUESTID');
+      $value = $member->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: message.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'MESSAGE');
+      $value = $member->addChild('value');
+      $value->addChild('string', 'BERHASIL');
+      // Add member: SN.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'SN');
+      $value = $member->addChild('value');
+      $value->addChild('string', '15011960601727');
+      // Add member: TRANSACTIONID.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'TRANSACTIONID');
+      $value = $member->addChild('value');
+      $value->addChild('string', '204576');
+      // Generate xml.
+      $devel[] = $xml->asXML();
+
+      // Create XML: Failed response.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $struct = $value->addChild('struct');
+      // Add member: response code.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'RESPONSECODE');
+      $value = $member->addChild('value');
+      $value->addChild('string', '');
+      // Add member: request id.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'REQUESTID');
+      $value = $member->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: message.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'MESSAGE');
+      $value = $member->addChild('value');
+      $value->addChild('string', 'INVALID');
+      // Add member: TRANSACTIONID.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'TRANSACTIONID');
+      $value = $member->addChild('value');
+      $value->addChild('string', '204576');
+      // Generate xml.
+      $devel[] = $xml->asXML();
+
+      // Create XML: Pending response.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $struct = $value->addChild('struct');
+      // Add member: response code.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'RESPONSECODE');
+      $value = $member->addChild('value');
+      $value->addChild('string', '68');
+      // Add member: request id.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'REQUESTID');
+      $value = $member->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: message.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'MESSAGE');
+      $value = $member->addChild('value');
+      $value->addChild('string', 'PENDING');
+      // Add member: TRANSACTIONID.
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'TRANSACTIONID');
+      $value = $member->addChild('value');
+      $value->addChild('string', '204576');
+      // Generate xml.
+      $devel[] = $xml->asXML();
+
+      // Generate random number.
+      $random = rand(0, 2);
+
+      // Return random xml response.
+      $return = $devel[$random];
+    }
+    else {
+       // Do real HTTP Request: input validation already available.
+      $result = drupal_http_request($endpoint, $http_options);
+
+      // Check the result:
+      // 1. Must have 200 http code.
+      // 2. Must have data.
+      if (isset($result->code) && $result->code == 200
+        && isset($result->data) && !empty($result->data)
+      ) {
+        // Set return value.
+        $return = $result->data;
+      }
+
+      // Log this condition, everything get log.
+      watchdog('otomax', 'Send data with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+        '@status' => ($return) ? 'OK' : 'BAD',
+        '!debug' => print_r($result, TRUE),
+        '!options' => print_r($http_options, TRUE),
+      ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Otomax: Send'), request_path()));
+    }
+  }
+  else {
+    watchdog('otomax', 'Invalid Otomax Endpoint <pre>!debug</pre> <pre>Options: !options</pre>', array(
+      '!debug' => print_r($settings, TRUE),
+      '!options' => print_r($http_options, TRUE),
+    ), WATCHDOG_ERROR, l(t('Otomax: Settings Error'), request_path()));
+  }
+
+  // Check return value: has object data.
+  if (!empty($return)) {
+    // Get xml data.
+    $result_xml = simplexml_load_string(trim($return));
+    // Check xml data.
+    if ($result_xml !== FALSE && isset($result_xml->params->param->value->struct)) {
+      // Get XML value.
+      $container = array();
+      foreach ((array) $result_xml->params->param->value->struct->children() as $child) {
+        if (isset($child->name) && isset($child->value->string)) {
+          $container[$child->name->__toString()] = $child->value->string->__toString();
+        }
+      }
+      // Log this container data.
+      watchdog('otomax', 'TopUp Process Result <pre>@result</pre>', array(
+        '@result' => print_r($container, TRUE),
+      ), WATCHDOG_INFO, l(t('Otomax: TopUp Process'), request_path()));
+      // Check the value: RESPONSECODE.
+      if (isset($container['RESPONSECODE'])) {
+        switch ($container['RESPONSECODE']) {
+          case '00':
+            // Return: topup success.
+            return TOPUP_SUCCESS;
+
+          case '68':
+            // Return: topup pending.
+            return TOPUP_PENDING;
+        }
+      }
+    }
+    else {
+      // Log this condition.
+      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre>', array(
+        '@result' => var_export($result_xml, TRUE),
+      ), WATCHDOG_ERROR, l(t('Otomax: TopUp Process XML'), request_path()));
+    }
+  }
+
+  return TOPUP_FAILED;
+}
+
+/**
+ * Function otomax_generate_request_id().
+ *
+ * @param array $topup
+ *   Topup data.
+ *
+ * @return string
+ *   Request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+ */
+function otomax_generate_request_id($topup) {
+  // Generate request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+  $request_id = str_pad($topup['line_item_id'], 10, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['topup_id'], 2, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['try'], 2, '0', STR_PAD_LEFT);
+  return $request_id;
+}

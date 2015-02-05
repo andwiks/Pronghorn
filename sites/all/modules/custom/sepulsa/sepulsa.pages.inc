@@ -604,7 +604,8 @@ function sepulsa_get_packet($nid) {
   // Load node wrapper.
   $node_wrapper = entity_metadata_wrapper('node', $nid);
   // Check node type and node status.
-  if ($node_wrapper->type->value() == 'pulsa' && !empty($node_wrapper->status->value())
+  if ($node_wrapper->type->value() == 'pulsa'
+    && $node_wrapper->status->value() == 1
   ) {
     // Get product object.
     $products = $node_wrapper->field_product->value();

@@ -66,6 +66,25 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
     
+  } else if ($form_id == "commerce_checkout_form_checkout") {
+    global $user;
+    
+    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    $form['cart_contents']['#title'] = NULL;
+    
+    $form['account']['#title'] = NULL;
+    if ($user->uid == 0) {
+      $form['account']['login']['mail']['#title'] = NULL;
+      $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
+      $form['account']['login']['#prefix'] = '<div class="cart-collaterals row col-sm-6 col-md-6 box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
+      $form['account']['login']['#suffix'] = '</div>';
+    }
+    
+    $form['commerce_payment']['#title'] = NULL;
+    $form['commerce_payment']['#prefix'] = '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    
+    $form['buttons']['continue']['#attributes'] = array('class' => array('btn', 'style1'));
+    
   }
 }
 

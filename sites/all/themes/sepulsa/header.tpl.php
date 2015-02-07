@@ -7,7 +7,7 @@
  * @since January 27th 2015.
  */
 
-global $base_url;
+global $base_url, $user;
 
 ?>
 <header id="header">
@@ -30,7 +30,10 @@ global $base_url;
           </li>
           <?php if ($user->uid > 0) { ?>
           <li class="menu-item-has-children">
-            <a href="#">Kupon</a>
+            <a href="<?php print $base_url."/user/".$user->uid; ?>">Akun Saya</a>
+          </li>
+          <li class="menu-item-has-children">
+            <a href="<?php print $base_url."/user/".$user->uid."/orders"; ?>">Kupon</a>
           </li>
           <li class="menu-item-has-children">
             <a href="<?php print $base_url."/user/logout"; ?>">Logout</a>

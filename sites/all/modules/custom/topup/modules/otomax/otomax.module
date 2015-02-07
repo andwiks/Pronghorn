@@ -527,7 +527,7 @@ function otomax_send($data, $settings, $topup = array()) {
     if ($result_xml !== FALSE && isset($result_xml->params->param->value->struct)) {
       // Get XML value.
       $container = array();
-      foreach ((array) $result_xml->params->param->value->struct->children() as $child) {
+      foreach ($result_xml->params->param->value->struct->children() as $child) {
         if (isset($child->name) && isset($child->value->string)) {
           $container[$child->name->__toString()] = $child->value->string->__toString();
         }

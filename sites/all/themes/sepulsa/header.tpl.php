@@ -66,17 +66,23 @@ global $base_url;
   <div class="mobile-nav-wrapper collapse visible-mobile" id="mobile-nav-wrapper">
     <ul class="mobile-nav">
       <li class="menu-item">
-        <a href="index.html">Home</a>
+        <a href="<?php print $base_url; ?>">Home</a>
       </li>
-      <li class="menu-item">
-        <a href="#">Kupon</a>
-      </li>
-      <li class="menu-item">
-        <a href="#">Login</a>
-      </li>
-      <li class="menu-item">
-        <a href="#">Sign Up</a>
-      </li>
+      <?php if ($user->uid > 0) { ?>
+        <li class="menu-item">
+          <a href="#">Kupon</a>
+        </li>
+        <li class="menu-item">
+          <a href="<?php print $base_url."/user/logout"; ?>">Logout</a>
+        </li>
+      <?php } else { ?>
+        <li class="menu-item">
+          <a href="<?php print $base_url."/user"; ?>">Login</a>
+        </li>
+        <li class="menu-item">
+          <a href="<?php print $base_url."/user/register"; ?>">Sign Up</a>
+        </li>
+      <?php } ?>
     </ul>
   </div>
 </header>
@@ -85,6 +91,6 @@ global $base_url;
 <div class="page-title-container">
   <div class="page-title"></div>
   <ul class="breadcrumbs">
-    <li><a href="index.html">Home</a></li>
+    <li><a href="<?php print $base_url; ?>">Home</a></li>
   </ul>
 </div>

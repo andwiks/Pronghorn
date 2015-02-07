@@ -4,6 +4,8 @@
  * sepulsa.module
  *
  * @author andre4s_y
+ *
+ * @todo: add sepulsa.install: add taxonomy mobile operator.
  */
 
 /**
@@ -49,6 +51,21 @@ function sepulsa_front_page() {
  *   Form array.
  */
 function sepulsa_phone_form($form, &$form_state) {
+  // Add sepulsa autocomplete form js.
+  drupal_add_js(drupal_get_path('module', 'sepulsa') . '/sepulsa.form.js', 'file');
+
+  // Get all operator phone prefixes.
+  $prefixes = sepulsa_get_all_operator_prefix();
+  // Get all operator card types.
+  $card_types = sepulsa_get_all_operator_card_type();
+  // Store these prefixes inside drupal settings.
+  drupal_add_js(array(
+    'sepulsa' => array(
+      'prefix' => $prefixes,
+      'cardtype' => $card_types,
+    ),
+  ), 'setting');
+
   // Check previous form state.
   $phone = (isset($form_state['values']['phone']) && !empty($form_state['values']['phone'])) ? $form_state['values']['phone'] : '';
   // Autocorrect phone prefix.
@@ -60,24 +77,31 @@ function sepulsa_phone_form($form, &$form_state) {
     '#title' => t('Phone Number'),
     '#required' => TRUE,
     '#default_value' => (!empty($phone)) ? $phone : '',
+    '#attributes' => array('autocomplete' => 'off'),
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
-    '#ajax' => array(
-      'callback' => 'sepulsa_autocomplete_operator',
-      'wrapper' => 'sepulsa-autocomplete-operator',
-      'event' => 'change blur',
-    ),
   );
 
+
+
   // Define default operator options.
-  $options = array(
+  $operator_options = array(
     0 => t('Select Operator'),
   );
+  // Add operator options with operator data from phone prefix.
+  $operator_options += drupal_map_assoc(array_keys($prefixes));
+
   // Check whether phone number is available.
   if (!empty($phone)) {
-    // Add operator options based on phone number input.
-    $options += sepulsa_get_operator($phone);
-    // Define default value for card type.
-    $operator = (isset($form_state['values']['operator']) && !empty($form_state['values']['operator'])) ? $form_state['values']['operator'] : 0;
+    // Define default operator value.
+    $operator = sepulsa_get_operator($phone);
+    // Check whether we can get only one operator.
+    if (count($operator) == 1) {
+      $operator = current($operator);
+    }
+    else {
+      // Trash unusable operator data.
+      unset($operator);
+    }
   }
 
   // Define operator dropdown select.
@@ -86,20 +110,19 @@ function sepulsa_phone_form($form, &$form_state) {
     '#title' => t('Operator'),
     '#required' => TRUE,
     '#default_value' => (isset($operator)) ? $operator : 0,
-    '#options' => $options,
-    '#prefix' => '<div id="sepulsa-autocomplete-operator">',
-    '#suffix' => '</div>',
+    '#options' => $operator_options,
+    '#disabled' => TRUE,
   );
 
   // Define default operator options.
-  $options = array(
+  $card_type_options = array(
     0 => t('Select Card Type'),
   );
 
+  $card_type_options += sepulsa_get_all_operator_card_type();
+
   // Check whether phone number is available.
-  if (!empty($phone)) {
-    // Add operator options based on operator.
-    $options += (isset($options[$operator])) ? sepulsa_get_card_type(array($operator => $options[$operator])) : array();
+  if (!empty($phone) && isset($operator)) {
     // Define default value for card type.
     $card_type = (isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])) ? $form_state['values']['card_type'] : 0;
     $card_type = intval($card_type);
@@ -110,7 +133,7 @@ function sepulsa_phone_form($form, &$form_state) {
     '#title' => t('Card Type'),
     '#required' => TRUE,
     '#default_value' => (isset($card_type)) ? $card_type : 0,
-    '#options' => $options,
+    '#options' => $card_type_options,
     '#prefix' => '<div id="sepulsa-autocomplete-card-type">',
     '#suffix' => '</div>',
     '#ajax' => array(
@@ -345,6 +368,7 @@ function sepulsa_autocomplete_operator($form, &$form_state) {
     '#commands' => array(
       ajax_command_replace('#sepulsa-autocomplete-operator', render($form['operator'])),
       ajax_command_replace('#sepulsa-autocomplete-card-type', render($form['card_type'])),
+      ajax_command_invoke('#edit-phone', 'focus'),
     ),
   );
 }
@@ -544,43 +568,6 @@ function sepulsa_get_operator($phone) {
     }
   }
   return array();
-}
-
-/**
- * Function sepulsa_get_card_type().
- *
- * Output Format:
- * key: node id.
- * value: node title.
- *
- * @param array $operator
- *   Operator array from sepulsa_get_operator().
- *
- * @return array
- *   Card type content.
- */
-function sepulsa_get_card_type($operator) {
-  // Define default options as return value.
-  $options = array();
-  // Get operator term id.
-  $tid = key($operator);
-
-  // Get node pulsa based on taxonomy id.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node')
-    ->entityCondition('bundle', 'pulsa')
-    ->propertyCondition('status', NODE_PUBLISHED)
-    ->fieldCondition('field_operator', 'tid', $tid, '=');
-  $result = $query->execute();
-  // Check whether result is available.
-  if (isset($result['node'])) {
-    $nodes = node_load_multiple(array_keys($result['node']));
-    foreach ($nodes as $node) {
-      $options[$node->nid] = $node->title;
-    }
-  }
-
-  return $options;
 }
 
 /**

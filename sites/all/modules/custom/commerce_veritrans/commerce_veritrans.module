@@ -76,7 +76,7 @@ function commerce_veritrans_settings_form($settings = array()) {
       ),
     ),
   );
-
+  // @todo: add phone number fields.
   // Get supported credit card type.
   $credit_card_types = commerce_payment_credit_card_types();
 
@@ -184,6 +184,26 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
   if (isset($payment_method['settings']) && !empty($payment_method['settings'])) {
     // Define order wrapper: to get total order amount.
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Define phone number options if available.
+    $phone = array();
+    // Get order line items.
+    $line_items = $order_wrapper->commerce_line_items->value();
+    // Looping for each line item.
+    foreach ($line_items as $line_item) {
+      // Get line item wrapper.
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+      // Check whether field is available.
+      if (isset($line_item_wrapper->field_phone_number)) {
+        // Check field phone number if not empty.
+        $number = $line_item_wrapper->field_phone_number->value();
+        // @todo: make this settingable.
+        if (!empty($number)) {
+          $phone[$number] = $number;
+        }
+      }
+    }
+
     // Check whether payment method type is cc.
     if ($payment_method['settings']['type'] == 'cc') {
       // Define fields for credit card form.
@@ -196,6 +216,7 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
           'vt_amount' => $order_wrapper->commerce_order_total->amount->value(),
           'vt_js' => $payment_method['settings']['js'],
         ),
+        'phone' => $phone,
       );
       // Get veritrans credit card form and merge it with current form array.
       $form['veritrans'] = commerce_veritrans_credit_card_form($fields, array());
@@ -269,6 +290,17 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
     $return_value = FALSE;
   }
 
+  // Define order wrapper: to get total order amount.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Get line item.
+  $line_items = $order_wrapper->commerce_line_items->value();
+  if (empty($line_items)
+    || $order_wrapper->commerce_order_total->amount->value() <= 0
+  ) {
+    form_set_error($prefix . 'type', t('Payment can not continue: cart can not empty.'));
+    $return_value = FALSE;
+  }
+
   // Return it.
   return $return_value;
 }
@@ -293,16 +325,8 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
  *   FALSE will rebuild the payment checkout form.
  */
 function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
-  // @todo!!
-  // $payment_method['settings']['server_key'];
-
   // Define order wrapper: to get total order amount.
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-  $transaction = array(
-    'order_id' => 'Prefix:' . $order->order_id,
-    'gross_amount'  => $order_wrapper->commerce_order_total->amount->value(),
-  );
 
   // Generate item string: Nama_Item,harga_satuan,Qty,SubTotal;
   $items = array();
@@ -324,71 +348,85 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     // Store it inside items.
     $items[] = $item;
   }
+  // Define default billing and shipping information.
+  $billing = $shipping = array();
+  // Check billing information.
+  if ($order_wrapper->commerce_customer_billing->value()) {
+    // Get customer billing address from order wrapper.
+    $billing = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
 
-  // Get billing information.
-  $billing = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
-
-  // Populate customer's billing address
-  $billing_address = array(
-      'first_name'   => $billing['first_name'],
-      'last_name'    => $billing['last_name'],
-      'address'      => $billing['thoroughfare'],
-      'city'         => $billing['locality'],
-      'postal_code'  => $billing['postal_code'],
-      'phone'        => $pane_values['veritrans']['phone'],
-      'country_code' => 'IDN'
+    // Populate customer's billing address.
+    $billing = array(
+      'first_name' => (isset($billing['first_name'])) ? $billing['first_name'] : '',
+      'last_name' => (isset($billing['last_name'])) ? $billing['last_name'] : '',
+      'address' => (isset($billing['thoroughfare'])) ? $billing['thoroughfare'] : '',
+      'city' => (isset($billing['locality'])) ? $billing['locality'] : '',
+      'postal_code' => (isset($billing['postal_code'])) ? $billing['postal_code'] : '',
+      'phone' => $pane_values['veritrans']['phone'],
+      'country_code' => (isset($billing['country'])) ? $billing['country'] : '',
     );
 
-  // Check whether shipping is the same as billing.
-  if (isset($order->data['profile_copy']['customer_profile_shipping']['status']) && !empty($order->data['profile_copy']['customer_profile_shipping']['status'])) {
-    $shipping_address = $billing_address;
+    // Check whether shipping is the same as billing.
+    if (isset($order->data['profile_copy']['customer_profile_shipping']['status']) && !empty($order->data['profile_copy']['customer_profile_shipping']['status'])) {
+      $shipping = $billing;
+    }
+    else {
+      // Check shipping information.
+      if ($order_wrapper->commerce_customer_shipping->value()) {
+        // Get shipping information.
+        $shipping = $order_wrapper->commerce_customer_shipping->commerce_customer_address->value();
+
+        // Populate customer's billing address
+        $shipping = array(
+          'first_name' => (isset($shipping['first_name'])) ? $shipping['first_name'] : '',
+          'last_name' => (isset($shipping['last_name'])) ? $shipping['last_name'] : '',
+          'address' => (isset($shipping['thoroughfare'])) ? $shipping['thoroughfare'] : '',
+          'city' => (isset($shipping['locality'])) ? $shipping['locality'] : '',
+          'postal_code' => (isset($shipping['postal_code'])) ? $shipping['postal_code'] : '',
+          'phone' => $pane_values['veritrans']['phone'],
+          'country_code' => (isset($shipping['country'])) ? $shipping['country'] : '',
+        );
+      }
+    }
   }
-  else {
-    // @todo: possible that this data is empty.
-    // Get shipping information.
-    $shipping = $order_wrapper->commerce_customer_shipping->commerce_customer_address->value();
 
-    // Populate customer's billing address
-    $shipping_address = array(
-      'first_name'   => $shipping['first_name'],
-      'last_name'    => $shipping['last_name'],
-      'address'      => $shipping['thoroughfare'],
-      'city'         => $shipping['locality'],
-      'postal_code'  => $shipping['postal_code'],
-      'phone'        => $pane_values['veritrans']['phone'],
-      'country_code' => 'IDN'
-    );
-  }
-
-  // Populate customer's info
-  $customer_details = array(
-    'first_name'       => $billing['first_name'],
-    'last_name'        => $billing['last_name'],
-    'email'            => $order->mail,
-    'phone'            => $pane_values['veritrans']['phone'],
-    'billing_address'  => $billing_address,
-    'shipping_address' => $shipping_address
-  );
-
-  // Transaction data to be sent
+  // Define transaction data to be sent.
   $transaction_data = array(
     'payment_type' => 'credit_card', // @todo: improve payment type id.
-    'credit_card'  => array(
-      'token_id'      => $pane_values['veritrans']['token'],
-      'bank'          => 'bni', // @todo: acquiring bank settings.
-      'save_token_id' => FALSE,
+    'credit_card' => array(
+      'token_id' => $pane_values['veritrans']['token'],
+      'bank' => 'bni', // @todo: acquiring bank settings.
+      'save_token_id' => boolval($pane_values['veritrans']['save']),
     ),
-    'transaction_details' => $transaction,
-    'item_details'        => $items,
-    'customer_details'    => $customer_details
+    'transaction_details' => array(
+      'order_id' => 'Order ' . $order->order_id, // @todo: prefix settingable.
+      'gross_amount'  => $order_wrapper->commerce_order_total->amount->value(),
+    ),
+    'item_details' => $items,
+    'customer_details' => array(
+      'first_name' => (isset($billing['first_name'])) ? $billing['first_name'] : $order->order_id,
+      'last_name' => (isset($billing['last_name'])) ? $billing['last_name'] : '',
+      'email' => $order->mail,
+      'phone' => $pane_values['veritrans']['phone'],
+    ),
   );
 
+  // Add billing information.
+  if (!empty($billing)) {
+    $transaction_data['customer_details']['billing_address'] = $billing;
+  }
+  // Add shipping information.
+  if (!empty($shipping)) {
+    $transaction_data['customer_details']['billing_address'] = $shipping;
+  }
+
+  // Define API endpoint settings.
   $settings = array(
     'url' => $payment_method['settings']['url'],
     'server_key' => $payment_method['settings']['server_key'],
     'timeout' => 5.0,
   );
-
+  // Do payment API.
   $payment = commerce_veritrans_api($transaction_data, $settings);
   // Check payment result.
   if (is_string($payment) && !empty($payment)) {
@@ -433,7 +471,10 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   commerce_payment_transaction_save($transaction);
 
   if (isset($payment->status_message)) {
-    drupal_set_message($payment->status_message, (($status == COMMERCE_PAYMENT_STATUS_SUCCESS) ? 'status' : 'error'));
+    drupal_set_message(t('Veritrans @type error: @message', array(
+      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+      '@message' => $payment->status_message,
+    )), (($status == COMMERCE_PAYMENT_STATUS_SUCCESS) ? 'status' : 'error'));
   }
   else {
     // @todo: improve this staus message.
@@ -449,6 +490,8 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
  */
 
 /**
+ * Function commerce_veritrans_credit_card_form().
+ *
  * Returns a set of credit card form elements that payment method modules can
  *   incorporate into their submission form callbacks.
  *
@@ -548,7 +591,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
   );
 
   $form['credit_card']['code'] = array(
-    '#type' => 'textfield',
+    '#type' => 'password',
     '#title' => !empty($fields['code']) ? $fields['code'] : t('Security code'),
     '#default_value' => $default['code'],
     '#attributes' => array('autocomplete' => 'off'),
@@ -558,15 +601,25 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
     '#validated' => TRUE,
   );
 
-  $form['phone'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Phone Number'),
-    '#default_value' => '',
-    '#attributes' => array('autocomplete' => 'off'),
-    '#required' => TRUE,
-    '#maxlength' => 14,
-    '#size' => 14,
-  );
+  // @todo: improve this with states.
+  if (isset($fields['phone']) && !empty($fields['phone'])) {
+    $form['phone'] = array(
+      '#type' => 'select',
+      '#title' => t('Phone Number'),
+      '#options' => $fields['phone'],
+    );
+  }
+  else {
+    $form['phone'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Phone Number'),
+      '#default_value' => '',
+      '#attributes' => array('autocomplete' => 'off'),
+      '#required' => TRUE,
+      '#maxlength' => 14,
+      '#size' => 14,
+    );
+  }
 
   $form['save'] = array(
     '#type' => 'checkbox',
@@ -587,7 +640,15 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
 }
 
 /**
+ * Function commerce_veritrans_payment_method_types().
+ *
  * Returns a set of payment methods that veritrans payment gateway can handle.
+ *
+ * @param string $key
+ *   Optional payment method key.
+ *
+ * @return array
+ *   Payment method array.
  */
 function commerce_veritrans_payment_method_types($key = '') {
   // Define payment method type available at Veritrans.
@@ -598,9 +659,21 @@ function commerce_veritrans_payment_method_types($key = '') {
     'mandiri' => t('Mandiri Clickpay'),
     'va' => t('Virtual Account'),
   );
-  return (isset($payment_method[$key])) ? $payment_method[$key] : $payment_method;
+  return (!empty($key) && isset($payment_method[$key])) ? $payment_method[$key] : $payment_method;
 }
 
+/**
+ * Function commerce_veritrans_api().
+ *
+ * @param array $data
+ *   Payment data.
+ * @param array $settings
+ *   Payment API settings.
+ *
+ * @return mixed
+ *   If success returns string json.
+ *   If failed returns drupal connection object.
+ */
 
 function commerce_veritrans_api($data, $settings) {
   // Define default endpoint.
@@ -616,7 +689,6 @@ function commerce_veritrans_api($data, $settings) {
       'verify_host' => FALSE,
     ),
   ));
-  // stream_context_set_option($stream_context, 'ssl', 'local_cert', drupal_get_path('module', 'topup') . '/cacert.pem');
 
   // Define option for http request.
   $http_options = array(
@@ -657,5 +729,3 @@ function commerce_veritrans_api($data, $settings) {
 
   return $return;
 }
-
-

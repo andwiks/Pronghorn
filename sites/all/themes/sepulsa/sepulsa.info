@@ -8,6 +8,8 @@ regions[content] = Content
 regions[footer] = Footer
 
 regions[right] = Right Bar
+regions[user_login] = User Login
+regions[user_signup] = User Signup
 
 version = "0.1"
 

@@ -28,33 +28,26 @@ global $base_url;
           <li class="menu-item-has-children">
             <a href="<?php print $base_url; ?>">Home</a>
           </li>
+          <?php if ($user->uid > 0) { ?>
           <li class="menu-item-has-children">
             <a href="#">Kupon</a>
           </li>
+          <li class="menu-item-has-children">
+            <a href="<?php print $base_url."/user/logout"; ?>">Logout</a>
+          </li>
+          <?php } else { ?>
           <li class="mini-cart menu-item-has-children">
-            <a href="#">Login</a>
+            <a href="<?php print $base_url."/user"; ?>">Login</a>
             <div class="sub-nav cart-content">
-              <form>
-                <div class="form-group">
-                  <input type="text" class="input-text full-width" placeholder="Email Address">
-                </div>
-                <div class="form-group">
-                  <input type="password" class="input-text full-width" placeholder="Password">
-                </div>
-                <div class="form-group" style="text-align:center">
-                  <button type="submit" class="btn style1">Login</button>
-                </div>
-                <div class="form-group">
-                  <div style="text-align:center">
-                    <a href="#">lupa password</a>
-                  </div>
-                </div>
-              </form>
+              <div style="text-align:center">
+                <?php print render($page['user_login']); ?>
+              </div>
             </div>
           </li>
           <li class="mini-cart menu-item-has-children">
-            <a href="#">Sign Up</a>
+            <a href="<?php print $base_url."/user/register"; ?>">Sign Up</a>
             <div class="sub-nav cart-content">
+              <?php print render($page['user_signup']); ?>
               <form>
                 <div class="form-group">
                   <input type="text" class="input-text full-width" placeholder="Email Address">
@@ -65,6 +58,7 @@ global $base_url;
               </form>
             </div>
           </li>
+          <?php } ?>
 
         </ul>
       </nav>

@@ -8,6 +8,7 @@
  */
 
 function sepulsa_form_alter(&$form, &$form_state, $form_id) {
+  //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
   $commer_form_id = substr($form_id, 0, 25);
   if ($form_id == "sepulsa_phone_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
@@ -22,6 +23,17 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     $form['packet']['#title'] = NULL;
     $form['packet']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Paket');
+  } else if ($form_id == "user_login_block") {
+    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    $form['name']['#title'] = NULL;
+    $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
+    
+    $form['pass']['#title'] = NULL;
+    $form['pass']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Password');
+    
+    $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
+    $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
+    
   } else if ($commer_form_id == 'commerce_cart_add_to_cart' && arg(0) == 'coupon') {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));

@@ -1,0 +1,4 @@
+name = User Sepulsa
+description = Some extension related with user module for sepulsa
+core = 7.x
+package = Sepulsa

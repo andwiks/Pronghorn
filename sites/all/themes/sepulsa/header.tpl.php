@@ -38,25 +38,23 @@ global $base_url;
           <?php } else { ?>
           <li class="mini-cart menu-item-has-children">
             <a href="<?php print $base_url."/user"; ?>">Login</a>
+            <?php if ($page['user_login']) { ?>
             <div class="sub-nav cart-content">
               <div style="text-align:center">
                 <?php print render($page['user_login']); ?>
               </div>
             </div>
+            <?php } ?>
           </li>
           <li class="mini-cart menu-item-has-children">
             <a href="<?php print $base_url."/user/register"; ?>">Sign Up</a>
+            <?php if ($page['user_signup']) { ?>
             <div class="sub-nav cart-content">
-              <?php print render($page['user_signup']); ?>
-              <form>
-                <div class="form-group">
-                  <input type="text" class="input-text full-width" placeholder="Email Address">
-                </div>
-                <div class="form-group" style="text-align:center">
-                  <button type="submit" class="btn style1">Sign Up</button>
-                </div>
-              </form>
+              <div style="text-align:center">
+                <?php print render($page['user_signup']); ?>
+              </div>
             </div>
+            <?php } ?>
           </li>
           <?php } ?>
 

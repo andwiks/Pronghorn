@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * user_sepulsa.module
+ *
+ * @author ananto@sepulsa.com
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function user_sepulsa_block_info() {
+  $blocks = array();
+  
+  $blocks['user_sepulsa_register'] = array(
+    'info' => t("User Registration"),
+  );
+  
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function user_sepulsa_block_view($delta = '') {
+  $block = array();
+  
+  switch ($delta) {
+    case 'user_sepulsa_register':
+      $block['subject'] = t('User Registration');
+      $block['content'] = user_sepulsa_register_block_contents();
+      return $block;
+      break;
+  } 
+}
+
+/**
+ * A module-defined block content function.
+ */
+function user_sepulsa_register_block_contents() {
+  $output = drupal_get_form("user_register_form");
+  
+  return $output;
+}
+

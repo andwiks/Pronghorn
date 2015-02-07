@@ -124,10 +124,50 @@ function topup_settings_form($form = array(), $form_state = array()) {
     '#required' => TRUE,
   );
 
+  // Add validate callback.
+  $form['#validate'][] = 'topup_settings_form_validate';
   // Add submit callback.
   $form['#submit'][] = 'topup_settings_form_submit';
 
   return system_settings_form($form);
+}
+
+/**
+ * Function topup_settings_form_validate().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function topup_settings_form_validate($form, &$form_state) {
+  // Get all properties of commerce_product entity.
+  $properties = entity_get_all_property_info('commerce_product');
+  // Validate topup_field_provider: must available.
+  if (!isset($properties[$form_state['values']['topup_field_provider']])) {
+    form_set_error('topup_field_provider', t('You must create field %field at commerce product first.', array(
+      '%field' => $form_state['values']['topup_field_provider'],
+    )));
+  }
+  // Validate topup_field_code: must available.
+  if (!isset($properties[$form_state['values']['topup_field_code']])) {
+    form_set_error('topup_field_code', t('You must create field %field at commerce product first.', array(
+      '%field' => $form_state['values']['topup_field_code'],
+    )));
+  }
+  else {
+    // Validate for update field allowed value settings.
+    // Get field old info.
+    $info = field_info_field($form_state['values']['topup_field_code']);
+    // Compare old allowed value with new allowed value.
+    $lost_keys = array_diff(array_keys($info['settings']['allowed_values']), array_keys(_topup_get_code_options()));
+    if (!empty($lost_keys)) {
+      form_set_error('topup_field_code', t('Unable to update field %field because values %values currently in use.', array(
+        '%field' => $form_state['values']['topup_field_code'],
+        '%values' => implode(', ', $lost_keys),
+      )));
+    }
+  }
 }
 
 /**
@@ -219,22 +259,22 @@ function topup_settings_form_submit($form, &$form_state) {
   }
 
   // Check field topup_field_code.
-  // @todo: update package code pattern
   if (isset($properties[$form_state['values']['topup_field_code']])) {
     // Get field info.
     $info = field_info_field($form_state['values']['topup_field_code']);
-    // Get all topup provider codes.
-    $codes = topup_provider_get_all_codes();
     // Update field allowed value settings.
-    $allowed_values = array();
-    foreach ($codes as $provider_id => $code_data) {
-      foreach ($code_data as $code => $code_info) {
-        $allowed_values[$code] = $provider_id . ' [' . $code . '] ' . $code_info['title'] . ' (' . $code_info['price'] . ')';
-      }
-    }
-    $info['settings']['allowed_values'] = $allowed_values;
+    $info['settings']['allowed_values'] = _topup_get_code_options();
     // Save the field.
     field_update_field($info);
+    // Update field instance.
+    $instance = array(
+      'field_name' => $form_state['values']['topup_field_code'],
+      'description' => t('Pattern: provider id [package code] code title (price).'),
+      'entity_type' => 'commerce_product',
+      'bundle' => $info['bundles']['commerce_product'][0],
+      'label' => t('Package Code'),
+    );
+    field_update_instance($instance);
   }
 }
 
@@ -289,6 +329,17 @@ function topup_provider_page() {
           'href' => $provider_link . '/enable',
         );
       }
+
+      // Check providers by module base.
+      $configurable_providers = variable_get('topup_providers_' . $provider['base'], array());
+      if (!empty($configurable_providers) && isset($configurable_providers[$id])) {
+        $links[] = array(
+          'title' => t('Delete'),
+          'href' => $provider_link . '/delete',
+        );
+      }
+
+
       // Add provider configure link.
       $links[] = array(
         'title' => t('Configure'),
@@ -342,6 +393,131 @@ function topup_provider_page() {
 }
 
 /**
+ * Function topup_provider_add_form().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ *
+ * @return array
+ *   Form array.
+ */
+function topup_provider_add_form($form = array(), $form_state = array()) {
+  // Machine name: provider id.
+  $form['provider_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Machine Provider ID'),
+    '#required' => TRUE,
+    '#default_value' => '',
+    '#description' => t('The provider id can only consist of lowercase letters, underscores, and numbers.'),
+    '#attributes' => array(
+      'placeholder' => t('provider_id'),
+    ),
+  );
+  // Provider Title.
+  $form['provider_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Provider Title'),
+    '#required' => TRUE,
+    '#default_value' => '',
+    '#description' => t('The provider title can only consist of letters, numbers, and space.'),
+    '#attributes' => array(
+      'placeholder' => t('provider title'),
+    ),
+  );
+  // Description.
+  $form['provider_desc'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Description'),
+    '#required' => TRUE,
+    '#default_value' => '',
+    '#attributes' => array(
+      'placeholder' => t('description'),
+    ),
+  );
+  // Get module base.
+  $options = array();
+  foreach (module_implements('topup_provider_info') as $module) {
+    $info = system_get_info('module', $module);
+    $options[$module] = $info['name'];
+  }
+  // Base module.
+  $form['module'] = array(
+    '#type' => 'select',
+    '#title' => t('Provider module base'),
+    '#options' => $options,
+    '#required' => TRUE,
+    '#description' => t('Choose base provider base module.'),
+  );
+
+  // Submit button: create.
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Create'),
+  );
+  return $form;
+}
+
+/**
+ * Function topup_provider_add_form_validate().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function topup_provider_add_form_validate($form, &$form_state) {
+  // Validate machine name.
+  if (isset($form_state['values']['provider_id']) && !preg_match('#^[a-z\_0-9]+$#', $form_state['values']['provider_id'])) {
+    form_set_error('provider_id', t('Provider ID can only consist of lowercase letters, underscores, and numbers.'));
+  }
+  else {
+    // Machine name must be unique for each module base integration.
+    $module_providers = variable_get('topup_providers_' . $form_state['values']['module'], array());
+    if (in_array($form_state['values']['provider_id'], $module_providers)) {
+      form_set_error('provider_id', t('Provider ID has been defined before.'));
+    }
+  }
+
+  // Validate provider title.
+  if (isset($form_state['values']['provider_title']) && !preg_match('#^[a-z\s0-9]+$#i', $form_state['values']['provider_title'])) {
+    form_set_error('provider_id', t('Provider ID can only consist of lowercase letters, underscores, and numbers.'));
+  }
+}
+
+/**
+ * Function topup_provider_add_form_submit().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function topup_provider_add_form_submit($form, &$form_state) {
+  // Get current module providers.
+  $module_providers = variable_get('topup_providers_' . $form_state['values']['module'], array());
+  // Save provider configuration.
+  $module_providers[$form_state['values']['provider_id']] = array(
+    'title' => $form_state['values']['provider_title'],
+    'description' => $form_state['values']['provider_desc'],
+  );
+  // Set variables.
+  variable_set('topup_providers_' . $form_state['values']['module'], $module_providers);
+  variable_set('topup_providers_title_' . $form_state['values']['provider_id'], $form_state['values']['provider_title']);
+  variable_set('topup_providers_desc_' . $form_state['values']['provider_id'], $form_state['values']['provider_desc']);
+  variable_set('topup_providers_status_' . $form_state['values']['provider_id'], FALSE);
+  variable_set('topup_providers_settings_' . $form_state['values']['provider_id'], array());
+
+  // Show success message.
+  drupal_set_message(t('A new provider has been setup successfully.'));
+  // Clear all caches.
+  drupal_flush_all_caches();
+  // Redirect to new provider page.
+  drupal_goto('admin/commerce/config/topup/provider/' . $form_state['values']['provider_id']);
+}
+
+/**
  * Function topup_provider_status_form().
  *
  * @param array $form
@@ -360,15 +536,27 @@ function topup_provider_status_form($form = array(), $form_state = array()) {
   $providers = topup_providers();
 
   if (isset($providers[$provider])
-    && in_array($operation, array('enable', 'disable'))
+    && in_array($operation, array('enable', 'disable', 'delete'))
   ) {
+
+    if ($operation == 'delete') {
+      $configurable_providers = variable_get('topup_providers_' . $providers[$provider]['base'], array());
+      if (empty($configurable_providers) || !isset($configurable_providers[$provider])) {
+        // Provider is not available.
+        drupal_set_message(t('Topup provider %provider can be be deleted because this is module implementations.', array(
+          '%provider' => $provider,
+        )), 'error');
+        // Redirect to provider list.
+        drupal_goto('admin/commerce/config/topup/provider');
+      }
+    }
+
     $form['info'] = array(
       '#markup' => t('Are you sure to @operation provider %provider ?<br />', array(
         '@operation' => $operation,
         '%provider' => $providers[$provider]['title'],
       )),
     );
-
     $form['operation'] = array(
       '#type' => 'value',
       '#value' => $operation,
@@ -381,7 +569,10 @@ function topup_provider_status_form($form = array(), $form_state = array()) {
       '#type' => 'value',
       '#value' => $providers[$provider]['title'],
     );
-
+    $form['provider_base'] = array(
+      '#type' => 'value',
+      '#value' => $providers[$provider]['base'],
+    );
     $form['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Yes'),
@@ -424,6 +615,16 @@ function topup_provider_status_form_submit($form, &$form_state) {
     case 'disable':
       variable_set('topup_providers_status_' . $form_state['values']['provider'], FALSE);
       break;
+
+    case 'delete':
+      $module_providers = variable_get('topup_providers_' . $form_state['values']['provider_base'], array());
+      unset($module_providers[$form_state['values']['provider']]);
+      variable_set('topup_providers_' . $form_state['values']['provider_base'], $module_providers);
+      variable_del('topup_providers_title_' . $form_state['values']['provider']);
+      variable_del('topup_providers_desc_' . $form_state['values']['provider']);
+      variable_del('topup_providers_status_' . $form_state['values']['provider']);
+      variable_del('topup_providers_settings_' . $form_state['values']['provider']);
+      break;
   }
   drupal_set_message(t('Provider %provider has been @operatord.', array(
     '%provider' => $form_state['values']['provider_title'],
@@ -451,6 +652,33 @@ function topup_provider_settings_form($form = array(), $form_state = array()) {
   $providers = topup_providers();
   // Check whether provider is available.
   if (isset($providers[$provider])) {
+    $form['provider_id'] = array(
+      '#type' => 'item',
+      '#title' => 'Provider ID',
+      '#title_display' => 'before',
+      '#markup' => $provider,
+    );
+    // Provider Title.
+    $form['provider_title'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Provider Title'),
+      '#required' => TRUE,
+      '#default_value' => $providers[$provider]['title'],
+      '#description' => t('The provider title can only consist of letters, numbers, and space.'),
+      '#attributes' => array(
+        'placeholder' => t('provider title'),
+      ),
+    );
+    // Description.
+    $form['provider_desc'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Description'),
+      '#required' => TRUE,
+      '#default_value' => $providers[$provider]['description'],
+      '#attributes' => array(
+        'placeholder' => t('description'),
+      ),
+    );
     // Get setting form callback.
     $settings_form = $providers[$provider]['base'] . '_settings_form';
     // Check whether settings form is available.
@@ -458,48 +686,60 @@ function topup_provider_settings_form($form = array(), $form_state = array()) {
       // Get settings form.
       $form['settings'] = $settings_form($providers[$provider]['settings']);
       $form['settings']['#tree'] = TRUE;
-
-      global $base_url;
-      // Callback URL.
-      $form['callback_url'] = array(
-        '#type' => 'item',
-        '#title' => t('Callback URL'),
-        '#markup' => $base_url . '/admin/commerce/config/topup/provider/' . $provider . '/callback',
-      );
-
-      // Add internal form value.
-      $form['id'] = array(
-        '#type' => 'value',
-        '#value' => $provider,
-      );
-
-      // Add submit button.
-      $form['save'] = array(
-        '#type' => 'submit',
-        '#value' => t('Save'),
-      );
-
-      // Check provider status.
-      if (!empty($providers[$provider]['status'])) {
-        // Disable button.
-        $form['status'] = array(
-          '#type' => 'submit',
-          '#value' => t('Disable'),
-        );
-      }
-      else {
-        // Enable button.
-        $form['status'] = array(
-          '#type' => 'submit',
-          '#value' => t('Enable'),
-        );
-      }
-
-      // Add submit callback.
-      $form['#submit'][] = 'topup_provider_settings_form_submit';
-
-      return $form;
+      $form['settings']['#type'] = 'fieldset';
+      $form['settings']['#title'] = t('Settings');
+      $form['settings']['#collapsible'] = TRUE;
+      $form['settings']['#collapse'] = FALSE;
     }
+    global $base_url;
+    // Callback URL.
+    $form['callback_url'] = array(
+      '#type' => 'item',
+      '#title' => t('Callback URL'),
+      '#markup' => $base_url . '/admin/commerce/config/topup/provider/' . $provider . '/callback',
+    );
+
+    // Add internal form value.
+    $form['id'] = array(
+      '#type' => 'value',
+      '#value' => $provider,
+    );
+
+    // Add submit button.
+    $form['save'] = array(
+      '#type' => 'submit',
+      '#value' => t('Save'),
+    );
+
+    // Check provider status.
+    if (!empty($providers[$provider]['status'])) {
+      // Disable button.
+      $form['status'] = array(
+        '#type' => 'submit',
+        '#value' => t('Disable'),
+      );
+    }
+    else {
+      // Enable button.
+      $form['status'] = array(
+        '#type' => 'submit',
+        '#value' => t('Enable'),
+      );
+    }
+
+    // Delete button.
+    $configurable_providers = variable_get('topup_providers_' . $providers[$provider]['base'], array());
+    if (!empty($configurable_providers) && isset($configurable_providers[$provider])) {
+      $form['delete'] = array(
+        '#type' => 'submit',
+        '#value' => t('Delete'),
+      );
+    }
+
+    // Add submit callback.
+    $form['#submit'][] = 'topup_provider_settings_form_submit';
+    // Return form.
+    return $form;
   }
   // Provider is not available.
   drupal_set_message(t('Topup provider %provider is not available or not configurable.', array(
@@ -522,6 +762,18 @@ function topup_provider_settings_form_submit($form, &$form_state) {
   if (isset($form_state['values']['settings']) && !empty($form_state['values']['settings'])
     && isset($form_state['values']['id']) && !empty($form_state['values']['id'])
   ) {
+    // Get provider based on url argument.
+    $provider = arg(5);
+    // Get all topup providers.
+    $providers = topup_providers();
+    // Update provider title if necessary.
+    if ($form_state['values']['provider_title'] != $providers[$provider]['title']) {
+      variable_set('topup_providers_title_' . $provider, $form_state['values']['provider_title']);
+    }
+    // Update provider description if necessary.
+    if ($form_state['values']['provider_desc'] != $providers[$provider]['description']) {
+      variable_set('topup_providers_desc_' . $provider, $form_state['values']['provider_desc']);
+    }
     // Store it inside variables.
     variable_set('topup_providers_settings_' . $form_state['values']['id'], $form_state['values']['settings']);
   }
@@ -539,6 +791,10 @@ function topup_provider_settings_form_submit($form, &$form_state) {
 
     case t('Disable'):
       $form_state['redirect'] = 'admin/commerce/config/topup/provider/' . $form_state['values']['id'] . '/disable';
+      break;
+
+    case t('Delete'):
+      $form_state['redirect'] = 'admin/commerce/config/topup/provider/' . $form_state['values']['id'] . '/delete';
       break;
   }
 }
@@ -565,5 +821,26 @@ function _topup_get_lineitem_fields($type = 'product') {
   foreach ($fields as $field_key => $field_info) {
     $options[$field_key] = $field_info['label'];
   }
+  return $options;
+}
+
+/**
+ * Function _topup_get_code_options().
+ *
+ * @return array
+ *   Codes array, suitable for allowed value at field setting.
+ */
+function _topup_get_code_options() {
+  // Get all topup provider codes.
+  $codes = topup_provider_get_all_codes();
+  // Define default options.
+  $options = array();
+  // Looping for each codes.
+  foreach ($codes as $provider_id => $code_data) {
+    foreach ($code_data as $code => $code_info) {
+      $options[$code] = $provider_id . ' [' . $code . '] ' . $code_info['title'] . ' (' . $code_info['price'] . ')';
+    }
+  }
+  // Return options.
   return $options;
 }

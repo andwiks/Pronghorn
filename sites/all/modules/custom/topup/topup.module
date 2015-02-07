@@ -32,16 +32,31 @@ define('TOPUP_FAILED', 0);
  */
 function topup_cron_queue_info() {
   $queue = array();
-  // Topup queue process.
+  // Topup queue process: first part.
   $queues['topup_process'] = array(
     'worker callback' => 'topup_queue_process',
     'time' => 120,
   );
-  // Topup queue query.
+
+  // Get try variable.
+  $try = variable_get('topup_try', 3);
+  $try = intval($try);
+  if ($try > 1) {
+    for ($i = 2; $i <= $try; $i++) {
+      // Topup queue process: for multiple try.
+      $queues['topup_process_' . $i] = array(
+        'worker callback' => 'topup_queue_process',
+        'time' => 120,
+      );
+    }
+  }
+
+  // Topup queue query: process pending topup.
   $queues['topup_query'] = array(
     'worker callback' => 'topup_queue_query',
     'time' => 120,
   );
+
   // Return queue array.
   return $queues;
 }
@@ -62,13 +77,23 @@ function topup_menu() {
     'file' => 'topup.admin.inc',
   );
 
-  // Topup provider page.
+  // Topup provider page: list.
   $items['admin/commerce/config/topup/provider'] = array(
     'title' => 'Top up Provider',
     'description' => 'Top up provider page',
     'page callback' => 'topup_provider_page',
     'access arguments' => array('configure store'),
     'file' => 'topup.admin.inc',
+  );
+
+  $items['admin/commerce/config/topup/provider/add'] = array(
+    'title' => 'Add provider',
+    'description' => 'Add provider page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('topup_provider_add_form'),
+    'access arguments' => array('configure store'),
+    'file' => 'topup.admin.inc',
+    'type' => MENU_LOCAL_ACTION,
   );
 
   // Get all topup providers.
@@ -114,6 +139,16 @@ function topup_menu() {
       'type' => MENU_CALLBACK,
     );
 
+    $items['admin/commerce/config/topup/provider/' . $provider_id . '/delete'] = array(
+      'title' => $provider_data['title'] . ' delete',
+      'description' => $provider_data['description'] . ' delete',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('topup_provider_status_form'),
+      'access arguments' => array('configure store'),
+      'file' => 'topup.admin.inc',
+      'type' => MENU_CALLBACK,
+    );
+
     $items['admin/commerce/config/topup/provider/' . $provider_id . '/callback'] = array(
       'title' => $provider_data['title'] . ' callback',
       'description' => $provider_data['description'] . ' callback',
@@ -124,6 +159,16 @@ function topup_menu() {
   }
 
   return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function topup_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'topup') . '/includes/views',
+  );
 }
 
 /**
@@ -177,6 +222,53 @@ function topup_callback() {
  */
 
 /**
+ * Function topup_requeue().
+ *
+ * @param int $line_item_id
+ *   Line item id.
+ */
+function topup_requeue($line_item_id) {
+  // Sanitize input line item id.
+  $line_item_id = intval($line_item_id);
+  // Get line item object.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
+
+  // Only for line item: topup_lineitem_type.
+  if ($line_item_wrapper->type->value() == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
+    // Get Topup provider.
+    $field_topup_provider = variable_get('topup_field_provider', 'field_api_provider');
+    // Get topup code.
+    $field_topup_code = variable_get('topup_field_code', 'field_package_code');
+    // Get quantity.
+    $quantity = intval($line_item_wrapper->quantity->value());
+    // Define default topup container.
+    $topup = array();
+    // Looping for each quantity.
+    for ($i = 0; $i < $quantity; $i++) {
+      // Store it in the container: for each quantity.
+      $topup[] = array(
+        'topup_id' => $i,
+        'topup_total' => $quantity,
+        'try' => 1,
+        'line_item_id' => $line_item_id,
+        'field_topup_provider' => $line_item_wrapper->commerce_product->$field_topup_provider->value(),
+        'field_topup_phone_number' => $line_item_wrapper->field_phone_number->value(),
+        'field_topup_code' => $line_item_wrapper->commerce_product->$field_topup_code->value(),
+      );
+    }
+    // Check whether pulsa container is available.
+    if (!empty($topup)) {
+      // Get the queue.
+      $queue = DrupalQueue::get('topup_process');
+      // Looping for each pulsa container.
+      foreach ($topup as $item) {
+        $queue->createItem($item);
+      }
+    }
+  }
+}
+
+/**
  * Function topup_queue().
  *
  * @param string $op
@@ -202,7 +294,7 @@ function topup_queue($op, $topup) {
             // Add try data.
             $topup['try'] = $topup['try'] + 1;
             // Queue it once again.
-            $queue = DrupalQueue::get('topup_process');
+            $queue = DrupalQueue::get('topup_process_' . $topup['try']);
             $queue->createItem($topup);
           }
           else {
@@ -270,6 +362,9 @@ function topup_queue($op, $topup) {
             $line_item_wrapper->field_topup_status->set(TOPUP_SUCCESS);
           }
 
+          // @todo: add check to other line item.
+          // @todo: invoke event when mobile prepaid all success.
+
           // Save line item.
           $line_item_wrapper->save();
           break;
@@ -294,10 +389,18 @@ function topup_providers() {
     // Build the provider array, including module names for the purpose
     // of including files if necessary.
     foreach (module_implements('topup_provider_info') as $module) {
-      foreach (module_invoke($module, 'topup_provider_info') as $base => $provider) {
-        $providers[$base] = $provider;
+      $module_providers = module_invoke($module, 'topup_provider_info');
+      $module_providers += variable_get('topup_providers_' . $module, array());
+      // Looping for each provider invoke.
+      foreach ($module_providers as $base => $provider) {
+        // Get provider title.
+        $providers[$base]['title'] = variable_get('topup_providers_title_' . $base, $provider['title']);
+        // Get provider description.
+        $providers[$base]['description'] = variable_get('topup_providers_desc_' . $base, $provider['description']);
+        // Define default status.
+        $default_status = (isset($provider['status'])) ? $provider['status'] : FALSE;
         // Get provider status.
-        $providers[$base]['status'] = variable_get('topup_providers_status_' . $base, $providers[$base]['status']);
+        $providers[$base]['status'] = variable_get('topup_providers_status_' . $base, $default_status);
         // Get providers base callback name.
         $providers[$base]['base'] = $module;
         // Get providers settings.
@@ -305,7 +408,7 @@ function topup_providers() {
       }
     }
 
-    drupal_alter('commerce_payment_method_info', $providers);
+    drupal_alter('topup_provider_info', $providers);
   }
 
   return $providers;

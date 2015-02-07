@@ -1,0 +1,56 @@
+<?php
+/**
+ * @file
+ * commerce_veritrans.install
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function commerce_veritrans_schema() {
+  // @todo: use schema to store token.
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function commerce_veritrans_requirements($phase) {
+  // Define default requirements.
+  $requirements = array();
+
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  // Check on installation phase.
+  if ($phase == 'install') {
+    // Get enabled currencies.
+    $currencies = commerce_currency_get_code(TRUE);
+    // This payment only usable for indonesia currency: IDR.
+    if (!isset($currencies['IDR'])) {
+      $requirements['veritrans_currency'] = array(
+        'title' => $t('currency setting'),
+        'value' => implode(', ', $currencies),
+        'description' => $t('Veritrans payment gateway only supports Indonesia currency: IDR.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    // This module requires curl.
+    if (!extension_loaded('curl')) {
+      $requirements['veritrans_curl'] = array(
+        'title' => $t('curl extension'),
+        'value' => $t('disabled'),
+        'description' => $t('Veritrans payment gateway requires curl php extension.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  // @todo: on runtime phase add vt_web, vt_link, vt_direct status.
+  // Return requirements.
+  return $requirements;
+}

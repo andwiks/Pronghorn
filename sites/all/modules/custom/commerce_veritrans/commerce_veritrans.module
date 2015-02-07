@@ -1,0 +1,661 @@
+<?php
+/**
+ * @file
+ * commerce_veritrans.module
+ *
+ * @author andre4s_y
+ *
+ * @todo: implement vt direct first.
+ * @todo: implement vt web seconds.
+ * @todo: implement vt link thirds.
+ * @todo: break it up into 3 separate modules.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_veritrans_commerce_payment_method_info() {
+  $payment_methods = array();
+
+  // VT-Direct: is onsite payment process.
+  $payment_methods['commerce_veritrans'] = array(
+    'base' => 'commerce_veritrans',
+    'title' => t('Veritrans Payment Gateway'),
+    'short_title' => t('Veritrans'),
+    'description' => t('Veritrans Payment Gateway Integration'),
+    'terminal' => TRUE,
+    'offsite' => FALSE,
+    'offsite_autoredirect' => FALSE,
+  );
+
+  return $payment_methods;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function commerce_veritrans_settings_form().
+ *
+ * Payment method callback: settings form.
+ *
+ * @param array $settings
+ *   Setting form array.
+ *
+ * @return array
+ *   Form array.
+ */
+function commerce_veritrans_settings_form($settings = array()) {
+  module_load_include('inc', 'commerce_payment', 'includes/commerce_payment.credit_card');
+
+  // Get supported payment method types.
+  $payment_methods = commerce_veritrans_payment_method_types();
+  // Payment method types as select dropdown.
+  $form['type'] = array(
+    '#type' => 'select',
+    '#title' => t('Payment Type'),
+    '#options' => $payment_methods,
+    '#default_value' => (isset($settings['type'])) ? $settings['type'] : 'cc',
+    '#description' => t('Choose payment type that this method will handle.'),
+    '#required' => TRUE,
+  );
+
+  // Provide credit card field.
+  $form['cc'] = array(
+    '#tree' => TRUE,
+    '#type' => 'fieldset',
+    '#title' => t('Credit Card Options'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][type]"]' => array('value' => 'cc'),
+      ),
+    ),
+  );
+
+  // Get supported credit card type.
+  $credit_card_types = commerce_payment_credit_card_types();
+
+  // Credit card type as checkboxes.
+  $form['cc']['card_types'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Select credit card types for this payment method.'),
+    '#options' => $credit_card_types,
+    '#default_value' => (isset($settings['cc']['card_types'])) ? $settings['cc']['card_types'] : array('visa', 'mastercard'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][type]"]' => array('value' => 'cc'),
+      ),
+    ),
+  );
+
+  // Set example payment server url.
+  $url = url('https://api.sandbox.veritrans.co.id/v2', array(
+    'absolute' => TRUE,
+    'external' => TRUE,
+  ));
+  // Payment server URL.
+  $form['url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Server URL'),
+    '#default_value' => (isset($settings['url'])) ? $settings['url'] : '',
+    '#maxlength' => 128,
+    '#description' => t('Please input full url: https:// or http://.<br />Example: @url.', array(
+      '@url' => $url,
+    )),
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => $url,
+    ),
+  );
+
+  // Payment client key.
+  $form['client_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Client Key'),
+    '#default_value' => (isset($settings['client_key'])) ? $settings['client_key'] : '',
+    '#maxlength' => 50,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => t('Client Key'),
+    ),
+  );
+
+  // Payment server key.
+  $form['server_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Server Key'),
+    '#default_value' => (isset($settings['server_key'])) ? $settings['server_key'] : '',
+    '#maxlength' => 50,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => t('Server Key'),
+    ),
+  );
+
+  // Set example javascript url.
+  $url = url('https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js', array(
+    'absolute' => TRUE,
+    'external' => TRUE,
+  ));
+  // Payment Java Script.
+  $form['js'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Java Script URL'),
+    '#default_value' => (isset($settings['js'])) ? $settings['js'] : '',
+    '#maxlength' => 128,
+    '#description' => t('Please input full url: https:// or http://.<br />Example: @url.', array(
+      '@url' => $url,
+    )),
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => $url,
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Function commerce_veritrans_submit_form().
+ *
+ * Payment method callback: submit form.
+ *
+ * @param array $payment_method
+ *   Payment Method Info array.
+ * @param array $pane_values
+ *   Checkout payment pane values.
+ * @param array $checkout_pane
+ *   Checkout pane array info.
+ * @param object $order
+ *   Order object.
+ *
+ * @return array
+ *   Payment method form array.
+ */
+function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout_pane, $order) {
+  $form = array();
+
+  // Check payment settings.
+  if (isset($payment_method['settings']) && !empty($payment_method['settings'])) {
+    // Define order wrapper: to get total order amount.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Check whether payment method type is cc.
+    if ($payment_method['settings']['type'] == 'cc') {
+      // Define fields for credit card form.
+      $fields = array(
+        'card_types' => array_filter($payment_method['settings']['cc']['card_types']),
+        'code' => t('Card CVV'),
+        'veritrans' => array(
+          'vt_url' => $payment_method['settings']['url'],
+          'vt_client' => $payment_method['settings']['client_key'],
+          'vt_amount' => $order_wrapper->commerce_order_total->amount->value(),
+          'vt_js' => $payment_method['settings']['js'],
+        ),
+      );
+      // Get veritrans credit card form and merge it with current form array.
+      $form['veritrans'] = commerce_veritrans_credit_card_form($fields, array());
+      // Define veritrans form tree.
+      $form['veritrans']['#tree'] = TRUE;
+    }
+  }
+  else {
+    // Show payment is not configured for user.
+    drupal_set_message(t('@payment is not configured for use. Please contact an administrator to resolve this issue.', array(
+      '@payment' => ucfirst($payment_method['title']),
+    )), 'error');
+    $form['error'] = array(
+      '#markup' => theme('status_messages', array('display' => 'error')),
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Function commerce_veritrans_submit_form_validate().
+ *
+ * Payment method callback: submit form validation.
+ *
+ * @param array $payment_method
+ *   Payment Method Info array.
+ * @param array $pane_form
+ *   Checkout pane form array.
+ * @param array $pane_values
+ *   Checkout pane form values.
+ * @param object $order
+ *   Order object.
+ * @param array $form_parents
+ *   The identifier of the base element of the payment pane.
+ *
+ * @return bool
+ *   FALSE will show correct form error.
+ */
+function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
+  // Define default return value.
+  $return_value = TRUE;
+  // Define form element name prefix: to provide valid form element name.
+  $prefix = implode('][', array_merge($form_parents, array('veritrans'))) . '][';
+
+  // Validate payment settings.
+  if (!(isset($payment_method['settings']) && !empty($payment_method['settings'])
+    && isset($payment_method['settings']['url']) && !empty($payment_method['settings']['url'])
+    && isset($payment_method['settings']['client_key']) && !empty($payment_method['settings']['client_key'])
+    && preg_match('#^http(s)?\:\/\/#', $payment_method['settings']['url'])
+  )) {
+    drupal_set_message(t('@payment is not configured for use. Please contact an administrator to resolve this issue.', array(
+      '@payment' => ucfirst($payment_method['title']),
+    )), 'error');
+    $return_value = FALSE;
+  }
+
+  // Validate veritrans payment token.
+  // @todo: validate pattern.
+  if (!(isset($pane_values['veritrans']['token']) && !empty($pane_values['veritrans']['token']))) {
+    form_set_error($prefix . 'type', t('Unable to get token for payment with @type.', array(
+      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+    )));
+    $return_value = FALSE;
+  }
+  // @todo: validate veritrans phone.
+  if (!(isset($pane_values['veritrans']['phone']) && !empty($pane_values['veritrans']['phone']))) {
+    form_set_error($prefix . 'type', t('Payment @type need to verify your phone number.', array(
+      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+    )));
+    $return_value = FALSE;
+  }
+
+  // Return it.
+  return $return_value;
+}
+
+/**
+ * Function commerce_veritrans_submit_form_submit().
+ *
+ * Payment method callback: submit form submission.
+ *
+ * @param array $payment_method
+ *   Payment Method Info array.
+ * @param array $pane_form
+ *   Checkout pane form array.
+ * @param array $pane_values
+ *   Checkout pane form values.
+ * @param object $order
+ *   Order object.
+ * @param array $charge
+ *   Amount and currency array (if available).
+ *
+ * @return bool
+ *   FALSE will rebuild the payment checkout form.
+ */
+function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
+  // @todo!!
+  // $payment_method['settings']['server_key'];
+
+  // Define order wrapper: to get total order amount.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+  $transaction = array(
+    'order_id' => 'Prefix:' . $order->order_id,
+    'gross_amount'  => $order_wrapper->commerce_order_total->amount->value(),
+  );
+
+  // Generate item string: Nama_Item,harga_satuan,Qty,SubTotal;
+  $items = array();
+  // Get order line items.
+  $line_items = $order_wrapper->commerce_line_items->value();
+  // Looping for each line item.
+  foreach ($line_items as $line_item) {
+    // Get line item wrapper.
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    // Get product price.
+    $unit_price = $line_item_wrapper->commerce_unit_price->value();
+    // Define item.
+    $item = array(
+      'id' => $line_item->line_item_id,
+      'price' => $unit_price['amount'],
+      'quantity' => (int) $line_item->quantity,
+      'name' => (isset($line_item->commerce_product)) ? $line_item_wrapper->commerce_product->value()->title : $line_item->line_item_label,
+    );
+    // Store it inside items.
+    $items[] = $item;
+  }
+
+  // Get billing information.
+  $billing = $order_wrapper->commerce_customer_billing->commerce_customer_address->value();
+
+  // Populate customer's billing address
+  $billing_address = array(
+      'first_name'   => $billing['first_name'],
+      'last_name'    => $billing['last_name'],
+      'address'      => $billing['thoroughfare'],
+      'city'         => $billing['locality'],
+      'postal_code'  => $billing['postal_code'],
+      'phone'        => $pane_values['veritrans']['phone'],
+      'country_code' => 'IDN'
+    );
+
+  // Check whether shipping is the same as billing.
+  if (isset($order->data['profile_copy']['customer_profile_shipping']['status']) && !empty($order->data['profile_copy']['customer_profile_shipping']['status'])) {
+    $shipping_address = $billing_address;
+  }
+  else {
+    // @todo: possible that this data is empty.
+    // Get shipping information.
+    $shipping = $order_wrapper->commerce_customer_shipping->commerce_customer_address->value();
+
+    // Populate customer's billing address
+    $shipping_address = array(
+      'first_name'   => $shipping['first_name'],
+      'last_name'    => $shipping['last_name'],
+      'address'      => $shipping['thoroughfare'],
+      'city'         => $shipping['locality'],
+      'postal_code'  => $shipping['postal_code'],
+      'phone'        => $pane_values['veritrans']['phone'],
+      'country_code' => 'IDN'
+    );
+  }
+
+  // Populate customer's info
+  $customer_details = array(
+    'first_name'       => $billing['first_name'],
+    'last_name'        => $billing['last_name'],
+    'email'            => $order->mail,
+    'phone'            => $pane_values['veritrans']['phone'],
+    'billing_address'  => $billing_address,
+    'shipping_address' => $shipping_address
+  );
+
+  // Transaction data to be sent
+  $transaction_data = array(
+    'payment_type' => 'credit_card', // @todo: improve payment type id.
+    'credit_card'  => array(
+      'token_id'      => $pane_values['veritrans']['token'],
+      'bank'          => 'bni', // @todo: acquiring bank settings.
+      'save_token_id' => FALSE,
+    ),
+    'transaction_details' => $transaction,
+    'item_details'        => $items,
+    'customer_details'    => $customer_details
+  );
+
+  $settings = array(
+    'url' => $payment_method['settings']['url'],
+    'server_key' => $payment_method['settings']['server_key'],
+    'timeout' => 5.0,
+  );
+
+  $payment = commerce_veritrans_api($transaction_data, $settings);
+  // Check payment result.
+  if (is_string($payment) && !empty($payment)) {
+    // @todo: chek json decode result.
+    $payment = json_decode($payment);
+  }
+  else {
+    // Payment API error: return object.
+    drupal_set_message(t('Payment error: @error', array(
+      '@error' => (isset($payment->error)) ? $payment_error : t('unknown'),
+    )), 'error');
+    return FALSE;
+  }
+
+  // Save input into order data.
+  $order->data['commerce_veritrans'] = $pane_values['veritrans'] + $charge;
+
+  // Save order data.
+  commerce_order_save($order);
+
+  if (isset($payment->status_code) && $payment->status_code == '200') {
+    $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+  }
+  else {
+    $status = COMMERCE_PAYMENT_STATUS_FAILURE;
+  }
+
+  // Create new payment transaction.
+  $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
+  $transaction->instance_id = $payment_method['instance_id'];
+  $transaction->amount = $charge['amount'];
+  $transaction->currency_code = $charge['currency_code'];
+  $transaction->status = $status;
+  $transaction->message = 'Payment Data: <br />!data';
+  $payment_data = '';
+  foreach ((array) $payment as $key =>$data) {
+    $payment_data .= $key . ' = ' . $data . '<br />';
+  }
+  $transaction->message_variables = array(
+    '!data' => $payment_data,
+  );
+  commerce_payment_transaction_save($transaction);
+
+  if (isset($payment->status_message)) {
+    drupal_set_message($payment->status_message, (($status == COMMERCE_PAYMENT_STATUS_SUCCESS) ? 'status' : 'error'));
+  }
+  else {
+    // @todo: improve this staus message.
+    drupal_set_message(t('Payment error: unknown.'), 'error');
+  }
+
+  // Always return TRUE at this step: because we only create new transaction.
+  return ($status == COMMERCE_PAYMENT_STATUS_SUCCESS) ? TRUE : FALSE;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Returns a set of credit card form elements that payment method modules can
+ *   incorporate into their submission form callbacks.
+ *
+ * @param $fields
+ *   An array specifying the CC fields that should be included on the form; the
+ *     card number and expiration date fields are always present.
+ * @param $default
+ *   An array of default values for the available CC fields.
+ *
+ * @todo Move this to outside file.
+ */
+function commerce_veritrans_credit_card_form($fields = array(), $default = array()) {
+  // Add veritrans js: because this form is loaded via ajax, use attached!
+  // (https://payments.veritrans.co.id/vtdirect/veritrans.min.js)
+  $form['#attached']['js'][] = array(
+    'data' => $fields['veritrans']['vt_js'],
+    'type' => 'external',
+  );
+  $form['#attached']['js'][] = array(
+    'data' => $fields['veritrans'],
+    'type' => 'setting',
+  );
+  // Add veritrans js to get token.
+  $form['#attached']['js'][] = array(
+    'data'  => drupal_get_path('module', 'commerce_veritrans') . '/theme/commerce_veritrans.token.js',
+    'type' => 'file',
+  );
+
+  // Create credit_card tree.
+  $form['credit_card'] = array(
+    '#tree' => TRUE,
+    '#attached' => array(
+      'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.theme.css'),
+    ),
+  );
+
+  // Merge default values into the default array.
+  $default += array(
+    'type' => '',
+    'owner' => '',
+    'number' => '',
+    'exp_month' => date('m'),
+    'exp_year' => date('Y'),
+    'code' => '',
+    'save' => 0,
+  );
+  $current_year_2 = date('y');
+  $current_year_4 = date('Y');
+
+//   $form['credit_card']['owner'] = array(
+//     '#type' => 'textfield',
+//     '#title' => t('Card owner'),
+//     '#default_value' => $default['owner'],
+//     '#attributes' => array('autocomplete' => 'off'),
+//     '#required' => TRUE,
+//     '#maxlength' => 64,
+//     '#size' => 32,
+//   );
+
+  // Always add a field for the credit card number.
+  $form['credit_card']['number'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Card number'),
+    '#default_value' => $default['number'],
+//     '#attributes' => array('autocomplete' => 'off'),
+    '#required' => TRUE,
+    '#maxlength' => 19,
+    '#size' => 20,
+    '#validated' => TRUE,
+  );
+
+  // Always add fields for the credit card expiration date.
+  $form['credit_card']['exp_month'] = array(
+    '#type' => 'select',
+    '#title' => t('Expiration'),
+    '#options' => drupal_map_assoc(array_keys(commerce_months())),
+    '#default_value' => strlen($default['exp_month']) == 1 ? '0' . $default['exp_month'] : $default['exp_month'],
+    '#required' => TRUE,
+    '#prefix' => '<div class="commerce-credit-card-expiration">',
+    '#suffix' => '<span class="commerce-month-year-divider">/</span>',
+    '#validated' => TRUE,
+  );
+
+  // Build a year select list that uses a 4 digit key with a 2 digit value.
+  $options = array();
+
+  for ($i = 0; $i < 20; $i++) {
+    $options[$current_year_4 + $i] = str_pad($current_year_2 + $i, 2, '0', STR_PAD_LEFT);
+  }
+
+  $form['credit_card']['exp_year'] = array(
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => $default['exp_year'],
+    '#suffix' => '</div>',
+    '#validated' => TRUE,
+  );
+
+  $form['credit_card']['code'] = array(
+    '#type' => 'textfield',
+    '#title' => !empty($fields['code']) ? $fields['code'] : t('Security code'),
+    '#default_value' => $default['code'],
+    '#attributes' => array('autocomplete' => 'off'),
+    '#required' => TRUE,
+    '#maxlength' => 4,
+    '#size' => 4,
+    '#validated' => TRUE,
+  );
+
+  $form['phone'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Phone Number'),
+    '#default_value' => '',
+    '#attributes' => array('autocomplete' => 'off'),
+    '#required' => TRUE,
+    '#maxlength' => 14,
+    '#size' => 14,
+  );
+
+  $form['save'] = array(
+    '#type' => 'checkbox',
+    '#default_value' => $default['save'],
+    '#title' => t('Save credit card'),
+    '#title_display' => 'before',
+  );
+
+  $form['token'] = array(
+    '#type' => 'hidden',
+    '#default_value' => '',
+    '#attributes' => array(
+      'id' => 'token_id',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * Returns a set of payment methods that veritrans payment gateway can handle.
+ */
+function commerce_veritrans_payment_method_types($key = '') {
+  // Define payment method type available at Veritrans.
+  $payment_method = array(
+    'bripay' => t('e-Pay BRI'),
+    'cc' => t('Credit Card'),
+    'cimb' => t('CIMB Clicks'),
+    'mandiri' => t('Mandiri Clickpay'),
+    'va' => t('Virtual Account'),
+  );
+  return (isset($payment_method[$key])) ? $payment_method[$key] : $payment_method;
+}
+
+
+function commerce_veritrans_api($data, $settings) {
+  // Define default endpoint.
+  $endpoint = (isset($settings['url'])) ? $settings['url'] : '';
+  // Define return value.
+  $return = FALSE;
+
+  // Define stream context.
+  $stream_context = stream_context_create(array(
+    'ssl' => array(
+      'local_cert' => drupal_get_path('module', 'topup') . '/cacert.pem',
+      'verify_peer' => FALSE,
+      'verify_host' => FALSE,
+    ),
+  ));
+  // stream_context_set_option($stream_context, 'ssl', 'local_cert', drupal_get_path('module', 'topup') . '/cacert.pem');
+
+  // Define option for http request.
+  $http_options = array(
+    'headers' => array(
+      'Content-Type' =>  'application/json',
+      'Accept' => 'application/json',
+      'Authorization' => 'Basic ' . base64_encode($settings['server_key'] . ':'),
+    ),
+    'max_redirects' => 0,
+    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 10.0,
+    'method' => 'POST',
+    'data' => json_encode($data),
+    'context' => $stream_context,
+  );
+
+  // Do real HTTP Request: input validation already available.
+  $result = drupal_http_request($endpoint . '/charge', $http_options);
+
+  // Check the result:
+  // 1. Must have 200 http code.
+  // 2. Must have data.
+  if (isset($result->code) && $result->code == 200
+    && isset($result->data) && !empty($result->data)
+  ) {
+    // Set return value.
+    $return = $result->data;
+  }
+  else {
+    $return = $result;
+  }
+
+  // Log this condition, everything get log.
+  watchdog('veritrans', 'Send API with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+    '@status' => (isset($result->code) && $result->code == 200) ? 'OK' : 'BAD',
+    '!debug' => print_r($result, TRUE),
+    '!options' => print_r($http_options, TRUE),
+  ), ((isset($result->code) && $result->code == 200) ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Veritrans: API'), request_path()));
+
+  return $return;
+}
+
+

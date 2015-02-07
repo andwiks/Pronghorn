@@ -285,11 +285,10 @@ function sepulsa_phone_form_submit($form, &$form_state) {
   // Load node pulsa.
   $pulsa = node_load($form_state['values']['card_type']);
   // Show message to user.
-  drupal_set_message(t('@pulsa (@product) has been added to cart.', array(
-    '@pulsa' => $pulsa->title,
-    '@product' => $product->title,
-  )));
-
+  // drupal_set_message(t('@pulsa (@product) has been added to cart.', array(
+  //  '@pulsa' => $pulsa->title,
+  //  '@product' => $product->title,
+  // )));
   // Redirect to coupon page.
   // By default redirection is handled by rules.
   // Check fast charge operation: redirect to checkout page.

@@ -92,3 +92,94 @@ function sepulsa_get_all_operator_prefix($reset = FALSE) {
   // Return operator array.
   return $operators;
 }
+
+/**
+ * Function sepulsa_get_all_operator_card_type().
+ *
+ * @param bool $reset
+ *   Reset flag.
+ *
+ * @return array
+ *   Array of operators (key) and array(node id => node title).
+ *
+ * @todo: reset create 502.
+ */
+function sepulsa_get_all_operator_card_type($reset = FALSE) {
+  // Declare static card types variable.
+  $card_types  = &drupal_static(__FUNCTION__, array(), $reset);
+  // If already defined, and not empty, then return it.
+  if (isset($card_types) && !empty($card_types) && !$reset) {
+    return $card_types;
+  }
+
+  // Get databases data from cache.
+  $cache = cache_get('sepulsa_all_operator_card_type', 'cache');
+  // Check whether cache is available.
+  if (empty($cache) || $reset) {
+    // Define default operators array.
+    $card_types = array();
+    // Get all taxonomy bundle: mobile_operator with nonempty prefix.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'taxonomy_term')
+      ->entityCondition('bundle', array('mobile_operator'))
+      ->fieldCondition('field_operator_prefix', 'value', '', '!=');
+    $result = $query->execute();
+    // Get all taxonomy id.
+    $tids = (isset($result['taxonomy_term'])) ? array_keys($result['taxonomy_term']) : array();
+    // Check whether we can get available taxonomy id.
+    if (!empty($tids)) {
+      // Looping for each tid.
+      foreach ($tids as $tid) {
+        // Load taxonomy term.
+        $term = taxonomy_term_load($tid);
+        // Add it in the operator array.
+        $card_types[$term->name] = sepulsa_get_card_type($tid);
+      }
+    }
+    // Store it inside cache.
+    cache_set('sepulsa_all_operator_card_type', $card_types, 'cache', CACHE_PERMANENT);
+  }
+  else {
+    $card_types = $cache->data;
+  }
+
+  // Return operator array.
+  return $card_types;
+}
+
+/**
+ * Function sepulsa_get_card_type().
+ *
+ * Output Format:
+ * key: node id.
+ * value: node title.
+ *
+ * @param int|array $operator
+ *   Operator term id or array operator result from sepulsa_get_operator().
+ *
+ * @return array
+ *   Card type content.
+ */
+function sepulsa_get_card_type($operator) {
+  // Define default options as return value.
+  $options = array();
+  // Get operator term id.
+  $operator = (is_array($operator)) ? key($operator) : intval($operator);
+
+  // Get node pulsa based on taxonomy id.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'pulsa')
+    ->propertyCondition('status', NODE_PUBLISHED)
+    ->fieldCondition('field_operator', 'tid', $operator, '=');
+  $result = $query->execute();
+  // Check whether result is available.
+  if (isset($result['node'])) {
+    $nodes = node_load_multiple(array_keys($result['node']));
+    foreach ($nodes as $node) {
+      $options[$node->nid] = $node->title;
+    }
+  }
+
+  return $options;
+}

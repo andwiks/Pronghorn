@@ -40,114 +40,6 @@ function sepulsa_menu() {
  */
 
 /**
- * Function sepulsa_get_all_operator_prefix().
- *
- * @param bool $reset
- *   Variable reset flag.
- *
- * @return array
- *   Array of operators (key) and prefix codes (values).
- */
-function sepulsa_get_all_operator_prefix($reset = FALSE) {
-  // Declare static operators variable.
-  $operators  = &drupal_static(__FUNCTION__, array(), $reset);
-  // If already defined, and not empty, then return it.
-  if (isset($operators) && !empty($operators) && !$reset) {
-    return $operators;
-  }
-
-  // Get databases data from cache.
-  $cache = cache_get('sepulsa_all_operator_prefix', 'cache');
-  // Check whether cache is available.
-  if (empty($cache) || $reset) {
-    // Define default operators array.
-    $operators = array();
-    // Get all taxonomy bundle: mobile_operator with nonempty prefix.
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term')
-      ->entityCondition('bundle', array('mobile_operator'))
-      ->fieldCondition('field_operator_prefix', 'value', '', '!=');
-    $result = $query->execute();
-    // Get all taxonomy id.
-    $tids = (isset($result['taxonomy_term'])) ? array_keys($result['taxonomy_term']) : array();
-    // Check whether we can get available taxonomy id.
-    if (!empty($tids)) {
-      // Looping for each tid.
-      foreach ($tids as $tid) {
-        // Load taxonomy term.
-        $term = taxonomy_term_load($tid);
-        // Get term wrapper: in order to get field easily.
-        $term_wrapper = entity_metadata_wrapper('taxonomy_term', $term);
-        // Add it in the operator array.
-        $operators[$term->name] = $term_wrapper->field_operator_prefix->value();
-      }
-    }
-    // Store it inside cache.
-    cache_set('sepulsa_all_operator_prefix', $operators, 'cache', CACHE_PERMANENT);
-  }
-  else {
-    $operators = $cache->data;
-  }
-
-  // Return operator array.
-  return $operators;
-}
-
-/**
- * Function sepulsa_get_all_operator_card_type().
- *
- * @param bool $reset
- *   Reset flag.
- *
- * @return array
- *   Array of operators (key) and array(node id => node title).
- *
- * @todo: reset create 502.
- */
-function sepulsa_get_all_operator_card_type($reset = FALSE) {
-  // Declare static card types variable.
-  $card_types  = &drupal_static(__FUNCTION__, array(), $reset);
-  // If already defined, and not empty, then return it.
-  if (isset($card_types) && !empty($card_types) && !$reset) {
-    return $card_types;
-  }
-
-  // Get databases data from cache.
-  $cache = cache_get('sepulsa_all_operator_card_type', 'cache');
-  // Check whether cache is available.
-  if (empty($cache) || $reset) {
-    // Define default operators array.
-    $card_types = array();
-    // Get all taxonomy bundle: mobile_operator with nonempty prefix.
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'taxonomy_term')
-      ->entityCondition('bundle', array('mobile_operator'))
-      ->fieldCondition('field_operator_prefix', 'value', '', '!=');
-    $result = $query->execute();
-    // Get all taxonomy id.
-    $tids = (isset($result['taxonomy_term'])) ? array_keys($result['taxonomy_term']) : array();
-    // Check whether we can get available taxonomy id.
-    if (!empty($tids)) {
-      // Looping for each tid.
-      foreach ($tids as $tid) {
-        // Load taxonomy term.
-        $term = taxonomy_term_load($tid);
-        // Add it in the operator array.
-        $card_types[$term->name] = sepulsa_get_card_type($tid);
-      }
-    }
-    // Store it inside cache.
-    cache_set('sepulsa_all_operator_card_type', $card_types, 'cache', CACHE_PERMANENT);
-  }
-  else {
-    $card_types = $cache->data;
-  }
-
-  // Return operator array.
-  return $card_types;
-}
-
-/**
  * Function sepulsa_get_card_type().
  *
  * Output Format:
@@ -182,4 +74,108 @@ function sepulsa_get_card_type($operator) {
   }
 
   return $options;
+}
+
+/**
+ * Function sepulsa_get_packet().
+ *
+ * Format:
+ * key: product_id.
+ * value: product title.
+ *
+ * @param int $nid
+ *   Node id.
+ *
+ * @return array
+ *   Packet options array.
+ */
+function sepulsa_get_packet($nid) {
+  // Define default packet options.
+  $options = array();
+
+  // Load node wrapper.
+  $node_wrapper = entity_metadata_wrapper('node', $nid);
+  // Check node type and node status.
+  if ($node_wrapper->type->value() == 'pulsa'
+    && $node_wrapper->status->value() == 1
+  ) {
+    // Get product object.
+    $products = $node_wrapper->field_product->value();
+    // Looping for each product.
+    foreach ($products as $product) {
+      // Check product status.
+      if (!empty($product->status)) {
+        // Add it inside options array.
+        $options[$product->product_id] = $product->title;
+      }
+    }
+  }
+
+  // Return options.
+  return $options;
+}
+
+/**
+ * Function sepulsa_get_all_operator_data().
+ *
+ * @param bool $reset
+ *   Variable reset flag.
+ *
+ * @return array
+ *   Array of operators (key).
+ *   Value: prefix codes and card types.
+ */
+function sepulsa_get_all_operator_data($reset = FALSE) {
+  // Declare static operators variable.
+  $operators  = &drupal_static(__FUNCTION__, NULL);
+  // If already defined, and not empty, then return it.
+  if (isset($operators) && !empty($operators) && !$reset) {
+    return $operators;
+  }
+
+  // Get databases data from cache.
+  $cache = cache_get('sepulsa_all_operator_data', 'cache');
+  // Check whether cache is available.
+  if (empty($cache) || $reset) {
+    // Define default operators array.
+    $operators = array();
+    // Get all taxonomy bundle: mobile_operator with nonempty prefix.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'taxonomy_term')
+      ->entityCondition('bundle', array('mobile_operator'))
+      ->fieldCondition('field_operator_prefix', 'value', '', '!=');
+    $result = $query->execute();
+    // Get all taxonomy id.
+    $tids = (isset($result['taxonomy_term'])) ? array_keys($result['taxonomy_term']) : array();
+    // Check whether we can get available taxonomy id.
+    if (!empty($tids)) {
+      // Looping for each tid.
+      foreach ($tids as $tid) {
+        // Get term wrapper: in order to get field easily.
+        $term_wrapper = entity_metadata_wrapper('taxonomy_term', $tid);
+        // Get operator card types.
+        $card_types = sepulsa_get_card_type($tid);
+        // Get operator packets.
+        $packets = array();
+        foreach ($card_types as $node_id => $node_title) {
+          $packets[$node_id] = sepulsa_get_packet($node_id);
+        }
+        // Add it in the operator array.
+        $operators[$tid] = array(
+          'operator' => $term_wrapper->label(),
+          'prefix' => $term_wrapper->field_operator_prefix->value(),
+          'cardtype' => $card_types,
+          'packet' => $packets,
+        );
+      }
+    }
+    // Store it inside cache.
+    cache_set('sepulsa_all_operator_data', $operators, 'cache', CACHE_PERMANENT);
+  }
+  else {
+    $operators = $cache->data;
+  }
+
+  // Return operator array.
+  return $operators;
 }

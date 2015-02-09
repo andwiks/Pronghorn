@@ -33,6 +33,16 @@ function sepulsa_autocomplete() {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
+  // Add sepulsa autocomplete form js.
+  drupal_add_js(drupal_get_path('module', 'sepulsa') . '/sepulsa.form.js', 'file');
+
+  // Get sepulsa operator data.
+  $operator_data = sepulsa_get_all_operator_data(TRUE);
+  // Store these prefixes inside drupal settings.
+  drupal_add_js(array(
+    'sepulsa' => $operator_data,
+  ), 'setting');
+
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
   // Return sepulsa phone form.
@@ -51,20 +61,19 @@ function sepulsa_front_page() {
  *   Form array.
  */
 function sepulsa_phone_form($form, &$form_state) {
-  // Add sepulsa autocomplete form js.
-  drupal_add_js(drupal_get_path('module', 'sepulsa') . '/sepulsa.form.js', 'file');
+  // Define default operator options.
+  $operator_options = array(
+    0 => t('Select Operator'),
+  );
+  // Define default card type: empty value.
+  $card_type_options = array(
+    0 => t('Select Card Type'),
+  );
+  // Define default packet options.
+  $packet_options = array();
 
-  // Get all operator phone prefixes.
-  $prefixes = sepulsa_get_all_operator_prefix();
-  // Get all operator card types.
-  $card_types = sepulsa_get_all_operator_card_type();
-  // Store these prefixes inside drupal settings.
-  drupal_add_js(array(
-    'sepulsa' => array(
-      'prefix' => $prefixes,
-      'cardtype' => $card_types,
-    ),
-  ), 'setting');
+  // Get sepulsa operator data.
+  $operator_data = sepulsa_get_all_operator_data(TRUE);
 
   // Check previous form state.
   $phone = (isset($form_state['values']['phone']) && !empty($form_state['values']['phone'])) ? $form_state['values']['phone'] : '';
@@ -77,30 +86,28 @@ function sepulsa_phone_form($form, &$form_state) {
     '#title' => t('Phone Number'),
     '#required' => TRUE,
     '#default_value' => (!empty($phone)) ? $phone : '',
-    '#attributes' => array('autocomplete' => 'off'),
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
+    '#attributes' => array(
+      'pattern' => '[0-9]*',
+    ),
   );
 
-
-
-  // Define default operator options.
-  $operator_options = array(
-    0 => t('Select Operator'),
-  );
   // Add operator options with operator data from phone prefix.
-  $operator_options += drupal_map_assoc(array_keys($prefixes));
-
-  // Check whether phone number is available.
-  if (!empty($phone)) {
-    // Define default operator value.
-    $operator = sepulsa_get_operator($phone);
-    // Check whether we can get only one operator.
-    if (count($operator) == 1) {
-      $operator = current($operator);
-    }
-    else {
-      // Trash unusable operator data.
-      unset($operator);
+  foreach ($operator_data as $data) {
+    $operator_options[$data['operator']] = $data['operator'];
+    // Check whether phone number is available.
+    if (!empty($phone)) {
+      // Define default operator value.
+      $prefix_key = array_search(substr($phone, 0, 4), $data['prefix']);
+      if ($prefix_key !== FALSE) {
+        $operator = $data['prefix'][$prefix_key];
+        $card_type_options = $data['cardtype'];
+        if (isset($form_state['values']['card_type']) && isset($card_type_options[$form_state['values']['card_type']])) {
+          $packet_options = $data['packet'][$form_state['values']['card_type']];
+          sort($packet_options);
+          $packet = key($packet_options);
+        }
+      }
     }
   }
 
@@ -114,71 +121,55 @@ function sepulsa_phone_form($form, &$form_state) {
     '#disabled' => TRUE,
   );
 
-  // Define default operator options.
-  $card_type_options = array(
-    0 => t('Select Card Type'),
-  );
+  $card_type_display = (count($card_type_options) > 1) ? 'inline' : 'none';
+  // Check whether operator input already available.
+    $form['card_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Card Type'),
+      '#required' => TRUE,
+      '#default_value' => isset($card_type) ? $card_type : key($card_type_options),
+      '#options' => $card_type_options,
+      '#prefix' => '<div id="sepulsa-autocomplete-card-type" style="display: ' . $card_type_display . ';">',
+      '#suffix' => '</div>',
+      '#validated' => TRUE,
+    );
 
-  $card_type_options += sepulsa_get_all_operator_card_type();
-
-  // Check whether phone number is available.
-  if (!empty($phone) && isset($operator)) {
-    // Define default value for card type.
-    $card_type = (isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])) ? $form_state['values']['card_type'] : 0;
-    $card_type = intval($card_type);
-  }
-  // Define operator dropdown select.
-  $form['card_type'] = array(
-    '#type' => 'select',
-    '#title' => t('Card Type'),
-    '#required' => TRUE,
-    '#default_value' => (isset($card_type)) ? $card_type : 0,
-    '#options' => $card_type_options,
-    '#prefix' => '<div id="sepulsa-autocomplete-card-type">',
-    '#suffix' => '</div>',
-    '#ajax' => array(
-      'callback' => 'sepulsa_autocomplete_packets',
-      'wrapper' => 'sepulsa-autocomplete-packets',
-      'event' => 'change blur',
-    ),
-    '#validated' => TRUE,
-  );
-
-  // Define default packet options.
-  $options = array(
-    0 => t('Select Packet'),
-  );
-  // Check whether operator has been selected.
-  if (isset($card_type) && !empty($card_type)) {
-    // Add packet options based on operator input.
-    $options += sepulsa_get_packet($card_type);
-    // Define default value for operator.
-    $packet = (isset($form_state['values']['packet']) && !empty($form_state['values']['packet'])) ? $form_state['values']['packet'] : 0;
-    $packet = intval($packet);
-  }
-  // Define packet dropdown select.
-  $form['packet'] = array(
-    '#type' => 'select',
-    '#title' => t('Packet'),
-    '#required' => TRUE,
-    '#default_value' => (isset($packet)) ? $packet : 0,
-    '#options' => $options,
-    '#ajax' => array(
-      'callback' => 'sepulsa_autocomplete_cart',
-      'wrapper' => 'sepulsa-autocomplete-cart',
-      'event' => 'ready change blur',
-    ),
-    '#prefix' => '<div id="sepulsa-autocomplete-packets">',
-    '#suffix' => '</div>',
-    '#validated' => TRUE,
-  );
+  $packet_display = (!empty($packet_options)) ? 'inline' : 'none';
+    // Define packet dropdown select.
+    $form['packet'] = array(
+      '#type' => 'select',
+      '#title' => t('Packet'),
+      '#required' => TRUE,
+      '#default_value' => (isset($packet)) ? $packet : key($packet_options),
+      '#options' => $packet_options,
+      '#prefix' => '<div id="sepulsa-autocomplete-packets" style="display: ' . $packet_display . ';">',
+      '#suffix' => '</div>',
+      '#validated' => TRUE,
+    );
 
   // Define add to cart: currently as markup.
-  $form['add'] = array(
-    '#markup' => '<div id="sepulsa-autocomplete-cart"></div>',
-  );
   // Check autocomplete for cart.
-  $form['add'] = sepulsa_autocomplete_cart($form, $form_state);
+  $form['add'] = array(
+      '#tree' => TRUE,
+      '#prefix' => '<div id="sepulsa-autocomplete-operation" style="display: ' . $packet_display . '; float: right;">',
+      '#suffix' => '</div>',
+    );
+    // Submit button: add to cart.
+    $form['add']['cart'] = array(
+      '#type' => 'submit',
+      '#value' => t('Add to Cart'),
+      '#attributes' => array(
+        'class' => array('btn', 'style1'),
+      ),
+    );
+    // Submit button: fast charge.
+    $form['add']['charge'] = array(
+      '#type' => 'submit',
+      '#value' => t('Fast Charge'),
+      '#attributes' => array(
+        'class' => array('btn', 'style1'),
+      ),
+    );
 
   // Return form array.
   return $form;
@@ -203,30 +194,18 @@ function sepulsa_phone_form_validate($form, &$form_state) {
   ) {
     // Define phone variable.
     $phone = sepulsa_autocorrect_mobile_prefix($form_state['values']['phone']);
-    // Get operators based on phone number.
-    $operator = sepulsa_get_operator($phone);
-    // 2. Validate operator.
-    // 2a. Available and not empty.
-    // 2b. Numeric value.
-    // 2c. Operator input has correct term id.
-    if (isset($form_state['values']['operator']) && !empty($form_state['values']['operator'])
-      && is_numeric($form_state['values']['operator'])
-      && isset($operator[$form_state['values']['operator']])
-    ) {
-      // Get card types from operator.
-      $card_types = sepulsa_get_card_type($operator);
-      // 3. Validate card type.
-      // 3a. Available and not empty.
-      // 3b. Numeric value.
-      // 3c. Card type input has correct node id.
-      if (isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])
-        && is_numeric($form_state['values']['card_type'])
-        && isset($card_types[$form_state['values']['card_type']])
-      ) {
-        // Define operator node id.
-        $card_type = intval($form_state['values']['card_type']);
-        // Get packets based on operator input.
-        $packets = sepulsa_get_packet($card_type);
+    // Get operator data.
+    $operator_data = sepulsa_get_all_operator_data();
+    // Define default packets.
+    $packets = array();
+    foreach ($operator_data as $operator) {
+      if (in_array(substr($phone, 0, 4), $operator['prefix'])) {
+        foreach ($operator['packet'] as $packet) {
+          $packets += $packet;
+        }
+      }
+    }
+
         // 4. Validate packet.
         // 4a. Available and not empty.
         // 4b. Numeric value.
@@ -250,16 +229,7 @@ function sepulsa_phone_form_validate($form, &$form_state) {
           // Invalid packet input.
           form_set_error('packet', t('Illegal packet input.'));
         }
-      }
-      else {
-        // Invalid card type input.
-        form_set_error('card_type', t('Illegal card_type input.'));
-      }
-    }
-    else {
-      // Invalid operator input.
-      form_set_error('operator', t('Illegal operator input.'));
-    }
+
   }
   else {
     // This section always return error.
@@ -305,13 +275,6 @@ function sepulsa_phone_form_submit($form, &$form_state) {
   // Add the line item to cart.
   commerce_cart_product_add($user->uid, $line_item);
 
-  // Load node pulsa.
-  $pulsa = node_load($form_state['values']['card_type']);
-  // Show message to user.
-  // drupal_set_message(t('@pulsa (@product) has been added to cart.', array(
-  //  '@pulsa' => $pulsa->title,
-  //  '@product' => $product->title,
-  // )));
   // Redirect to coupon page.
   // By default redirection is handled by rules.
   // Check fast charge operation: redirect to checkout page.
@@ -323,122 +286,6 @@ function sepulsa_phone_form_submit($form, &$form_state) {
     // Redirect to checkout page.
     $form_state['redirect'] = 'checkout';
   }
-}
-
-/**
- * Function sepulsa_autocomplete_operator().
- *
- * @param array $form
- *   Form array.
- * @param array $form_state
- *   Form state array.
- *
- * @return form
- *   Form operator array.
- */
-function sepulsa_autocomplete_operator($form, &$form_state) {
-  // Check for input phone number.
-  if (!empty($form_state['values']['phone'])
-    && strlen($form_state['values']['phone']) >= 4
-    && preg_match('#^\+?\d+$#', $form_state['values']['phone'])
-  ) {
-    // Sanitize phone number.
-    $phone = sepulsa_autocorrect_mobile_prefix($form_state['values']['phone']);
-    // Get list of operator based on phone number.
-    $operator = sepulsa_get_operator($phone);
-    // Check for non empty options.
-    if (!empty($operator)) {
-      // Add operator options.
-      $form['operator']['#options'] = $operator;
-      $form['operator']['#validated'] = TRUE;
-    }
-    // Get list of card type based on operator.
-    $card_types = sepulsa_get_card_type($operator);
-    // Check for non empty options.
-    if (!empty($card_types)) {
-      // Add operator options.
-      $form['card_type']['#options'] = $form['card_type']['#options'] + $card_types;
-      $form['card_type']['#validated'] = TRUE;
-    }
-  }
-
-  // Return ajax command so multiple elements can be replaced.
-  return array(
-    '#type' => 'ajax',
-    '#commands' => array(
-      ajax_command_replace('#sepulsa-autocomplete-operator', render($form['operator'])),
-      ajax_command_replace('#sepulsa-autocomplete-card-type', render($form['card_type'])),
-      ajax_command_invoke('#edit-phone', 'focus'),
-    ),
-  );
-}
-
-/**
- * Function sepulsa_autocomplete_packets().
- *
- * @param array $form
- *   Form array.
- * @param array $form_state
- *   Form state array.
- *
- * @return array
- *   Form packet array.
- */
-function sepulsa_autocomplete_packets($form, &$form_state) {
-  // Get input card_type, which is a node id.
-  $nid = (isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])) ? intval($form_state['values']['card_type']) : 0;
-  // Check whehter we can get node id.
-  if (!empty($nid)) {
-    // Get packet options.
-    $options = sepulsa_get_packet($nid);
-    // Check for non empty options.
-    if (!empty($options)) {
-      // Add packets options.
-      $form['packet']['#options'] = $form['packet']['#options'] + $options;
-      $form['packet']['#validated'] = TRUE;
-    }
-  }
-  // Return packet form.
-  return $form['packet'];
-}
-
-/**
- * Function sepulsa_autocomplete_cart().
- *
- * @param array $form
- *   Form array.
- *
- * @param array $form_state
- *   Form state array.
- *
- * @return array
- *   Form add to cart button.
- */
-function sepulsa_autocomplete_cart($form, &$form_state) {
-  // Check for all for nonempty input: validate function will inspect the value.
-  if (isset($form_state['values']['phone']) && !empty($form_state['values']['phone'])
-    && isset($form_state['values']['operator']) && !empty($form_state['values']['operator'])
-    && isset($form_state['values']['card_type']) && !empty($form_state['values']['card_type'])
-    && isset($form_state['values']['packet']) && !empty($form_state['values']['packet'])
-  ) {
-    $form['add'] = array(
-      '#tree' => TRUE,
-    );
-    // Submit button: add to cart.
-    $form['add']['cart'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add to Cart'),
-      '#attributes' => array('class' => array('btn', 'style1'), 'style' => 'float:right'),
-    );
-    // Submit button: fast charge.
-    $form['add']['charge'] = array(
-      '#type' => 'submit',
-      '#value' => t('Fast Charge'),
-      '#attributes' => array('class' => array('btn', 'style1'), 'style' => 'float:right'),
-    );
-  }
-  // Return form add: markup or submit button.
-  return $form['add'];
 }
 
 /**
@@ -477,16 +324,23 @@ function sepulsa_autocomplete_prefix($string, $count = 4) {
   // Define default count.
   $count = intval($count);
   // Get List of operator and prefix code.
-  $operators = sepulsa_get_all_operator_prefix();
+  $operators = sepulsa_get_all_operator_data();
   // Define default matches.
   $matches = array();
   // Only for non empty operators.
   if (!empty($operators)) {
-    foreach ($operators as $prefixs) {
-      foreach ($prefixs as $prefix) {
-        $sub_prefix = substr($prefix, 0, $count);
-        if (strstr($sub_prefix, $string) !== FALSE && !array_key_exists($sub_prefix, $matches)) {
-          $matches[$sub_prefix] = ' ' . $sub_prefix;
+    // Looping for each operator.
+    foreach ($operators as $operator) {
+      // Check whether prefix is available.
+      if (isset($operator['prefix']) && !empty($operator['prefix'])) {
+        // Looping for each prefix.
+        foreach ($operator['prefix'] as $prefix) {
+          // Autocomplete based on count parameter: create sub prefix.
+          $sub_prefix = substr($prefix, 0, $count);
+          // Check whether prefix is available and not exists before.
+          if (strstr($sub_prefix, $string) !== FALSE && !array_key_exists($sub_prefix, $matches)) {
+            $matches[$sub_prefix] = ' ' . $sub_prefix;
+          }
         }
       }
     }
@@ -507,7 +361,8 @@ function sepulsa_autocomplete_prefix($string, $count = 4) {
  */
 function sepulsa_autocomplete_phone_number($string = '') {
   $matches = array();
-  if (!empty($string)) {
+  // Check whether strin gis not empty or has input 0.
+  if (!empty($string) || $string == '0') {
     // Check ID access number.
     if (preg_match('#^[\+|0]?6?2?$#', $string)) {
       $matches['08'] = ' 08';
@@ -532,79 +387,4 @@ function sepulsa_autocomplete_phone_number($string = '') {
   }
 
   drupal_json_output($matches);
-}
-
-/**
- * Function sepulsa_get_operator().
- *
- * Output Format:
- * key: taxonomy id.
- * value: taxonomy term name.
- *
- * @param string $phone
- *   Phone number.
- *
- * @return array
- *   Operator content.
- */
-function sepulsa_get_operator($phone) {
-  // Chop phone number.
-  $phone = substr($phone, 0, 4);
-  // Get taxonomy id: based on phone prefix.
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'taxonomy_term')
-    ->entityCondition('bundle', array('mobile_operator'))
-    ->fieldCondition('field_operator_prefix', 'value', $phone, '=');
-  $result = $query->execute();
-  // Get taxonomy term ids.
-  $tids = (isset($result['taxonomy_term'])) ? array_keys($result['taxonomy_term']) : array();
-
-  if (!empty($tids)) {
-    foreach ($tids as $tid) {
-      // Load taxonomy term by tid.
-      $term = taxonomy_term_load($tid);
-      // This suppose to result only 1 tid, so after finish, break the loop.
-      return array($tid => $term->name);
-    }
-  }
-  return array();
-}
-
-/**
- * Function sepulsa_get_packet().
- *
- * Format:
- * key: product_id.
- * value: product title.
- *
- * @param int $nid
- *   Node id.
- *
- * @return array
- *   Packet options array.
- */
-function sepulsa_get_packet($nid) {
-  // Define default packet options.
-  $options = array();
-
-  // Load node wrapper.
-  $node_wrapper = entity_metadata_wrapper('node', $nid);
-  // Check node type and node status.
-  if ($node_wrapper->type->value() == 'pulsa'
-    && $node_wrapper->status->value() == 1
-  ) {
-    // Get product object.
-    $products = $node_wrapper->field_product->value();
-    // Looping for each product.
-    foreach ($products as $product) {
-      // Check product status.
-      if (!empty($product->status)) {
-        // Add it inside options array.
-        $options[$product->product_id] = $product->title;
-      }
-    }
-  }
-
-  // Return options.
-  return $options;
 }

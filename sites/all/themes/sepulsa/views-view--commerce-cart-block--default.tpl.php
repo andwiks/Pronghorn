@@ -47,11 +47,9 @@ $total = commerce_line_items_total($line_items);
     </div>
   <?php endif; ?>
 
-  <?php if ($footer): ?>
-    <div class="pricing-table-header">
-      <h4 class="pricing-type">TOTAL = IDR <?php print number_format($total['amount'], 0, ".", ","); ?></h4>
-    </div>
-  <?php endif; ?>
+  <div class="pricing-table-header">
+    <h4 class="pricing-type">TOTAL = IDR <?php print number_format($total['amount'], 0, ".", ","); ?></h4>
+  </div>
   
   <div class="pricing-table-footer">
     <a href="<?php print $base_url."/checkout"; ?>" class="btn style4">Proses</a>

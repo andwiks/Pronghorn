@@ -68,7 +68,7 @@ global $base_url;
   <!-- Javascript -->
   <script type="text/javascript">
     function cacluateLaunchTime() {
-      var launchDateStr = "2015/02/15 22:00:00"; // timezone must be UTC + 0
+      var launchDateStr = "2015/02/21 21:00:00"; // timezone must be UTC + 0
       var launchDate = new Date(launchDateStr);
       launchDate.setTime( launchDate.getTime() - launchDate.getTimezoneOffset()*60*1000 );
 

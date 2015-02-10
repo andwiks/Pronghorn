@@ -55,7 +55,7 @@
 	    $.fancybox.close();
 	  }
 	  
-	  $(".checkout-continue", context).on("click", function (event) {   
+	  $("#edit-continue", context).on("click", function (event) {   
 	      event.preventDefault();
 	      $(this).attr("disabled", "disabled");
 	      Veritrans.token(card, callback);

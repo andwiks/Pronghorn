@@ -13,7 +13,9 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == "sepulsa_phone_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['phone']['#title'] = NULL;
-    $form['phone']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Masukkan Nomor Handphone', 'pattern' => '[0-9]*');
+    $form['phone']['#attributes']['class'] = array('input-text', 'full-width');
+    $form['phone']['#attributes']['placeholder'] = t('Masukkan Nomor Handphone (mis. 081234567890)');
+    $form['phone']['#attributes']['pattern'] = '[0-9]*';
 
     $form['operator']['#title'] = NULL;
     $form['operator']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Operator');

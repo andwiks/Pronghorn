@@ -33,7 +33,7 @@ global $base_url, $user;
             <a href="<?php print $base_url."/user/".$user->uid; ?>">Akun Saya</a>
           </li>
           <li class="menu-item-has-children">
-            <a href="<?php print $base_url."/user/".$user->uid."/orders"; ?>">Kupon</a>
+            <a href="<?php print $base_url."/user/".$user->uid."/coupon"; ?>">Kupon</a>
           </li>
           <li class="menu-item-has-children">
             <a href="<?php print $base_url."/user/logout"; ?>">Logout</a>

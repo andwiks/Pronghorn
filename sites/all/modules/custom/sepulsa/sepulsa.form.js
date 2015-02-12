@@ -23,6 +23,7 @@
       }
       
       $(document).ready(function() {
+    	$("input[name=op]").attr("disabled", "disabled");
     	$("#edit-phone").trigger("blur").focus().val($("#edit-phone").val());
       });
       

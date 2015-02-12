@@ -155,7 +155,6 @@ function sepulsa_phone_form($form, &$form_state) {
   $form['add']['cart'] = array(
     '#type' => 'submit',
     '#value' => t('Add to Cart'),
-    '#disabled' => TRUE,
     '#attributes' => array(
       'class' => array('btn', 'style1', 'inactive'),
     ),
@@ -164,7 +163,6 @@ function sepulsa_phone_form($form, &$form_state) {
   $form['add']['charge'] = array(
     '#type' => 'submit',
     '#value' => t('Fast Charge'),
-    '#disabled' => TRUE,
     '#attributes' => array(
       'class' => array('btn', 'style1', 'inactive'),
     ),

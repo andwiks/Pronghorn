@@ -14,7 +14,7 @@
           "card_exp_month": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-month").val(),
           "card_exp_year": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-year").val(),
           "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-credit-card-code").val(),
-          "secure": false,
+          "secure": true,
           "gross_amount": settings.vt_amount
         }
       };
@@ -35,8 +35,9 @@
 	    	// Example: error with cvv.
 	    	// Example: network error.
 	      alert(response.status_message);
+	      closeDialog();
 	      $("#edit-continue").removeAttr("disabled", "disabled");
-	      return FALSE;
+	      return false;
 	    }
 	  }
 	

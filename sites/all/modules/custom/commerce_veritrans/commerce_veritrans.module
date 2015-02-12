@@ -536,9 +536,9 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     if (json_last_error() != JSON_ERROR_NONE) {
       // Log this condtion.
       watchdog('commerce_veritrans', 'Payment server return invalid json. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
-        '@payment' => print_r($payment),
-        '@pmethod' => print_r($payment_method),
-        '@order' => print_r($order),
+        '@payment' => print_r($payment, TRUE),
+        '@pmethod' => print_r($payment_method, TRUE),
+        '@order' => print_r($order, TRUE),
       ), WATCHDOG_ERROR, 'Veritrans Submit');
       // Payment API error: invalid json.
       drupal_set_message(t('Payment error: unable to interpret payment server return value.'), 'error');
@@ -548,14 +548,14 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   else {
     // Log this condtion.
     watchdog('commerce_veritrans', 'Payment server error: @error. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
-      '@error' => (isset($payment->error)) ? $payment_error : t('unknown'),
-      '@payment' => print_r($payment),
-      '@pmethod' => print_r($payment_method),
-      '@order' => print_r($order),
+      '@error' => (isset($payment->error)) ? $payment->error : t('unknown'),
+      '@payment' => print_r($payment, TRUE),
+      '@pmethod' => print_r($payment_method, TRUE),
+      '@order' => print_r($order, TRUE),
     ), WATCHDOG_ERROR, 'Veritrans Submit');
     // Payment API error: return object.
     drupal_set_message(t('Payment error: @error', array(
-      '@error' => (isset($payment->error)) ? $payment_error : t('unknown'),
+      '@error' => (isset($payment->error)) ? $payment->error : t('unknown'),
     )), 'error');
     return FALSE;
   }

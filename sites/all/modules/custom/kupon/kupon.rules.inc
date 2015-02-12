@@ -62,6 +62,6 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
     
     $node = node_submit($node); // Prepare node for saving
     node_save($node);
-    drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
+    //drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
   }
 }

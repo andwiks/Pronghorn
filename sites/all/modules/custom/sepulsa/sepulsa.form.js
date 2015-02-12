@@ -13,7 +13,7 @@
         $("#sepulsa-autocomplete-card-type").hide();
         $("#edit-packet option").remove();
         $("#sepulsa-autocomplete-packets").hide();
-        $("input[name=op]").toggleClass("inactive", true);
+        $("input[name=op]").toggleClass("inactive", true).attr("disabled", "disabled");
       }
       function sepulsa_form_packet(oid, pid) {
     	$("#edit-packet option").remove();
@@ -51,7 +51,7 @@
               sepulsa_form_packet(operator, $("#edit-card-type").val());
               if ($('#edit-packet option').size() > 0) {
                 $("#sepulsa-autocomplete-packets").show();
-                $("input[name=op]").toggleClass("inactive", false);
+                $("input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
               }
               return;
             }

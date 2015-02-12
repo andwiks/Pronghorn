@@ -13,7 +13,7 @@
         $("#sepulsa-autocomplete-card-type").hide();
         $("#edit-packet option").remove();
         $("#sepulsa-autocomplete-packets").hide();
-        $("input[name=op]").toggleClass("inactive", true).attr("disabled", "disabled");
+        $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", true).attr("disabled", "disabled");
       }
       function sepulsa_form_packet(oid, pid) {
     	$("#edit-packet option").remove();
@@ -23,7 +23,7 @@
       }
       
       $(document).ready(function() {
-    	$("input[name=op]").attr("disabled", "disabled");
+    	$("form#sepulsa-phone-form input[name=op]").attr("disabled", "disabled");
     	$("#edit-phone").trigger("blur").focus().val($("#edit-phone").val());
       });
       
@@ -52,7 +52,7 @@
               sepulsa_form_packet(operator, $("#edit-card-type").val());
               if ($('#edit-packet option').size() > 0) {
                 $("#sepulsa-autocomplete-packets").show();
-                $("input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
+                $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
               }
               return;
             }

@@ -6,6 +6,8 @@
  * @author andre4s_y
  *
  * @todo: 'terminal' => TRUE, handle.
+ * @todo: warning kalau setting tidak tersedia untuk line item tertentu.
+ * @see http://dev.sepulsa.com/admin/reports/event/1147
  */
 
 /**

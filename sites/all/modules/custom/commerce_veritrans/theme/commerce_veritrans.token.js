@@ -21,6 +21,7 @@
 	
 	  function callback(response) {
 	    console.log(response);
+	    // @todo: can not invoke 3DS.
 	    if (response.redirect_url) {
 	      openDialog(response.redirect_url);
 	    }
@@ -34,7 +35,7 @@
 	    	// Example: error with cvv.
 	    	// Example: network error.
 	      alert(response.status_message);
-	      $(".checkout-continue").removeAttr("disabled", "disabled");
+	      $("#edit-continue").removeAttr("disabled", "disabled");
 	      return FALSE;
 	    }
 	  }

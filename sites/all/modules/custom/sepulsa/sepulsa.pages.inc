@@ -33,16 +33,6 @@ function sepulsa_autocomplete() {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
-  // Add sepulsa autocomplete form js.
-  drupal_add_js(drupal_get_path('module', 'sepulsa') . '/sepulsa.form.js', 'file');
-
-  // Get sepulsa operator data.
-  $operator_data = sepulsa_get_all_operator_data(TRUE);
-  // Store these prefixes inside drupal settings.
-  drupal_add_js(array(
-    'sepulsa' => $operator_data,
-  ), 'setting');
-
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
   // Return sepulsa phone form.
@@ -61,6 +51,18 @@ function sepulsa_front_page() {
  *   Form array.
  */
 function sepulsa_phone_form($form, &$form_state) {
+  // Get sepulsa operator data.
+  $operator_data = sepulsa_get_all_operator_data();
+  // Add sepulsa autocomplete form js.
+  $form['#attached']['js'][] = array(
+    'data' => drupal_get_path('module', 'sepulsa') . '/sepulsa.form.js',
+    'type' => 'file',
+  );
+  $form['#attached']['js'][] = array(
+    'data' => array('sepulsa' => $operator_data),
+    'type' => 'setting',
+  );
+
   // Define default operator options.
   $operator_options = array(
     0 => t('Select Operator'),
@@ -71,9 +73,6 @@ function sepulsa_phone_form($form, &$form_state) {
   );
   // Define default packet options.
   $packet_options = array();
-
-  // Get sepulsa operator data.
-  $operator_data = sepulsa_get_all_operator_data(TRUE);
 
   // Check previous form state.
   $phone = (isset($form_state['values']['phone']) && !empty($form_state['values']['phone'])) ? $form_state['values']['phone'] : '';
@@ -123,53 +122,51 @@ function sepulsa_phone_form($form, &$form_state) {
 
   $card_type_display = (count($card_type_options) > 1) ? 'inline' : 'none';
   // Check whether operator input already available.
-    $form['card_type'] = array(
-      '#type' => 'select',
-      '#title' => t('Card Type'),
-      '#required' => TRUE,
-      '#default_value' => isset($card_type) ? $card_type : key($card_type_options),
-      '#options' => $card_type_options,
-      '#prefix' => '<div id="sepulsa-autocomplete-card-type" style="display: ' . $card_type_display . ';">',
-      '#suffix' => '</div>',
-      '#validated' => TRUE,
-    );
+  $form['card_type'] = array(
+    '#type' => 'select',
+    '#title' => t('Card Type'),
+    '#required' => TRUE,
+    '#default_value' => isset($card_type) ? $card_type : key($card_type_options),
+    '#options' => $card_type_options,
+    '#prefix' => '<div id="sepulsa-autocomplete-card-type" style="display: ' . $card_type_display . ';">',
+    '#suffix' => '</div>',
+    '#validated' => TRUE,
+  );
 
   $packet_display = (!empty($packet_options)) ? 'inline' : 'none';
-    // Define packet dropdown select.
-    $form['packet'] = array(
-      '#type' => 'select',
-      '#title' => t('Packet'),
-      '#required' => TRUE,
-      '#default_value' => (isset($packet)) ? $packet : key($packet_options),
-      '#options' => $packet_options,
-      '#prefix' => '<div id="sepulsa-autocomplete-packets" style="display: ' . $packet_display . ';">',
-      '#suffix' => '</div>',
-      '#validated' => TRUE,
-    );
+  // Define packet dropdown select.
+  $form['packet'] = array(
+    '#type' => 'select',
+    '#title' => t('Packet'),
+    '#required' => TRUE,
+    '#default_value' => (isset($packet)) ? $packet : key($packet_options),
+    '#options' => $packet_options,
+    '#prefix' => '<div id="sepulsa-autocomplete-packets" style="display: ' . $packet_display . ';">',
+    '#suffix' => '</div>',
+    '#validated' => TRUE,
+  );
 
   // Define add to cart: currently as markup.
   // Check autocomplete for cart.
   $form['add'] = array(
-      '#tree' => TRUE,
-      '#prefix' => '<div id="sepulsa-autocomplete-operation" style="display: ' . $packet_display . '; float: right;">',
-      '#suffix' => '</div>',
-    );
-    // Submit button: add to cart.
-    $form['add']['cart'] = array(
-      '#type' => 'submit',
-      '#value' => t('Add to Cart'),
-      '#attributes' => array(
-        'class' => array('btn', 'style1'),
-      ),
-    );
-    // Submit button: fast charge.
-    $form['add']['charge'] = array(
-      '#type' => 'submit',
-      '#value' => t('Fast Charge'),
-      '#attributes' => array(
-        'class' => array('btn', 'style1'),
-      ),
-    );
+    '#tree' => TRUE,
+  );
+  // Submit button: add to cart.
+  $form['add']['cart'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add to Cart'),
+    '#attributes' => array(
+      'class' => array('btn', 'style1', 'inactive'),
+    ),
+  );
+  // Submit button: fast charge.
+  $form['add']['charge'] = array(
+    '#type' => 'submit',
+    '#value' => t('Fast Charge'),
+    '#attributes' => array(
+      'class' => array('btn', 'style1', 'inactive'),
+    ),
+  );
 
   // Return form array.
   return $form;
@@ -206,29 +203,29 @@ function sepulsa_phone_form_validate($form, &$form_state) {
       }
     }
 
-        // 4. Validate packet.
-        // 4a. Available and not empty.
-        // 4b. Numeric value.
-        // 4c. Packet input has correct product id.
-        if (isset($form_state['values']['packet']) && !empty($form_state['values']['packet'])
-          && is_numeric($form_state['values']['packet'])
-          && isset($packets[$form_state['values']['packet']])
-        ) {
-          // 5. Validate submit button: human or bot.
-          // 5a. Check form operation.
-          // 5b. Form operation must the same as form add/charge input.
-          if (!(isset($form_state['values']['op']) && !empty($form_state['values']['op'])
-            && ($form_state['values']['op'] == $form_state['values']['add']['cart']
-            || $form_state['values']['op'] == $form_state['values']['add']['charge'])
-          )) {
-            // Invalid form input.
-            form_set_error('packet', t('Illegal form operation.'));
-          }
-        }
-        else {
-          // Invalid packet input.
-          form_set_error('packet', t('Illegal packet input.'));
-        }
+    // 4. Validate packet.
+    // 4a. Available and not empty.
+    // 4b. Numeric value.
+    // 4c. Packet input has correct product id.
+    if (isset($form_state['values']['packet']) && !empty($form_state['values']['packet'])
+      && is_numeric($form_state['values']['packet'])
+      && isset($packets[$form_state['values']['packet']])
+    ) {
+      // 5. Validate submit button: human or bot.
+      // 5a. Check form operation.
+      // 5b. Form operation must the same as form add/charge input.
+      if (!(isset($form_state['values']['op']) && !empty($form_state['values']['op'])
+        && ($form_state['values']['op'] == $form_state['values']['add']['cart']
+        || $form_state['values']['op'] == $form_state['values']['add']['charge'])
+      )) {
+        // Invalid form input.
+        form_set_error('packet', t('Illegal form operation.'));
+      }
+    }
+    else {
+      // Invalid packet input.
+      form_set_error('packet', t('Illegal packet input.'));
+    }
 
   }
   else {

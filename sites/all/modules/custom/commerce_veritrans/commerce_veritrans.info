@@ -7,3 +7,5 @@ dependencies[] = commerce_payment
 dependencies[] = commerce_order
 dependencies[] = fancybox
 core = 7.x
+
+files[] = includes/views/handlers/commerce_veritrans_handler_field_payment_transaction_link_approve.inc

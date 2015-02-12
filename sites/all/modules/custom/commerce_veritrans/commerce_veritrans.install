@@ -4,6 +4,9 @@
  * commerce_veritrans.install
  *
  * @author andre4s_y
+ *
+ * @todo: string token limit how many chars?
+ * @todo: expired is utc or +07?
  */
 
 /**
@@ -14,7 +17,81 @@
  * Implements hook_schema().
  */
 function commerce_veritrans_schema() {
-  // @todo: use schema to store token.
+  // Define grouponers table.
+  $schema = array(
+    'commerce_veritrans_token' => array(
+      'description' => 'Table for storing veritrans payment token.',
+      'fields' => array(
+        'token_id' => array(
+          'description' => 'The unique identifier of payment token.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'uid' => array(
+          'description' => 'Drupal User ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'order_id' => array(
+          'description' => 'Commerce Order ID.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'phone' => array(
+          'description' => 'User Phone Number.',
+          'type' => 'varchar',
+          'length' => 14,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'token' => array(
+          'description' => 'Veritrans Token.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ),
+        'expired' => array(
+          'description' => 'Veritrans Token Expired Datetime.',
+          'type' => 'int',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'first' => array(
+          'description' => 'Credit Card Masked First 6 Digits.',
+          'type' => 'char',
+          'length' => 6,
+          'default' => '',
+        ),
+        'last' => array(
+          'description' => 'Credit Card Masked Last 4 Digits.',
+          'type' => 'char',
+          'length' => 4,
+          'default' => '',
+        ),
+      ),
+      'primary key' => array('token_id'),
+      'indexes' => array(
+        'uid' => array('uid'),
+        'order_id' => array('order_id'),
+      ),
+      'foreign keys' => array(
+        'creator' => array(
+          'table' => 'users',
+          'columns' => array('uid' => 'uid'),
+        ),
+        'order_id' => array(
+          'table' => 'commerce_order',
+          'columns'=> array('order_id' => 'order_id'),
+        ),
+      ),
+    ),
+  );
+  // Return schema definition array.
+  return $schema;
 }
 
 /**
@@ -36,16 +113,7 @@ function commerce_veritrans_requirements($phase) {
       $requirements['veritrans_currency'] = array(
         'title' => $t('currency setting'),
         'value' => implode(', ', $currencies),
-        'description' => $t('Veritrans payment gateway only supports Indonesia currency: IDR.'),
-        'severity' => REQUIREMENT_ERROR,
-      );
-    }
-    // This module requires curl.
-    if (!extension_loaded('curl')) {
-      $requirements['veritrans_curl'] = array(
-        'title' => $t('curl extension'),
-        'value' => $t('disabled'),
-        'description' => $t('Veritrans payment gateway requires curl php extension.'),
+        'description' => $t('Veritrans payment gateway only supports Indonesia (IDN) currency: IDR.'),
         'severity' => REQUIREMENT_ERROR,
       );
     }

@@ -8456,4 +8456,6 @@ body.woocommerce select:not(.default-style) + .customSelect {
   height: 100%;
   margin-left: 20px; }
 
+.tqcoupon { margin:0 auto !important; float:none !important;}
+
 .inactive { background:#CCC}

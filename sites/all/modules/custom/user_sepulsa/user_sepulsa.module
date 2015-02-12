@@ -67,7 +67,7 @@ function user_sepulsa_user_insert(&$edit, &$account, $category = NULL) {
   // Other modules may implement hook_email_registration_name($edit, $account)
   // to generate a username (return a string to be used as the username, NULL
   // to have email_registration generate it).
-  // $names = module_invoke_all('email_registration_name', $edit, $account);
+  $names = module_invoke_all('user_sepulsa_name', $edit, $account);
   // Remove any empty entries.
   $names = array_filter($names);
 

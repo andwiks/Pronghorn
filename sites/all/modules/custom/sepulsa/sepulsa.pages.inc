@@ -101,6 +101,7 @@ function sepulsa_phone_form($form, &$form_state) {
       if ($prefix_key !== FALSE) {
         $operator = $data['prefix'][$prefix_key];
         $card_type_options = $data['cardtype'];
+        // @todo: check this.
         if (isset($form_state['values']['card_type']) && isset($card_type_options[$form_state['values']['card_type']])) {
           $packet_options = $data['packet'][$form_state['values']['card_type']];
           sort($packet_options);
@@ -198,7 +199,11 @@ function sepulsa_phone_form_validate($form, &$form_state) {
     foreach ($operator_data as $operator) {
       if (in_array(substr($phone, 0, 4), $operator['prefix'])) {
         foreach ($operator['packet'] as $packet) {
-          $packets += $packet;
+          foreach ($packet as $weight => $packet_data) {
+            if (isset($packet_data['id']) && isset($packet_data['title'])) {
+              $packets[$packet_data['id']]= $packet_data['title'];
+            }
+          }
         }
       }
     }

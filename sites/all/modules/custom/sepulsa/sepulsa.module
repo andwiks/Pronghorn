@@ -106,7 +106,10 @@ function sepulsa_get_packet($nid) {
       // Check product status.
       if (!empty($product->status)) {
         // Add it inside options array.
-        $options[$product->product_id] = $product->title;
+        $options[] = array(
+          'id' => $product->product_id,
+          'title' => $product->title
+        );
       }
     }
   }
@@ -128,6 +131,7 @@ function sepulsa_get_packet($nid) {
 function sepulsa_get_all_operator_data($reset = FALSE) {
   // Declare static operators variable.
   $operators  = &drupal_static(__FUNCTION__, NULL);
+
   // If already defined, and not empty, then return it.
   if (isset($operators) && !empty($operators) && !$reset) {
     return $operators;

@@ -18,7 +18,7 @@
       function sepulsa_form_packet(oid, pid) {
     	$("#edit-packet option").remove();
         for (packet in settings.sepulsa[oid].packet[pid]) {
-          $("#edit-packet").append($("<option>", {"value":packet}).text(settings.sepulsa[oid].packet[pid][packet])).val(packet);
+          $("#edit-packet").append($("<option>", {"value":settings.sepulsa[oid].packet[pid][packet].id}).text(settings.sepulsa[oid].packet[pid][packet].title)).val(settings.sepulsa[oid].packet[pid][packet].id);
         }
       }
       

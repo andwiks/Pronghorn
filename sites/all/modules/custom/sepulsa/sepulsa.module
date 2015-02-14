@@ -36,6 +36,14 @@ function sepulsa_menu() {
 }
 
 /**
+ * Implements hook_menu_alter().
+ */
+function sepulsa_menu_alter(&$items) {
+  // Change hybrid auth tab into: Social Login.
+  $items['user/%user/hybridauth']['title'] = 'Social Login';
+}
+
+/**
  * Public Functions.
  */
 
@@ -80,8 +88,8 @@ function sepulsa_get_card_type($operator) {
  * Function sepulsa_get_packet().
  *
  * Format:
- * key: product_id.
- * value: product title.
+ * key: weight.
+ * value: array(id, title).
  *
  * @param int $nid
  *   Node id.
@@ -105,10 +113,13 @@ function sepulsa_get_packet($nid) {
     foreach ($products as $product) {
       // Check product status.
       if (!empty($product->status)) {
+        // Get product price for sorting/future use.
+        $price = field_get_items('commerce_product', $product, 'commerce_price');
         // Add it inside options array.
         $options[] = array(
           'id' => $product->product_id,
-          'title' => $product->title
+          'title' => $product->title,
+          'price' => (isset($price[0]['amount'])) ? $price[0]['amount'] : 0,
         );
       }
     }
@@ -131,7 +142,6 @@ function sepulsa_get_packet($nid) {
 function sepulsa_get_all_operator_data($reset = FALSE) {
   // Declare static operators variable.
   $operators  = &drupal_static(__FUNCTION__, NULL);
-
   // If already defined, and not empty, then return it.
   if (isset($operators) && !empty($operators) && !$reset) {
     return $operators;

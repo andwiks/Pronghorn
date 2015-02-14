@@ -1,0 +1,7 @@
+name = Referral Sepulsa
+description = Some extension related with contrib referral module
+core = 7.x
+package = Sepulsa
+
+dependencies[] = referral
+dependencies[] = userpoints

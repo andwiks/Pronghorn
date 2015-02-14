@@ -30,17 +30,17 @@ global $base_url, $user;
           </li>
           <?php if ($user->uid > 0) { ?>
           <li class="menu-item-has-children">
-            <a href="<?php print $base_url."/user/".$user->uid; ?>">Akun Saya</a>
+            <a href="<?php print $base_url."/user/".$user->uid; ?>"><?php print t('My Account'); ?></a>
           </li>
           <li class="menu-item-has-children">
-            <a href="<?php print $base_url."/user/".$user->uid."/coupon"; ?>">Kupon</a>
+            <a href="<?php print $base_url."/user/".$user->uid."/coupon"; ?>"><?php print t('Coupon'); ?></a>
           </li>
           <li class="menu-item-has-children">
-            <a href="<?php print $base_url."/user/logout"; ?>">Logout</a>
+            <a href="<?php print $base_url."/user/logout"; ?>"><?php print t('Logout'); ?></a>
           </li>
           <?php } else { ?>
           <li class="mini-cart menu-item-has-children">
-            <a href="<?php print $base_url."/user"; ?>">Login</a>
+            <a href="<?php print $base_url."/user"; ?>"><?php print t('Log In'); ?></a>
             <?php if ($page['user_login']) { ?>
             <div class="sub-nav cart-content">
               <div style="text-align:center">
@@ -50,7 +50,7 @@ global $base_url, $user;
             <?php } ?>
           </li>
           <li class="mini-cart menu-item-has-children">
-            <a href="<?php print $base_url."/user/register"; ?>">Sign Up</a>
+            <a href="<?php print $base_url."/user/register"; ?>"><?php print t('Sign Up'); ?></a>
             <?php if ($page['user_signup']) { ?>
             <div class="sub-nav cart-content">
               <div style="text-align:center">

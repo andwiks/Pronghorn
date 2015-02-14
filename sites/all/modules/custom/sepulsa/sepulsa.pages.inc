@@ -33,6 +33,15 @@ function sepulsa_autocomplete() {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
+  global $user;
+  // Get cart order.
+  $order = commerce_cart_order_load($user->uid);
+  // Check whether order is not empty.
+  if (!empty($order)) {
+    // Empty the cart.
+    // For now, always empty cart when visit homepage
+    commerce_cart_order_empty($order);
+  }
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
   // Return sepulsa phone form.

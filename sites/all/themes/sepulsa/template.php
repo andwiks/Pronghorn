@@ -15,7 +15,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['phone']['#title'] = NULL;
     $form['phone']['#attributes']['class'] = array('input-text', 'full-width');
     $form['phone']['#attributes']['placeholder'] = t('Masukkan Nomor Handphone (mis. 081234567890)');
-    $form['phone']['#attributes']['pattern'] = '[0-9]*';
 
     $form['operator']['#title'] = NULL;
     $form['operator']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Operator');
@@ -107,4 +106,13 @@ function sepulsa_menu_local_tasks(&$variables) {
   }
 
   return $output;
+}
+
+function sepulsa_preprocess_block(&$vars, $hook) {
+  //drupal_set_message("<pre>".print_r($vars, true)."</pre>");
+  foreach ($vars['classes_array'] as $key => $value) {
+    if ($value == 'block') {
+      $vars['classes_array'][$key] = NULL;
+    }
+  }
 }

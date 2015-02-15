@@ -38,7 +38,7 @@ function kupon_rules_action_info() {
  */
 function kupon_create_owned_simple_coupon($line_item, $user) {
   if ($line_item->type == "coupon") {
-    //drupal_set_message("<pre>".print_r($user, true)."</pre>");
+    //drupal_set_message("<pre>".print_r($line_item, true)."</pre>");
     $node_coupon = node_load($line_item->data['context']['entity']['entity_id']);
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
@@ -57,6 +57,9 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
       'timezone' => date_default_timezone(),
       'timezone_db' => date_default_timezone(),
       'date_type' => 'datestamp',
+    );
+    $node->field_order_id[$node->language][] = array(
+      'value' => $line_item->order_id,
     );
     $node->uid = $user->uid;
     

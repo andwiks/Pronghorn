@@ -212,7 +212,7 @@ function sepulsa_phone_form_validate($form, &$form_state) {
   // 1c. At least has 8 chars (magic number?).
   // 1d. Maximum has 14 chars (magic number?).
   if (isset($form_state['values']['phone']) && !empty($form_state['values']['phone'])
-    && preg_match('#^\+?\d{8,14}#', $form_state['values']['phone'])
+    && preg_match('#^\+?\d{8,14}$#', $form_state['values']['phone'])
   ) {
     // Define phone variable.
     $phone = sepulsa_autocorrect_mobile_prefix($form_state['values']['phone']);

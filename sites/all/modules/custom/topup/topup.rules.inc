@@ -11,6 +11,24 @@
  */
 
 /**
+ * Implements hook_rules_event_info().
+ */
+function topup_rules_event_info() {
+  // So that we can use the entity_rules_events_variables() helper function.
+  module_load_include('inc', 'entity', 'entity.rules');
+
+  $events = array();
+
+  $events['all_topup_success'] = array(
+    'label' => t('When all topup is success'),
+    'group' => t('Topup'),
+    'variables' => entity_rules_events_variables('commerce_order', t('Order', array(), array('context' => 'a drupal commerce order'))),
+  );
+
+  return $events;
+}
+
+/**
  * Implements hook_rules_action_info().
  */
 function topup_rules_action_info() {
@@ -27,6 +45,20 @@ function topup_rules_action_info() {
     'group' => t('Topup'),
     'callbacks' => array(
       'execute' => 'topup_queue_request',
+    ),
+  );
+
+  $actions['topup_complete'] = array(
+    'label' => t('Topup Complete'),
+    'parameter' => array(
+      'commerce_order' => array(
+        'type' => 'commerce_order',
+        'label' => t('Topup Order Complete'),
+      ),
+    ),
+    'group' => t('Topup'),
+    'callbacks' => array(
+      'execute' => 'topup_complete',
     ),
   );
 
@@ -92,4 +124,17 @@ function topup_queue_request($order) {
       $queue->createItem($item);
     }
   }
+}
+
+/**
+ * Function topup_complete().
+ *
+ * Dummy action callback to update order status into complete.
+ *
+ * @param object $order
+ *   Order Object.
+ */
+function topup_complete($order) {
+  // Update order status.
+  commerce_order_status_update($order, 'completed', FALSE, NULL, t('Order state updated via Rules (Topup Complete).'));
 }

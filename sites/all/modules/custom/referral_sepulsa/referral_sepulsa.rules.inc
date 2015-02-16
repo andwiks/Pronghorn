@@ -60,6 +60,13 @@ function referral_sepulsa_rules_action_info() {
           'label' => t('Point Percentage'),
           'description' => t('Percentage of commerce order total convert into points (eg. 10)'),
         ),
+        'category' => array(
+          'type' => 'text',
+          'label' => t('Userpoint Category'),
+          'description' => t('Select Userpoint Category'),
+          'options list' => 'referral_sepulsa_userpoint_category_options',
+          'restriction' => 'input',
+        ),
       ),
     ),
   );
@@ -81,7 +88,7 @@ function user_first_paid_in_full_order($order, $user) {
 /**
  * The action function for 'assign_point_to_referrer_user'.
  */
-function assign_point_to_referrer_user($order, $user, $point_percentage) {
+function assign_point_to_referrer_user($order, $user, $point_percentage, $category) {
     // select table user_referral, get user referrer from current user
     $referrer_uid = db_query_range("SELECT referral_uid FROM {referral} WHERE uid = :uid", 0, 1, array('uid' => $user->uid))->fetchField();
     
@@ -92,7 +99,20 @@ function assign_point_to_referrer_user($order, $user, $point_percentage) {
         $params = array (
           'uid' => $referrer_uid,
           'points' => $points,
+          'tid' => $category
         );
         userpoints_userpointsapi($params); 
     }
+}
+
+function referral_sepulsa_userpoint_category_options() {
+    $list = array();
+    $vocabulary = taxonomy_vocabulary_machine_name_load('userpoints');
+    $terms = entity_load('taxonomy_term', FALSE, array('vid' => $vocabulary->vid));
+    foreach ($terms as $category) {
+        $list[$category->tid] = $category->name;
+    }
+    //drupal_set_message("<pre>".print_r($list, true)."</pre>");
+ 
+    return $list;
 }

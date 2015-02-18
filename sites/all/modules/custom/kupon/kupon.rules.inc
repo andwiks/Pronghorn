@@ -43,28 +43,39 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
     
-    $node = new stdClass();
-    $node->title = $node_coupon->title;
-    $node->type = "owned_simple_coupon";
-    $node->language = LANGUAGE_NONE;
+    if ($node_coupon->field_coupon_type[$node_coupon->language][0]['value'] == 'unique') {
+        $unique_nid = db_query_range("SELECT nid FROM {node} WHERE uid = 1 AND type = 'owned_unique_coupon'", 0, 1)->fetchField();
+        if ($unique_nid != null) {
+            $node = node_load($unique_nid);
+            $node->uid = $user->uid;
+            node_save($node);
+        } else {
+            drupal_set_message($node_coupon->title.' is out of stock', 'error');
+        }
+    } else {
+        $node = new stdClass();
+        $node->title = $node_coupon->title;
+        $node->type = "owned_simple_coupon";
+        $node->language = LANGUAGE_NONE;
+
+        $node->field_simple_coupon[$node->language][] = array(
+          'target_id' => $node_coupon->nid,
+          'target_type' => 'node',
+        );
+        $node->field_owned_coupon_expiry[$node->language][] = array(
+          'value' => $expiry[0]['value'],
+          'timezone' => date_default_timezone(),
+          'timezone_db' => date_default_timezone(),
+          'date_type' => 'datestamp',
+        );
+        $node->field_order_id[$node->language][] = array(
+          'value' => $line_item->order_id,
+        );
+        $node->uid = $user->uid;
+        $node = node_submit($node); // Prepare node for saving
+        node_save($node);
+    }
     
-    $node->field_simple_coupon[$node->language][] = array(
-      'target_id' => $node_coupon->nid,
-      'target_type' => 'node',
-    );
-    $node->field_owned_coupon_expiry[$node->language][] = array(
-      'value' => $expiry[0]['value'],
-      'timezone' => date_default_timezone(),
-      'timezone_db' => date_default_timezone(),
-      'date_type' => 'datestamp',
-    );
-    $node->field_order_id[$node->language][] = array(
-      'value' => $line_item->order_id,
-    );
-    $node->uid = $user->uid;
-    
-    $node = node_submit($node); // Prepare node for saving
-    node_save($node);
     //drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
   }
 }

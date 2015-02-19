@@ -5,10 +5,9 @@
 ;(function($) {
   Drupal.behaviors.commerceVeritrans = {
     attach: function (context, settings) {
-      $("#edit-commerce-payment-payment-details-veritrans-tokens").on("change", function () {
- 		$("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", ($(this).val() != "0"));
-      });
-    	
+      if (typeof Veritrans == "undefined") {
+    	Veritrans = {};
+      }
       Veritrans.url = settings.vt_url + '/token';
       Veritrans.client_key = settings.vt_client;
       
@@ -70,7 +69,11 @@
     	event.preventDefault();
         Veritrans.token(card, callback);     
         return false;
-      });     
+      });  
+      
+      $("#edit-commerce-payment-payment-details-veritrans-tokens").on("change ready", function () {
+   		$("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", ($(this).val() != "0"));
+      });
     }
   }
 })(jQuery);

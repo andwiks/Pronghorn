@@ -7,3 +7,6 @@ sites/*/private
 
 # Ignore test folder
 test
+
+#Ignore lain-lain, latest dumped DB for development, or other
+#zzzother

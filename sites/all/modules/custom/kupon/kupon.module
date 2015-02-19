@@ -1,5 +1,7 @@
 <?php
 
+define('KUPON_UPLOAD_PERM', 'kupon_upload_perm');
+
 /**
  * Implements hook_views_api().
  */
@@ -9,4 +11,118 @@ function kupon_views_api() {
     'path' => drupal_get_path('module', 'kupon'), 
     'template path' => drupal_get_path('module', 'kupon'),
   );
+}
+
+/**
+* Implementation of hook_permission().
+*/
+
+function kupon_permission() {
+  return array(
+	KUPON_UPLOAD_PERM => array(
+	  'title' => t('Kupon Upload CSV'),
+	  'description' => t('Upload Owned Unique Coupon in CSV'),
+	),
+  );
+}
+
+/**
+* Implementation of hook_menu().
+*/
+
+function kupon_menu() {
+  $items = array();
+
+  $items['admin/content/unique_coupon'] = array(
+    'title'            => t('Upload Owned Unique Coupon'),
+    'description'      => t('Upload Owned Unique Coupon'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('create_owned_unique_coupon_form'),
+    'access arguments' => array(KUPON_UPLOAD_PERM),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+function create_owned_unique_coupon_form($form, &$form_state){
+    $form['simple_coupon_id'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Simple Coupon ID'),
+        '#required' => true,
+        '#description' => t('Simple Coupon ID'),
+    );
+    
+    $form['#attributes']['enctype'] = "multipart/form-data";
+    $form['csv_upload'] = array(
+        '#type' => 'file',
+        '#title' => t('CSV File'),
+        '#size' => 40,
+        '#description' => t('Select the CSV file to be imported. '),
+    );
+    
+    $form['submit'] = array(
+        '#type' => 'submit', 
+        '#title' => 'Submit',
+        '#value' => 'Submit'
+    );
+    
+    return $form;
+}
+
+function create_owned_unique_coupon_form_validate($form, &$form_state){
+    $validators = array('file_validate_extensions' => array('csv'));
+    $file = file_save_upload('csv_upload', $validators);
+    // check file uploaded OK
+    if (!$file) { 
+      form_set_error('csv_upload', t('A file must be uploaded'));
+    }
+    else if($file->filemime != 'text/csv') {
+      form_set_error('csv_upload', t('The file must be of CSV type only.'));
+    }
+    else {
+      // set files to form_state, to process when form is submitted
+      $form_state['values']['csv_upload'] = $file;
+    } 
+}
+
+function create_owned_unique_coupon_form_submit($form, &$form_state){
+    $timestamp = time();
+    $unique_code_total = 0;
+    $filepath = $form_state['values']['csv_upload']->destination;
+    $handle = @fopen($filepath, "r");
+    $simple_coupon_id = $form['simple_coupon_id']['#value'];
+    $node_coupon = node_load($simple_coupon_id);
+    
+    if ($node_coupon != null) {
+        while ($row = fgetcsv($handle, 1000, ',')) {
+            $unique_code = $row[0];
+            // start create owned unique coupon
+            $node = new stdClass();
+            $node->title = $node_coupon->title;
+            $node->type = "owned_unique_coupon";
+            $node->language = LANGUAGE_NONE;
+
+            $node->field_unique_coupon[$node->language][] = array(
+              'target_id' => $node_coupon->nid,
+              'target_type' => 'node',
+            );
+            $node->field__unique_coupon_code[$node->language][] = array(
+              'value' => $unique_code,
+            );
+            $node->field_owned_unique_coupon_expiry[$node->language][] = array(
+              'value' => $timestamp,
+              'timezone' => date_default_timezone(),
+              'timezone_db' => date_default_timezone(),
+              'date_type' => 'datestamp',
+            );
+            $node->uid = 1;
+            $node = node_submit($node); // Prepare node for saving
+            node_save($node);
+            $unique_code_total = $unique_code_total + 1;
+        }    
+        drupal_set_message('Unique Codes Import Successfully', 'notice');
+    } else {
+        drupal_set_message('Invalid Simple Coupon ID', 'error');
+    }
 }

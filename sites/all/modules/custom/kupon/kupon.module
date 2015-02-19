@@ -103,14 +103,14 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
             $node->type = "owned_unique_coupon";
             $node->language = LANGUAGE_NONE;
 
-            $node->field_unique_coupon[$node->language][] = array(
+            $node->field_simple_coupon[$node->language][] = array(
               'target_id' => $node_coupon->nid,
               'target_type' => 'node',
             );
-            $node->field__unique_coupon_code[$node->language][] = array(
+            $node->field_unique_coupon_code[$node->language][] = array(
               'value' => $unique_code,
             );
-            $node->field_owned_unique_coupon_expiry[$node->language][] = array(
+            $node->field_expiry_date[$node->language][] = array(
               'value' => $timestamp,
               'timezone' => date_default_timezone(),
               'timezone_db' => date_default_timezone(),

@@ -49,7 +49,7 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
             $node = node_load($unique_nid);
             $node->language = LANGUAGE_NONE;
             $node->uid = $user->uid;
-            $node->field_unique_order_id[$node->language][] = array(
+            $node->field_order_id[$node->language][] = array(
                 'value' => $line_item->order_id,
             );
             node_save($node);

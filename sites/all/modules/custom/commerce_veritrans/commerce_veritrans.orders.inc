@@ -17,7 +17,6 @@
  *   Order object.
  * @param object $transaction
  *   Payment transaction object.
- *
  */
 function commerce_veritrans_payment_approve_form_wrapper($order, $transaction) {
   // Get latest payment response.
@@ -68,7 +67,7 @@ function commerce_veritrans_payment_approve_form_wrapper($order, $transaction) {
  * @return array
  *   Form array.
  */
-function commerce_veritrans_payment_approve_form($form = array(), $form_state = array(), $order, $transaction, $payment_method) {
+function commerce_veritrans_payment_approve_form($form, $form_state, $order, $transaction, $payment_method) {
   // Show payment information.
   $form['info'] = array(
     '#type' => 'fieldset',
@@ -169,18 +168,13 @@ function commerce_veritrans_payment_approve_form_submit($form, &$form_state) {
     $payment = json_decode($payment);
     // Chek json decode result.
     if (json_last_error() == JSON_ERROR_NONE) {
-      // Update payment transaction.
-      $order->data['commerce_veritrans']['response'] = $payment;
-
-      // Save order data.
-      commerce_order_save($order);
-
       // Check payment status.
       if (isset($payment->status_code) && $payment->status_code == '200'
         && isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'capture'
       ) {
         $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
         $status_message = 'status';
+        commerce_veritrans_token_new($order->order_id, $order->data['commerce_veritrans']['response'], $order->data['commerce_veritrans']['phone']);
       }
       elseif ((isset($payment->status_code) && $payment->status_code == '201')
         || (isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'challenge')
@@ -193,28 +187,42 @@ function commerce_veritrans_payment_approve_form_submit($form, &$form_state) {
         $status_message = 'error';
       }
 
+      // Update payment transaction.
+      $order->data['commerce_veritrans']['response'] = $payment;
+
+      // Save order data.
+      commerce_order_save($order);
+
+      // Get order total.
+      $total = field_get_items('commerce_order', $order, 'commerce_order_total');
       // Create new payment transaction.
       $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
       $transaction->instance_id = $payment_method['instance_id'];
       $transaction->remote_id = (isset($payment->order_id)) ? $payment->order_id : $order->order_id;
       $transaction->remote_status = $status;
-      $transaction->amount = (isset($payment->gross_amount)) ? intval($payment->gross_amount) : $charge['amount'];
-      $transaction->currency_code = $charge['currency_code']; // @todo.
+      $transaction->amount = (isset($payment->gross_amount)) ? intval($payment->gross_amount) : 0;
+      $transaction->currency_code = $total[0]['currency_code'];
       $transaction->status = $status;
       $transaction->message = 'Payment Data: <br />!data';
       $payment_data = '';
-      foreach ((array) $payment as $key =>$data) {
+      foreach ((array) $payment as $key => $data) {
         $payment_data[] = str_replace('_', ' ', $key) . ' = ' . ((is_array($data)) ? '<ul><li>' . implode('</li><li>', $data) . '</li></ul>' : $data);
       }
       $transaction->message_variables = array(
         '!data' => implode('<br />', $payment_data),
       );
       commerce_payment_transaction_save($transaction);
-      // @todo: improve payment notification.
-      drupal_set_message(t('Success approve payment transaction.'));
+
+      // Show notification to admin.
+      drupal_set_message(t('Payment transaction: @message.', array(
+        '@message' => (isset($payment->status_message)) ? $payment->status_message : t('approved'),
+      )));
+
+      // Redirect to order payment transaction list.
+      $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/payment';
     }
     else {
-      // Log this condtion.
+      // Log this condition.
       watchdog('commerce_veritrans', 'Payment server return invalid json. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
         '@payment' => print_r($payment),
         '@pmethod' => print_r($payment_method),

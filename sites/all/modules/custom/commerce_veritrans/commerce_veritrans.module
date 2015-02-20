@@ -9,6 +9,8 @@
  * @todo: implement vt web seconds.
  * @todo: implement vt link thirds.
  * @todo: break it up into 3 separate modules.
+ *
+ * @todo: query operation.
  */
 
 /**
@@ -22,17 +24,34 @@ function commerce_veritrans_commerce_payment_method_info() {
   $payment_methods = array();
 
   // VT-Direct: is onsite payment process.
+  // Can not use terminal: because form has js attachements.
   $payment_methods['commerce_veritrans'] = array(
     'base' => 'commerce_veritrans',
     'title' => t('Veritrans Payment Gateway'),
-    'short_title' => t('Veritrans'),
     'description' => t('Veritrans Payment Gateway Integration'),
-    'terminal' => TRUE,
+    'terminal' => FALSE,
     'offsite' => FALSE,
     'offsite_autoredirect' => FALSE,
   );
 
   return $payment_methods;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function commerce_veritrans_form_commerce_checkout_form_checkout_alter(&$form, &$form_state) {
+  // Check whether form contain payment method.
+  if (isset($form['commerce_payment']['payment_method'])) {
+    // Looping foreach options.
+    foreach ($form['commerce_payment']['payment_method']['#options'] as $payment_instance_id => $payment_title) {
+      $payment_details = explode('|', $payment_instance_id);
+      if (isset($payment_details[1])) {
+        $settings = rules_config_load($payment_details[1]);
+        $form['commerce_payment']['payment_method']['#options'][$payment_instance_id] = (isset($settings->label)) ? $settings->label : $payment_title;
+      }
+    }
+  }
 }
 
 /**
@@ -52,37 +71,60 @@ function commerce_veritrans_menu() {
     'file' => 'commerce_veritrans.orders.inc',
   );
 
+  // @todo: cancel/deny.
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/cancel'] = array(
+    'title' => 'Cancel',
+    'page callback' => 'commerce_veritrans_payment_cancel_form_wrapper',
+    'page arguments' => array(3, 5),
+    'access callback' => 'commerce_payment_transaction_access',
+    'access arguments' => array('delete', 5),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'file' => 'commerce_veritrans.orders.inc',
+  );
+  // @todo: query.
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/query'] = array(
+    'title' => 'Query',
+    'page callback' => 'commerce_veritrans_payment_query_form_wrapper',
+    'page arguments' => array(3, 5),
+    'access callback' => 'commerce_payment_transaction_access',
+    'access arguments' => array('view', 5),
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'file' => 'commerce_veritrans.orders.inc',
+  );
+
   $items['user/%user/token'] = array(
-    'title' => 'Payment Token',
+    'title' => 'Saved Credit Card',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_veritrans_user_token', 1),
+    'page arguments' => array('commerce_veritrans_user_token_form', 1),
     'access callback' => 'user_edit_access',
     'access arguments' => array(1),
     'file' => 'commerce_veritrans.pages.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
-  $items['user/%user/token/delete'] = array(
-    'title' => 'Delete Payment Token',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('commerce_veritrans_user_token_delete', 1, 4),
-    'access callback' => 'user_edit_access',
-    'access arguments' => array(1),
-    'file' => 'commerce_veritrans.pages.inc',
-    'type' => MENU_CALLBACK,
-  );
-
   return $items;
 }
 
 /**
- * Implements hook_views_api().
+ * Implements hook_menu_contextual_links_alter().
  */
-function commerce_veritrans_views_api() {
-  return array(
-    'api' => 3,
-    'path' => drupal_get_path('module', 'commerce_veritrans') . '/includes/views',
-  );
+function commerce_veritrans_menu_contextual_links_alter(&$links, $router_item, $root_path) {
+  // Check for payment transaction approve links.
+  if (isset($links['commerce-payment-transaction-approve'])) {
+    // Get payment transaction.
+    $transaction = $router_item['page_arguments'][1];
+    // Get order object.
+    $order = $router_item['page_arguments'][0];
+    // Check payment transaction and payment response.
+    if (!($transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
+      && isset($order->data['commerce_veritrans']['response'])
+      && $order->data['commerce_veritrans']['response']->fraud_status == 'challenge'
+    )) {
+      unset($links['commerce-payment-transaction-approve']);
+    }
+  }
 }
 
 /**
@@ -161,12 +203,25 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#type' => 'select',
     '#title' => t('Type'),
     '#options' => array(
+      'default' => t('Default'),
+      'authcapture' => t('Pre-Authorization + Capture'),
       'oneclick' => t('One Click'),
-      'regular' => t('Regular'),
+      'twoclick' => t('Two Click'),
     ),
-    '#default_value' => (isset($settings['credit_card']['bank'])) ? $settings['credit_card']['bank'] : 'regular',
+    '#default_value' => (isset($settings['credit_card']['type'])) ? $settings['credit_card']['type'] : 'default',
+    '#description' => t('One Click and Authorize process must use 3-D Secure.'),
   );
-
+  $form['credit_card']['3ds'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Always use 3-D Secure'),
+    '#default_value' => (isset($settings['credit_card']['3ds'])) ? $settings['credit_card']['3ds'] : '1',
+    '#description' => t('If this option enable, at checkout, form will always try to use 3-D Secure.'),
+    '#states' => array(
+      'checked' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][credit_card][type]"]' => array('value' => 'oneclick'),
+      ),
+    ),
+  );
   // Order ID Prefix.
   $form['prefix'] = array(
     '#type' => 'textfield',
@@ -253,8 +308,8 @@ function commerce_veritrans_settings_form($settings = array()) {
  *   Payment Method Info array.
  * @param array $pane_values
  *   Checkout payment pane values.
- * @param array $checkout_pane
- *   Checkout pane array info.
+ * @param array|null $checkout_pane
+ *   Checkout pane array info, if null callback from terminal.
  * @param object $order
  *   Order object.
  *
@@ -303,15 +358,32 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
           'vt_client' => $payment_method['settings']['client_key'],
           'vt_amount' => $order_wrapper->commerce_order_total->amount->value(),
           'vt_js' => $payment_method['settings']['js'],
+          'vt_secure' => boolval($payment_method['settings']['credit_card']['3ds']),
+          'vt_bank' => $payment_method['settings']['credit_card']['bank'],
+          'vt_type' => $payment_method['settings']['credit_card']['type'],
         ),
         'phone' => $phone,
         'type' => $payment_method['settings']['credit_card']['type'],
+        'uid' => $order->uid,
       );
       // Get veritrans credit card form and merge it with current form array.
       $form['veritrans'] = commerce_veritrans_credit_card_form($fields, array());
       // Define veritrans form tree.
       $form['veritrans']['#tree'] = TRUE;
+      // @todo: form attachement create js error!
+      // Move form attachments.
+      // $form['#attached'] = $form['veritrans']['#attached'];
+      // unset($form['veritrans']['#attached']);
     }
+
+    // Define veritrans error message.
+    $form['error'] = array(
+      '#type' => 'hidden',
+      '#default_value' => '',
+      '#attributes' => array(
+        'id' => 'error_message',
+      ),
+    );
   }
   else {
     // Show payment is not configured for user.
@@ -372,10 +444,40 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
     $return_value = FALSE;
   }
   // @todo: validate veritrans phone.
-  if (!(isset($pane_values['veritrans']['phone']) && !empty($pane_values['veritrans']['phone']))) {
-    form_set_error($prefix . 'type', t('Payment @type need to verify your phone number.', array(
-      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-    )));
+  if (!(isset($pane_values['veritrans']['credit_card']['phone']) && !empty($pane_values['veritrans']['credit_card']['phone']))) {
+    // Check whether operation is oneclick or twoclick.
+    if (in_array($payment_method['settings']['credit_card']['type'], array('oneclick', 'twoclick'))) {
+      // Try to get phone from token.
+      $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['token']);
+      if (empty($customer_phone)) {
+        form_set_error($prefix . '][token', t('Payment @type unable to get your phone number based on previous transactions.', array(
+          '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+        )));
+        $return_value = FALSE;
+      }
+    }
+    else {
+      form_set_error($prefix . '][credit_card][phone', t('Payment @type need to verify your phone number.', array(
+        '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+      )));
+      $return_value = FALSE;
+    }
+  }
+
+  // Validate veritrans error message.
+  if (isset($pane_values['error']) && !empty($pane_values['error'])) {
+    if (stripos($pane_values['error'], 'cvv') !== FALSE) {
+      form_set_error($prefix . 'credit_card][code', t('Payment @type error: @message.', array(
+        '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+        '@message' => $pane_values['error'],
+      )));
+    }
+    else {
+      form_set_error($prefix, t('Payment @type error: @message.', array(
+        '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+        '@message' => $pane_values['error'],
+      )));
+    }
     $return_value = FALSE;
   }
 
@@ -386,7 +488,7 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
   if (empty($line_items)
     || $order_wrapper->commerce_order_total->amount->value() <= 0
   ) {
-    form_set_error($prefix . 'type', t('Payment can not continue: cart can not empty.'));
+    form_set_error($prefix . 'type', t('Payment can not continue: cart can not empty or payment amount can not 0.'));
     $return_value = FALSE;
   }
 
@@ -427,14 +529,23 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
     // Get product price.
     $unit_price = $line_item_wrapper->commerce_unit_price->value();
+    // Check currency: if not IDR.
+    if ($unit_price['currency_code'] != 'IDR') {
+      $unit_price['amount'] = commerce_currency_convert($unit_price['amount'], $unit_price['currency_code'], 'IDR');
+    }
+
+    // Get item name: by default is line item label (SKU).
+    $item_name = $line_item->line_item_label;
+    // Check whether line item has product: possible other value: shipping, tax.
+    if (isset($line_item->commerce_product)) {
+      $item_name .= ' ' . $line_item_wrapper->commerce_product->value()->title;
+    }
     // Define item.
     $item = array(
-      // @todo: improve id with SKU?
       'id' => $line_item->line_item_id,
-      'price' => $unit_price['amount'],
+      'price' => (int) $unit_price['amount'],
       'quantity' => (int) $line_item->quantity,
-      // @todo: improve this name (ex: Telkomsel Rp 25.000,-).
-      'name' => (isset($line_item->commerce_product)) ? $line_item_wrapper->commerce_product->value()->title : $line_item->line_item_label,
+      'name' => $item_name,
     );
     // Store it inside items.
     $items[] = $item;
@@ -453,7 +564,7 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
       'address' => (isset($billing['thoroughfare'])) ? $billing['thoroughfare'] : '',
       'city' => (isset($billing['locality'])) ? $billing['locality'] : '',
       'postal_code' => (isset($billing['postal_code'])) ? $billing['postal_code'] : '',
-      'phone' => $pane_values['veritrans']['phone'],
+      'phone' => $pane_values['veritrans']['credit_card']['phone'],
       'country_code' => 'IDN', // @todo: ISO 3166-1 alpha-3: Indonesia only.
     );
 
@@ -481,6 +592,13 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     }
   }
 
+  // Check customer phone.
+  $customer_phone = (isset($pane_values['veritrans']['phone'])) ? $pane_values['veritrans']['phone'] : '';
+  if (empty($customer_phone)) {
+    // Get phone from token.
+    $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['token']);
+  }
+
   // Define transaction data to be sent.
   $transaction_data = array(
     'payment_type' => 'credit_card',
@@ -497,18 +615,14 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
       'first_name' => (isset($billing['first_name'])) ? $billing['first_name'] : $order->mail,
       'last_name' => (isset($billing['last_name'])) ? $billing['last_name'] : '',
       'email' => $order->mail,
-      'phone' => $pane_values['veritrans']['phone'],
+      'phone' => $customer_phone,
     ),
   );
 
   // @todo: Add token information: only if not regular?
-  if (isset($pane_values['veritrans']['save'])) {
-    $transaction_data['credit_card']['save_token_id'] = boolval($pane_values['veritrans']['save']);
+  if (isset($pane_values['veritrans']['credit_card']['save'])) {
+    $transaction_data['credit_card']['save_token_id'] = boolval($pane_values['veritrans']['credit_card']['save']);
   }
-
-  watchdog('commerce_veritrans', 'TD:<pre>'.print_r($transaction_data, TRUE).'</pre>');
-  watchdog('commerce_veritrans', 'O:<pre>'.print_r($order, TRUE).'</pre>');
-  watchdog('commerce_veritrans', 'PV:<pre>'.print_r($pane_values, TRUE).'</pre>');
 
   // Add billing information.
   if (!empty($billing)) {
@@ -535,10 +649,11 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     // Chek json decode result.
     if (json_last_error() != JSON_ERROR_NONE) {
       // Log this condtion.
-      watchdog('commerce_veritrans', 'Payment server return invalid json. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
+      watchdog('commerce_veritrans', 'Payment server return invalid json. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre> <pre>@td</pre>', array(
         '@payment' => print_r($payment, TRUE),
         '@pmethod' => print_r($payment_method, TRUE),
         '@order' => print_r($order, TRUE),
+        '@td' => print_r($transaction_data, TRUE),
       ), WATCHDOG_ERROR, 'Veritrans Submit');
       // Payment API error: invalid json.
       drupal_set_message(t('Payment error: unable to interpret payment server return value.'), 'error');
@@ -547,11 +662,12 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   }
   else {
     // Log this condtion.
-    watchdog('commerce_veritrans', 'Payment server error: @error. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
+    watchdog('commerce_veritrans', 'Payment server error: @error. Debug: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre> <pre>@td</pre>', array(
       '@error' => (isset($payment->error)) ? $payment->error : t('unknown'),
       '@payment' => print_r($payment, TRUE),
       '@pmethod' => print_r($payment_method, TRUE),
       '@order' => print_r($order, TRUE),
+      '@td' => print_r($transaction_data, TRUE),
     ), WATCHDOG_ERROR, 'Veritrans Submit');
     // Payment API error: return object.
     drupal_set_message(t('Payment error: @error', array(
@@ -561,6 +677,12 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   }
 
   // Save input into order data.
+  if (isset($pane_values['veritrans']['credit_card'])) {
+    // Spare phone number information.
+    $pane_values['veritrans']['phone'] = $pane_values['veritrans']['credit_card']['phone'];
+    // We do not need to save this data: user credential.
+    unset($pane_values['veritrans']['credit_card']);
+  }
   $order->data['commerce_veritrans'] = $pane_values['veritrans'] + $charge;
   $order->data['commerce_veritrans']['response'] = $payment;
 
@@ -568,6 +690,8 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   commerce_order_save($order);
 
   // Check payment status.
+  // 1. status code: 200.
+  // 2. transaction status: capture.
   if (isset($payment->status_code) && $payment->status_code == '200'
     && isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'capture'
   ) {
@@ -605,17 +729,16 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   );
   commerce_payment_transaction_save($transaction);
 
+  // @todo: review this section.
   if (isset($payment->status_message)) {
-    drupal_set_message(t('@type error: @message', array(
+    drupal_set_message(t('@type: @message', array(
       '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
       '@message' => $payment->status_message,
     )), $status_message);
   }
-  else {
-    // @todo: improve this staus message.
-    drupal_set_message(t('Payment error: unknown.'), 'error');
-  }
-
+  // User get redirected to checkout payment first.
+  // DSM already called there before complete page.
+  // watchdog('commerce_veritrans', $status_message . ': <pre>'.print_r($payment, TRUE).'</pre>');
   // Always return TRUE at this step: because we only create new transaction.
   return ($status == COMMERCE_PAYMENT_STATUS_SUCCESS || $status == COMMERCE_PAYMENT_STATUS_PENDING) ? TRUE : FALSE;
 }
@@ -648,11 +771,13 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
   $form['#attached']['js'][] = array(
     'data' => $fields['veritrans'],
     'type' => 'setting',
+    'defer' => TRUE,
   );
   // Add veritrans js to get token.
   $form['#attached']['js'][] = array(
     'data'  => drupal_get_path('module', 'commerce_veritrans') . '/theme/commerce_veritrans.token.js',
     'type' => 'file',
+    'defer' => TRUE,
   );
 
   // Create credit_card tree.
@@ -661,6 +786,10 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
     '#attached' => array(
       'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.theme.css'),
     ),
+    '#type' => 'fieldset',
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+    '#weight' => 1,
   );
 
   // Merge default values into the default array.
@@ -676,22 +805,12 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
   $current_year_2 = date('y');
   $current_year_4 = date('Y');
 
-//   $form['credit_card']['owner'] = array(
-//     '#type' => 'textfield',
-//     '#title' => t('Card owner'),
-//     '#default_value' => $default['owner'],
-//     '#attributes' => array('autocomplete' => 'off'),
-//     '#required' => TRUE,
-//     '#maxlength' => 64,
-//     '#size' => 32,
-//   );
-
   // Always add a field for the credit card number.
   $form['credit_card']['number'] = array(
     '#type' => 'textfield',
     '#title' => t('Card number'),
     '#default_value' => $default['number'],
-//     '#attributes' => array('autocomplete' => 'off'),
+    '#attributes' => array('autocomplete' => 'off'),
     '#required' => TRUE,
     '#maxlength' => 19,
     '#size' => 20,
@@ -738,26 +857,59 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
 
   // @todo: improve this with states.
   if (isset($fields['phone']) && !empty($fields['phone'])) {
-    $form['phone'] = array(
+    $form['credit_card']['phone'] = array(
       '#type' => 'select',
       '#title' => t('Phone Number'),
       '#options' => $fields['phone'],
     );
   }
   else {
-    $form['phone'] = array(
+    $form['credit_card']['phone'] = array(
       '#type' => 'textfield',
       '#title' => t('Phone Number'),
       '#default_value' => '',
       '#attributes' => array('autocomplete' => 'off'),
       '#required' => TRUE,
+      '#validated' => TRUE,
       '#maxlength' => 14,
       '#size' => 14,
     );
   }
 
-  if (isset($fields['type']) && $fields['type'] != 'regular') {
-    $form['save'] = array(
+  if (isset($fields['type']) && in_array($fields['type'], array('oneclick', 'twoclick'))) {
+    // Get valid veritrans token.
+    $tokens = commerce_veritrans_token_get($fields['uid']);
+    // Check whether token is available.
+    if (!empty($tokens)) {
+      // Define token options.
+      $token_options = array();
+      foreach ($tokens as $token) {
+        $token = (array) $token;
+        $token_options[$token['token']] = $token['first'] . ' - ' . $token['last'] . ' (' . $token['phone'] . ')';
+      }
+      // Add last options.
+      $token_options[0] = t('New Credit Card');
+      // Define tokens form: select.
+      $form['tokens'] = array(
+        '#type' => 'select',
+        '#title' => t('Saved Credit Card'),
+        '#options' => $token_options,
+        '#description' => t('Your first 6 digits and 4 last digits of credit card number and phone number for the last transactions.'),
+        '#weight' => 0,
+      );
+      // Collapsed standard credit card form.
+      $form['credit_card']['#collapsed'] = TRUE;
+      $form['credit_card']['#states'] = array(
+        'expanded' => array(
+          ':input[name="commerce_payment[payment_details][veritrans][tokens]"]' => array('value' => '0'),
+        ),
+        'collapsed' => array(
+          ':input[name="commerce_payment[payment_details][veritrans][tokens]"]' => array('!value' => '0'),
+        )
+      );
+    }
+    // Add save credit card option.
+    $form['credit_card']['save'] = array(
       '#type' => 'checkbox',
       '#default_value' => $default['save'],
       '#title' => t('Save credit card'),
@@ -813,7 +965,6 @@ function commerce_veritrans_payment_method_types($key = '') {
  *
  * @todo: after processing.
  */
-
 function commerce_veritrans_api($data, $settings) {
   // Define default endpoint.
   $endpoint = (isset($settings['url'])) ? $settings['url'] : '';
@@ -917,4 +1068,42 @@ function commerce_veritrans_token_new($order_id, $payment, $phone) {
   }
   // Return the return value.
   return FALSE;
+}
+
+/**
+ * Function commerce_veritrans_token_get().
+ *
+ * @param int $uid
+ *   Drupal UID.
+ *
+ * @return array
+ *   Veritrans Token.
+ */
+function commerce_veritrans_token_get($uid) {
+  // @todo: all time token.
+  // @todo: sort by?
+  $tokens = db_select('commerce_veritrans_token', 't')
+    ->fields('t')
+    ->condition('uid', $uid, '=')
+    ->condition('expired', time(), '>')
+    ->execute()
+    ->fetchAll();
+  return $tokens;
+}
+
+/**
+ * Function commerce_veritrans_token_get_phone().
+ *
+ * @param string $token
+ *   Payment Token.
+ *
+ * @return string
+ *   Phone number used for previous payment.
+ */
+function commerce_veritrans_token_get_phone($token) {
+  return db_select('commerce_veritrans_token', 't')
+    ->fields('t', array('phone'))
+    ->condition('token', $token, '=')
+    ->execute()
+    ->fetchField();
 }

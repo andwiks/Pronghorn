@@ -1,7 +1,10 @@
 name = Sepulsa
 description = Sepulsa Initial theme
 core = 7.x
+engine = phptemplate
+version = "0.1"
 
+; Available Regions
 regions[page_top] = Page top
 regions[page_bottom] = Page bottom
 regions[content] = Content
@@ -11,8 +14,7 @@ regions[right] = Right Bar
 regions[user_login] = User Login
 regions[user_signup] = User Signup
 
-version = "0.1"
-
+; Stylesheets
 stylesheets[all][] = css/bootstrap.min.css
 stylesheets[all][] = css/font-awesome.min.css
 stylesheets[all][] = css/animate.min.css
@@ -24,6 +26,7 @@ stylesheets[all][] = css/custom.css
 stylesheets[all][] = css/updates.css
 stylesheets[all][] = css/responsive.css
 
+; Javascripts
 scripts[] = js/jquery.noconflict.js
 scripts[] = js/modernizr.2.8.3.min.js
 scripts[] = js/jquery-migrate-1.2.1.min.js

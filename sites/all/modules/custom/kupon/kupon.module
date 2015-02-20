@@ -87,14 +87,21 @@ function create_owned_unique_coupon_form_validate($form, &$form_state){
 }
 
 function create_owned_unique_coupon_form_submit($form, &$form_state){
-    $timestamp = time();
     $unique_code_total = 0;
     $filepath = $form_state['values']['csv_upload']->destination;
     $handle = @fopen($filepath, "r");
     $simple_coupon_id = $form['simple_coupon_id']['#value'];
     $node_coupon = node_load($simple_coupon_id);
     
-    if ($node_coupon != null) {
+    if (isset($node_coupon->field_product[LANGUAGE_NONE])) {
+        $product = commerce_product_load($node_coupon->field_product[LANGUAGE_NONE][0]['product_id']);
+        $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
+        $expiry = $expiry[0]['value'];
+    } else {
+        $expiry = time();
+    }
+    //drupal_set_message("<pre>".print_r($node_coupon, true)."</pre>");
+    if ($node_coupon != null && $node_coupon->type == 'coupon' && (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique')) {
         while ($row = fgetcsv($handle, 1000, ',')) {
             $unique_code = $row[0];
             // start create owned unique coupon
@@ -110,8 +117,8 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
             $node->field_unique_coupon_code[$node->language][] = array(
               'value' => $unique_code,
             );
-            $node->field_expiry_date[$node->language][] = array(
-              'value' => $timestamp,
+            $node->field_owned_coupon_expiry[$node->language][] = array(
+              'value' => $expiry,
               'timezone' => date_default_timezone(),
               'timezone_db' => date_default_timezone(),
               'date_type' => 'datestamp',

@@ -70,7 +70,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   } else if ($form_id == "commerce_checkout_form_checkout") {
     global $user;
     
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    //drupal_set_message("<pre>".print_r($form['commerce_payment']['payment_details'], true)."</pre>");
     $form['cart_contents']['#title'] = NULL;
     
     $form['account']['#title'] = NULL;
@@ -83,6 +83,31 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     
     $form['commerce_payment']['#title'] = NULL;
     $form['commerce_payment']['#prefix'] = '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    
+    if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#attributes']['class'] = array('input-text');
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#prefix'] = "<br /><h6><strong>".t('Card Number')."</strong></h6>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#suffix'] = "<br /><h6><strong>".t('Expiration')."</strong></h6>";
+
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['style'] = 'width:75px !important; margin-right:10px; display:inline';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['class'] = array('selector');
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#suffix'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['style'] = 'width:85px; display:inline';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['class'] = array('selector');
+      
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#prefix'] = "<br /><h6><strong>".t('Card CVV')."</strong></h6>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['class'] = array('input-text');
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['style'] = "width:65px !important";
+      
+      $form['commerce_payment']['payment_details']['veritrans']['phone']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['phone']['#prefix'] = "<br /><h6><strong>".t('Phone Number')."</strong></h6>";
+      $form['commerce_payment']['payment_details']['veritrans']['phone']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
+      $form['commerce_payment']['payment_details']['veritrans']['phone']['#attributes']['class'] = array('selector');
+      
+    }
     
     $form['buttons']['continue']['#attributes'] = array('class' => array('btn', 'style1'));
     

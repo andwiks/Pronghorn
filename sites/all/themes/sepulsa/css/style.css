@@ -8459,3 +8459,15 @@ body.woocommerce select:not(.default-style) + .customSelect {
 .tqcoupon { margin:0 auto !important; float:none !important;}
 
 .inactive { background:#CCC}
+img {
+        max-width: 100%;
+    }
+.well {
+        box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        display:none;
+        margin:5px;
+    }
+.product-price2 { color:#F00; font-size:18px}
+
+ul.tnc { padding-left:20px}
+ul.tnc li { list-style:decimal; list-style-position:outside; padding-bottom:5px}

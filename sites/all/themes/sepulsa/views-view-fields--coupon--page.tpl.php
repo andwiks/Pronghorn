@@ -28,14 +28,39 @@
 
 <div class="post-image">
   <div class="image-container">
-    <a href="<?php print $fields['field_coupon_product_image']->content; ?>" class="image soap-mfp-popup"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></a>
+    <a href="#pop<?php print $fields['nid']->content; ?>" class="image pop<?php print $fields['nid']->content; ?>_open"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></a>
   </div>
 </div>
 <div class="post-content">
   <div class="post-date"><span><?php print $fields['title']->content; ?></span></div>
   <h4 class="entry-title"><a href="#"><?php //print $fields['title']->content; ?></a></h4>
-  <p><?php print $fields['field_description']->content; ?></p>
+  <p>
+    <?php print $fields['field_description']->content; ?>.
+    Syarat penggunaan <a href="#pop<?php print $fields['nid']->content; ?>" class="image pop<?php print $fields['nid']->content; ?>_open">klik disini</a>.
+    <br />
+    <a href="http://<?php print $fields['field_website']->content; ?>" target="_blank"><?php print $fields['field_website']->content; ?></a>
+  </p>
   <div class="post-action">
     <?php print $fields['field_product']->content; ?>
   </div>
 </div>
+
+<div id="pop<?php print $fields['nid']->content; ?>" class="well pop<?php print $fields['nid']->content; ?>_close" style="max-width:44em;">
+  <p><img src="<?php print $fields['field_coupon_product_image']->content; ?>" width="100%"></p>
+  <h2 style="margin-bottom:5px"><strong><?php print $fields['title']->content; ?></strong></h2>
+  <p>
+    <?php print $fields['field_description']->content; ?>.
+  </p>
+  <hr class="color-text">
+  <p><strong><?php print t('Terms & Conditions'); ?></strong></p>  
+  <?php if (isset($fields['field_coupon_tnc']->content)) print $fields['field_coupon_tnc']->content; else print "-"; ?>
+</div>
+
+<?php
+//TO DO : make it neater
+?>
+<script>
+jQuery(document).ready(function () {
+  jQuery('#pop<?php print $fields['nid']->content; ?>').popup();
+});
+</script>

@@ -37,22 +37,22 @@ global $base_url;
               <a href="http://placehold.it/770x415" class="soap-mfp-popup">
                 <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner1.jpg" alt="">
                 <div class="slide-text">
-                  <h4 class="slide-title">Judul iklan nol satu dua</h4>
-                  <span class="meta-info">line kedua hey ho</span>
+                  <h4 class="slide-title">Isi pulsa sekarang gratis</h4>
+                  <span class="meta-info">Dapatkan cashback dengan isi ulang di SEPULSA</span>
                 </div>
               </a>
               <a href="http://placehold.it/770x415" class="soap-mfp-popup">
-                <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner2.jpg" alt="">
+                <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner2b.jpg" alt="">
                 <div class="slide-text">
-                  <h4 class="slide-title">Hand-crafted Accuracy & Pixel Perfection</h4>
-                  <span class="meta-info">In Fashion  .  12 Nov, 2014</span>
+                  <h4 class="slide-title">Temukan deal-deal menarik hanya di SEPULSA</h4>
+                  <span class="meta-info"></span>
                 </div>
               </a>
               <a href="http://placehold.it/770x415" class="soap-mfp-popup">
                 <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner3.jpg" alt="">
                 <div class="slide-text">
-                  <h4 class="slide-title">Hand-crafted Accuracy & Pixel Perfection</h4>
-                  <span class="meta-info">In Fashion  .  12 Nov, 2014</span>
+                  <h4 class="slide-title">Isi pulsa paling gampang ? Ya di SEPULSA</h4>
+                  <span class="meta-info">Juga cepat, aman dan menguntungkan</span>
                 </div>
               </a>
             </div>

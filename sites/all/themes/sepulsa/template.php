@@ -136,6 +136,21 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
     
+  } else if ($form_id == "views_form_commerce_cart_block_default") {
+    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    global $base_url;
+    
+    foreach ($form['edit_delete'] as &$value) {
+      if (isset($value['#type'])) {
+        //drupal_set_message("<pre>".print_r($value, true)."</pre>");
+        //$value['#type'] = 'image_button';
+        //$value['#attributes']['src'] = $base_url.'/'.drupal_get_path('theme','sepulsa').'/images/ico-close.png';
+        //$value['#attributes']['width'] = '40px';
+        $value['#attributes']['class'][] = 'hapusButton';
+        $value['#value'] = '';
+      }
+    }
+    
   }
 }
 

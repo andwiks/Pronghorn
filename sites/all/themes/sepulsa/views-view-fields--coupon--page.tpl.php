@@ -24,6 +24,7 @@
  * @ingroup views_templates
  */
 
+global $base_url;
 $web_name = $fields['field_website']->content;
 $web_link = $fields['field_website_link']->content; 
 if (!isset($web_link)) {
@@ -42,18 +43,18 @@ if (!isset($web_link)) {
   <h4 class="entry-title"><a href="#"><?php //print $fields['title']->content; ?></a></h4>
   <p>
     <?php print $fields['field_description']->content; ?>.
-    Syarat penggunaan <a href="#pop<?php print $fields['nid']->content; ?>" class="image pop<?php print $fields['nid']->content; ?>_open" style="color:#dc2c27">klik disini</a>.
-    <br />
-    <a href="<?php print $web_link; ?>" target="_blank"><?php print $web_name; ?></a>
+    Syarat penggunaan <a href="#pop<?php print $fields['nid']->content; ?>" class="image pop<?php print $fields['nid']->content; ?>_open" style="color:#dc2c27">klik disini</a>
   </p>
   <div class="post-action">
     <?php print $fields['field_product']->content; ?>
   </div>
 </div>
 
-<div id="pop<?php print $fields['nid']->content; ?>" class="well pop<?php print $fields['nid']->content; ?>_close" style="max-width:44em;">
+<div id="pop<?php print $fields['nid']->content; ?>" class="well" style="max-width:44em;">
+  <p style="float:right"><a href="#" class="pop<?php print $fields['nid']->content; ?>_close"><img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/ico-close.png" width="40px"></a></p>
   <p><img src="<?php print $fields['field_coupon_product_image']->content; ?>" width="100%"></p>
   <h2 style="margin-bottom:5px"><strong><?php print $fields['title']->content; ?></strong></h2>
+  <a href="<?php print $web_link; ?>" target="_blank"><?php print $web_name; ?></a>
   <p>
     <?php print $fields['field_description']->content; ?>.
   </p>

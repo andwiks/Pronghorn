@@ -5,23 +5,23 @@
         <nav class="secondary-menu">
           <ul class="nav nav-pills">
             <li class="dropdown menu-item-has-children">
-              <a href="index.html">Home</a>
+              <a href="<?php print $base_url; ?>">Home</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="#">Tentang Kami</a>
+              <a href="about">Tentang Kami</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="#">F.A.Q.</a>
+              <a href="faq">F.A.Q.</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="#">Syarat Penggunaan</a>
+              <a href="ga-terms-conditions">Syarat Penggunaan</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="#">Kontak Kami</a>
+              <a href="contact">Kontak Kami</a>
             </li>
         </ul>
         </nav>
-        <div class="copyright">&copy; 2014 sepulsa</div>
+        <div class="copyright">&copy; 2015 PT. Sepulsa Teknologi Indonesia</div>
       </div>
     </div>
   </div>

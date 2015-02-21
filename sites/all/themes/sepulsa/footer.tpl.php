@@ -8,16 +8,16 @@
               <a href="<?php print $base_url; ?>">Home</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="about">Tentang Kami</a>
+              <a href="<?php print $base_url; ?>/about">Tentang Kami</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="faq">F.A.Q.</a>
+              <a href="<?php print $base_url; ?>/faq">F.A.Q.</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="ga-terms-conditions">Syarat Penggunaan</a>
+              <a href="<?php print $base_url; ?>/ga-terms-conditions">Syarat Penggunaan</a>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="contact">Kontak Kami</a>
+              <a href="<?php print $base_url; ?>/contact">Kontak Kami</a>
             </li>
         </ul>
         </nav>

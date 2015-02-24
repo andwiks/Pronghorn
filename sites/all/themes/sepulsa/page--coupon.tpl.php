@@ -18,6 +18,7 @@ global $base_url;
       <div id="main">
         
         
+        <h3>Silahkan pilih (maksimal 3) kupon diskon menarik dibawah ini.</h3>
         <div class="row">
           <div class="col-sm-9">
 

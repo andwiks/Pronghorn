@@ -16,9 +16,6 @@
             <li class="dropdown menu-item-has-children">
               <a href="<?php print $base_url; ?>/ga-terms-conditions">Syarat Penggunaan</a>
             </li>
-            <li class="dropdown menu-item-has-children">
-              <a href="<?php print $base_url; ?>/contact">Kontak Kami</a>
-            </li>
         </ul>
         </nav>
         <div class="copyright">&copy; 2015 PT. Sepulsa Teknologi Indonesia</div>

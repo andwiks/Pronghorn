@@ -1,0 +1,76 @@
+<?php
+/**
+ * @file
+ * Install File for WebEngage.
+ *
+ * @category Install
+ * @package   WebEngage
+ * @link     http://www.webengage.com/
+ */
+
+  module_load_include("php", "webengage", "webengage_constants");
+
+ /**
+  * Implements hook_install().
+  */
+function webengage_install() {
+  $t = get_t();
+  $num_existing_rows = db_query("SELECT * FROM {webengage_settings} LIMIT 1")->rowCount();
+  if ($num_existing_rows == NULL || $num_existing_rows <= 0) {
+    try{
+      db_insert('webengage_settings')
+      ->fields(array(
+        'option_key' => 'license_code',
+        'option_value' => '',
+      ))
+      ->execute();
+
+      db_insert('webengage_settings')
+      ->fields(array(
+        'option_key' => 'widget_status',
+        'option_value' => '',
+      ))
+      ->execute();
+    }
+    catch (PDOException $e) {
+      drupal_set_message($t('Error: %message', array('%message' => $e->getMessage())), 'error');
+    }
+  }
+
+  drupal_set_message($t("Please enable the 'WebEngage Script' block from 'admin->structure->blocks' menu. Choose 'Footer' if available. Also, do it if you change the theme."), 'warning');
+  drupal_set_message($t("WebEngage settings are available at 'admin->structure->menus->WebEngage Settings->list links->WebEngage Settings'"));
+}
+
+ /**
+  * Implements hook_schema().
+  */
+function webengage_schema() {
+  $schema = array();
+  if (!db_table_exists('webengage_settings')) {
+    $schema['webengage_settings'] = array(
+      'description' => 'The base table for webengage.',
+      'fields' => array(
+        'nid' => array(
+          'description' => 'The primary identifier for webengage settings table.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ),
+        'option_key' => array(
+          'description' => 'option_key.',
+          'type' => 'varchar',
+          'length' => 64,
+          'not null' => TRUE,
+        ),
+        'option_value' => array(
+          'description' => 'option_value.',
+          'type' => 'text',
+          'not null' => TRUE,
+        ),
+      ),
+      'primary key' => array('nid'),
+    );
+  }
+
+  return $schema;
+}

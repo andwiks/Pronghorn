@@ -34,21 +34,21 @@ global $base_url;
               
           <div class="col-sm-6 col-md-4">
             <div class="post-slider style2 owl-carousel box">
-              <a href="http://placehold.it/770x415" class="soap-mfp-popup">
+              <a href="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner1.jpg" class="soap-mfp-popup">
                 <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner1.jpg" alt="">
                 <div class="slide-text">
                   <h4 class="slide-title">Isi pulsa sekarang gratis</h4>
                   <span class="meta-info">Dapatkan cashback dengan isi ulang di SEPULSA</span>
                 </div>
               </a>
-              <a href="http://placehold.it/770x415" class="soap-mfp-popup">
+              <a href="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner2b.jpg" class="soap-mfp-popup">
                 <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner2b.jpg" alt="">
                 <div class="slide-text">
                   <h4 class="slide-title">Temukan deal-deal menarik hanya di SEPULSA</h4>
                   <span class="meta-info"></span>
                 </div>
               </a>
-              <a href="http://placehold.it/770x415" class="soap-mfp-popup">
+              <a href="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner3.jpg" class="soap-mfp-popup">
                 <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/banner3.jpg" alt="">
                 <div class="slide-text">
                   <h4 class="slide-title">Isi pulsa paling gampang ? Ya di SEPULSA</h4>

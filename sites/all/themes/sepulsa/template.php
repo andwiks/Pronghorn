@@ -30,7 +30,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     
     $form['add']['#prefix'] = '<p></p>';
     $form['add']['cart']['#attributes']['style'] = 'float:right'; 
-    $form['add']['charge']['#attributes']['style'] = 'float:right'; 
+    $form['add']['charge']['#attributes']['style'] = 'float:right;display:none;'; 
     
   } else if ($form_id == "user_login_block") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");

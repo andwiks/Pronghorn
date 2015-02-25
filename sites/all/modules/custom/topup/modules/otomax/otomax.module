@@ -38,8 +38,9 @@ function otomax_topup_provider_info() {
  * Implements hook_topup_code_info().
  */
 function otomax_topup_code_info() {
-  $codes = array();
+  $code_info = array();
 
+  $codes = array();
   $codes['HB25'] = array('price' => 24100, 'title' => t('BOLT 25 Rb'),);
   $codes['HB50'] = array('price' => 48100, 'title' => t('BOLT 50 Rb'),);
   $codes['HB100'] = array('price' => 96100, 'title' => t('BOLT 100 Rb'),);
@@ -70,23 +71,17 @@ function otomax_topup_code_info() {
   $codes['HI25'] = array('price' => 24850, 'title' => t('INDOSAT_REGULAR_NASIONAL 25 Rb'),);
   $codes['HI50'] = array('price' => 49350, 'title' => t('INDOSAT_REGULAR_NASIONAL 50 Rb'),);
   $codes['HI100'] = array('price' => 98000, 'title' => t('INDOSAT_REGULAR_NASIONAL 100 Rb'),);
-//   $codes['HIG5'] = array('price' => 5400, 'title' => t('INDOSAT_GPRS 5 Rb'),);
-//   $codes['HIG10'] = array('price' => 10400, 'title' => t('INDOSAT_GPRS 10 Rb'),);
-//   $codes['HIG25'] = array('price' => 24850, 'title' => t('INDOSAT_GPRS 25 Rb'),);
-//   $codes['HIP5'] = array('price' => 5300, 'title' => t('INDOSAT_REGULAR_NASIONAL 5 Rb'),);
-//   $codes['HIP10'] = array('price' => 10300, 'title' => t('INDOSAT_REGULAR_NASIONAL 10 Rb'),);
+
   $codes['HIP25'] = array('price' => 24850, 'title' => t('INDOSAT_REGULAR_NASIONAL 25 Rb'),);
   $codes['HIP50'] = array('price' => 49350, 'title' => t('INDOSAT_REGULAR_NASIONAL 50 Rb'),);
   $codes['HIP100'] = array('price' => 98000, 'title' => t('INDOSAT_REGULAR_NASIONAL 100 Rb'),);
-//   $codes['HIS5'] = array('price' => 5400, 'title' => t('INDOSAT_SMS 5 Rb'),);
-//   $codes['HIS10'] = array('price' => 10400, 'title' => t('INDOSAT_SMS 10 Rb'),);
-//   $codes['HIS25'] = array('price' => 24850, 'title' => t('INDOSAT_SMS 25 Rb'),);
+
   $codes['HN5'] = array('price' => 5250, 'title' => t('AXIS 5 Rb'),);
   $codes['HN10'] = array('price' => 10250, 'title' => t('AXIS 10 Rb'),);
   $codes['HN25'] = array('price' => 24700, 'title' => t('AXIS 25 Rb'),);
   $codes['HN50'] = array('price' => 49375, 'title' => t('AXIS 50 Rb'),);
   $codes['HN100'] = array('price' => 98750, 'title' => t('AXIS 100 Rb'),);
-//   $codes[''] = array('price' => , 'title' => t(''),);
+
   $codes['HS5'] = array('price' => 5650, 'title' => t('TELKOMSEL_NASIONAL 5 Rb'),);
   $codes['HS10'] = array('price' => 10400, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
   $codes['HS20'] = array('price' => 20000, 'title' => t('TELKOMSEL_NASIONAL 20 Rb'),);
@@ -94,11 +89,9 @@ function otomax_topup_code_info() {
   $codes['HS50'] = array('price' => 49300, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
   $codes['HS100'] = array('price' => 97300, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
   $codes['HSP5'] = array('price' => 5600, 'title' => t('TELKOMSEL_NASIONAL 5 Rb'),);
-//   $codes['HSP10'] = array('price' => 10300, 'title' => t('TELKOMSEL_NASIONAL 10 Rb'),);
+
   $codes['HSP20'] = array('price' => 19925, 'title' => t('TELKOMSEL_NASIONAL 20 Rb'),);
-//   $codes['HSP25'] = array('price' => 24750, 'title' => t('TELKOMSEL_NASIONAL 25 Rb'),);
-//   $codes['HSP50'] = array('price' => 48550, 'title' => t('TELKOMSEL_NASIONAL 50 Rb'),);
-//   $codes['HSP100'] = array('price' => 96800, 'title' => t('TELKOMSEL_NASIONAL 100 Rb'),);
+
   $codes['HT1'] = array('price' => 1000, 'title' => t('THREE 1 Rb'),);
   $codes['HT5'] = array('price' => 4950, 'title' => t('THREE 5 Rb'),);
   $codes['HT10'] = array('price' => 9900, 'title' => t('THREE 10 Rb'),);
@@ -107,10 +100,7 @@ function otomax_topup_code_info() {
   $codes['HT40'] = array('price' => 39600, 'title' => t('THREE 40 Rb'),);
   $codes['HT50'] = array('price' => 49350, 'title' => t('THREE 50 Rb'),);
   $codes['HT100'] = array('price' => 98500, 'title' => t('THREE 100 Rb'),);
-//   $codes['HTD1'] = array('price' => 47500, 'title' => t('THREEDATA_1GB'),);
-//   $codes['HTD2'] = array('price' => 71250, 'title' => t('THREEDATA_2GB'),);
-//   $codes['HTD5'] = array('price' => 118750, 'title' => t('THREEDATA_5GB'),);
-//   $codes['HTD500'] = array('price' => 33250, 'title' => t('THREEDATA_500MB'),);
+
   $codes['HTM100'] = array('price' => 80000, 'title' => t('THREE 100 Rb'),);
   $codes['HTM200'] = array('price' => 140000, 'title' => t('THREE 200 Rb'),);
   $codes['HXBP25'] = array('price' => 21500, 'title' => t('XL_BAGIPULSA_25RB'),);
@@ -125,7 +115,7 @@ function otomax_topup_code_info() {
   $codes['HXR100'] = array('price' => 98750, 'title' => t('XL_NASIONAL 100 Rb'),);
   $codes['HXR200'] = array('price' => 198000, 'title' => t('XL_NASIONAL 200 Rb'),);
   $codes['HXRP5'] = array('price' => 5250, 'title' => t('XL_NASIONAL 5 Rb'),);
-//   $codes['HXRP10'] = array('price' => 10250, 'title' => t('XL_NASIONAL 10 Rb'),);
+
   $codes['HY5'] = array('price' => 4850, 'title' => t('SMARTFREN 5 Rb'),);
   $codes['HY10'] = array('price' => 9700, 'title' => t('SMARTFREN 10 Rb'),);
   $codes['HY20'] = array('price' => 19400, 'title' => t('SMARTFREN 20 Rb'),);
@@ -169,8 +159,18 @@ function otomax_topup_code_info() {
   $codes['XLF50'] = array('price' => 50000, 'title' => t('XL_FISIK_50RB'),);
   $codes['XSN55'] = array('price' => 46000, 'title' => t('XL_SUPER_NGEBUT_11GB'),);
 
+  $code_info['fastcom'] = $codes;
+
+  $codes = array();
+  $codes['SI10'] = array('price' => 10300, 'title' => t('SIMPATI 10 Rb'),);
+  $codes['SI20'] = array('price' => 19950, 'title' => t('SIMPATI 20 Rb'),);
+  $codes['SI25'] = array('price' => 24700, 'title' => t('SIMPATI 25 Rb'),);
+  $codes['SI50'] = array('price' => 48750, 'title' => t('SIMPATI 50 Rb'),);
+  $codes['SI100'] = array('price' => 97000, 'title' => t('SIMPATI 100 Rb'),);
+
+  $code_info['poin2000'] = $codes;
   // @todo: improve this.
-  return array('fastcom' => $codes);
+  return $code_info;
 }
 
 /**

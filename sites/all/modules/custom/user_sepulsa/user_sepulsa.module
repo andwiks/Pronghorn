@@ -34,6 +34,7 @@ function user_sepulsa_user_view($account, $view_mode, $langcode) {
   if ($view_mode == 'full') {
     //drupal_set_message("<pre>".print_r($account, true)."</pre>");
     $account->content['hybridauth_identities'] = NULL;
+    $account->content['mimemail'] = NULL;
   }
 }
 

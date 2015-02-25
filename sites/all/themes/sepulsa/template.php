@@ -154,6 +154,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   } else if ($form_id == "user_profile_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['contact']['#attributes']['style'] = "display:none;";
+    $form['mimemail']['#attributes']['style'] = "display:none;";
     
     $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
     

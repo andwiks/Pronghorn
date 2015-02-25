@@ -52,6 +52,7 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
             $node->field_order_id[$node->language][] = array(
                 'value' => $line_item->order_id,
             );
+            $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry[0]['value'];
             node_save($node);
         } else {
             drupal_set_message($node_coupon->title.' is out of stock', 'error');

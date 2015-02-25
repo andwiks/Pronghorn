@@ -1,0 +1,17 @@
+name = Commerce Billy Mail
+description = Mailing functionality for commerce billy. Allows to send out invoices via email using rules.
+package = Commerce (contrib)
+core = 7.x
+version = 1.0
+
+dependencies[] = rules
+dependencies[] = mimemail
+dependencies[] = commerce_billy
+dependencies[] = commerce_billy_pdf
+dependencies[] = token
+; Information added by Drupal.org packaging script on 2014-09-16
+version = "7.x-1.0-beta3"
+core = "7.x"
+project = "commerce_billy_mail"
+datestamp = "1410864836"
+

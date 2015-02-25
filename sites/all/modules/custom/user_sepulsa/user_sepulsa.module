@@ -6,6 +6,35 @@
  * @author ananto@sepulsa.com
  */
 
+
+/*
+ * Implements hook_menu_alter()
+ */
+function user_sepulsa_menu_alter(&$items) {
+  $items['user/%/hybridauth']['access callback'] = FALSE;
+}
+
+/*
+ * Implements hook_page_alter()
+ */
+function user_sepulsa_page_alter(&$page) {
+  if (arg(0) == 'user' && arg(1) >= 1) {
+    global $user;
+    drupal_set_title($user->mail);
+  }
+}
+
+/*
+ * Implements hook_user_view()
+ */
+function user_sepulsa_user_view($account, $view_mode, $langcode) {
+  //drupal_set_message($view_mode);
+  if ($view_mode == 'full') {
+    //drupal_set_message("<pre>".print_r($account, true)."</pre>");
+    $account->content['hybridauth_identities'] = NULL;
+  }
+}
+
 /**
  * Implements hook_block_info().
  */

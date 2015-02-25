@@ -122,8 +122,8 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
       
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><div class="checkbox"><label>';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</label></div>';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><label><div class="checkbox">';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</div></label>';
       
       if (isset($form['commerce_payment']['payment_details']['veritrans']['tokens'])) {
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title'] = NULL;
@@ -151,7 +151,40 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     
+  } else if ($form_id == "user_profile_form") {
+    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    $form['contact']['#attributes']['style'] = "display:none;";
+    
+    $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
+    
+    $form['account']['mail']['#attributes']['class'] = array('input-text');
+    $form['account']['mail']['#suffix'] = '<p></p>';
+    
+    $form['account']['current_pass']['#attributes']['class'] = array('input-text');
+    $form['account']['current_pass']['#description'] = t('Enter your current password to change the E-mail address or Password.');
+    $form['account']['current_pass']['#suffix'] = '<p></p>';
+    
+    $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
+    
+  } else if ($form_id == "commerce_veritrans_user_token_form") {
+    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
+    $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
+    
   }
+}
+
+/**
+ * Implementation of expand_password_confirm.
+ */
+function sepulsa_form_process_password_confirm($element) {
+  //drupal_set_message("<pre>".print_r($element, true)."</pre>");
+  $element['pass1']['#attributes']['class'] = array('input-text');
+  $element['pass1']['#suffix'] = '<p></p>';
+  
+  $element['pass2']['#attributes']['class'] = array('input-text');
+  //$element['pass2']['#suffix'] = '<p></p>';
+  
+  return $element;
 }
 
 function sepulsa_menu_local_tasks(&$variables) {

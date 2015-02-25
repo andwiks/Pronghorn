@@ -21,6 +21,8 @@ function user_sepulsa_page_alter(&$page) {
   if (arg(0) == 'user' && arg(1) >= 1) {
     global $user;
     drupal_set_title($user->mail);
+  } else if (arg(0) == 'cart') {
+    drupal_goto("<front>");
   }
 }
 

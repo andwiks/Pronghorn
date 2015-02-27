@@ -12,6 +12,7 @@
  */
 function user_sepulsa_menu_alter(&$items) {
   $items['user/%/hybridauth']['access callback'] = FALSE;
+  $items['user/%user/edit']['title'] = "Informasi Akun";
 }
 
 /*

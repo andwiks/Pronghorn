@@ -661,7 +661,7 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   $settings = array(
     'url' => $payment_method['settings']['url'],
     'server_key' => $payment_method['settings']['server_key'],
-    'timeout' => 5.0,
+    'timeout' => 30.0,
     'op' => 'charge',
   );
   // Do payment API.

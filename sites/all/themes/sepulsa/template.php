@@ -116,6 +116,11 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['class'] = array('input-text');
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['style'] = "width:75px !important";
       
+      $form['commerce_payment']['payment_details']['veritrans']['code2']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = "<p></p> <label for='edit-commerce-payment-payment-details-veritrans-code2' style='display: block;'> <h6><strong>".t('Card CVV')."</strong></h6></label>";
+      $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['class'] = array('input-text');
+      $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
+      
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<p></p><h6><strong>".t('Phone Number')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';

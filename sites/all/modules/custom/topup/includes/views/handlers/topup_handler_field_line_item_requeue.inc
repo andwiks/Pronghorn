@@ -68,11 +68,13 @@ class topup_handler_field_line_item_requeue extends views_handler_field {
         $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
         // Get topup field code.
         $field_topup_code = variable_get('topup_field_code', 'field_package_code');
+        // Get topup code.
+        $topup_code = $line_item_wrapper->commerce_product->$field_topup_code->value();
         // Show message to user.
         drupal_set_message(t('Line item (@id)  %phone [@code] has been requeued.', array(
           '@id' => $line_item_id,
           '%phone' => $line_item_wrapper->field_phone_number->value(),
-          '@code' => $line_item_wrapper->commerce_product->$field_topup_code->value(),
+          '@code' => (!empty($topup_code)) ? $topup_code : '-',
         )));
       }
     }

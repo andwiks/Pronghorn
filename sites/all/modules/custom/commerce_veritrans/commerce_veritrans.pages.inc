@@ -66,6 +66,9 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
       '#type' => 'tableselect',
       '#header' => $header,
       '#options' => $options,
+      '#attributes' => array(
+        'class' => array('table', 'style1'),
+      ),
       '#empty' => t('You do not have saved credit card yet.'),
     );
 
@@ -89,7 +92,7 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
       }
     }
     $form['list'] = array(
-      '#markup' => '<ul><li>' . implode('</li></li>', $lists) . '</li></ul>',
+      '#markup' => '<ul><li>' . implode('</li><li>', $lists) . '</li></ul>',
     );
     $form['confirm'] = array(
       '#type' => 'submit',

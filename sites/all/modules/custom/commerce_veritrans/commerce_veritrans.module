@@ -804,7 +804,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       'css' => array(drupal_get_path('module', 'commerce_payment') . '/theme/commerce_payment.theme.css'),
     ),
     '#type' => 'fieldset',
-    '#collapsible' => TRUE,
+    '#collapsible' => FALSE,
     '#collapsed' => FALSE,
     '#weight' => 1,
   );
@@ -883,21 +883,18 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       '#type' => 'select',
       '#title' => t('Phone Number'),
       '#options' => $fields['phone'] + array('0' => t('Other Phone Number')),
+      '#default_value' => key($fields['phone']),
     );
     // Provide phone other text field.
     $form['credit_card']['phone_other'] = array(
       '#type' => 'textfield',
       '#title' => t('Other Phone Number'),
+      '#title_display' => 'invisible',
       '#default_value' => '',
       '#attributes' => array('autocomplete' => 'off'),
       '#validated' => TRUE,
       '#maxlength' => 14,
       '#size' => 14,
-      '#states' => array(
-        'visible' => array(
-          ':input[name$="[veritrans][credit_card][phone]"]' => array('value' => '0'),
-        ),
-      ),
     );
   }
   else {
@@ -937,6 +934,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       // Check default value.
       if (!(isset($default['tokens']) && $default['tokens'] === '0')) {
         // Collapsed standard credit card form.
+        $form['credit_card']['#collapsible'] = TRUE;
         $form['credit_card']['#collapsed'] = TRUE;
         $form['credit_card']['#attributes'] = array(
           'style' => array('display: none;'),

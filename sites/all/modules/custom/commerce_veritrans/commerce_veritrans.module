@@ -453,9 +453,11 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
     // Check phone other field.
     if (!(isset($pane_values['veritrans']['credit_card']['phone_other']) && !empty($pane_values['veritrans']['credit_card']['phone_other']))) {
       // Check whether operation is oneclick or twoclick.
-      if (in_array($payment_method['settings']['credit_card']['type'], array('oneclick', 'twoclick'))) {
-        // Try to get phone from token.
-        $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['token']);
+      if (in_array($payment_method['settings']['credit_card']['type'], array('oneclick', 'twoclick'))
+        && !empty($pane_values['veritrans']['tokens'])
+      ) {
+        // Try to get phone from previous tokens: not from current token.
+        $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['tokens']);
         if (empty($customer_phone)) {
           form_set_error($prefix . '][token', t('Payment @type unable to get your phone number based on previous transactions.', array(
             '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
@@ -575,9 +577,9 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   // Check customer phone.
   $customer_phone = (isset($pane_values['veritrans']['credit_card']['phone'])) ? $pane_values['veritrans']['credit_card']['phone'] : '';
   $customer_phone = (isset($pane_values['veritrans']['credit_card']['phone_other']) && !empty($pane_values['veritrans']['credit_card']['phone_other'])) ? $pane_values['veritrans']['credit_card']['phone_other'] : $customer_phone;
-  if (empty($customer_phone)) {
-    // Get phone from token.
-    $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['token']);
+  if (empty($customer_phone) && !empty($pane_values['veritrans']['tokens'])) {
+    // Get phone from previous selected tokens: not from current token.
+    $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['tokens']);
   }
 
   // Define default billing and shipping information.
@@ -643,9 +645,9 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     ),
   );
 
-  // @todo: Add token information: only if not regular?
+  // Add token save information: only if not regular?
   if (isset($pane_values['veritrans']['credit_card']['save'])) {
-    $transaction_data['credit_card']['save_token_id'] = boolval($pane_values['veritrans']['credit_card']['save']);
+    $transaction_data['credit_card']['save_token_id'] = (!empty($pane_values['veritrans']['credit_card']['save']));
   }
 
   // Add billing information.
@@ -873,7 +875,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
     '#attributes' => array(
       'autocomplete' => 'off',
       'readonly' => 'readonly',
-      'placeholder' => t('code'),
+      'placeholder' => '',
     ),
   );
 
@@ -938,6 +940,24 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
         $form['credit_card']['#collapsed'] = TRUE;
         $form['credit_card']['#attributes'] = array(
           'style' => array('display: none;'),
+        );
+      }
+
+      // Twoclick need cvv2 input.
+      if ($fields['type'] == 'twoclick') {
+        $form['code2'] = array(
+          '#type' => 'password',
+          '#title' => t('Security code'),
+          '#default_value' => '',
+          '#required' => TRUE,
+          '#maxlength' => 4,
+          '#size' => 4,
+          '#validated' => TRUE,
+          '#attributes' => array(
+            'autocomplete' => 'off',
+            'readonly' => 'readonly',
+            'placeholder' => '',
+          ),
         );
       }
     }
@@ -1059,7 +1079,7 @@ function commerce_veritrans_api($data, $settings) {
     '!debug' => print_r($result, TRUE),
     '!options' => print_r($http_options, TRUE),
   ), ((isset($result->code) && $result->code == 200) ? WATCHDOG_INFO : WATCHDOG_ERROR), l(t('Veritrans API: @op', array(
-    'op' => $operation,
+    '@op' => $operation,
   )), request_path()));
 
   return $return;

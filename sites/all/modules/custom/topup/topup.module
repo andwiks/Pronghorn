@@ -40,6 +40,12 @@ function topup_cron_queue_info() {
     'time' => 120,
   );
 
+  // Topup queue query: process pending topup.
+  $queues['topup_query'] = array(
+    'worker callback' => 'topup_queue_query',
+    'time' => 120,
+  );
+
   // Get try variable.
   $try = variable_get('topup_try', 3);
   $try = intval($try);
@@ -50,14 +56,13 @@ function topup_cron_queue_info() {
         'worker callback' => 'topup_queue_process',
         'time' => 120,
       );
+      // Topup queue query: for multiple try.
+      $queues['topup_query_' . $i] = array(
+        'worker callback' => 'topup_queue_query',
+        'time' => 120,
+      );
     }
   }
-
-  // Topup queue query: process pending topup.
-  $queues['topup_query'] = array(
-    'worker callback' => 'topup_queue_query',
-    'time' => 120,
-  );
 
   // Return queue array.
   return $queues;
@@ -249,6 +254,7 @@ function topup_requeue($line_item_id) {
     for ($i = 0; $i < $quantity; $i++) {
       // Store it in the container: for each quantity.
       $topup[] = array(
+        'order_id' => $line_item_wrapper->order_id->value(),
         'topup_id' => $i,
         'topup_total' => $quantity,
         'try' => 1,
@@ -332,9 +338,16 @@ function topup_queue($op, $topup) {
           break;
 
         case TOPUP_PENDING:
-          // Queue it once again.
-          $queue = DrupalQueue::get('topup_query');
-          $queue->createItem($topup);
+          // Get topup try query.
+          $topup['try_query'] = isset($topup['try_query']) ? intval($topup['try_query']) : 0;
+          // Check whether topup try still allowed
+          if ($topup['try_query'] < variable_get('topup_try', 3)) {
+            $topup['try_query']++;
+            // Queue for query.
+            $queue = ($topup['try_query'] == 1) ? 'topup_query' : 'topup_query_' . $topup['try_query'];
+            $queue = DrupalQueue::get($queue);
+            $queue->createItem($topup);
+          }
           break;
 
         case TOPUP_SUCCESS:

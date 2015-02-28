@@ -298,7 +298,8 @@ function otomax_topup_process($topup, $settings) {
   $value->addChild('string', $topup['field_topup_code']);
   // Generate xml.
   $xml = $xml->asXML();
-
+  // Set topup operation.
+  $topup['op'] = 'process';
   // Send xml data.
   return otomax_send($xml, $settings, $topup);
 }
@@ -349,6 +350,8 @@ function otomax_topup_query($topup, $settings) {
 
   // Add request id to topup data.
   $topup['request_id'] = $request_id;
+  // Set topup operation.
+  $topup['op'] = 'query';
 
   // Send xml data.
   return otomax_send($xml, $settings, $topup);
@@ -374,6 +377,8 @@ function otomax_topup_query($topup, $settings) {
 function otomax_send($data, $settings, $topup = array()) {
   // Define default endpoint.
   $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
+  // Define default operation.
+  $operation = (isset($topup['op'])) ? $topup['op'] : t('default');
   // Define return value flag.
   $return = FALSE;
 
@@ -504,12 +509,17 @@ function otomax_send($data, $settings, $topup = array()) {
         $return = $result->data;
       }
 
+      // Beautify XML data.
+      if (isset($result->data) && !empty($result->data)) {
+        $result->data = htmlentities($result->data);
+      }
+      $http_options['data'] = htmlentities($http_options['data']);
       // Log this condition, everything get log.
-      watchdog('otomax', 'Send data with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+      watchdog('otomax', 'Otomax Send data with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
         '@status' => ($return) ? 'OK' : 'BAD',
         '!debug' => print_r($result, TRUE),
         '!options' => print_r($http_options, TRUE),
-      ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Otomax: Send'), request_path()));
+      ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Otomax: Send Data'), request_path()));
     }
   }
   else {
@@ -532,10 +542,18 @@ function otomax_send($data, $settings, $topup = array()) {
           $container[$child->name->__toString()] = $child->value->string->__toString();
         }
       }
+
       // Log this container data.
-      watchdog('otomax', 'TopUp Process Result <pre>@result</pre>', array(
-        '@result' => print_r($container, TRUE),
-      ), WATCHDOG_INFO, l(t('Otomax: TopUp Process'), request_path()));
+      $debug = $container + $topup;
+      watchdog('otomax', 'Otomax @op Result Order @oid <pre>@debug</pre>', array(
+        '@op' => ucfirst($operation),
+        '@debug' => print_r($debug, TRUE),
+        '@oid' => $topup['order_id'],
+      ), WATCHDOG_INFO, l(t('Otomax: @op @oid', array(
+        '@op' => ucfirst($operation),
+        '@oid' => $topup['order_id'],
+      )), request_path()));
+
       // Check the value: RESPONSECODE.
       if (isset($container['RESPONSECODE'])) {
         switch ($container['RESPONSECODE']) {
@@ -551,9 +569,12 @@ function otomax_send($data, $settings, $topup = array()) {
     }
     else {
       // Log this condition.
-      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre>', array(
+      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@topup</pre>', array(
         '@result' => var_export($result_xml, TRUE),
-      ), WATCHDOG_ERROR, l(t('Otomax: TopUp Process XML'), request_path()));
+        '@topup' => print_r($topup, TRUE),
+      ), WATCHDOG_ERROR, l(t('Otomax: @op XML', array(
+        '@op' => ucfirst($operation),
+      )), request_path()));
     }
   }
 

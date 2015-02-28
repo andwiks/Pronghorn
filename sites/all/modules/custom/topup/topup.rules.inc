@@ -103,6 +103,7 @@ function topup_queue_request($order) {
       for ($i = 0; $i < $line_item->quantity; $i++) {
         // Store it in the container: for each quantity.
         $topup[] = array(
+          'order_id' => $order->order_id,
           'topup_id' => $i,
           'topup_total' => $line_item->quantity,
           'try' => 1,

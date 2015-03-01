@@ -69,6 +69,16 @@ function referral_sepulsa_rules_action_info() {
         ),
       ),
     ),
+    'add_point_line_item' => array(
+      'label' => t('Add Point Line Item'), 
+      'group' => t('Sepulsa'),
+      'parameter' => array(
+           'order' => array(
+          'type' => 'commerce_order',
+          'label' => t('Commerce Order'),
+        ),
+      ),
+    ),
   );
   
   return $actions;
@@ -78,7 +88,7 @@ function referral_sepulsa_rules_action_info() {
  * The condition function for 'user_first_paid_in_full_order'.
  */
 function user_first_paid_in_full_order($order, $user) {
-    $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'pending' OR status = 'completed') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
+    $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'pending' OR status = 'invoiced' OR status = 'completed') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
     
     // if order id prev exists, it means this is not user first order
     if ($order_id_prev) return FALSE;
@@ -99,7 +109,8 @@ function assign_point_to_referrer_user($order, $user, $point_percentage, $catego
         $params = array (
           'uid' => $referrer_uid,
           'points' => $points,
-          'tid' => $category
+          'tid' => $category,
+          'description' => 'User '.$user->uid.' has made first purchase.'
         );
         userpoints_userpointsapi($params); 
     }
@@ -115,4 +126,69 @@ function referral_sepulsa_userpoint_category_options() {
     //drupal_set_message("<pre>".print_r($list, true)."</pre>");
  
     return $list;
+}
+
+/**
+ * The action function for 'assign_point_to_referrer_user'.
+ */
+function add_point_line_item($order) {
+    drupal_set_message("<pre>".print_r($order, true)."</pre>");
+    //commerce_userpoints_discount_use_credit_callback($order, 10000, 'IDR');
+    /*$line_item_id = commerce_userpoints_discount_order_has_userpoint_line_item($order->order_id);
+    
+    $amount = 100;
+    // If there is no existing userpoints line item, we create a new one.
+    if ($line_item_id == NULL) {
+        // Create the line item.
+        $line_item = commerce_userpoints_discount_line_item_factory_new($order->order_id);
+  
+        // Create the userpoints transaction.
+        $userpoints_params = array(
+          'points' => $amount * -1,
+          'uid' => $order->uid,
+          'operation' => 'commerce_userpoints_discount_credit',
+          'tid' => variable_get('commerce_userpoints_discount_default_termid', userpoints_get_default_tid()),
+          'display' => FALSE,
+          'entity_id' => $order->order_id,
+          'entity_type' => 'commerce_order',
+        );
+
+        $result = userpoints_userpointsapi($userpoints_params);
+        
+        drupal_set_message("<pre>".print_r($result, true)."</pre>");
+        $label = "User credit";
+        commerce_userpoints_discount_line_item_populate(
+          $line_item, $order->order_id,
+          $result['transaction'], commerce_default_currency(), $label);
+
+        commerce_userpoints_discount_line_item_save($line_item);
+    } else {
+        // If there is an existing userpoints line item for this order, we load it to get its userpoints transaction id.
+        $line_item = commerce_line_item_load($line_item_id);
+
+        // Get the existing transaction.
+        $txn_field = field_get_items('commerce_line_item', $line_item, 'commerce_userpoints_discount_transaction');
+
+        // Clear out the old $line_item.
+        commerce_userpoints_discount_clear_order($order->order_id);
+        unset($line_item);
+
+        // Update the userpoints transaction.
+        $userpoints_params = array(
+          'points' => intval($amount) * -1,
+          'txn_id' => $txn_field[0]['value'],
+          'status' => 0,
+        );
+        $result = userpoints_userpointsapi($userpoints_params);
+    
+        // Create the new line item.
+        $line_item = commerce_userpoints_discount_line_item_factory_new($order->order_id);
+
+        $label = t("User credit");
+        commerce_userpoints_discount_line_item_populate(
+          $line_item, $order->order_id,
+          $result['transaction'], commerce_default_currency(), $label);
+
+        commerce_userpoints_discount_line_item_save($line_item);
+    }*/
 }

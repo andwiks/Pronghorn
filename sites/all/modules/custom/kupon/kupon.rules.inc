@@ -52,7 +52,7 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
             $node = node_load($unique_nid);
             $node->language = LANGUAGE_NONE;
             $node->uid = $user->uid;
-            $node->field_order_id[$node->language][] = array(
+            $node->field_order_id[$node->language][0] = array(
                 'value' => $line_item->order_id,
             );
             $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry[0]['value'];

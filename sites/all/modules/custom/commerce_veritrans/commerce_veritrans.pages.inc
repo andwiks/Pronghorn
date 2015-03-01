@@ -45,7 +45,7 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
     if (!empty($tokens)) {
       foreach ($tokens as $token) {
         $options[$token->token_id] = array(
-          'cc' => $token->first . ' - ' . $token->last,
+          'cc' => commerce_veritrans_token_format($token),
           'phone' => $token->phone,
           'expired' => format_date($token->expired),
           'order' => l(t('Order @oid', array('@oid' => $token->order_id)), 'user/' . $account->uid . '/orders/' . $token->order_id),
@@ -88,7 +88,7 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
     $lists = array();
     foreach ($tokens as $token) {
       if (in_array($token->token_id, $form_state['deleted'])) {
-        $lists[] = $token->first . ' - ' . $token->last . ' (' . $token->phone . ')';
+        $lists[] = commerce_veritrans_token_format($token, TRUE);
       }
     }
     $form['list'] = array(

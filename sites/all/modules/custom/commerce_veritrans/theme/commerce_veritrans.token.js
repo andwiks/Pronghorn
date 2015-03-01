@@ -4,42 +4,28 @@
 
 ;(function($) {
   Drupal.behaviors.commerceVeritrans = {
-    attach: function (context, settings) {        
-      $.ajax({
-        url: settings.vt_js,
-        dataType: "script",
-        cache: true
-      }).done(function (script, textStatus) {
-        Veritrans.url = settings.vt_url + '/token';
-        Veritrans.client_key = settings.vt_client;
-        $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").hide();
-      });
-                  
-      var card = function () {
-    	if (settings.vt_type == "twoclick"
-          && $("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")
-          && $("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0"
-        ) {
-    	  return {
-    		"card_cvv": $("#edit-commerce-payment-payment-details-veritrans-code2").val(),
-    		"token_id" : $("#edit-commerce-payment-payment-details-veritrans-tokens").val(),
-		    "two_click" : true,
-		    "secure": settings.vt_secure,
-    		"bank": settings.vt_bank,
-    		"gross_amount": settings.vt_amount
-    	  }
-    	} 
-        return {
-          "card_number": $("#edit-commerce-payment-payment-details-veritrans-credit-card-number").val(),
-          "card_exp_month": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-month").val(),
-          "card_exp_year": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-year").val(),
-          "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-credit-card-code").val(),
-          "secure": settings.vt_secure,
-          "bank": settings.vt_bank,
-          "gross_amount": settings.vt_amount
-        }
-      };
-    
+    attach: function (context, settings) {   
+      function toggleCCForm(toggle) {
+          $("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", toggle).toggle(!toggle);
+        $("#edit-commerce-payment-payment-details-veritrans-code2").toggle(toggle).prev("label").toggle(toggle);
+      }
+      
+      function openDialog(url) {
+        $.fancybox({
+          href: url,
+          type: "iframe",
+          autoSize: false,
+          width: 700,
+          height: 500,
+          closeBtn: false,
+          modal: true
+        });
+      }
+      
+      function closeDialog() {
+        $.fancybox.close();
+      }
+      
       function callback(response) {
         if (response.redirect_url) {
           openDialog(response.redirect_url);
@@ -59,23 +45,43 @@
           $("form").submit();
         }
       }
-    
-      function openDialog(url) {
-        $.fancybox({
-          href: url,
-          type: "iframe",
-          autoSize: false,
-          width: 700,
-          height: 500,
-          closeBtn: false,
-          modal: true
-        });
-      }
-    
-      function closeDialog() {
-        $.fancybox.close();
-      }
       
+      $.ajax({
+        url: settings.vt_js,
+        dataType: "script",
+        cache: true
+      }).done(function (script, textStatus) {
+        Veritrans.url = settings.vt_url + '/token';
+        Veritrans.client_key = settings.vt_client;
+        $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").hide();
+        toggleCCForm($("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0");
+      });
+                  
+      var card = function () {
+        if (settings.vt_type == "twoclick"
+          && $("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")
+          && $("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0"
+        ) {
+          return {
+            "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-code2").val(),
+            "token_id" : $("#edit-commerce-payment-payment-details-veritrans-tokens").val(),
+            "two_click" : true,
+            "secure": settings.vt_secure,
+            "bank": settings.vt_bank,
+            "gross_amount": settings.vt_amount
+          }
+        } 
+        return {
+          "card_number": $("#edit-commerce-payment-payment-details-veritrans-credit-card-number").val(),
+          "card_exp_month": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-month").val(),
+          "card_exp_year": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-year").val(),
+          "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-credit-card-code").val(),
+          "secure": settings.vt_secure,
+          "bank": settings.vt_bank,
+          "gross_amount": settings.vt_amount
+        }
+      };
+                   
       $("#edit-continue", context).on("click", function (event) {
         if (settings.vt_type == "oneclick" 
           && $("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")
@@ -98,9 +104,7 @@
       });
       
       $("#edit-commerce-payment-payment-details-veritrans-tokens", context).on("change", function () {
-        toogle = (($(this).val() != "0"));
-        $("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", toogle).toggle(!toogle);
-        $("#edit-commerce-payment-payment-details-veritrans-code2").toggle(toogle).prev("label").toggle(toogle);
+        toggleCCForm(($(this).val() != "0"));
       });
     }
   }

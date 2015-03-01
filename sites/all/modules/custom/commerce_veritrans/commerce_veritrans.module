@@ -52,7 +52,7 @@ function commerce_veritrans_form_commerce_checkout_form_checkout_alter(&$form, &
       $payment_details = explode('|', $payment_instance_id);
       if (isset($payment_details[1])) {
         $settings = rules_config_load($payment_details[1]);
-        $form['commerce_payment']['payment_method']['#options'][$payment_instance_id] = (isset($settings->label)) ? $settings->label : $payment_title;
+        $form['commerce_payment']['payment_method']['#options'][$payment_instance_id] = (isset($settings->label)) ? t($settings->label) : $payment_title;
       }
     }
   }
@@ -75,24 +75,13 @@ function commerce_veritrans_menu() {
     'file' => 'commerce_veritrans.orders.inc',
   );
 
-  // @todo: cancel/deny.
+  // Transaction cancel/deny.
   $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/cancel'] = array(
     'title' => 'Cancel',
     'page callback' => 'commerce_veritrans_payment_cancel_form_wrapper',
     'page arguments' => array(3, 5),
     'access callback' => 'commerce_payment_transaction_access',
     'access arguments' => array('delete', 5),
-    'type' => MENU_LOCAL_TASK,
-    'context' => MENU_CONTEXT_INLINE,
-    'file' => 'commerce_veritrans.orders.inc',
-  );
-  // @todo: query.
-  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/query'] = array(
-    'title' => 'Query',
-    'page callback' => 'commerce_veritrans_payment_query_form_wrapper',
-    'page arguments' => array(3, 5),
-    'access callback' => 'commerce_payment_transaction_access',
-    'access arguments' => array('view', 5),
     'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'file' => 'commerce_veritrans.orders.inc',
@@ -115,18 +104,35 @@ function commerce_veritrans_menu() {
  * Implements hook_menu_contextual_links_alter().
  */
 function commerce_veritrans_menu_contextual_links_alter(&$links, $router_item, $root_path) {
-  // Check for payment transaction approve links.
-  if (isset($links['commerce-payment-transaction-approve'])) {
-    // Get payment transaction.
-    $transaction = $router_item['page_arguments'][1];
+  // Check for payment transaction approve|cancel links.
+  if (isset($links['commerce-payment-transaction-approve'])
+    || isset($links['commerce-payment-transaction-cancel'])
+  ) {
     // Get order object.
     $order = $router_item['page_arguments'][0];
-    // Check payment transaction and payment response.
-    if (!($transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
-      && isset($order->data['commerce_veritrans']['response'])
-      && $order->data['commerce_veritrans']['response']->fraud_status == 'challenge'
-    )) {
-      unset($links['commerce-payment-transaction-approve']);
+    // Check payment transaction result.
+    if (isset($order->data['commerce_veritrans']['response'])) {
+      // Get payment transaction.
+      $transaction = $router_item['page_arguments'][1];
+      // 1. Check payment transaction: pending.
+      // 2. Check payment response: challenge.
+      if (!($transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
+        && isset($order->data['commerce_veritrans']['response']->fraud_status)
+        && $order->data['commerce_veritrans']['response']->fraud_status == 'challenge'
+      )) {
+        unset($links['commerce-payment-transaction-approve']);
+      }
+      // 1. Check payment transaction: success.
+      // 2. Check status code: 200.
+      // 3. Check transaction status: capture.
+      if (!($transaction->status == COMMERCE_PAYMENT_STATUS_SUCCESS
+        && isset($order->data['commerce_veritrans']['response']->status_code)
+        && $order->data['commerce_veritrans']['response']->status_code == '200'
+        && isset($order->data['commerce_veritrans']['response']->transaction_status)
+        && $order->data['commerce_veritrans']['response']->transaction_status == 'capture'
+      )) {
+        unset($links['commerce-payment-transaction-cancel']);
+      }
     }
   }
 }
@@ -219,11 +225,6 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#title' => t('Always use 3-D Secure'),
     '#default_value' => (isset($settings['credit_card']['3ds'])) ? $settings['credit_card']['3ds'] : '1',
     '#description' => t('If this option enable, at checkout, form will always try to use 3-D Secure.'),
-    '#states' => array(
-      'checked' => array(
-        ':input[name="parameter[payment_method][settings][payment_method][settings][credit_card][type]"]' => array('value' => 'oneclick'),
-      ),
-    ),
   );
   // Order ID Prefix.
   $form['prefix'] = array(
@@ -324,6 +325,28 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
 
   // Check payment settings.
   if (isset($payment_method['settings']) && !empty($payment_method['settings'])) {
+    // Check checkout pane variable: form from terminal.
+    if (empty($checkout_pane)) {
+      // @todo: get latest payment operation => to define operation options.
+      // Select payment operation.
+      $form['operation'] = array(
+        '#type' => 'select',
+        '#title' => t('Payment Operation'),
+        '#options' => array(
+          'query' => t('Query'),
+          'update' => t('Query + Update'),
+        ),
+        '#default_value' => 'query',
+      );
+      // Submit button.
+      $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => t('Go'),
+      );
+      // Return form array.
+      return $form;
+    }
+
     // Define order wrapper: to get total order amount.
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
@@ -421,6 +444,20 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
 function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $pane_values, $order, $form_parents = array()) {
   // Define default return value.
   $return_value = TRUE;
+
+  // Check form parents.
+  if (isset($pane_form['#array_parents'][0]) && $pane_form['#array_parents'][0] == 'payment_terminal') {
+    // Check payment submit button.
+    if (!(isset($pane_values['submit']) && isset($pane_form['submit']['#value'])
+      && $pane_values['submit'] == $pane_form['submit']['#value']
+    )) {
+      form_set_error('payment_details][submit', t('Unknown payment operation from terminal.'));
+      $return_value = FALSE;
+    }
+    // Validate form from terminal.
+    return $return_value;
+  }
+
   // Define form element name prefix: to provide valid form element name.
   $prefix = implode('][', array_merge($form_parents, array('veritrans'))) . '][';
 
@@ -539,6 +576,102 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
  *   FALSE will rebuild the payment checkout form.
  */
 function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pane_values, $order, $charge) {
+  // Check payment parents.
+  if (isset($pane_form['#array_parents'][0]) && $pane_form['#array_parents'][0] == 'payment_terminal') {
+    if (isset($pane_values['submit']) && isset($pane_form['submit']['#value'])
+      && $pane_values['submit'] == $pane_form['submit']['#value']
+    ) {
+      // Submit called from terminal.
+      switch ($pane_values['operation']) {
+        case 'query':
+        case 'update':
+          // Get latest payment transaction.
+          $query = new EntityFieldQuery();
+          $query->entityCondition('entity_type', 'commerce_payment_transaction')
+            ->propertyCondition('order_id', $order->order_id, '=')
+            ->propertyOrderBy('revision_id', 'DESC')
+            ->range(0, 1);
+          $result = $query->execute();
+
+          // Check query result.
+          if (isset($result['commerce_payment_transaction']) && !empty($result['commerce_payment_transaction'])) {
+            // Get transaction id.
+            $transaction_id = key($result['commerce_payment_transaction']);
+            $transaction = commerce_payment_transaction_load($transaction_id);
+
+            // Call commerce_veritrans_query_operation.
+            $payment = commerce_veritrans_payment_query_operation($order, $transaction);
+            // Check payment result.
+            if ($payment !== FALSE) {
+              // Only for update operation.
+              if ($pane_values['operation'] == 'update') {
+                // Create new transaction flag.
+                $new_transaction = FALSE;
+                // Get order balance.
+                $balance = commerce_payment_order_balance($order);
+                // Check payment data.
+                if (isset($balance['amount']) && isset($payment->status_code)
+                  && isset($payment->transaction_status)
+                ) {
+                  // Case: Order balance > 0 but transaction capture (200).
+                  if ($balance['amount'] > 0
+                    && $payment->status_code == '200'
+                    && $payment->transaction_status == 'capture'
+                  ) {
+                    $new_transaction = TRUE;
+                    $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+                    // @todo: need to success previous payment pending if any.
+                  }
+                  // Case: Order balance <= 0 but transaction cancel (200).
+                  if ($balance['amount'] <= 0
+                    && $payment->status_code == '200'
+                    && $payment->transaction_status == 'cancel'
+                  ) {
+                    $new_transaction = TRUE;
+                    // @todo: need to cancel previous payment sucess if any.
+                    $status = COMMERCE_PAYMENT_STATUS_FAILURE;
+                    $balance['amount'] = $payment->gross_amount;
+                  }
+                }
+                // Check new transaction flag.
+                if ($new_transaction) {
+                  // Add new failed transaction.
+                  $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
+                  $transaction->instance_id = $payment_method['instance_id'];
+                  $transaction->remote_id = (isset($payment->order_id)) ? $payment->order_id : $order->order_id;
+                  $transaction->remote_status = $status;
+                  $transaction->amount = $balance['amount'];
+                  $transaction->currency_code = $balance['currency_code'];
+                  $transaction->status = $status;
+                  $transaction->message = 'Payment Data: <br />!data';
+                  $payment_data = '';
+                  foreach ((array) $payment as $key => $data) {
+                    $payment_data[] = str_replace('_', ' ', $key) . ' = ' . ((is_array($data)) ? '<ul><li>' . implode('</li><li>', $data) . '</li></ul>' : $data);
+                  }
+                  $transaction->message_variables = array(
+                    '!data' => implode('<br />', $payment_data),
+                  );
+                  commerce_payment_transaction_save($transaction);
+                }
+                else {
+                  drupal_set_message('No payment update necessary.');
+                }
+              }
+              // Show query result to user.
+              drupal_set_message(t('Query result: <pre>@result</pre>', array(
+                '@result' => print_r($payment, TRUE),
+              )));
+            }
+          }
+          else {
+            drupal_set_message('Unable to get latest order payment transaction.', 'error');
+          }
+          break;
+      }
+    }
+    return FALSE;
+  }
+
   // Define order wrapper: to get total order amount.
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
@@ -920,8 +1053,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       // Define token options.
       $token_options = array();
       foreach ($tokens as $token) {
-        $token = (array) $token;
-        $token_options[$token['token']] = $token['first'] . ' - ' . $token['last'] . ' (' . $token['phone'] . ')';
+        $token_options[$token->token] = commerce_veritrans_token_format($token, TRUE);
       }
       // Add last options.
       $token_options[0] = t('New Credit Card');
@@ -1051,8 +1183,8 @@ function commerce_veritrans_api($data, $settings) {
       'Authorization' => 'Basic ' . base64_encode($settings['server_key'] . ':'),
     ),
     'max_redirects' => 0,
-    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 10.0,
-    'method' => 'POST',
+    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 30.0,
+    'method' => (isset($settings['method'])) ? $settings['method'] : 'POST',
     'data' => (!empty($data)) ? json_encode($data) : '',
     'context' => $stream_context,
   );
@@ -1170,4 +1302,59 @@ function commerce_veritrans_token_get_phone($token) {
     ->condition('token', $token, '=')
     ->execute()
     ->fetchField();
+}
+
+/**
+ * Function commerce_veritrans_token_format().
+ *
+ * @param object $token
+ *   Token object.
+ * @param bool $phone
+ *   Phone included flag.
+ *
+ * @return string
+ *   Formatted token.
+ */
+function commerce_veritrans_token_format($token, $phone = FALSE) {
+  // Define format: xxxxxx - xxxxxx - xxxx
+  $format = $token->first . ' - xxxxxx - ' . $token->last;
+  // Return formatted token.
+  return ($phone) ? $format . ' (' . $token->phone . ')' : $format;
+}
+
+/**
+ * Function commerce_veritrans_payment_query_operation().
+ *
+ * @param object $order
+ *   Order object.
+ * @param object $transaction
+ *   Payment transaction object.
+ */
+function commerce_veritrans_payment_query_operation($order, $transaction) {
+  // Check whether order has data related to veritrans order id.
+  if (isset($order->data['commerce_veritrans']['response']->order_id) && isset($transaction->instance_id)) {
+    // Get payment method settings.
+    $payment_method = commerce_payment_method_instance_load($transaction->instance_id);
+
+    // Preparing status api settings.
+    $settings = array(
+      'url' => $payment_method['settings']['url'] . '/' . $order->data['commerce_veritrans']['response']->order_id,
+      'op' => 'status',
+      'server_key' => $payment_method['settings']['server_key'],
+      'method' => 'GET',
+    );
+
+    // Do veritrans API: setatus.
+    $payment = commerce_veritrans_api(array(), $settings);
+    // Check payment result.
+    if (is_string($payment) && !empty($payment)) {
+      // Decode the string.
+      $payment = json_decode($payment);
+      // Chek json decode result.
+      if (json_last_error() == JSON_ERROR_NONE) {
+        return $payment;
+      }
+    }
+  }
+  return FALSE;
 }

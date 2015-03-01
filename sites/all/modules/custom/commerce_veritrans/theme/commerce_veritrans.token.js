@@ -6,7 +6,7 @@
   Drupal.behaviors.commerceVeritrans = {
     attach: function (context, settings) {   
       function toggleCCForm(toggle) {
-          $("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", toggle).toggle(!toggle);
+        $("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", toggle).toggle(!toggle);
         $("#edit-commerce-payment-payment-details-veritrans-code2").toggle(toggle).prev("label").toggle(toggle);
       }
       
@@ -54,7 +54,9 @@
         Veritrans.url = settings.vt_url + '/token';
         Veritrans.client_key = settings.vt_client;
         $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").hide();
-        toggleCCForm($("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0");
+        if ($("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")) {
+          toggleCCForm($("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0");
+        }
       });
                   
       var card = function () {

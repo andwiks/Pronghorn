@@ -27,66 +27,66 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     $form['packet']['#title'] = NULL;
     $form['packet']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Paket');
-    
+
     $form['add']['#prefix'] = '<p></p>';
-    $form['add']['cart']['#attributes']['style'] = 'float:right'; 
-    $form['add']['charge']['#attributes']['style'] = 'float:right;display:none;'; 
-    
+    $form['add']['cart']['#attributes']['style'] = 'float:right';
+    $form['add']['charge']['#attributes']['style'] = 'float:right;display:none;';
+
   } else if ($form_id == "user_login_block") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p></p>';
-    
+
     $form['pass']['#title'] = NULL;
     $form['pass']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Password');
     $form['pass']['#suffix'] = '<p></p>';
-    
+
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
     $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
-    
+
   } else if ($commer_form_id == 'commerce_cart_add_to_cart' && arg(0) == 'coupon') {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
-    
+
   } else if ($form_id == "user_login") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p></p>';
-    
+
     $form['pass']['#title'] = NULL;
     $form['pass']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Password');
     $form['pass']['#suffix'] = '<p></p>';
-    
+
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
     $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
-    
+
   } else if ($form_id == "user_register_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['account']['name']['#title'] = NULL;
     $form['account']['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Username');
-    
+
     $form['account']['mail']['#title'] = NULL;
     $form['account']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['account']['mail']['#suffix'] = '<p></p>';
-    
+
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
-    
+
   } else if ($form_id == "user_pass") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p><br /></p>';
-    
+
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
-    
+
   } else if ($form_id == "commerce_checkout_form_checkout") {
     global $user;
-    
+
     //drupal_set_message("<pre>".print_r($form['commerce_payment'], true)."</pre>");
     $form['cart_contents']['#title'] = NULL;
-    
+
     $form['account']['#title'] = NULL;
     if ($user->uid == 0) {
       $form['account']['login']['mail']['#title'] = NULL;
@@ -94,10 +94,10 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['account']['login']['#prefix'] = '<div class="cart-collaterals row col-sm-6 col-md-6 box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
     }
-    
+
     $form['commerce_payment']['#title'] = NULL;
     $form['commerce_payment']['#prefix'] = '<p></p><h4><strong>'.t('Payment Options').'</strong></h4>';
-    
+
     if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#attributes']['class'] = array('input-text');
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title'] = NULL;
@@ -110,33 +110,35 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#suffix'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['style'] = 'width:85px; display:inline';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['class'] = array('selector');
-      
+
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#prefix'] = "<p></p><h6><strong>".t('Card CVV')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['class'] = array('input-text');
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['style'] = "width:75px !important";
-      
+
       if (isset($form['commerce_payment']['payment_details']['veritrans']['code2'])) {
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#title'] = NULL;
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = "<p></p> <label for='edit-commerce-payment-payment-details-veritrans-code2' style='display: block;'> <h6><strong>".t('Card CVV')."</strong></h6></label>";
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['class'] = array('input-text');
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
-      
+
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<p></p><h6><strong>".t('Phone Number')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
-      
+
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = "<p></p>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['class'] = array('input-text');
-      
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><label><div class="checkbox">';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</div></label>';
-      
+
+      if (isset($form['commerce_payment']['payment_details']['veritrans']['credit_card']['save'])) {
+        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><label><div class="checkbox">';
+        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</div></label>';
+      }
+
       if (isset($form['commerce_payment']['payment_details']['veritrans']['tokens'])) {
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title'] = NULL;
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#prefix'] = "<p></p><h6><strong>".t('Saved Credit Card')."</strong></h6>";
@@ -144,14 +146,14 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
       }
     }
-    
+
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
-    
+
   } else if ($form_id == "views_form_commerce_cart_block_default") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     global $base_url;
-    
+
     foreach ($form['edit_delete'] as &$value) {
       if (isset($value['#type'])) {
         //drupal_set_message("<pre>".print_r($value, true)."</pre>");
@@ -162,27 +164,27 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $value['#value'] = '';
       }
     }
-    
+
   } else if ($form_id == "user_profile_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['contact']['#attributes']['style'] = "display:none;";
     $form['mimemail']['#attributes']['style'] = "display:none;";
-    
+
     $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
-    
+
     $form['account']['mail']['#attributes']['class'] = array('input-text');
     $form['account']['mail']['#suffix'] = '<p></p>';
-    
+
     $form['account']['current_pass']['#attributes']['class'] = array('input-text');
     $form['account']['current_pass']['#description'] = t('Enter your current password to change the E-mail address or Password.');
     $form['account']['current_pass']['#suffix'] = '<p></p>';
-    
+
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
-    
+
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
-    
+
   }
 }
 
@@ -193,10 +195,10 @@ function sepulsa_form_process_password_confirm($element) {
   //drupal_set_message("<pre>".print_r($element, true)."</pre>");
   $element['pass1']['#attributes']['class'] = array('input-text');
   $element['pass1']['#suffix'] = '<p></p>';
-  
+
   $element['pass2']['#attributes']['class'] = array('input-text');
   //$element['pass2']['#suffix'] = '<p></p>';
-  
+
   return $element;
 }
 

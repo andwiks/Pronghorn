@@ -1033,7 +1033,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       'placeholder' => '',
     ),
   );
-$fields['phone'] = array('123' => '123');
+
   // Check whether default phone is available.
   if (isset($fields['phone']) && !empty($fields['phone'])) {
     $form['credit_card']['phone'] = array(

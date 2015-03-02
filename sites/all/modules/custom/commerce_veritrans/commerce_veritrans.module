@@ -1068,7 +1068,10 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
 
   if (isset($fields['type']) && in_array($fields['type'], array('oneclick', 'twoclick'))) {
     // Get valid veritrans token.
-    $tokens = commerce_veritrans_token_get($fields['uid']);
+    $tokens = array();
+    if ($fields['uid'] > 0) {
+      $tokens = commerce_veritrans_token_get($fields['uid']);
+    }
     // Check whether token is available.
     if (!empty($tokens)) {
       // Define token options.

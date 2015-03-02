@@ -41,6 +41,7 @@ function commerce_veritrans_commerce_payment_method_info() {
  * Implements hook_form_FORM_ID_alter().
  */
 function commerce_veritrans_form_commerce_checkout_form_checkout_alter(&$form, &$form_state) {
+  // @todo: if payment is located at checkout elsewhere.
   // Add autocomplete off to the form.
   $form['#attributes']['autocomplete'] = 'off';
   // Check whether form contain payment method.
@@ -1032,7 +1033,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       'placeholder' => '',
     ),
   );
-
+$fields['phone'] = array('123' => '123');
   // Check whether default phone is available.
   if (isset($fields['phone']) && !empty($fields['phone'])) {
     $form['credit_card']['phone'] = array(

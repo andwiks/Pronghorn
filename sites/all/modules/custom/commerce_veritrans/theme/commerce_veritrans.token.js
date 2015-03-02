@@ -42,7 +42,7 @@
           else {
             $("#error_message").val(response.status_message);
           }
-          document.getElementsByTagName("form").submit();
+          $("form#commerce-checkout-form-checkout").submit();
         }
       }
       
@@ -56,6 +56,11 @@
         $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").hide();
         if ($("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")) {
           toggleCCForm($("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0");
+        }
+        if ($("#edit-commerce-payment-payment-details-veritrans-credit-card-phone").is("select")
+          && $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone").val() == "0"
+        ) {
+          $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").show();
         }
       });
                   

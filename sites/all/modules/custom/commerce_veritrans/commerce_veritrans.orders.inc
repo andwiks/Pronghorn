@@ -171,7 +171,7 @@ function commerce_veritrans_payment_approve_form_submit($form, &$form_state) {
         && isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'capture'
       ) {
         $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
-        commerce_veritrans_token_new($order->order_id, $order->data['commerce_veritrans']['response'], $order->data['commerce_veritrans']['phone']);
+        commerce_veritrans_token_new($order, $order->data['commerce_veritrans']['response'], $order->data['commerce_veritrans']['phone']);
       }
       elseif ((isset($payment->status_code) && $payment->status_code == '201')
         || (isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'challenge')

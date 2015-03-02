@@ -878,7 +878,7 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
     $status_message = 'status';
     // Save payment token.
-    commerce_veritrans_token_new($order->order_id, $payment, $customer_phone);
+    commerce_veritrans_token_new($order, $payment, $customer_phone);
   }
   elseif ((isset($payment->status_code) && $payment->status_code == '201')
     || (isset($payment->transaction_status) && strtolower($payment->transaction_status) == 'challenge')
@@ -1117,13 +1117,16 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
         );
       }
     }
-    // Add save credit card option.
-    $form['credit_card']['save'] = array(
-      '#type' => 'checkbox',
-      '#default_value' => $default['credit_card']['save'],
-      '#title' => t('Save credit card'),
-      '#title_display' => 'before',
-    );
+    // Hide for anonymous user.
+    if ($fields['uid'] > 0) {
+      // Add save credit card option.
+      $form['credit_card']['save'] = array(
+        '#type' => 'checkbox',
+        '#default_value' => $default['credit_card']['save'],
+        '#title' => t('Save credit card'),
+        '#title_display' => 'before',
+      );
+    }
   }
 
   $form['token'] = array(
@@ -1246,8 +1249,8 @@ function commerce_veritrans_api($data, $settings) {
  *
  * Insert token data into table commerce_veritrans_token.
  *
- * @param int $order_id
- *   Order ID.
+ * @param object $order
+ *   Order object.
  * @param object $payment
  *   Payment data response from veritrans.
  * @param string $phone
@@ -1256,15 +1259,13 @@ function commerce_veritrans_api($data, $settings) {
  * @return bool
  *   Flag whether add operation is successfull.
  */
-function commerce_veritrans_token_new($order_id, $payment, $phone) {
+function commerce_veritrans_token_new($order, $payment, $phone) {
   // @todo: check $payment->secure_token, what is this?
   // Check payment data.
   if (isset($payment->saved_token_id) && !empty($payment->saved_token_id)
     && isset($payment->saved_token_id_expired_at) && !empty($payment->saved_token_id_expired_at)
     && isset($payment->masked_card) && !empty($payment->masked_card)
   ) {
-    // Get global user object.
-    global $user;
     // Get unix timestamp from token expired.
     $expire_time = strtotime($payment->saved_token_id_expired_at);
     // Check whether strtotime fail.
@@ -1276,8 +1277,8 @@ function commerce_veritrans_token_new($order_id, $payment, $phone) {
     // Insert into db.
     return db_insert('commerce_veritrans_token')
       ->fields(array(
-        'uid' => $user->uid,
-        'order_id' => $order_id,
+        'uid' => $order->uid,
+        'order_id' => $order->order_id,
         'token' => $payment->saved_token_id,
         'phone' => $phone,
         'expired' => $expire_time,

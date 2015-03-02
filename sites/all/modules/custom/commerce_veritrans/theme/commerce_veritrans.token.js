@@ -42,7 +42,7 @@
           else {
             $("#error_message").val(response.status_message);
           }
-          $("form").submit();
+          document.getElementsByTagName("form").submit();
         }
       }
       

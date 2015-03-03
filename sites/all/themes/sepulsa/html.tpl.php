@@ -48,5 +48,9 @@ global $base_url;
   <?php print $page_top; ?>
   <?php print $page; ?>
   <?php print $page_bottom; ?>
+  <!-- Thawte SSL Seal -->
+  <div id="thawteseal" style="text-align:center;" title="Click to Verify - This site chose Thawte SSL for secure e-commerce and confidential communications.">
+	<div><script type="text/javascript" src="https://seal.thawte.com/getthawteseal?host_name=www.sepulsa.com&amp;size=S&amp;lang=en"></script></div>
+  </div>
 </body>
 </html>

@@ -42,7 +42,7 @@
           else {
             $("#error_message").val(response.status_message);
           }
-          $("form#commerce-checkout-form-checkout").submit();
+          $("form#commerce-checkout-form-checkout", context).submit();
         }
       }
       

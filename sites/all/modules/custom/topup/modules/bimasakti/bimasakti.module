@@ -1,0 +1,516 @@
+<?php
+/**
+ * @file
+ * bimasakti.module
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_topup_provider_info().
+ */
+function bimasakti_topup_provider_info() {
+  $providers = array();
+
+  $providers['rajabiller'] = array(
+    'title' => t('Raja Biller'),
+    'description' => t('Raja Biller'),
+    'status' => TRUE,
+  );
+
+  return $providers;
+}
+
+/**
+ * Implements hook_topup_code_info().
+ */
+function bimasakti_topup_code_info() {
+  $code_info = array();
+
+  $codes = array();
+  $codes['AX100H'] = array('price' => 100025, 'title' => t('AXIS 100RB'),);
+  $codes['AX10H'] = array('price' => 10400, 'title' => t('AXIS 10RB'),);
+  $codes['AX20H'] = array('price' => 20025, 'title' => t('AXIS 20RB'),);
+  $codes['AX25H'] = array('price' => 25025, 'title' => t('AXIS 25RB'),);
+  $codes['AX50H'] = array('price' => 50025, 'title' => t('AXIS 50RB'),);
+  $codes['AX5H'] = array('price' => 5400, 'title' => t('AXIS 5RB'),);
+
+  $codes['B100H'] = array('price' => 97100, 'title' => t('BOLT 100RB'),);
+  $codes['B150H'] = array('price' => 145100, 'title' => t('BOLT 150RB'),);
+  $codes['B200H'] = array('price' => 194100, 'title' => t('BOLT 200RB'),);
+  $codes['B25H'] = array('price' => 24475, 'title' => t('BOLT 25RB'),);
+  $codes['B50H'] = array('price' => 48600, 'title' => t('BOLT 50RB'),);
+
+  $codes['C100H'] = array('price' => 93075, 'title' => t('CERIA 100RB'),);
+  $codes['C10H'] = array('price' => 9375, 'title' => t('CERIA 10RB'),);
+  $codes['C20H'] = array('price' => 18725, 'title' => t('CERIA 20RB'),);
+  $codes['C50H'] = array('price' => 46550, 'title' => t('CERIA 50RB'),);
+  $codes['C5H'] = array('price' => 4725, 'title' => t('CERIA 5RB'),);
+
+  $codes['E100H'] = array('price' => 98150, 'title' => t('ESIA 100RB'),);
+  $codes['E10H'] = array('price' => 10250, 'title' => t('ESIA 10RB'),);
+  $codes['E11H'] = array('price' => 10875, 'title' => t('ESIA 11RB'),);
+  $codes['E15H'] = array('price' => 14725, 'title' => t('ESIA 15RB'),);
+  $codes['E20H'] = array('price' => 19675, 'title' => t('ESIA 20RB'),);
+  $codes['E25H'] = array('price' => 24750, 'title' => t('ESIA 25RB'),);
+  $codes['E50H'] = array('price' => 49150, 'title' => t('ESIA 50RB'),);
+  $codes['E5H'] = array('price' => 5250, 'title' => t('ESIA 5RB'),);
+  $codes['E1H'] = array('price' => 1150, 'title' => t('ESIA SERIBU'),);
+
+  $codes['F100H'] = array('price' => 97050, 'title' => t('FLEXI 100RB'),);
+  $codes['F10H'] = array('price' => 9750, 'title' => t('FLEXI 10RB'),);
+  $codes['F20H'] = array('price' => 19450, 'title' => t('FLEXI 20RB'),);
+  $codes['F50H'] = array('price' => 48550, 'title' => t('FLEXI 50RB'),);
+  $codes['F5H'] = array('price' => 4900, 'title' => t('FLEXI 5RB'),);
+
+  $codes['R100H'] = array('price' => 100525, 'title' => t('FREN 100RB'),);
+  $codes['R10H'] = array('price' => 10275, 'title' => t('FREN 10RB'),);
+  $codes['R25H'] = array('price' => 25175, 'title' => t('FREN 25RB'),);
+  $codes['R50H'] = array('price' => 50475, 'title' => t('FREN 50RB'),);
+
+  $codes['H100H'] = array('price' => 100525, 'title' => t('HEPI 100RB'),);
+  $codes['H10H'] = array('price' => 10225, 'title' => t('HEPI 10RB'),);
+  $codes['H25H'] = array('price' => 25325, 'title' => t('HEPI 25RB'),);
+  $codes['H50H'] = array('price' => 50525, 'title' => t('HEPI 50RB'),);
+  $codes['H5H'] = array('price' => 5275, 'title' => t('HEPI 5RB'),);
+
+  $codes['IT100H'] = array('price' => 98275, 'title' => t('INDOSAT M2 100RB'),);
+  $codes['IT10H'] = array('price' => 10175, 'title' => t('INDOSAT M2 10RB'),);
+  $codes['IT25H'] = array('price' => 25025, 'title' => t('INDOSAT M2 25RB'),);
+  $codes['IT50H'] = array('price' => 49325, 'title' => t('INDOSAT M2 50RB'),);
+  $codes['IT5H'] = array('price' => 5175, 'title' => t('INDOSAT M2 5RB'),);
+
+  $codes['IG10H'] = array('price' => 10775, 'title' => t('ISAT IM3 / MENTARI GPRS 10RB'),);
+  $codes['IG25H'] = array('price' => 25575, 'title' => t('ISAT IM3 / MENTARI GPRS 25RB'),);
+  $codes['IG5H'] = array('price' => 5775, 'title' => t('ISAT IM3 / MENTARI GPRS 5RB'),);
+
+  $codes['I100H'] = array('price' => 98275, 'title' => t('ISAT IM3 / MENTARI REGULER 100RB'),);
+  $codes['I10H'] = array('price' => 10625, 'title' => t('ISAT IM3 / MENTARI REGULER 10RB'),);
+  $codes['I20H'] = array('price' => 20200, 'title' => t('ISAT IM3 / MENTARI REGULER 20RB'),);
+  $codes['I30H'] = array('price' => 30200, 'title' => t('ISAT IM3 / MENTARI REGULER 30RB'),);
+  $codes['I25H'] = array('price' => 24975, 'title' => t('ISAT IM3 / MENTARI REGULER 25RB'),);
+  $codes['I50H'] = array('price' => 49275, 'title' => t('ISAT IM3 / MENTARI REGULER 50RB'),);
+  $codes['I5H'] = array('price' => 5625, 'title' => t('ISAT IM3 / MENTARI REGULER 5RB'),);
+
+  $codes['IS10H'] = array('price' => 10825, 'title' => t('ISAT IM3 / MENTARI SMS 10RB'),);
+  $codes['IS25H'] = array('price' => 25575, 'title' => t('ISAT IM3 / MENTARI SMS 25RB'),);
+  $codes['IS5H'] = array('price' => 5825, 'title' => t('ISAT IM3 / MENTARI SMS 5RB'),);
+
+  $codes['TI100H'] = array('price' => 90000, 'title' => t('ISAT IM3/MENTARI TRANSFER 100RB'),);
+  $codes['TI10=0H'] = array('price' => 9000, 'title' => t('ISAT IM3/MENTARI TRANSFER 10RB'),);
+  $codes['TI20H'] = array('price' => 18000, 'title' => t('ISAT IM3/MENTARI TRANSFER 20RB'),);
+  $codes['TI25H'] = array('price' => 22500, 'title' => t('ISAT IM3/MENTARI TRANSFER 25RB'),);
+  $codes['TI50H'] = array('price' => 45000, 'title' => t('ISAT IM3/MENTARI TRANSFER 50RB'),);
+  $codes['TI5H'] = array('price' => 4800, 'title' => t('ISAT IM3/MENTARI TRANSFER 5RB'),);
+
+  $codes['CM100H'] = array('price' => 97025, 'title' => t('SMART 100RB'),);
+  $codes['CM10H'] = array('price' => 9775, 'title' => t('SMART 10RB'),);
+  $codes['CM20H'] = array('price' => 20275, 'title' => t('SMART 20RB'),);
+  $codes['CM25H'] = array('price' => 24425, 'title' => t('SMART 25RB'),);
+  $codes['CM50H'] = array('price' => 48375, 'title' => t('SMART 50RB'),);
+  $codes['CM5H'] = array('price' => 4975, 'title' => t('SMART 5RB'),);
+
+  $codes['O100H'] = array('price' => 99225, 'title' => t('STARONE 100RB'),);
+  $codes['O10H'] = array('price' => 10275, 'title' => t('STARONE 10RB'),);
+  $codes['O50H'] = array('price' => 49175, 'title' => t('STARONE 50RB'),);
+  $codes['O5H'] = array('price' => 5250, 'title' => t('STARONE 5RB'),);
+
+  $codes['S100H'] = array('price' => 97725, 'title' => t('TELKOMSEL SIMPATI / AS 100RB'),);
+  $codes['S10H'] = array('price' => 10875, 'title' => t('TELKOMSEL SIMPATI / AS 10RB'),);
+  $codes['S15H'] = array('price' => 15725, 'title' => t('TELKOMSEL SIMPATI / AS 15RB'),);
+  $codes['S20H'] = array('price' => 20225, 'title' => t('TELKOMSEL SIMPATI / AS 20RB'),);
+  $codes['S25H'] = array('price' => 25025, 'title' => t('TELKOMSEL SIMPATI / AS 25RB'),);
+  $codes['S50H'] = array('price' => 49575, 'title' => t('TELKOMSEL SIMPATI / AS 50RB'),);
+  $codes['S5H'] = array('price' => 5875, 'title' => t('TELKOMSEL SIMPATI / AS 5RB'),);
+
+  $codes['TS100H'] = array('price' => 93600, 'title' => t('TELKOMSEL TRANSFER 100RB'),);
+  $codes['TS10H'] = array('price' => 10300, 'title' => t('TELKOMSEL TRANSFER 10RB'),);
+  $codes['TS20H'] = array('price' => 19800, 'title' => t('TELKOMSEL TRANSFER 20RB'),);
+  $codes['TS25H'] = array('price' => 24600, 'title' => t('TELKOMSEL TRANSFER 25RB'),);
+  $codes['TS50H'] = array('price' => 47600, 'title' => t('TELKOMSEL TRANSFER 50RB'),);
+  $codes['TS5H'] = array('price' => 5650, 'title' => t('TELKOMSEL TRANSFER 5RB'),);
+
+  $codes['T100H'] = array('price' => 99025, 'title' => t('THREE 100RB'),);
+  $codes['T10H'] = array('price' => 9925, 'title' => t('THREE 10RB'),);
+  $codes['T20H'] = array('price' => 19825, 'title' => t('THREE 20RB'),);
+  $codes['T30H'] = array('price' => 29725, 'title' => t('THREE 30RB'),);
+  $codes['T50H'] = array('price' => 49525, 'title' => t('THREE 50RB'),);
+  $codes['T50H'] = array('price' => 4975, 'title' => t('THREE 5RB'),);
+  $codes['T1H'] = array('price' => 1015, 'title' => t('THREE SERIBU'),);
+
+  $codes['XR100H'] = array('price' => 99675, 'title' => t('XLCOM REGULER 100RB'),);
+  $codes['XR10H'] = array('price' => 10425, 'title' => t('XLCOM REGULER 10RB'),);
+  $codes['XR25H'] = array('price' => 25000, 'title' => t('XLCOM REGULER 25RB'),);
+  $codes['XR50H'] = array('price' => 49900, 'title' => t('XLCOM REGULER 50RB'),);
+  $codes['XR5H'] = array('price' => 5375, 'title' => t('XLCOM REGULER 5RB'),);
+
+  $code_info['rajabiller'] = $codes;
+
+  return $code_info;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function bimasakti_settings_form().
+ *
+ * Topup provider callback: settings form.
+ *
+ * @param array $settings
+ *   Setting form array.
+ *
+ * @return array
+ *   Form array.
+ */
+function bimasakti_settings_form($settings = array()) {
+  $form = array();
+
+  // Environment: dev or prod.
+  $form['environment'] = array(
+    '#type' => 'select',
+    '#title' => t('Environment'),
+    '#options' => array(
+      'dev' => t('Development'),
+      'prod' => t('Production'),
+    ),
+    '#default_value' => isset($settings['environment']) ? $settings['environment'] : 'dev',
+    '#description' => t('Development environment will not send real data and get response with dummy data.'),
+  );
+
+  // API Endpoint.
+  $form['endpoint'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint'),
+    '#default_value' => isset($settings['endpoint']) ? $settings['endpoint'] : '',
+    '#size' => 60,
+    '#maxlength' => 60,
+    '#description' => t('Bimasakti endpoint. Please input using full url.'),
+    '#required' => TRUE,
+  );
+
+  $form['timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint Timeout'),
+    '#default_value' => isset($settings['timeout']) ? $settings['timeout'] : 30,
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#description' => t('Bimasakti server endpoint timeout.'),
+    '#field_suffix' => t('s'),
+    '#required' => TRUE,
+  );
+
+  // UID number.
+  $form['uid'] = array(
+    '#type' => 'textfield',
+    '#title' => t('UID'),
+    '#default_value' => isset($settings['uid']) ? $settings['uid'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('Registered User ID at Bimasakti server system.'),
+    '#required' => TRUE,
+  );
+  // PIN number.
+  $form['pin'] = array(
+    '#type' => 'textfield',
+    '#title' => t('PIN'),
+    '#default_value' => isset($settings['pin']) ? $settings['pin'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#description' => t('PIN for top up transaction.'),
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+/**
+ * Function bimasakti_topup_process().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function bimasakti_topup_process($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = bimasakti_generate_request_id($topup);
+
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall></methodCall>');
+  $xml->addChild('methodName', 'fastpay.pulsa');
+  $params = $xml->addChild('params');
+  // Add value: Kode Produk.
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $value->addChild('string', $topup['field_topup_code']);
+  // Add value: NOHP.
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $value->addChild('string', $topup['field_topup_phone_number']);
+  // Add value: UID.
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $value->addChild('string', $settings['uid']);
+  // Add value: PIN.
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $value->addChild('string', $settings['pin']);
+  // Add value: request id.
+  $param = $params->addChild('param');
+  $value = $param->addChild('value');
+  $value->addChild('string', $topup['request_id']);
+  // Generate xml.
+  $xml = $xml->asXML();
+
+  // Set topup operation.
+  $topup['op'] = 'request';
+  // Send xml data.
+  return bimasakti_send($xml, $settings, $topup);
+}
+
+/**
+ * Function bimasakti_topup_query().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param array $settings
+ *   Topup provider settings.
+ *
+ * @return int
+ *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
+ */
+function bimasakti_topup_query($topup, $settings) {
+  // Generate request id.
+  $topup['request_id'] = bimasakti_generate_request_id($topup);
+  // Check topup ref2.
+  $topup['ref2'] = isset($topup['ref2']) ? $topup['ref2'] : '';
+  // Get order revision pending time.
+  $topup_time = db_select('commerce_order_revision', 'r')
+     ->fields('r', array('revision_timestamp'))
+     ->condition('order_id', $topup['order_id'], '=')
+     ->condition('status', 'pending', '=')
+     ->range(0, 1)
+     ->execute()
+     ->fetchField();
+  // Check topup time.
+  if (!empty($topup_time)) {
+    // Set XML.
+    $xml = new SimpleXMLElement('<methodCall></methodCall>');
+    $xml->addChild('methodName', 'fastpay.datatransaksi');
+    $params = $xml->addChild('params');
+    // Add value: Tanggal 1 (YYYYMMDDHHIISS).
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', date('YmdHis', $topup_time));
+    // Add value: Tanggal 2 (YYYYMMDDHHIISS).
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', date('YmdHis', $topup_time + 3600));
+    // Add value: Transaction ID.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', $topup['request_id']);
+    // Add value: product code.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', $topup['field_topup_code']);
+    // Add value: Customer ID.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', $topup['ref2']);
+    // Add value: limit.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', '1');
+    // Add value: user id.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', $settings['uid']);
+    // Add value: pin.
+    $param = $params->addChild('param');
+    $value = $param->addChild('value');
+    $value->addChild('string', $settings['pin']);
+    // Generate xml.
+    $xml = $xml->asXML();
+
+    // Set topup operation.
+    $topup['op'] = 'query';
+
+    // Send xml data.
+    return bimasakti_send($xml, $settings, $topup);
+  }
+
+  // Log this condition.
+  watchdog('bimasakti', 'TopUp Query Unable to get topup time. <pre>@topup</pre> <pre>@settings</pre>', array(
+    '@topup' => print_r($topup, TRUE),
+    '@settings' => print_r($settings),
+  ), WATCHDOG_ERROR, t('Bimasakti: Query'));
+  // Other condition: set pending.
+  return TOPUP_PENDING;
+}
+
+/**
+ * Private Functions.
+ */
+
+/**
+ * Function bimasakti_send().
+ *
+ * @param string $data
+ *   XML post data.
+ * @param array $settings
+ *   Post settings.
+ * @param array $topup
+ *   Topup data.
+ *
+ * @return mixed
+ *   Object if success, and FALSE otherwise.
+ */
+function bimasakti_send($data, $settings, &$topup) {
+  // Define default endpoint.
+  $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
+  // Define default operation.
+  $operation = (isset($topup['op'])) ? $topup['op'] : t('default');
+  // Define return value flag.
+  $return = FALSE;
+
+  // Define option for http request.
+  $http_options = array(
+    'headers' => array(
+      'Content-Type' => 'application/xml',
+    ),
+    'max_redirects' => 0,
+    'timeout' => (isset($settings['timeout'])) ? (float) $settings['timeout'] : 10.0,
+    'method' => 'POST',
+    'data' => $data,
+  );
+
+  // Check whether we have endpoint.
+  if (!empty($endpoint)) {
+    // Only for development.
+    if ($settings['environment'] == 'dev' && !empty($topup)) {
+      // Create XML: Success response.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      // @todo.
+      // Generate xml.
+      $devel[] = $xml->asXML();
+
+      // Generate random number.
+      $random = rand(0, count($devel) - 1);
+
+      // Return random xml response.
+      $return = $devel[$random];
+    }
+    else {
+       // Do real HTTP Request: input validation already available.
+      $result = drupal_http_request($endpoint, $http_options);
+
+      // Check the result:
+      // 1. Must have 200 http code.
+      // 2. Must have data.
+      if (isset($result->code) && $result->code == 200
+        && isset($result->data) && !empty($result->data)
+      ) {
+        // Set return value.
+        $return = $result->data;
+      }
+
+      // Beautify XML data.
+      if (isset($result->data) && !empty($result->data)) {
+        $result->data = htmlentities($result->data);
+      }
+      $http_options['data'] = htmlentities($http_options['data']);
+      // Log this condition, everything get log.
+      watchdog('bimasakti', 'Send data with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+        '@status' => ($return) ? 'OK' : 'BAD',
+        '!debug' => print_r($result, TRUE),
+        '!options' => print_r($http_options, TRUE),
+      ), ($return ? WATCHDOG_DEBUG : WATCHDOG_ERROR), l(t('Bimasakti: Send Data'), request_path()));
+    }
+  }
+  else {
+    watchdog('bimasakti', 'Invalid Bimasakti Endpoint <pre>!debug</pre> <pre>Options: !options</pre>', array(
+      '!debug' => print_r($settings, TRUE),
+      '!options' => print_r($http_options, TRUE),
+    ), WATCHDOG_ERROR, t('Bimasakti: Settings Error'));
+  }
+
+  // Check return value: has object data.
+  if (!empty($return)) {
+    // Get xml data.
+    $result_xml = simplexml_load_string(trim($return));
+    // Check xml data.
+    if ($result_xml !== FALSE && isset($result_xml->params->param->value->array->data->value)) {
+      // Get XML value.
+      $container = array();
+      foreach ($result_xml->params->param->value->array->data->value as $child) {
+        if (isset($child->string)) {
+          $container[] = $child->string->__toString();
+        }
+      }
+
+      // Log this container data.
+      $debug = $container + $topup;
+      watchdog('bimasakti', '@op Result Order @oid <pre>@debug</pre>', array(
+        '@op' => ucfirst($operation),
+        '@debug' => print_r($debug, TRUE),
+        '@oid' => $topup['order_id'],
+      ), WATCHDOG_INFO, l(t('Bimasakti: @op @oid', array(
+        '@op' => ucfirst($operation),
+        '@oid' => $topup['order_id'],
+      )), request_path()));
+
+      // Check the value: RESPONSECODE.
+      if (isset($container[8])) {
+        switch ($container[8]) {
+          case '00':
+            // Return: topup success.
+            return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+
+          case '':
+            // Save the ref 2 response.
+            $topup['ref2'] = $container[7];
+            // Return: topup pending.
+            return TOPUP_PENDING;
+        }
+      }
+    }
+    else {
+      // Log this condition.
+      watchdog('bimasakti', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@topup</pre>', array(
+        '@result' => var_export($result_xml, TRUE),
+        '@topup' => print_r($topup, TRUE),
+      ), WATCHDOG_ERROR, t('Bimasakti: @op XML', array(
+        '@op' => ucfirst($operation),
+      )));
+    }
+  }
+
+  return TOPUP_FAILED;
+}
+
+/**
+ * Function bimasakti_generate_request_id().
+ *
+ * @param array $topup
+ *   Topup data.
+ *
+ * @return string
+ *   Request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+ */
+function bimasakti_generate_request_id($topup) {
+  // Generate request id: 10 digit line item id, 2 digit topup id, 2 digit try.
+  $request_id = str_pad($topup['line_item_id'], 10, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['topup_id'], 2, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['try'], 2, '0', STR_PAD_LEFT);
+  return $request_id;
+}

@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * bimasakti.install
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function bimasakti_requirements($phase) {
+  $requirements = array();
+
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  // Only on phase install.
+  if ($phase == 'install') {
+    // Test SimpleXML extension.
+    if (!extension_loaded('simplexml')) {
+      $requirements['simplexml'] = array(
+        'title' => t('SimpleXML extension'),
+        'value' => $t('disabled'),
+        'description' => $t('Bimasakti integration requires PHP SimpleXML extension.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+
+  return $requirements;
+}

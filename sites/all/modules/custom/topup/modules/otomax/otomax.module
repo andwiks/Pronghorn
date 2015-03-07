@@ -256,13 +256,17 @@ function otomax_settings_form($settings = array()) {
  *   Topup data.
  * @param array $settings
  *   Topup provider settings.
+ * @param array $output.
+ *   Optional output result.
  *
  * @return int
  *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
  */
-function otomax_topup_process($topup, $settings) {
+function otomax_topup_process($topup, $settings, &$output = NULL) {
   // Generate request id.
-  $topup['request_id'] = $request_id = otomax_generate_request_id($topup);
+  $topup['request_id'] = otomax_generate_request_id($topup);
+  // Set topup operation.
+  $topup['op'] = 'process';
 
   // Set XML.
   $xml = new SimpleXMLElement('<methodCall></methodCall>');
@@ -280,7 +284,7 @@ function otomax_topup_process($topup, $settings) {
   $member = $struct->addChild('member');
   $member->addChild('name', 'REQUESTID');
   $value = $member->addChild('value');
-  $value->addChild('string', $request_id);
+  $value->addChild('string', $topup['request_id']);
   // Add member: PIN.
   $member = $struct->addChild('member');
   $member->addChild('name', 'PIN');
@@ -298,10 +302,9 @@ function otomax_topup_process($topup, $settings) {
   $value->addChild('string', $topup['field_topup_code']);
   // Generate xml.
   $xml = $xml->asXML();
-  // Set topup operation.
-  $topup['op'] = 'process';
+
   // Send xml data.
-  return otomax_send($xml, $settings, $topup);
+  return otomax_send($xml, $settings, $topup, $output);
 }
 
 /**
@@ -311,13 +314,26 @@ function otomax_topup_process($topup, $settings) {
  *   Topup data.
  * @param array $settings
  *   Topup provider settings.
+ * @param array $output
+ *   Optional array output.
  *
  * @return int
  *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
  */
-function otomax_topup_query($topup, $settings) {
-  // Generate request id.
-  $topup['request_id'] = $request_id = otomax_generate_request_id($topup);
+function otomax_topup_query($topup, $settings, &$output = NULL) {
+  // Set topup operation.
+  $topup['op'] = 'query';
+  // Get latest request id.
+  if (isset($topup['topup_data']['data']) && is_array($topup['topup_data']['data'])
+    && !empty($topup['topup_data']['data'])
+  ) {
+    $request_ids = array_keys($topup['topup_data']['data']);
+    $topup['request_id'] = array_pop($request_ids);
+  }
+  else {
+    // Generate request id from topup.
+    $topup['request_id'] = otomax_generate_request_id($topup);
+  }
   // Set XML.
   $xml = new SimpleXMLElement('<methodCall></methodCall>');
   $xml->addChild('methodName', 'topUpInquiry');
@@ -329,7 +345,7 @@ function otomax_topup_query($topup, $settings) {
   $member = $struct->addChild('member');
   $member->addChild('name', 'REQUESTID');
   $value = $member->addChild('value');
-  $value->addChild('string', $request_id);
+  $value->addChild('string', $topup['request_id']);
   // Add member: MSISDN.
   $member = $struct->addChild('member');
   $member->addChild('name', 'MSISDN');
@@ -348,13 +364,8 @@ function otomax_topup_query($topup, $settings) {
   // Generate xml.
   $xml = $xml->asXML();
 
-  // Add request id to topup data.
-  $topup['request_id'] = $request_id;
-  // Set topup operation.
-  $topup['op'] = 'query';
-
   // Send xml data.
-  return otomax_send($xml, $settings, $topup);
+  return otomax_send($xml, $settings, $topup, $output);
 }
 
 /**
@@ -369,12 +380,14 @@ function otomax_topup_query($topup, $settings) {
  * @param array $settings
  *   Post settings.
  * @param array $topup
- *   Optional topup data for debug.
+ *   Topup data.
+ * @param array $output
+ *   Optional output array.
  *
  * @return mixed
  *   Object if success, and FALSE otherwise.
  */
-function otomax_send($data, $settings, $topup = array()) {
+function otomax_send($data, $settings, $topup, &$output = NULL) {
   // Define default endpoint.
   $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
   // Define default operation.
@@ -554,6 +567,13 @@ function otomax_send($data, $settings, $topup = array()) {
         '@oid' => $topup['order_id'],
       )), request_path()));
 
+      // Store output if necessary.
+      if (!is_null($output)) {
+        $output = $debug;
+        $topup['topup_data']['data'][$topup['request_id']] = $container['MESSAGE'];
+        $output['topup_data'] = $topup['topup_data']['data'];
+      }
+
       // Check the value: RESPONSECODE.
       if (isset($container['RESPONSECODE'])) {
         switch ($container['RESPONSECODE']) {
@@ -594,6 +614,6 @@ function otomax_generate_request_id($topup) {
   // Generate request id: 10 digit line item id, 2 digit topup id, 2 digit try.
   $request_id = str_pad($topup['line_item_id'], 10, '0', STR_PAD_LEFT);
   $request_id .= str_pad($topup['topup_id'], 2, '0', STR_PAD_LEFT);
-  $request_id .= str_pad($topup['try'], 2, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['total'], 2, '0', STR_PAD_LEFT);
   return $request_id;
 }

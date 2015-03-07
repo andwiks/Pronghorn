@@ -227,9 +227,22 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
             $data = '';
             if (is_array($topup_data['data'])) {
               foreach ($topup_data['data'] as $key => $value) {
-                $data .= t('@key: @value<br />', array(
+                if (is_array($value)) {
+                  $temp = '';
+                  foreach ($value as $k => $v) {
+                    $temp .= t('<li>@key: @value</li>', array(
+                      '@key' => $k,
+                      '@value' => $v,
+                    ));
+                  }
+                  $value = '<ul>' . $temp . '</ul>';
+                }
+                else {
+                  $value = check_plain($value);
+                }
+                $data .= t('@key: !value<br />', array(
                   '@key' => $key,
-                  '@value' => $value,
+                  '!value' => $value,
                 ));
               }
             }
@@ -238,7 +251,7 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
             }
           }
           $element[$delta] = array(
-            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try (@total)<br />!data', array(
+            '#markup' => t('<strong>Topup #@no:</strong><br /><strong>Status:</strong> @status<br /><strong>Try:</strong> @try (@total)<br />!data', array(
               '@no' => $delta + 1,
               '@status' => $topup_data['status'],
               '@try' => $topup_data['try'],
@@ -441,6 +454,12 @@ function topup_queue($op, $topup) {
       $topup_data = topup_update_topup_data($topup, $result, $topup_output);
       // Check result status.
       switch ($result) {
+        case TOPUP_ERROR:
+          // Update topup status: error.
+          topup_update_status($topup['line_item_id'], $result);
+          // Then do nothing.
+          break;
+
         case TOPUP_FAILED:
           // Check whether topup try has not been reach.
           if ($topup['try'] < variable_get('topup_try', 3)) {

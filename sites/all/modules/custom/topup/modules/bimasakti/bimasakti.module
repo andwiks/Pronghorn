@@ -236,17 +236,21 @@ function bimasakti_settings_form($settings = array()) {
  *   Topup data.
  * @param array $settings
  *   Topup provider settings.
+ * @param array $output.
+ *   Optional output result.
  *
  * @return int
  *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
  */
-function bimasakti_topup_process($topup, $settings) {
+function bimasakti_topup_process($topup, $settings, &$output = NULL) {
+  // Set topup operation.
+  $topup['op'] = 'pulsa';
   // Generate request id.
   $topup['request_id'] = bimasakti_generate_request_id($topup);
 
   // Set XML.
   $xml = new SimpleXMLElement('<methodCall></methodCall>');
-  $xml->addChild('methodName', 'fastpay.pulsa');
+  $xml->addChild('methodName', 'fastpay.' . $topup['op']);
   $params = $xml->addChild('params');
   // Add value: Kode Produk.
   $param = $params->addChild('param');
@@ -271,10 +275,8 @@ function bimasakti_topup_process($topup, $settings) {
   // Generate xml.
   $xml = $xml->asXML();
 
-  // Set topup operation.
-  $topup['op'] = 'request';
   // Send xml data.
-  return bimasakti_send($xml, $settings, $topup);
+  return bimasakti_send($xml, $settings, $topup, $output);
 }
 
 /**
@@ -284,37 +286,56 @@ function bimasakti_topup_process($topup, $settings) {
  *   Topup data.
  * @param array $settings
  *   Topup provider settings.
+ * @param array $output.
+ *   Optional output result.
  *
  * @return int
  *   Topup status (TOPUP_SUCCESS|TOPUP_PENDING|TOPUP_FAILED).
  */
-function bimasakti_topup_query($topup, $settings) {
-  // Generate request id.
-  $topup['request_id'] = bimasakti_generate_request_id($topup);
-  // Check topup ref2.
-  $topup['ref2'] = isset($topup['ref2']) ? $topup['ref2'] : '';
-  // Get order revision pending time.
-  $topup_time = db_select('commerce_order_revision', 'r')
-     ->fields('r', array('revision_timestamp'))
-     ->condition('order_id', $topup['order_id'], '=')
-     ->condition('status', 'pending', '=')
-     ->range(0, 1)
-     ->execute()
-     ->fetchField();
+function bimasakti_topup_query($topup, $settings, &$output = NULL) {
+  // Set topup operation.
+  $topup['op'] = 'datatransaksi';
+  // Get latest request id.
+  if (isset($topup['topup_data']['data']) && is_array($topup['topup_data']['data'])
+    && !empty($topup['topup_data']['data'])
+  ) {
+    $request_ids = array_keys($topup['topup_data']['data']);
+    $topup['request_id'] = array_pop($request_ids);
+    $topup['ref2'] = $topup['topup_data']['data'][$topup['request_id']]['ref2'];
+    $topup_time_start = $topup_time_end = $topup['topup_data']['data'][$topup['request_id']]['time'];
+  }
+  else {
+    // Generate request id from topup.
+    $topup['request_id'] = otomax_generate_request_id($topup);
+     // Check topup ref2.
+    $topup['ref2'] = isset($topup['ref2']) ? $topup['ref2'] : '';
+    // Get order revision pending time.
+    $topup_time_start = db_select('commerce_order_revision', 'r')
+       ->fields('r', array('revision_timestamp'))
+       ->condition('order_id', $topup['order_id'], '=')
+       ->condition('status', 'pending', '=')
+       ->range(0, 1)
+       ->execute()
+       ->fetchField();
+    // Correcting topup time format.
+    $topup_time_end = date('YmdHis', $topup_time_start + 1800);
+    $topup_time_start = date('YmdHis', $topup_time_start);
+  }
+
   // Check topup time.
-  if (!empty($topup_time)) {
+  if (!empty($topup_time_start)) {
     // Set XML.
     $xml = new SimpleXMLElement('<methodCall></methodCall>');
-    $xml->addChild('methodName', 'fastpay.datatransaksi');
+    $xml->addChild('methodName', 'fastpay.' . $topup['op']);
     $params = $xml->addChild('params');
     // Add value: Tanggal 1 (YYYYMMDDHHIISS).
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', date('YmdHis', $topup_time));
+    $value->addChild('string', $topup_time_start);
     // Add value: Tanggal 2 (YYYYMMDDHHIISS).
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', date('YmdHis', $topup_time + 3600));
+    $value->addChild('string', $topup_time_end);
     // Add value: Transaction ID.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
@@ -342,20 +363,18 @@ function bimasakti_topup_query($topup, $settings) {
     // Generate xml.
     $xml = $xml->asXML();
 
-    // Set topup operation.
-    $topup['op'] = 'query';
-
     // Send xml data.
-    return bimasakti_send($xml, $settings, $topup);
+    return bimasakti_send($xml, $settings, $topup, $output);
   }
 
   // Log this condition.
-  watchdog('bimasakti', 'TopUp Query Unable to get topup time. <pre>@topup</pre> <pre>@settings</pre>', array(
+  watchdog('bimasakti', 'Bimasakti Query Unable to get topup time. <pre>@topup</pre> <pre>@settings</pre>', array(
     '@topup' => print_r($topup, TRUE),
     '@settings' => print_r($settings),
   ), WATCHDOG_ERROR, t('Bimasakti: Query'));
-  // Other condition: set pending.
-  return TOPUP_PENDING;
+
+  // Other condition: set error.
+  return TOPUP_ERROR;
 }
 
 /**
@@ -371,11 +390,13 @@ function bimasakti_topup_query($topup, $settings) {
  *   Post settings.
  * @param array $topup
  *   Topup data.
+ * @param array $output
+ *   Optional output data.
  *
  * @return mixed
  *   Object if success, and FALSE otherwise.
  */
-function bimasakti_send($data, $settings, &$topup) {
+function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
   // Define default endpoint.
   $endpoint = (isset($settings['endpoint'])) ? $settings['endpoint'] : '';
   // Define default operation.
@@ -397,18 +418,265 @@ function bimasakti_send($data, $settings, &$topup) {
   // Check whether we have endpoint.
   if (!empty($endpoint)) {
     // Only for development.
-    if ($settings['environment'] == 'dev' && !empty($topup)) {
-      // Create XML: Success response.
+    if ($settings['environment'] == 'dev') {
+      // Generate pulsa: success.
       $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
-      // @todo.
-      // Generate xml.
-      $devel[] = $xml->asXML();
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: time.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: SN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '1130234239174848');
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: Ref2.
+      $value = $data->addChild('value');
+      $value->addChild('string', time());
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '00');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' BERHASIL. SN=1130234239174848 Harga=10025');
+      // Save xml.
+      $devel['pulsa'][] = $xml->asXML();
+
+      // Generate pulsa: pending.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: time.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: SN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '1130234239174848');
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: Ref2.
+      $value = $data->addChild('value');
+      $value->addChild('string', time());
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' SEDANG DIPROSES. SN=1130234239174848 Harga=10025');
+      // Save xml.
+      $devel['pulsa'][] = $xml->asXML();
+
+      // Generate pulsa: failed.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: time.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: SN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '1130234239174848');
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: Ref2.
+      $value = $data->addChild('value');
+      $value->addChild('string', time());
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '99');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' GAGAL.');
+      // Save xml.
+      $devel['pulsa'][] = $xml->asXML();
+
+      // Generate pulsa: error.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $fault = $xml->addChild('fault');
+      $value = $fault->addChild('value');
+      $struct = $value->addChild('struct');
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'faultCode');
+      $member_value = $member->addChild('value');
+      $member_value->addChild('int', '176');
+      $member = $struct->addChild('member');
+      $member->addChild('name', 'faultString');
+      $member_value = $member->addChild('value');
+      $member_value->addChild('string', 'XML Error');
+      // Save xml.
+      $devel['pulsa'][] = $xml->asXML();
+      // Generate datatransaksi: success.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: datestart.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: dateend.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '00');
+      // Add member: ???.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Transaksi berhasil');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' BERHASIL.');
+      // Save xml.
+      $devel['datatransaksi'][] = $xml->asXML();
+      // Generate datatransaksi: failed.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: datestart.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: dateend.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '');
+      // Add member: ???.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Transaksi berhasil');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' SEDANG DIPROSES.');
+      // Save xml.
+      $devel['datatransaksi'][] = $xml->asXML();
+      // Generate datatransaksi: pending.
+      $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
+      $params = $xml->addChild('params');
+      $param = $params->addChild('param');
+      $value = $param->addChild('value');
+      $array = $value->addChild('array');
+      $data = $array->addChild('data');
+      // Add member: datestart.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: dateend.
+      $value = $data->addChild('value');
+      $value->addChild('string', date('YmdHis'));
+      // Add member: kode produk.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_code']);
+      // Add member: nohp.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['field_topup_phone_number']);
+      // Add member: Ref1.
+      $value = $data->addChild('value');
+      $value->addChild('string', $topup['request_id']);
+      // Add member: UID.
+      $value = $data->addChild('value');
+      $value->addChild('string', $settings['uid']);
+      // Add member: PIN.
+      $value = $data->addChild('value');
+      $value->addChild('string', '-----');
+      // Add member: Status.
+      $value = $data->addChild('value');
+      $value->addChild('string', '99');
+      // Add member: ???.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Transaksi berhasil');
+      // Add member: Keterangan.
+      $value = $data->addChild('value');
+      $value->addChild('string', 'Pengisian pulsa ' . $topup['field_topup_code'] . ' Anda ke nomor ' . $topup['field_topup_phone_number'] . ' GAGAL.');
+      // Save xml.
+      $devel['datatransaksi'][] = $xml->asXML();
 
       // Generate random number.
-      $random = rand(0, count($devel) - 1);
+      $random = rand(0, count($devel[$operation]) - 1);
 
       // Return random xml response.
-      $return = $devel[$random];
+      $return = $devel[$operation][$random];
     }
     else {
        // Do real HTTP Request: input validation already available.
@@ -438,6 +706,7 @@ function bimasakti_send($data, $settings, &$topup) {
     }
   }
   else {
+    // Log this condition.
     watchdog('bimasakti', 'Invalid Bimasakti Endpoint <pre>!debug</pre> <pre>Options: !options</pre>', array(
       '!debug' => print_r($settings, TRUE),
       '!options' => print_r($http_options, TRUE),
@@ -469,25 +738,65 @@ function bimasakti_send($data, $settings, &$topup) {
         '@oid' => $topup['order_id'],
       )), request_path()));
 
-      // Check the value: RESPONSECODE.
-      if (isset($container[8])) {
-        switch ($container[8]) {
-          case '00':
-            // Return: topup success.
-            return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+      // Sadly different operation has different xml result.
+      switch ($operation) {
+        case 'pulsa':
+          // Store output if necessary.
+          if (!is_null($output)) {
+            $output = $debug;
+            $topup['topup_data']['data'][$topup['request_id']] = array(
+              'time' => $container[2],
+              'ref2' => $container[7],
+            );
+            $output['topup_data'] = $topup['topup_data']['data'];
+          }
+          // Check the value: RESPONSECODE.
+          if (isset($container[8])) {
+            switch ($container[8]) {
+              case '00':
+                // Return: topup success.
+                return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
 
-          case '':
-            // Save the ref 2 response.
-            $topup['ref2'] = $container[7];
-            // Return: topup pending.
-            return TOPUP_PENDING;
-        }
+              case '':
+                // Save the ref 2 response.
+                $topup['ref2'] = $container[7];
+                // Return: topup pending.
+                return TOPUP_PENDING;
+
+              default:
+                // Return: topup failed.
+                return TOPUP_FAILED;
+            }
+          }
+          break;
+
+        case 'datatransaksi';
+          // Check the value: RESPONSECODE.
+          if (isset($container[7])) {
+            switch ($container[7]) {
+              case '00':
+                // Return: topup success.
+                return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+
+              case '':
+                // Return: topup pending.
+                return TOPUP_PENDING;
+
+              default:
+                // Return: topup failed.
+                return TOPUP_FAILED;
+            }
+          }
+          break;
       }
     }
     else {
+      // Get libxml errors.
+      $xml_errors = libxml_get_errors();
       // Log this condition.
-      watchdog('bimasakti', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@topup</pre>', array(
+      watchdog('bimasakti', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
         '@result' => var_export($result_xml, TRUE),
+        '@errors' => print_r($xml_errors, TRUE),
         '@topup' => print_r($topup, TRUE),
       ), WATCHDOG_ERROR, t('Bimasakti: @op XML', array(
         '@op' => ucfirst($operation),
@@ -495,7 +804,8 @@ function bimasakti_send($data, $settings, &$topup) {
     }
   }
 
-  return TOPUP_FAILED;
+  // Other condition: return topup error.
+  return TOPUP_ERROR;
 }
 
 /**
@@ -511,6 +821,6 @@ function bimasakti_generate_request_id($topup) {
   // Generate request id: 10 digit line item id, 2 digit topup id, 2 digit try.
   $request_id = str_pad($topup['line_item_id'], 10, '0', STR_PAD_LEFT);
   $request_id .= str_pad($topup['topup_id'], 2, '0', STR_PAD_LEFT);
-  $request_id .= str_pad($topup['try'], 2, '0', STR_PAD_LEFT);
+  $request_id .= str_pad($topup['total'], 2, '0', STR_PAD_LEFT);
   return $request_id;
 }

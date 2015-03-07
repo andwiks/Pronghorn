@@ -595,14 +595,19 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
       // Get libxml errors.
       $xml_errors = libxml_get_errors();
       // Log this condition.
-      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
-        '@result' => var_export($result_xml, TRUE),
+      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@return</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
+        '@return' => htmlentities($return),
         '@errors' => print_r($xml_errors, TRUE),
         '@topup' => print_r($topup, TRUE),
       ), WATCHDOG_ERROR, l(t('Otomax: @op XML', array(
         '@op' => ucfirst($operation),
       )), request_path()));
     }
+  }
+
+  // Store output if necessary.
+  if (!is_null($output) && isset($topup['topup_data']['data'])) {
+    $output['topup_data'] = $topup['topup_data']['data'];
   }
 
   // Return topup error.

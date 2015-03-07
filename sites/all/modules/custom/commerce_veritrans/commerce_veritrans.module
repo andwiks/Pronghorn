@@ -11,6 +11,7 @@
  * @todo: break it up into 3 separate modules.
  *
  * @todo: order revision when user submit at checkout.
+ * @todo: order still in checkout but payout.
  */
 
 /**
@@ -463,12 +464,16 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
   // @todo: important data still passthrough this machine.
   // Build response array.
   parse_str($pane_values['veritrans']['response'], $response);
+  // Remove important data.
+  if (isset($response['token_id'])) {
+    $response['token_id'] = '-filtered-';
+  }
   // Log payment response data: even for failed condition.
   watchdog('commerce_veritrans', 'Payment AJAX Response Validation: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
-    '@payment' => print_r($response, TRUE),
+    '@payment' => (!empty($response)) ? print_r($response, TRUE) : print_r($pane_values['veritrans']['response'], TRUE),
     '@pmethod' => print_r($payment_method, TRUE),
     '@order' => print_r($order, TRUE),
-  ), ((isset($response->status_code) && $response->status_code == '200') ? WATCHDOG_INFO : WATCHDOG_NOTICE), l(t('Veritrans AJAX: @oid', array(
+  ), ((isset($response['status_code']) && $response['status_code'] == '200') ? WATCHDOG_INFO : WATCHDOG_NOTICE), l(t('Veritrans AJAX: @oid', array(
     '@oid' => $order->order_id,
   )), 'admin/commerce/orders/' . $order->order_id));
 

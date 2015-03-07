@@ -34,8 +34,8 @@
           if (settings.vt_secure) {
             closeDialog();
           }
+          $("#response_data").val($.param(response, true));
           if (response.status_code == "200") {          
-            $("#response_data").val($.param(response, true));
             $("#token_id").val(response.token_id);
             $("#error_message").val("");
           }
@@ -98,7 +98,11 @@
           return true;
         }
         event.preventDefault();
-        Veritrans.token(card, callback);     
+        if (typeof Veritrans === "undefined") {
+          alert("Unable to connect to payment server! Please check your internet connection and reload the page.");
+          return false;
+        }
+        Veritrans.token(card, callback);
         return false;
       });  
             

@@ -4,8 +4,6 @@
  * topup.module
  *
  * @author andre4s_y
- *
- * @todo: 'terminal' => TRUE, handle.
  */
 
 /**
@@ -27,6 +25,11 @@ define('TOPUP_INQUEUE', 3);
  * Topup request is canceled.
  */
 define('TOPUP_CANCELED', 4);
+
+/**
+ * Topup request is contain error.
+ */
+define('TOPUP_ERROR', 5);
 
 /**
  * Topup has no status.
@@ -661,6 +664,9 @@ function topup_translate_status($status) {
 
     case TOPUP_CANCELED:
       return t('Canceled');
+
+    case TOPUP_ERROR:
+      return t('Error');
 
     case TOPUP_NONE:
       return t('No Status');

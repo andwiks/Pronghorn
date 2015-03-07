@@ -197,6 +197,7 @@ function topup_settings_form_submit($form, &$form_state) {
           TOPUP_FAILED => topup_translate_status(TOPUP_FAILED),
           TOPUP_INQUEUE => topup_translate_status(TOPUP_INQUEUE),
           TOPUP_CANCELED => topup_translate_status(TOPUP_CANCELED),
+          TOPUP_ERROR => topup_translate_status(TOPUP_ERROR),
           TOPUP_NONE => topup_translate_status(TOPUP_NONE),
         ),
       ),

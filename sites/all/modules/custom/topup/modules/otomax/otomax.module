@@ -6,7 +6,6 @@
  * @author andre4s_y
  *
  * @todo provide callback function for callback.
- * @todo terminal handler.
  */
 
 /**
@@ -409,7 +408,7 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
   // Check whether we have endpoint.
   if (!empty($endpoint)) {
     // Only for development.
-    if ($settings['environment'] == 'dev' && !empty($topup)) {
+    if ($settings['environment'] == 'dev') {
       // Create XML: Success response.
       $xml = new SimpleXMLElement('<methodResponse></methodResponse>');
       $params = $xml->addChild('params');
@@ -503,7 +502,7 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
       $devel[] = $xml->asXML();
 
       // Generate random number.
-      $random = rand(0, 2);
+      $random = rand(0, count($devel) - 1);
 
       // Return random xml response.
       $return = $devel[$random];
@@ -536,10 +535,11 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
     }
   }
   else {
+    // Log this condition.
     watchdog('otomax', 'Invalid Otomax Endpoint <pre>!debug</pre> <pre>Options: !options</pre>', array(
       '!debug' => print_r($settings, TRUE),
       '!options' => print_r($http_options, TRUE),
-    ), WATCHDOG_ERROR, l(t('Otomax: Settings Error'), request_path()));
+    ), WATCHDOG_ERROR, t('Otomax: Settings Error'));
   }
 
   // Check return value: has object data.
@@ -584,13 +584,20 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
           case '68':
             // Return: topup pending.
             return TOPUP_PENDING;
+
+          default:
+            // Return: topup failed.
+            return TOPUP_FAILED;
         }
       }
     }
     else {
+      // Get libxml errors.
+      $xml_errors = libxml_get_errors();
       // Log this condition.
-      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@topup</pre>', array(
+      watchdog('otomax', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
         '@result' => var_export($result_xml, TRUE),
+        '@errors' => print_r($xml_errors, TRUE),
         '@topup' => print_r($topup, TRUE),
       ), WATCHDOG_ERROR, l(t('Otomax: @op XML', array(
         '@op' => ucfirst($operation),
@@ -598,7 +605,8 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
     }
   }
 
-  return TOPUP_FAILED;
+  // Return topup error.
+  return TOPUP_ERROR;
 }
 
 /**

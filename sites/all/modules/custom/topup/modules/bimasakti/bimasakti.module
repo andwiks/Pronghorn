@@ -771,6 +771,11 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
           break;
 
         case 'datatransaksi';
+          // Store output if necessary.
+          if (!is_null($output)) {
+            $output = $debug;
+            $output['topup_data'] = $topup['topup_data']['data'];
+          }
           // Check the value: RESPONSECODE.
           if (isset($container[7])) {
             switch ($container[7]) {
@@ -794,8 +799,8 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
       // Get libxml errors.
       $xml_errors = libxml_get_errors();
       // Log this condition.
-      watchdog('bimasakti', 'TopUp Process Invalid XML Return Data <pre>@result</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
-        '@result' => var_export($result_xml, TRUE),
+      watchdog('bimasakti', 'TopUp Process Invalid XML Return Data <pre>@return</pre> <pre>@errors</pre> <pre>@topup</pre>', array(
+        '@return' => htmlentities($return),
         '@errors' => print_r($xml_errors, TRUE),
         '@topup' => print_r($topup, TRUE),
       ), WATCHDOG_ERROR, t('Bimasakti: @op XML', array(
@@ -804,6 +809,10 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
     }
   }
 
+  // Store output if necessary.
+  if (!is_null($output) && isset($topup['topup_data']['data'])) {
+    $output['topup_data'] = $topup['topup_data']['data'];
+  }
   // Other condition: return topup error.
   return TOPUP_ERROR;
 }

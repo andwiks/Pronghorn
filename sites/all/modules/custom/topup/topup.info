@@ -11,4 +11,4 @@ dependencies[] = commerce_order
 dependencies[] = commerce_order_ui
 
 ; Views handlers
-files[] = includes/views/handlers/topup_handler_field_line_item_requeue.inc
+files[] = includes/views/handlers/topup_handler_field_line_item_operation.inc

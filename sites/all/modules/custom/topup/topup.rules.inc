@@ -85,34 +85,12 @@ function topup_queue_request($order) {
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
   // Looping for each line item.
   foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-    // Get line item object.
-    $line_item = $line_item_wrapper->value();
-    // Only for line item: topup_lineitem_type.
-    if ($line_item->type == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
-      // Get phone number: only one number.
-      $field_topup_phone_number = field_get_items('commerce_line_item', $line_item, variable_get('topup_field_phone_number', 'field_phone_number'));
-
-      // Get product object.
-      $product = $line_item_wrapper->commerce_product->value();
-      // Get Topup provider.
-      $field_topup_provider = field_get_items('commerce_product', $product, variable_get('topup_field_provider', 'field_api_provider'));
-      // Get topup code.
-      $field_topup_code = field_get_items('commerce_product', $product, variable_get('topup_field_code', 'field_package_code'));
-
-      // Looping for each quantity.
-      for ($i = 0; $i < $line_item->quantity; $i++) {
-        // Store it in the container: for each quantity.
-        $topup[] = array(
-          'order_id' => $order->order_id,
-          'topup_id' => $i,
-          'topup_total' => $line_item->quantity,
-          'try' => 1,
-          'line_item_id' => $line_item->line_item_id,
-          'field_topup_provider' => $field_topup_provider[0]['value'],
-          'field_topup_phone_number' => $field_topup_phone_number[0]['value'],
-          'field_topup_code' => $field_topup_code[0]['value'],
-        );
-      }
+    // Get topup array and merge it with current array.
+    $topup_data = topup_get_topup_from_line_item_id($line_item_wrapper->line_item_id->value());
+    // Check whether topup data is available.
+    if (!empty($topup_data)) {
+      // Merge it with current topup data.
+      $topup = array_merge($topup, $topup_data);
     }
   }
 
@@ -122,6 +100,9 @@ function topup_queue_request($order) {
     $queue = DrupalQueue::get('topup_process');
     // Looping for each pulsa container.
     foreach ($topup as $item) {
+      // Update topup status: in queue.
+      topup_update_status($item['line_item_id'], TOPUP_INQUEUE);
+      // Queue it.
       $queue->createItem($item);
     }
   }

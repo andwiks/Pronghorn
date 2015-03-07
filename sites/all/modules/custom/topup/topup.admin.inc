@@ -195,6 +195,8 @@ function topup_settings_form_submit($form, &$form_state) {
           TOPUP_SUCCESS => topup_translate_status(TOPUP_SUCCESS),
           TOPUP_PENDING => topup_translate_status(TOPUP_PENDING),
           TOPUP_FAILED => topup_translate_status(TOPUP_FAILED),
+          TOPUP_INQUEUE => topup_translate_status(TOPUP_INQUEUE),
+          TOPUP_NONE => topup_translate_status(TOPUP_NONE),
         ),
       ),
     );
@@ -208,7 +210,7 @@ function topup_settings_form_submit($form, &$form_state) {
       'required' => FALSE,
       'default_value' => array(
         array(
-          'value' => TOPUP_PENDING,
+          'value' => TOPUP_NONE,
         ),
       ),
     );
@@ -233,6 +235,12 @@ function topup_settings_form_submit($form, &$form_state) {
       'default_value' => array(
         array(
           'value' => '',
+        ),
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'Topup Data Formatter',
+          'type' => 'topup_data_formatter',
         ),
       ),
     );
@@ -359,16 +367,16 @@ function topup_provider_page() {
         ));
       }
       else {
-          $operations = theme_links(array(
-            'links' => $links,
-            'attributes' => array(),
-            'heading' => array(),
-          ));
+        $operations = theme_links(array(
+          'links' => $links,
+          'attributes' => array(),
+          'heading' => array(),
+        ));
       }
       // Create tabular rows.
       $rows[] = array(
         'data' => array(
-          'title' => $provider['title'] . '<br />(' . $provider['base'] . ')',
+          'title' => $provider['title'] . '<br />(' . $id . '|' . $provider['base'] . ')',
           'description' => $provider['description'],
           'endpoint' => (isset($provider['settings']['endpoint'])) ? $provider['settings']['endpoint'] : '-',
           'operations' => $operations,
@@ -696,7 +704,7 @@ function topup_provider_settings_form($form = array(), $form_state = array()) {
     $form['callback_url'] = array(
       '#type' => 'item',
       '#title' => t('Callback URL'),
-      '#markup' => $base_url . '/admin/commerce/config/topup/provider/' . $provider . '/callback',
+      '#markup' => $base_url . '/topup/' . $provider . '/callback',
     );
 
     // Add internal form value.

@@ -6,22 +6,30 @@
  * @author andre4s_y
  *
  * @todo: 'terminal' => TRUE, handle.
- * @todo: views button conflict with other button.
- * @see http://dev.sepulsa.com/admin/reports/event/1147
  */
 
 /**
- * Top up request is success.
+ * Topup request is success.
  */
 define('TOPUP_SUCCESS', 1);
 
 /**
- * Top up request is pending.
+ * Topup request is pending.
  */
 define('TOPUP_PENDING', 2);
 
 /**
- * Top up request is failed.
+ * Topup request is in queue.
+ */
+define('TOPUP_INQUEUE', 3);
+
+/**
+ * Topup has no status.
+ */
+define('TOPUP_NONE', 7);
+
+/**
+ * Topup request is failed.
  */
 define('TOPUP_FAILED', 0);
 
@@ -156,7 +164,7 @@ function topup_menu() {
       'type' => MENU_CALLBACK,
     );
 
-    $items['admin/commerce/config/topup/provider/' . $provider_id . '/callback'] = array(
+    $items['topup/' . $provider_id . '/callback'] = array(
       'title' => $provider_data['title'] . ' callback',
       'description' => $provider_data['description'] . ' callback',
       'page callback' => 'topup_callback',
@@ -176,6 +184,83 @@ function topup_views_api() {
     'api' => 3,
     'path' => drupal_get_path('module', 'topup') . '/includes/views',
   );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function topup_field_formatter_info() {
+  return array(
+    'topup_data_formatter' => array(
+      'label' => t('Topup Data Formatter'),
+      'description' => t('Display the topup data via a default View.'),
+      'field types' => array('text'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function topup_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  switch ($display['type']) {
+    case 'topup_data_formatter':
+      foreach ($items as $delta => $item) {
+        // Unserialize value: because data saved in string field type.
+        $topup_data = unserialize($item['value']);
+        if ($topup_data !== FALSE && isset($topup_data['status'])
+          && isset($topup_data['try']) && isset($topup_data['data'])
+        ) {
+          // Define topup data.
+          $data = '';
+          if (!empty($topup_data['data'])) {
+            $data = $topup_data['data'];
+            if (is_array($topup_data['data'])) {
+              foreach ($topup_data['data'] as $key => $value) {
+                $data .= t('@key: @value<br />', array(
+                  '@key' => $key,
+                  '@value' => $value,
+                ));
+              }
+            }
+          }
+          $element[$delta] = array(
+            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try<br />@data', array(
+              '@no' => $delta + 1,
+              '@status' => $topup_data['status'],
+              '@try' => $topup_data['try'],
+              '@data' => !empty($data) ? $data : '-',
+            )),
+          );
+        }
+        else {
+          $element[$delta] = array(
+            '#markup' => t('No topup data'),
+          );
+        }
+      }
+    break;
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function topup_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $element = array();
+  $element['help'] = array(
+    '#markup' => '<p>' . t('No configuration is necessary.') . '</p>',
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function topup_field_formatter_settings_summary($field, $instance, $view_mode) {
+  return t('Displaying topup data.');
 }
 
 /**
@@ -233,47 +318,67 @@ function topup_callback() {
  *
  * @param int $line_item_id
  *   Line item id.
+ *
+ * @param string $op
+ *   Requeue operation.
  */
-function topup_requeue($line_item_id) {
-  // Sanitize input line item id.
-  $line_item_id = intval($line_item_id);
-  // Get line item object.
-  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
-
-  // Only for line item: topup_lineitem_type.
-  if ($line_item_wrapper->type->value() == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
-    // Get Topup provider.
-    $field_topup_provider = variable_get('topup_field_provider', 'field_api_provider');
-    // Get topup code.
-    $field_topup_code = variable_get('topup_field_code', 'field_package_code');
-    // Get quantity.
-    $quantity = intval($line_item_wrapper->quantity->value());
-    // Define default topup container.
-    $topup = array();
-    // Looping for each quantity.
-    for ($i = 0; $i < $quantity; $i++) {
-      // Store it in the container: for each quantity.
-      $topup[] = array(
-        'order_id' => $line_item_wrapper->order_id->value(),
-        'topup_id' => $i,
-        'topup_total' => $quantity,
-        'try' => 1,
-        'line_item_id' => $line_item_id,
-        'field_topup_provider' => $line_item_wrapper->commerce_product->$field_topup_provider->value(),
-        'field_topup_phone_number' => $line_item_wrapper->field_phone_number->value(),
-        'field_topup_code' => $line_item_wrapper->commerce_product->$field_topup_code->value(),
-      );
+function topup_requeue($line_item_id, $op = 'process') {
+  // Get topup array.
+  $topup = topup_get_topup_from_line_item_id($line_item_id);
+  // Check whether pulsa container is available.
+  if (!empty($topup)) {
+    // Update topup status: in queue.
+    topup_update_status($line_item_id, TOPUP_INQUEUE);
+    // Get the queue.
+    $queue = DrupalQueue::get('topup_' . $op);
+    // Looping for each pulsa container.
+    foreach ($topup as $item) {
+      // For query operation.
+      if ($op == 'query') {
+        // Do as the last query, no need to try again.
+        // Set maximum try.
+        $item['try'] = variable_get('topup_try', 3);
+      }
+      // Queue item.
+      $queue->createItem($item);
     }
-    // Check whether pulsa container is available.
-    if (!empty($topup)) {
-      // Get the queue.
-      $queue = DrupalQueue::get('topup_process');
-      // Looping for each pulsa container.
-      foreach ($topup as $item) {
-        $queue->createItem($item);
+  }
+}
+
+/**
+ * Function topup_query().
+ *
+ * @param int $line_item_id
+ *   Line item id.
+ */
+function topup_query($line_item_id) {
+  // Get topup array.
+  $topup = topup_get_topup_from_line_item_id($line_item_id);
+  // Get all providers.
+  $providers = topup_providers();
+  // Define output container.
+  $output = array();
+  // Check whether pulsa container is available.
+  if (!empty($topup)) {
+    // Looping for each topup.
+    foreach ($topup as $id => $item) {
+      // Check topup providers.
+      if (isset($item['field_topup_provider']) && isset($providers[$item['field_topup_provider']])) {
+        // Get topup callback.
+        $callback = $providers[$item['field_topup_provider']]['base'] . '_topup_query';
+        // Check topup process callback.
+        if (function_exists($callback) && is_callable($callback)) {
+          // Define output container for this item.
+          $output[$id] = array();
+          // Call query callback.
+          $result = $callback($item, $providers[$item['field_topup_provider']]['settings'], $output[$id]);
+          // Store result back to output.
+          $output[$id]['result'] = $result;
+        }
       }
     }
   }
+  return $output;
 }
 
 /**
@@ -293,25 +398,26 @@ function topup_queue($op, $topup) {
     $callback = $providers[$topup['field_topup_provider']]['base'] . '_topup_' . $op;
     // Check topup process callback.
     if (function_exists($callback) && is_callable($callback)) {
-      $result = $callback($topup, $providers[$topup['field_topup_provider']]['settings']);
+      // Define topup output: to store other data dan status.
+      $topup_output = array();
+      // Call callback functions.
+      $result = $callback($topup, $providers[$topup['field_topup_provider']]['settings'], $topup_output);
       // Check result status.
       switch ($result) {
         case TOPUP_FAILED:
+          // Update topup data.
+          $topup_data = topup_update_topup_data($topup, $result, $topup_output);
           // Check whether topup try has not been reach.
           if ($topup['try'] < variable_get('topup_try', 3)) {
             // Add try data.
             $topup['try'] = $topup['try'] + 1;
+            // Update topup status: in queue.
+            topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
             // Queue it once again.
             $queue = DrupalQueue::get('topup_process_' . $topup['try']);
             $queue->createItem($topup);
           }
           else {
-            // Load line item wrapper.
-            $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
-            $topup_data = $line_item_wrapper->field_topup_data->value();
-            $topup_data[$topup['topup_id']] = $topup['topup_id'] . ':' . topup_translate_status(TOPUP_FAILED);
-            $line_item_wrapper->field_topup_data->set($topup_data);
-
             // Check total quantity.
             if ($topup['topup_total'] == 1) {
               $failed = 1;
@@ -320,8 +426,10 @@ function topup_queue($op, $topup) {
               $failed = 0;
               // Check topup data.
               for ($i = 0; $i < $topup['topup_total']; $i++) {
+                // Unserialize topup data.
+                $topup_data[$i] = unserialize($topup_data[$i]);
                 // Check topup data: using $i.
-                if (isset($topup_data[$i]) && $topup_data[$i] == TOPUP_FAILED) {
+                if (isset($topup_data[$i]['status']) && $topup_data[$i]['status'] == $result) {
                   $failed++;
                 }
               }
@@ -329,33 +437,35 @@ function topup_queue($op, $topup) {
 
             // Update topup status if total success >= topup total.
             if ($failed >= $topup['topup_total']) {
-              $line_item_wrapper->field_topup_status->set(TOPUP_FAILED);
+              topup_update_status($topup['line_item_id'], $result);
             }
-
-            // Save line item.
-            $line_item_wrapper->save();
           }
           break;
 
         case TOPUP_PENDING:
           // Get topup try query.
-          $topup['try_query'] = isset($topup['try_query']) ? intval($topup['try_query']) : 0;
+          $topup['try_query'] = isset($topup['try_query']) ? intval($topup['try_query']) : 1;
           // Check whether topup try still allowed
           if ($topup['try_query'] < variable_get('topup_try', 3)) {
             $topup['try_query']++;
+            // Update topup status: in queue.
+            topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
             // Queue for query.
             $queue = ($topup['try_query'] == 1) ? 'topup_query' : 'topup_query_' . $topup['try_query'];
             $queue = DrupalQueue::get($queue);
             $queue->createItem($topup);
           }
+          else {
+            // Update topup status: pending.
+            topup_update_status($topup['line_item_id'], $result);
+            // Update topup data.
+            topup_update_topup_data($topup, $result, $topup_output);
+          }
           break;
 
         case TOPUP_SUCCESS:
-          // Load line item wrapper.
-          $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
-          $topup_data = $line_item_wrapper->field_topup_data->value();
-          $topup_data[$topup['topup_id']] = $topup['topup_id'] . ':' . topup_translate_status(TOPUP_SUCCESS);
-          $line_item_wrapper->field_topup_data->set($topup_data);
+          // Update topup data.
+          $topup_data = topup_update_topup_data($topup, $result, $topup_output);
 
           // Check total quantity.
           if ($topup['topup_total'] == 1) {
@@ -365,8 +475,10 @@ function topup_queue($op, $topup) {
             $success = 0;
             // Check topup data.
             for ($i = 0; $i < $topup['topup_total']; $i++) {
+              // Unserialize topup data.
+              $topup_data[$i] = unserialize($topup_data[$i]);
               // Check topup data: using $i.
-              if (isset($topup_data[$i]) && $topup_data[$i] == TOPUP_SUCCESS) {
+              if (isset($topup_data[$i]['status']) && $topup_data[$i]['status'] == $result) {
                 $success++;
               }
             }
@@ -374,29 +486,22 @@ function topup_queue($op, $topup) {
 
           // Update topup status if total success >= topup total.
           if ($success >= $topup['topup_total']) {
-            $line_item_wrapper->field_topup_status->set(TOPUP_SUCCESS);
+            topup_update_status($topup['line_item_id'], $result);
           }
-
-          // Save line item.
-          $line_item_wrapper->save();
 
           // Define all topup success variable.
           $all_topup_success = FALSE;
           // Define topup line item counter.
           $topup_counter_success = $topup_counter = 0;
           // Define order wrapper: to get total order amount.
-          $order_wrapper = entity_metadata_wrapper('commerce_order', $line_item_wrapper->order_id->value());
-          // Get order line items.
-          $line_items = $order_wrapper->commerce_line_items->value();
+          $order_wrapper = entity_metadata_wrapper('commerce_order', $topup['order_id']);
           // Looping for each line item.
-          foreach ($line_items as $line_item) {
+          foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
             // Only for line item: topup_lineitem_type.
-            if ($line_item->type == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
+            if ($line_item_wrapper->type->value() == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
               $topup_counter++;
-              // Get line item wrapper.
-              $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
               // Check field topup status.
-              if ($line_item_wrapper->field_topup_status->value() == TOPUP_SUCCESS) {
+              if ($line_item_wrapper->field_topup_status->value() == $result) {
                 $topup_counter_success++;
               }
             }
@@ -418,7 +523,6 @@ function topup_queue($op, $topup) {
             // Save the updated order.
             commerce_order_save($order);
           }
-
           break;
       }
     }
@@ -519,7 +623,146 @@ function topup_translate_status($status) {
     case TOPUP_FAILED:
       return t('Failed');
 
+    case TOPUP_INQUEUE:
+      return t('In Queue');
+
+    case TOPUP_NONE:
+      return t('No Status');
+
     default:
       return t('Unknown');
   }
+}
+
+/**
+ * Function topup_get_topup_from_line_item_id().
+ *
+ * @param int $line_item_id
+ *   Line item id.
+ *
+ * @return array.
+ *   Topup array.
+ */
+function topup_get_topup_from_line_item_id($line_item_id) {
+  // Sanitize input line item id.
+  $line_item_id = intval($line_item_id);
+  // Get line item object.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
+  // Define topup array.
+  $topup = array();
+  // Only for line item: topup_lineitem_type.
+  if ($line_item_wrapper->type->value() == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
+    // Get Topup provider.
+    $field_topup_provider = variable_get('topup_field_provider', 'field_api_provider');
+    // Get topup code.
+    $field_topup_code = variable_get('topup_field_code', 'field_package_code');
+    // Get quantity.
+    $quantity = intval($line_item_wrapper->quantity->value());
+    // Get previous topup data.
+    $topup_data = $line_item_wrapper->field_topup_data->value();
+    // Looping for each quantity.
+    for ($i = 0; $i < $quantity; $i++) {
+      // Store it in the container: for each quantity.
+      $topup[] = array(
+        'order_id' => $line_item_wrapper->order_id->value(),
+        'topup_id' => $i,
+        'topup_total' => $quantity,
+        'topup_data' => (isset($topup_data[$i])) ? unserialize($topup_data[$i]) : array(),
+        'try' => 1,
+        'line_item_id' => $line_item_id,
+        'field_topup_provider' => $line_item_wrapper->commerce_product->$field_topup_provider->value(),
+        'field_topup_phone_number' => $line_item_wrapper->field_phone_number->value(),
+        'field_topup_code' => $line_item_wrapper->commerce_product->$field_topup_code->value(),
+      );
+    }
+  }
+  // Return topup array.
+  return $topup;
+}
+
+/**
+ * Function topup_update_status().
+ *
+ * @param int $line_item_id
+ *   Line Item ID.
+ * @param int $status
+ *   Topup status.
+ */
+function topup_update_status($line_item_id, $status) {
+  // Get line item wrapper.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', intval($line_item_id));
+  // Check field topup_status availability.
+  if (isset($line_item_wrapper->field_topup_status)
+    && $line_item_wrapper->field_topup_status->value() != $status
+  ) {
+    // Check whether topup status is in queue.
+    if ($status == TOPUP_INQUEUE) {
+      $topup_inqueue = topup_translate_status($status);
+      $topup_data = $line_item_wrapper->field_topup_data->value();
+      foreach ($topup_data as $id => $topup) {
+        $topup = unserialize($topup);
+        if (isset($topup['status']) && $topup['status'] != $topup_inqueue) {
+          $topup['status'] = $topup_inqueue;
+        }
+        $topup_data[$id] = serialize($topup);
+      }
+      $line_item_wrapper->field_topup_data->set($topup_data);
+    }
+    // Set topup status.
+    $line_item_wrapper->field_topup_status->set($status);
+    // Save line item.
+    $line_item_wrapper->save();
+  }
+}
+
+/**
+ * Function topup_delete_data().
+ *
+ * @param int $line_item_id
+ *   Line item ID.
+ */
+function topup_delete_topup_data($line_item_id) {
+  // Get line item wrapper.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', intval($line_item_id));
+  // Check field topup_status availability.
+  if (isset($line_item_wrapper->field_topup_data)) {
+    // Set with empty array.
+    $line_item_wrapper->field_topup_data->set(array());
+    // Save line item.
+    $line_item_wrapper->save();
+  }
+}
+
+/**
+ * Function topup_update_topup_data().
+ *
+ * @param array $topup
+ *   Topup data.
+ * @param int $result
+ *   Topup result status.
+ * @param array $output
+ *   Topup result output.
+ *
+ * @return array
+ *   Updated topup data.
+ */
+function topup_update_topup_data($topup, $result, $output) {
+  // Load line item wrapper.
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
+  // Get current topup data.
+  $topup_data = $line_item_wrapper->field_topup_data->value();
+  // Create updated topup data.
+  $topup_data_update = array(
+    'status' => topup_translate_status($result),
+    'try' => $topup['try'],
+    'data' => (isset($output['topup_data']) && !empty($output['topup_data'])) ? $output['topup_data'] : '',
+  );
+  // Serialize topup data and get back to previous topup data.
+  $topup_data[$topup['topup_id']] = serialize($topup_data_update);
+  // Set the topup data.
+  $line_item_wrapper->field_topup_data->set($topup_data);
+  // Save line item.
+  $line_item_wrapper->save();
+  // Return updated topup data.
+  return $topup_data;
 }

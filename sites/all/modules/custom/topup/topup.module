@@ -210,7 +210,8 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
         // Unserialize value: because data saved in string field type.
         $topup_data = unserialize($item['value']);
         if ($topup_data !== FALSE && isset($topup_data['status'])
-          && isset($topup_data['try']) && isset($topup_data['data'])
+          && isset($topup_data['try']) && isset($topup_data['total'])
+          && isset($topup_data['data'])
         ) {
           // Define topup data.
           $data = '';
@@ -226,17 +227,18 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
             }
           }
           $element[$delta] = array(
-            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try<br />@data', array(
+            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try (@total)<br />@data', array(
               '@no' => $delta + 1,
               '@status' => $topup_data['status'],
               '@try' => $topup_data['try'],
+              '@total' => $topup_data['total'],
               '@data' => !empty($data) ? $data : '-',
             )),
           );
         }
         else {
           $element[$delta] = array(
-            '#markup' => t('No topup data'),
+            '#markup' => t('No data'),
           );
         }
       }
@@ -338,6 +340,8 @@ function topup_requeue($line_item_id, $op = 'process') {
         // Do as the last query, no need to try again.
         // Set maximum try.
         $item['try'] = variable_get('topup_try', 3);
+        // Do not count total try.
+        $item['total']--;
       }
       // Queue item.
       $queue->createItem($item);
@@ -402,15 +406,17 @@ function topup_queue($op, $topup) {
       $topup_output = array();
       // Call callback functions.
       $result = $callback($topup, $providers[$topup['field_topup_provider']]['settings'], $topup_output);
+      // Update topup data: whatever the result.
+      $topup_data = topup_update_topup_data($topup, $result, $topup_output);
       // Check result status.
       switch ($result) {
         case TOPUP_FAILED:
-          // Update topup data.
-          $topup_data = topup_update_topup_data($topup, $result, $topup_output);
           // Check whether topup try has not been reach.
           if ($topup['try'] < variable_get('topup_try', 3)) {
             // Add try data.
-            $topup['try'] = $topup['try'] + 1;
+            $topup['try']++;
+            // Add try total data.
+            $topup['total']++;
             // Update topup status: in queue.
             topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
             // Queue it once again.
@@ -458,15 +464,10 @@ function topup_queue($op, $topup) {
           else {
             // Update topup status: pending.
             topup_update_status($topup['line_item_id'], $result);
-            // Update topup data.
-            topup_update_topup_data($topup, $result, $topup_output);
           }
           break;
 
         case TOPUP_SUCCESS:
-          // Update topup data.
-          $topup_data = topup_update_topup_data($topup, $result, $topup_output);
-
           // Check total quantity.
           if ($topup['topup_total'] == 1) {
             $success = 1;
@@ -662,13 +663,16 @@ function topup_get_topup_from_line_item_id($line_item_id) {
     $topup_data = $line_item_wrapper->field_topup_data->value();
     // Looping for each quantity.
     for ($i = 0; $i < $quantity; $i++) {
+      // Get topup_data for this topup id.
+      $topup_data_id = (isset($topup_data[$i])) ? unserialize($topup_data[$i]) : array();
       // Store it in the container: for each quantity.
       $topup[] = array(
         'order_id' => $line_item_wrapper->order_id->value(),
         'topup_id' => $i,
         'topup_total' => $quantity,
-        'topup_data' => (isset($topup_data[$i])) ? unserialize($topup_data[$i]) : array(),
+        'topup_data' => $topup_data_id,
         'try' => 1,
+        'total' => (isset($topup_data_id['total']) ? ($topup_data_id['total'] + 1) : 1),
         'line_item_id' => $line_item_id,
         'field_topup_provider' => $line_item_wrapper->commerce_product->$field_topup_provider->value(),
         'field_topup_phone_number' => $line_item_wrapper->field_phone_number->value(),
@@ -755,6 +759,7 @@ function topup_update_topup_data($topup, $result, $output) {
   $topup_data_update = array(
     'status' => topup_translate_status($result),
     'try' => $topup['try'],
+    'total' => $topup['total'],
     'data' => (isset($output['topup_data']) && !empty($output['topup_data'])) ? $output['topup_data'] : '',
   );
   // Serialize topup data and get back to previous topup data.

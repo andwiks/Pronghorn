@@ -221,7 +221,7 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
           // Define topup data.
           $data = '';
           if (!empty($topup_data['data'])) {
-            $data = $topup_data['data'];
+            $data = '';
             if (is_array($topup_data['data'])) {
               foreach ($topup_data['data'] as $key => $value) {
                 $data .= t('@key: @value<br />', array(
@@ -230,14 +230,17 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
                 ));
               }
             }
+            else {
+              $data = check_plain($topup_data['data']);
+            }
           }
           $element[$delta] = array(
-            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try (@total)<br />@data', array(
+            '#markup' => t('Topup #@no:<br />Status: @status<br />Try: @try (@total)<br />!data', array(
               '@no' => $delta + 1,
               '@status' => $topup_data['status'],
               '@try' => $topup_data['try'],
               '@total' => $topup_data['total'],
-              '@data' => !empty($data) ? $data : '-',
+              '!data' => !empty($data) ? $data : '-',
             )),
           );
         }
@@ -385,6 +388,8 @@ function topup_query($line_item_id) {
         $callback = $providers[$item['field_topup_provider']]['base'] . '_topup_query';
         // Check topup process callback.
         if (function_exists($callback) && is_callable($callback)) {
+          // Do not count total try.
+          $item['total']--;
           // Define output container for this item.
           $output[$id] = array();
           // Call query callback.
@@ -440,6 +445,8 @@ function topup_queue($op, $topup) {
             $topup['try']++;
             // Add try total data.
             $topup['total']++;
+            // Update topup data.
+            $topup['topup_data'] = unserialize($topup_data[$topup['topup_id']]);
             // Update topup status: in queue.
             topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
             // Queue it once again.
@@ -479,6 +486,8 @@ function topup_queue($op, $topup) {
             $topup['try_query']++;
             // Update topup status: in queue.
             topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
+            // Update topup data.
+            $topup['topup_data'] = unserialize($topup_data[$topup['topup_id']]);
             // Queue for query.
             $queue = ($topup['try_query'] == 1) ? 'topup_query' : 'topup_query_' . $topup['try_query'];
             $queue = DrupalQueue::get($queue);

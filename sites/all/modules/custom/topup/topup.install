@@ -33,6 +33,7 @@ function topup_uninstall() {
   variable_del('topup_field_provider');
   variable_del('topup_field_code');
   variable_del('topup_try');
+  variable_del('topup_cancel_list');
   // Delete variable topup_providers_*.
   db_delete('variable')
     ->condition('name', db_like('topup_providers') . '%', 'LIKE')

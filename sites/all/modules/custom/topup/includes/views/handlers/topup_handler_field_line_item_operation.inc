@@ -57,6 +57,7 @@ class topup_handler_field_line_item_operation extends views_handler_field {
         '#type' => 'select',
         '#options' => array(
           0 => t('- Operation -'),
+          'cancel' => t('Cancel'),
           'query' => t('Query'),
           'reset' => t('Reset'),
           'requeue_query' => t('Requeue: Query'),
@@ -179,6 +180,25 @@ class topup_handler_field_line_item_operation extends views_handler_field {
             topup_delete_topup_data($line_item_id);
             // Show message to user.
             drupal_set_message(t('Line item (@id) topup has been reset.', array(
+              '@id' => $line_item_id,
+            )));
+            break;
+
+          case 'cancel':
+            // Update topup status.
+            topup_update_status($line_item_id, TOPUP_CANCELED);
+            // Get topup cancel list.
+            $cancel_list = variable_get('topup_cancel_list', array());
+            // Get topup quantity.
+            $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
+            $quantity = intval($line_item_wrapper->quantity->value());
+            for ($i = 0; $i < $quantity; $i++) {
+              $cancel_list[$line_item_id][$i] = TRUE;
+            }
+            // Update topup cancel list.
+            variable_set('topup_cancel_list', $cancel_list);
+            // Show message to user.
+            drupal_set_message(t('Line item (@id) topup has been canceled. Queue process also canceled unless it is running.', array(
               '@id' => $line_item_id,
             )));
             break;

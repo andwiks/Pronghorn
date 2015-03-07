@@ -24,6 +24,11 @@ define('TOPUP_PENDING', 2);
 define('TOPUP_INQUEUE', 3);
 
 /**
+ * Topup request is canceled.
+ */
+define('TOPUP_CANCELED', 4);
+
+/**
  * Topup has no status.
  */
 define('TOPUP_NONE', 7);
@@ -329,6 +334,14 @@ function topup_requeue($line_item_id, $op = 'process') {
   $topup = topup_get_topup_from_line_item_id($line_item_id);
   // Check whether pulsa container is available.
   if (!empty($topup)) {
+    // Reset topup cancel list for this line item.
+    $cancel_list = variable_get('topup_cancel_list', array());
+    if (isset($cancel_list[$line_item_id])) {
+      $cancel_list[$line_item_id] = array();
+      unset($cancel_list[$line_item_id]);
+      // Update topup cancel list.
+      variable_set('topup_cancel_list', $cancel_list);
+    }
     // Update topup status: in queue.
     topup_update_status($line_item_id, TOPUP_INQUEUE);
     // Get the queue.
@@ -394,6 +407,16 @@ function topup_query($line_item_id) {
  *   Topup data.
  */
 function topup_queue($op, $topup) {
+  // Get topup queue cancel list.
+  $cancel_list = variable_get('topup_cancel_list', array());
+  // Check whether this topup is canceled.
+  if (isset($cancel_list[$topup['line_item_id']][$topup['topup_id']])) {
+    unset($cancel_list[$topup['line_item_id']][$topup['topup_id']]);
+    // Reset topup cancel list.
+    variable_set('topup_cancel_list', $cancel_list);
+    // Exit the function gracefully.
+    return;
+  }
   // Get all providers.
   $providers = topup_providers();
   // Check topup providers.
@@ -627,6 +650,9 @@ function topup_translate_status($status) {
     case TOPUP_INQUEUE:
       return t('In Queue');
 
+    case TOPUP_CANCELED:
+      return t('Canceled');
+
     case TOPUP_NONE:
       return t('No Status');
 
@@ -700,7 +726,7 @@ function topup_update_status($line_item_id, $status) {
     && $line_item_wrapper->field_topup_status->value() != $status
   ) {
     // Check whether topup status is in queue.
-    if ($status == TOPUP_INQUEUE) {
+    if ($status == TOPUP_INQUEUE || $status == TOPUP_CANCELED) {
       $topup_inqueue = topup_translate_status($status);
       $topup_data = $line_item_wrapper->field_topup_data->value();
       foreach ($topup_data as $id => $topup) {

@@ -1,0 +1,423 @@
+<?php
+/**
+ * @file
+ * order_services.module
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function order_services_services_resources() {
+  $definition = array(
+    'order' => array(
+      'actions' => array(
+        'order_detail' => array(
+          'help' => 'Get Order Detail',
+          'callback' => '_order_services_detail',
+          'documentation callback' => 'order_services_detail_doc',
+          'access callback' => 'services_access_menu',
+          'args' => array(
+            array(
+              'name' => 'orderid',
+              'type' => 'string',
+              'description' => 'A valid order id',
+              'source' => array(
+                'data' => 'orderid',
+                'param' => 'orderid',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+        'order_list' => array(
+          'help' => 'Get Order List',
+          'callback' => '_order_services_list',
+          'documentation callback' => 'order_services_list_doc',
+          'access callback' => 'services_access_menu',
+        ),
+      ),
+    ),
+  );
+  return $definition;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Resources callback for order detail.
+ */
+function _order_services_detail($orderid){
+  $order = commerce_order_load($orderid);
+  return $order;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Resources callback for order list.
+ */
+function _order_services_list(){
+    global $user;
+    if (isset($user) && $user->uid > 0) {
+        $result = db_query("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed') AND uid = :uid", array('uid' => $user->uid));
+        foreach ($result as $user_order) {
+           $user_orders[] = $user_order->order_id;
+        }
+        $order = commerce_order_load_multiple($user_orders);
+        return $order;
+    } else {
+        return "Invalid user";
+    }
+}
+
+/**
+ * Documentation callback for user actions order detail.
+ */
+function order_services_detail_doc() {
+  global $base_url;
+  $response = '
+    stdClass Object
+    (
+    [order_number] => 123
+    [revision_id] => 451
+    [revision_uid] => 50
+    [mail] => user@mail.com
+    [status] => pending
+    [log] => Order state updated via Rules.
+    [revision_timestamp] => 1425204461
+    [revision_hostname] => ::1
+    [data] => Array
+        (
+            [last_cart_refresh] => 1425204460
+            [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
+            [commerce_payment_example] => Array
+                (
+                    [credit_card] => Array
+                        (
+                            [valid_types] => Array
+                                (
+                                )
+                            [number] => 4111--------1111
+                            [exp_month] => 03
+                            [exp_year] => 2015
+                        )
+                )
+            [commerce_payment_order_paid_in_full_invoked] => 1
+        )
+
+    [order_id] => 123
+    [type] => commerce_order
+    [uid] => 50
+    [created] => 1425204461
+    [changed] => 1425204461
+    [hostname] => ::1
+    [commerce_line_items] => Array
+        (
+            [und] => Array
+                (
+                    [0] => Array
+                        (
+                            [line_item_id] => 509
+                        )
+
+                    [1] => Array
+                        (
+                            [line_item_id] => 510
+                        )
+                )
+        )
+
+    [commerce_order_total] => Array
+        (
+            [und] => Array
+                (
+                    [0] => Array
+                        (
+                            [amount] => 100000
+                            [currency_code] => IDR
+                            [data] => Array
+                                (
+                                    [components] => Array
+                                        (
+                                            [0] => Array
+                                                (
+                                                    [name] => base_price
+                                                    [price] => Array
+                                                        (
+                                                            [amount] => 100000
+                                                            [currency_code] => IDR
+                                                            [data] => Array
+                                                                (
+                                                                )
+                                                        )
+                                                    [included] => 1
+                                                )
+                                        )
+                                )
+                        )
+                )
+        )
+
+    [commerce_customer_billing] => Array
+        (
+        )
+
+    [rdf_mapping] => Array
+        (
+        )
+
+)
+  ';
+  $element = array(
+    '#name' => t('Order Detail Service'),
+    '#description' => t('Get Order Detail'),
+    '#auth' => FALSE,
+    '#path' => 'order/order_detail',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/order/order_detail.json<br />POST data x-www-form-urlencoded: orderid=123 <br />POST data application/json: {"orderid": "123"}<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument @arg',
+        '#description' => t('Required argument: orderid.'),
+        '#response' => '
+        [
+            "Missing required argument @arg"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for user actions order list.
+ */
+function order_services_list_doc() {
+  global $base_url;
+  $response = '
+    Array
+    (
+        [123] => stdClass Object
+            (
+            [order_number] => 123
+            [revision_id] => 123
+            [revision_uid] => 50
+            [mail] => user@mail.com
+            [status] => pending
+            [log] => Order state updated via Rules.
+            [revision_timestamp] => 1425204461
+            [revision_hostname] => ::1
+            [data] => Array
+                (
+                    [last_cart_refresh] => 1425204460
+                    [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
+                    [commerce_payment_example] => Array
+                        (
+                            [credit_card] => Array
+                                (
+                                    [valid_types] => Array
+                                        (
+                                        )
+                                    [number] => 4111--------1111
+                                    [exp_month] => 03
+                                    [exp_year] => 2015
+                                )
+                        )
+                    [commerce_payment_order_paid_in_full_invoked] => 1
+                )
+
+            [order_id] => 123
+            [type] => commerce_order
+            [uid] => 50
+            [created] => 1425204461
+            [changed] => 1425204461
+            [hostname] => ::1
+            [commerce_line_items] => Array
+                (
+                    [und] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [line_item_id] => 509
+                                )
+
+                            [1] => Array
+                                (
+                                    [line_item_id] => 510
+                                )
+                        )
+                )
+
+            [commerce_order_total] => Array
+                (
+                    [und] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [amount] => 100000
+                                    [currency_code] => IDR
+                                    [data] => Array
+                                        (
+                                            [components] => Array
+                                                (
+                                                    [0] => Array
+                                                        (
+                                                            [name] => base_price
+                                                            [price] => Array
+                                                                (
+                                                                    [amount] => 100000
+                                                                    [currency_code] => IDR
+                                                                    [data] => Array
+                                                                        (
+                                                                        )
+                                                                )
+                                                            [included] => 1
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+
+            [commerce_customer_billing] => Array
+                (
+                )
+
+            [rdf_mapping] => Array
+                (
+                )
+        )
+        
+        [456] => stdClass Object
+            (
+            [order_number] => 456
+            [revision_id] => 456
+            [revision_uid] => 50
+            [mail] => user@mail.com
+            [status] => pending
+            [log] => Order state updated via Rules.
+            [revision_timestamp] => 1425204461
+            [revision_hostname] => ::1
+            [data] => Array
+                (
+                    [last_cart_refresh] => 1425204460
+                    [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
+                    [commerce_payment_example] => Array
+                        (
+                            [credit_card] => Array
+                                (
+                                    [valid_types] => Array
+                                        (
+                                        )
+                                    [number] => 4111--------1111
+                                    [exp_month] => 03
+                                    [exp_year] => 2015
+                                )
+                        )
+                    [commerce_payment_order_paid_in_full_invoked] => 1
+                )
+
+            [order_id] => 456
+            [type] => commerce_order
+            [uid] => 50
+            [created] => 1425204461
+            [changed] => 1425204461
+            [hostname] => ::1
+            [commerce_line_items] => Array
+                (
+                    [und] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [line_item_id] => 509
+                                )
+
+                            [1] => Array
+                                (
+                                    [line_item_id] => 510
+                                )
+                        )
+                )
+
+            [commerce_order_total] => Array
+                (
+                    [und] => Array
+                        (
+                            [0] => Array
+                                (
+                                    [amount] => 100000
+                                    [currency_code] => IDR
+                                    [data] => Array
+                                        (
+                                            [components] => Array
+                                                (
+                                                    [0] => Array
+                                                        (
+                                                            [name] => base_price
+                                                            [price] => Array
+                                                                (
+                                                                    [amount] => 100000
+                                                                    [currency_code] => IDR
+                                                                    [data] => Array
+                                                                        (
+                                                                        )
+                                                                )
+                                                            [included] => 1
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )
+
+            [commerce_customer_billing] => Array
+                (
+                )
+
+            [rdf_mapping] => Array
+                (
+                )
+        )
+    )
+  ';
+  $element = array(
+    '#name' => t('Order List Service'),
+    '#description' => t('Get Order List'),
+    '#auth' => FALSE,
+    '#path' => 'order/order_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/order/order_list.json<br />POST data x-www-form-urlencoded<br />POST data application/json<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

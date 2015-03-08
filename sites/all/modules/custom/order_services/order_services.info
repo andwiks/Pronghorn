@@ -1,0 +1,7 @@
+name = "Order Services Integration"
+description = "Integrates Order with Services module"
+core = "7.x"
+
+dependencies[] = commerce
+dependencies[] = services
+dependencies[] = services_documentation

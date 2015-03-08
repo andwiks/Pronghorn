@@ -39,6 +39,7 @@ function order_services_services_resources() {
           'callback' => '_order_services_list',
           'documentation callback' => 'order_services_list_doc',
           'access callback' => 'services_access_menu',
+          'args' => array(),
         ),
       ),
     ),
@@ -404,6 +405,7 @@ function order_services_list_doc() {
     '#description' => t('Get Order List'),
     '#auth' => FALSE,
     '#path' => 'order/order_list',
+    '#args' => 'none',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/order/order_list.json<br />POST data x-www-form-urlencoded<br />POST data application/json<br />',
     // Example response. E.g., a JSON array.

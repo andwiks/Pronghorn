@@ -10,3 +10,10 @@ test
 
 #Ignore lain-lain, latest dumped DB for development, or other
 zzzother
+
+#Ignore mac trash files
+*.DS_Store*
+*.buildpath
+*.project
+*.settings
+nbproject

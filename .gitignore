@@ -19,4 +19,4 @@ zzzother
 nbproject
 
 # Ignore .htaccess
-.htaccess
+*.htaccess

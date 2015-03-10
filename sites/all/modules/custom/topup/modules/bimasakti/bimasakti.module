@@ -745,7 +745,7 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
           if (!is_null($output)) {
             $output = $debug;
             $topup['topup_data']['data'][$topup['request_id']] = array(
-              'time' => $container[2],
+              'time' => $container[1],
               'ref2' => $container[7],
             );
             $output['topup_data'] = $topup['topup_data']['data'];
@@ -771,25 +771,30 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
           break;
 
         case 'datatransaksi';
+          // @todo: possible multiple responses.
           // Store output if necessary.
           if (!is_null($output)) {
             $output = $debug;
             $output['topup_data'] = $topup['topup_data']['data'];
           }
-          // Check the value: RESPONSECODE.
-          if (isset($container[7])) {
-            switch ($container[7]) {
-              case '00':
-                // Return: topup success.
-                return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+          // 1. Check value: Ref2 [3].
+          // 2. Check value: RESPONSECODE [7].
+          if (isset($container[3]) && isset($container[7])) {
+            // Check whether ref2 is correct.
+            if ($topup['ref2'] == $container[3]) {
+              switch ($container[7]) {
+                case '00':
+                  // Return: topup success.
+                  return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
 
-              case '':
-                // Return: topup pending.
-                return TOPUP_PENDING;
+                case '':
+                  // Return: topup pending.
+                  return TOPUP_PENDING;
 
-              default:
-                // Return: topup failed.
-                return TOPUP_FAILED;
+                default:
+                  // Return: topup failed.
+                  return TOPUP_FAILED;
+              }
             }
           }
           break;

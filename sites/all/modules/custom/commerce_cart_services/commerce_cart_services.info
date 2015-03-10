@@ -1,0 +1,7 @@
+name = "Commerce Cart Services Integration"
+description = "Integrates Commerce Cart with Services module"
+core = "7.x"
+
+dependencies[] = commerce_cart
+dependencies[] = services
+dependencies[] = services_documentation

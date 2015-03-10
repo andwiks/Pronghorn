@@ -8,12 +8,15 @@ sites/*/private
 # Ignore test folder
 test
 
-#Ignore lain-lain, latest dumped DB for development, or other
+# Ignore lain-lain, latest dumped DB for development, or other
 zzzother
 
-#Ignore mac trash files
+# Ignore mac trash files
 *.DS_Store*
 *.buildpath
 *.project
 *.settings
 nbproject
+
+# Ignore .htaccess
+*.htaccess

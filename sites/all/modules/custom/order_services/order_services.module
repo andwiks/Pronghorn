@@ -403,7 +403,7 @@ function order_services_list_doc() {
   $element = array(
     '#name' => t('Order List Service'),
     '#description' => t('Get Order List'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'order/order_list',
     '#args' => 'none',
     // Example request. E.g., a request URL, headers, and a JSON array.
@@ -414,6 +414,14 @@ function order_services_list_doc() {
     '#verb' => 'actions',
     // Errors.
     '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site. Header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),

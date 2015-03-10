@@ -815,6 +815,7 @@ function topup_delete_topup_data($line_item_id) {
  *   Updated topup data.
  */
 function topup_update_topup_data($topup, $result, $output) {
+  // @todo: wrap this using try and catch: in case field topup data overmax.
   // Load line item wrapper.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
   // Get current topup data.

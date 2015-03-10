@@ -5,21 +5,40 @@
         <nav class="secondary-menu">
           <ul class="nav nav-pills">
             <li class="dropdown menu-item-has-children">
-              <a href="<?php print $base_url; ?>">Home</a>
+              <?php print l('Home', '<front>'); ?>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="<?php print $base_url; ?>/about">Tentang Kami</a>
+              <?php print l('Tentang Kami', 'about'); ?>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="<?php print $base_url; ?>/faq">F.A.Q.</a>
+              <?php print l('F.A.Q.', 'faq'); ?>
             </li>
             <li class="dropdown menu-item-has-children">
-              <a href="<?php print $base_url; ?>/ga-terms-conditions">Syarat Penggunaan</a>
+              <?php print l('Syarat Penggunaan', 'ga-terms-conditions'); ?>
             </li>
-        </ul>
+          </ul>
+          <div class="c-sepulsa">© 2014 sepulsa</div>
         </nav>
-        <div class="copyright">&copy; 2015 PT. Sepulsa Teknologi Indonesia</div>
+
+        <div class="keamanan">
+          <p>Keamanan Berbelanja:</p>
+            <div>
+              <img src="<?php print url(path_to_theme() . '/images/footer/secure-visa.jpg'); ?>" style="min-height:25px; max-height:40px">
+              <img src="<?php print url(path_to_theme() . '/images/footer/secure-mc.jpg'); ?>" style="min-height:25px; max-height:40px">
+              <a href="https://sealinfo.thawte.com/thawtesplash?form_file=fdf/thawtesplash.fdf&amp;dn=WWW.SEPULSA.COM&amp;lang=en" tabindex="-1" onmousedown="return v_mDown(event);" target="THAWTE_Splash">
+                <img name="seal" src="<?php print url(path_to_theme() . '/images/footer/secure-thawte.jpg'); ?>"  oncontextmenu="return false;" alt="Click to Verify - This site has chosen a thawte SSL Certificate to improve Web site security" style="min-height:25px; max-height:40px">
+              </a>
+            </div>
+        </div>
+
+        <div class="pembayaran">
+          <p>Metode Pembayaran:</p>
+          <div>
+            <img src="<?php print url(path_to_theme() . '/images/footer/payment-mc.jpg'); ?>" style="min-height:25px; max-height:40px">
+            <img src="<?php print url(path_to_theme() . '/images/footer/payment-visa.jpg'); ?>" style="min-height:25px; max-height:40px">
+          </div>
+        </div>
       </div>
-	</div>
-   </div>
+    </div>
+  </div>
 </footer>

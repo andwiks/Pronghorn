@@ -3402,9 +3402,9 @@ ul.filter-categories > li {
       color: inherit; }
   #nav li.menu-item-has-children > .sub-nav {
     background: rgba(255, 255, 255, 0.9);
-	border-bottom:1px solid #ddd;
-	border-left:1px solid #ddd;
-	border-right:1px solid #ddd }
+  border-bottom:1px solid #ddd;
+  border-left:1px solid #ddd;
+  border-right:1px solid #ddd }
   #nav > ul > li.menu-item-has-children:hover > a {
     color: #000;
     background: rgba(255, 255, 255, 0.9); }
@@ -5329,7 +5329,7 @@ ul.filter-categories > li {
 .tab-container .tabs li {
   float: left; }
 .tab-container .tabs li.active a {
-  color: #333; 
+  color: #333;
   }
 .tab-container .tabs a {
   white-space: nowrap;
@@ -5940,16 +5940,16 @@ ul.filter-categories > li {
       display: table-cell;
       vertical-align: middle;
       text-align: right;
-	  color:#333;
-	  font-size: 1em;
-	  letter-spacing: 0.01em }
+    color:#333;
+    font-size: 1em;
+    letter-spacing: 0.01em }
   #footer .secondary-menu .nav > li > a {
     font-size: 0.9333em;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.01em;
     padding: 5px 10px;
-	color:#666 }
+  color:#666 }
     #footer .secondary-menu .nav > li > a:hover, #footer .secondary-menu .nav > li > a:focus {
       background: none;
       color: #dc2c27; }
@@ -6800,7 +6800,7 @@ ul.filter-options li {
       width: 100%; }
   .iso-container.iso-col-3 .iso-item {
     width: 32.3333%;
-	padding:3px }
+  padding:3px }
     .iso-container.iso-col-3 .iso-item.double-width {
       width: 66.66666%; }
   .iso-container.iso-col-4 .iso-item {
@@ -8030,7 +8030,7 @@ body.woocommerce select:not(.default-style) + .customSelect {
     padding: 14px 5px; }
   .woocommerce table.shop_table thead tr {
     border: 1px solid #ddd;
-	background-color:#f7f7f7 }
+  background-color:#f7f7f7 }
   .woocommerce table.shop_table thead th {
     color: #333;
     font-size: 1.1667em;
@@ -8476,3 +8476,42 @@ ul.tnc li { list-style:decimal; list-style-position:outside; padding-bottom:5px}
 
 .couponLi { float:left}
 .closeCart-1 {float:right; margin:1px 15px 0 0}
+
+/* 5 mar */
+@media screen and (max-width:768px){.nav {
+margin: 0 auto;
+list-style: none;
+padding-bottom:10px;}
+#footer .copyright-area .secondary-menu {
+width:100%; margin:0 auto; display:block;
+    }
+.nav-pills>li {
+float: none; text-align:center
+}
+}
+
+#footer .copyright-area .secondary-menu {
+      vertical-align: top !important; }
+
+
+@media screen and (max-width:768px){#footer .copyright-area .copyright {
+display: block;
+vertical-align: middle;
+text-align:center;
+color: #333;
+font-size: 1em;
+letter-spacing: 0.01em;   }
+.c-sepulsa { text-align:center; margin:0 0 10px 0 !important;;}
+.keamanan, .pembayaran { float:none !important; display:block; text-align:center !important; margin-left:0 !important}
+}
+
+.keamanan p, .pembayaran p { margin-bottom:5px; color:#333}
+.keamanan, .pembayaran { float:right; width:auto; text-align:right; margin-left:20px; padding-top:4px}
+
+.c-sepulsa { color:#999; margin: 10px 0 0 10px }
+
+.howto-img { display:block}
+.howto-img .howto { padding:0 10px 10px !important; float:left}
+@media screen and (max-width:768px){.howto { padding:0 10px 10px !important} }
+
+.keamanan img, .pembayaran img { border:#CCC 1px solid}

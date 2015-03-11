@@ -232,6 +232,26 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
 
   }
+  elseif ($form_id == 'commerce_checkout_form_complete' && !empty($form_state['build_info']['args'][0]) && is_object($form_state['build_info']['args'][0])) {
+    $order = $form_state['build_info']['args'][0];
+    if (!empty($order->data['payment_method']) && $order->data['payment_method'] == 'bank_transfer|commerce_payment_bank_transfer') {
+      $form['checkout_completion_message']['message']['#markup'] = '<div class="checkout-completion-message">';
+      $form['checkout_completion_message']['message']['#markup'] .= '<div class="container">';
+      $form['checkout_completion_message']['message']['#markup'] .= '<div class="heading-box">';
+      $form['checkout_completion_message']['message']['#markup'] .= '<h2 class="box-title">Terimakasih, Transaksi Anda Sukses</h2>';
+      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
+      $form['checkout_completion_message']['message']['#markup'] .= '<div class="tqbox">';
+      $form['checkout_completion_message']['message']['#markup'] .= 'Segera bayar transaksi anda melalui Bank Transfer, untuk mengetahui detail pembayaran klik disini';
+      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
+      $form['checkout_completion_message']['message']['#markup'] .= 'Pulsa anda akan masuk setelah pembayaran sukses dan dikonfirmasi, anda bisa mamantau status pulsa anda atau histori transaksi ' . l('disini', 'user/' . $order->uid);
+      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
+      $form['checkout_completion_message']['message']['#markup'] .= 'Cek juga kupon-kupon yang anda dapatkan ' . l('disini', 'user/' . $order->uid) . ', atau anda bisa kembali ke ' . l('halaman depan', '<front>');
+      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
+      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
+      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
+      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
+    }
+  }
 }
 
 /**

@@ -193,7 +193,8 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
  */
 function sepulsa_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
   if ($form_state['build_info']['args'][0]->title == 'Konfirmasi Pembayaran') {
-    $form['#attributes']['class'][] = 'text-left';
+    $form['actions']['submit']['#attributes']['class'][] = 'btn';
+    $form['actions']['submit']['#attributes']['class'][] = 'style1';
   }
 }
 

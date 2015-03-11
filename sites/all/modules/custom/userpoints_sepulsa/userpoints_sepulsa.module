@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Implements hook_commerce_checkout_pane_info().
+ */
+function userpoints_sepulsa_commerce_checkout_pane_info() {
+  $checkout_panes = array();
+  $checkout_panes['userpoints_sepulsa'] = array(
+    'title' => t('Userpoint Sepulsa'),
+    'page' => 'checkout',
+    'file' => 'userpoints_sepulsa.checkout_pane.inc',
+    'base' => 'userpoints_sepulsa_pane',
+    'weight' => 10,
+  );
+
+  return $checkout_panes;
+}

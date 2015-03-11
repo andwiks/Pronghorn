@@ -223,8 +223,11 @@ function topup_settings_form_submit($form, &$form_state) {
     // Create field: field_topup_data.
     $field = array(
       'field_name' => 'field_topup_data',
-      'type' => 'text',
+      'type' => 'text_long',
       'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+      'settings' => array(
+        'max_length' => '',
+      ),
     );
     field_create_field($field);
     // Create an instance and attach it to the commerce product entity.

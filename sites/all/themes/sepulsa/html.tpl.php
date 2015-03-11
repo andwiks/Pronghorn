@@ -15,7 +15,7 @@ global $base_url;
 <!--[if gt IE 9]><!-->  <html> <!--<![endif]-->
 <head>
     <title>Sepulsa | Isi Pulsa Gratis</title>
-    
+
     <link rel="shortcut icon" href="<?php print $base_url . '/' . path_to_theme(); ?>/images/favicon.png" />
 
     <meta charset="utf-8">
@@ -29,12 +29,12 @@ global $base_url;
     <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Playfair+Display:400,400italic' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Dosis:400,300,500,600,700' rel='stylesheet' type='text/css'>
-    
+
     <!-- CSS for IE -->
     <!--[if lte IE 9]>
         <link rel="stylesheet" type="text/css" href="<?php print $base_url . '/' . path_to_theme(); ?>/css/ie.css" />
     <![endif]-->
-    
+
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script type='text/javascript' src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -49,8 +49,8 @@ global $base_url;
   <?php print $page; ?>
   <?php print $page_bottom; ?>
   <!-- Thawte SSL Seal -->
-  <div id="thawteseal" style="text-align:center;" title="Click to Verify - This site chose Thawte SSL for secure e-commerce and confidential communications.">
-	<div><script type="text/javascript" src="https://seal.thawte.com/getthawteseal?host_name=www.sepulsa.com&amp;size=S&amp;lang=en"></script></div>
+  <div id="thawteseal" style="display:none;text-align:center;" title="Click to Verify - This site chose Thawte SSL for secure e-commerce and confidential communications.">
+    <div><script type="text/javascript" src="https://seal.thawte.com/getthawteseal?host_name=www.sepulsa.com&amp;size=S&amp;lang=en"></script></div>
   </div>
 </body>
 </html>

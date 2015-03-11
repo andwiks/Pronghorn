@@ -215,52 +215,56 @@ function topup_field_formatter_view($entity_type, $entity, $field, $instance, $l
   switch ($display['type']) {
     case 'topup_data_formatter':
       foreach ($items as $delta => $item) {
-        // Unserialize value: because data saved in string field type.
-        $topup_data = unserialize($item['value']);
-        if ($topup_data !== FALSE && isset($topup_data['status'])
-          && isset($topup_data['try']) && isset($topup_data['total'])
-          && isset($topup_data['data'])
-        ) {
-          // Define topup data.
-          $data = '';
-          if (!empty($topup_data['data'])) {
+        // Check item: only serialize string contain valid data.
+        if (isset($item['value']) && !empty($item['value']) && preg_match('#^a\:#i', $item['value'])) {
+          // Unserialize value: because data saved in string field type.
+          $topup_data = unserialize($item['value']);
+          if ($topup_data !== FALSE && isset($topup_data['status'])
+            && isset($topup_data['try']) && isset($topup_data['total'])
+            && isset($topup_data['data'])
+          ) {
+            // Define topup data.
             $data = '';
-            if (is_array($topup_data['data'])) {
-              foreach ($topup_data['data'] as $key => $value) {
-                if (is_array($value)) {
-                  $temp = '';
-                  foreach ($value as $k => $v) {
-                    $temp .= t('<li>@key: @value</li>', array(
-                      '@key' => $k,
-                      '@value' => $v,
-                    ));
+            if (!empty($topup_data['data'])) {
+              $data = '';
+              if (is_array($topup_data['data'])) {
+                foreach ($topup_data['data'] as $key => $value) {
+                  if (is_array($value)) {
+                    $temp = '';
+                    foreach ($value as $k => $v) {
+                      $temp .= t('<li>@key: @value</li>', array(
+                        '@key' => $k,
+                        '@value' => $v,
+                      ));
+                    }
+                    $value = '<ul>' . $temp . '</ul>';
                   }
-                  $value = '<ul>' . $temp . '</ul>';
+                  else {
+                    $value = check_plain($value);
+                  }
+                  $data .= t('@key: !value<br />', array(
+                    '@key' => $key,
+                    '!value' => $value,
+                  ));
                 }
-                else {
-                  $value = check_plain($value);
-                }
-                $data .= t('@key: !value<br />', array(
-                  '@key' => $key,
-                  '!value' => $value,
-                ));
+              }
+              else {
+                $data = check_plain($topup_data['data']);
               }
             }
-            else {
-              $data = check_plain($topup_data['data']);
-            }
+            $element[$delta] = array(
+              '#markup' => t('<strong>Topup #@no:</strong><br /><strong>Status:</strong> @status<br /><strong>Try:</strong> @try (@total)<br />!data', array(
+                '@no' => $delta + 1,
+                '@status' => $topup_data['status'],
+                '@try' => $topup_data['try'],
+                '@total' => $topup_data['total'],
+                '!data' => !empty($data) ? $data : '-',
+              )),
+            );
           }
-          $element[$delta] = array(
-            '#markup' => t('<strong>Topup #@no:</strong><br /><strong>Status:</strong> @status<br /><strong>Try:</strong> @try (@total)<br />!data', array(
-              '@no' => $delta + 1,
-              '@status' => $topup_data['status'],
-              '@try' => $topup_data['try'],
-              '@total' => $topup_data['total'],
-              '!data' => !empty($data) ? $data : '-',
-            )),
-          );
         }
-        else {
+        // Check whether element has been defined.
+        if (!isset($element[$delta])) {
           $element[$delta] = array(
             '#markup' => t('No data'),
           );
@@ -811,6 +815,7 @@ function topup_delete_topup_data($line_item_id) {
  *   Updated topup data.
  */
 function topup_update_topup_data($topup, $result, $output) {
+  // @todo: wrap this using try and catch: in case field topup data overmax.
   // Load line item wrapper.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
   // Get current topup data.

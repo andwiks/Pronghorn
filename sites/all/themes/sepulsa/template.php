@@ -146,6 +146,52 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
       }
     }
+    elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
+      $details = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings']['details'];
+
+      $form['commerce_payment']['payment_details']['bank_details'] = array();
+      $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p class="lead">' . t('Please make payment to:') . '</p>';
+      $form['commerce_payment']['payment_details']['bank_details']['account_bank'] = array(
+        '#type' => 'textfield',
+        '#prefix' => '<h6><strong>' . t('Banking institution') . '</strong></h6>',
+        '#default_value' => $details['account_bank'],
+        '#size' => 30,
+        '#disabled' => TRUE,
+        '#attributes' => array(
+          'class' => array('input-text'),
+        ),
+      );
+      $form['commerce_payment']['payment_details']['bank_details']['account_number'] = array(
+        '#type' => 'textfield',
+        '#prefix' => '<p></p><h6><strong>' . t('Account number') . '</strong></h6>',
+        '#default_value' => $details['account_number'],
+        '#size' => 30,
+        '#disabled' => TRUE,
+        '#attributes' => array(
+          'class' => array('input-text'),
+        ),
+      );
+      $form['commerce_payment']['payment_details']['bank_details']['account_owner'] = array(
+        '#type' => 'textfield',
+        '#prefix' => '<p></p><h6><strong>' . t('Account owner') . '</strong></h6>',
+        '#default_value' => $details['account_owner'],
+        '#size' => 30,
+        '#disabled' => TRUE,
+        '#attributes' => array(
+          'class' => array('input-text'),
+        ),
+      );
+      $form['commerce_payment']['payment_details']['bank_details']['account_branch'] = array(
+        '#type' => 'textfield',
+        '#prefix' => '<p></p><h6><strong>' . t('Branch office') . '</strong></h6>',
+        '#default_value' => $details['account_branch'],
+        '#size' => 30,
+        '#disabled' => TRUE,
+        '#attributes' => array(
+          'class' => array('input-text'),
+        ),
+      );
+    }
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';

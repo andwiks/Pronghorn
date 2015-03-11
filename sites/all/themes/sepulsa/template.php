@@ -189,6 +189,15 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_BASE_FORM_ID_alter() for webform_client_form().
+ */
+function sepulsa_form_webform_client_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_state['build_info']['args'][0]->title == 'Konfirmasi Pembayaran') {
+    $form['#attributes']['class'][] = 'text-left';
+  }
+}
+
+/**
  * Implementation of expand_password_confirm.
  */
 function sepulsa_form_process_password_confirm($element) {

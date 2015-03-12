@@ -33,6 +33,7 @@ function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpo
   $resources['user']['operations']['update']['args'][0]['source']['param'] = 'uid';
   $resources['node']['operations']['index']['documentation callback'] = $resources['node']['operations']['index']['callback'] . '_doc';
   $resources['node']['operations']['retrieve']['documentation callback'] = $resources['node']['operations']['retrieve']['callback'] . '_doc';
+  $resources['node']['operations']['retrieve']['args'][0]['source']['param'] = 0;
 }
 
 /**
@@ -437,10 +438,10 @@ function _node_resource_index_doc() {
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => '
     <ul>
-      <li>Get all node type banner which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=banner&parameters[status]=1</li>
-      <li>Get all node type coupon which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=coupon&parameters[status]=1</li>
-      <li>Get all user owned simple coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_simple_coupon&parameters[uid]=@uid</li>
-      <li>Get all user owned unique coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_unique_coupon&parameters[field_order_id]=@order_id</li>
+      <li>Get all node type banner which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=banner&amp;parameters[status]=1</li>
+      <li>Get all node type coupon which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=coupon&amp;parameters[status]=1</li>
+      <li>Get all user owned simple coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_simple_coupon&amp;parameters[uid]=@uid</li>
+      <li>Get all user owned unique coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_unique_coupon&amp;parameters[field_order_id]=@order_id</li>
     </ul>
     ',
     // Example response. E.g., a JSON array.

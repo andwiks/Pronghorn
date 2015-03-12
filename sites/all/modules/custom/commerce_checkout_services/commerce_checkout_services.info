@@ -1,0 +1,8 @@
+name = "Commerce Checkout Services Integration"
+description = "Integrates Commerce Checkout with Services module"
+core = "7.x"
+
+dependencies[] = commerce_checkout
+dependencies[] = commerce_cart_services
+dependencies[] = services
+dependencies[] = services_documentation

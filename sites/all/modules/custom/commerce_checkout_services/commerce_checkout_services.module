@@ -1,0 +1,608 @@
+<?php
+/**
+ * @file
+ * commerce_checkout_services.module
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function commerce_checkout_services_services_resources() {
+  $commerce_checkout_resources = array(
+    'checkout' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => 'Retrieve specific checkout pane data.',
+          'callback' => 'commerce_checkout_services_resource_pane_retrieve',
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'commerce_checkout_services_resource_pane_retrieve_doc',
+          'args' => array(
+            array(
+              'name' => 'pane',
+              'type' => 'string',
+              'description' => 'Checkout pane data information.',
+              'source' => array('path' => 0),
+              'optional' => TRUE,
+            ),
+            array(
+              'name' => 'field',
+              'type' => 'string',
+              'description' => 'Checkout form field data information.',
+              'source' => array('path' => 1),
+              'optional' => TRUE,
+            ),
+            array(
+              'name' => 'attribute',
+              'type' => 'string',
+              'description' => 'Checkout form field attribute data information.',
+              'source' => array('path' => 2),
+              'optional' => TRUE,
+            ),
+          ),
+        ),
+      ),
+      'actions' => array(
+        'process' => array(
+          'help' => 'Process checkout data.',
+          'callback' => 'commerce_checkout_services_resource_process',
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'commerce_checkout_services_resource_process_doc',
+          'args' => array(
+            array(
+              'name' => 'checkout',
+              'type' => 'array',
+              'description' => 'The order data',
+              'source' => array('data' => 'checkout'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'complete' => array(
+          'help' => 'Complete checkout process.',
+          'callback' => 'commerce_checkout_services_resource_complete',
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'commerce_checkout_services_resource_complete_doc',
+          'args' => array(
+            array(
+              'name' => 'order_id',
+              'type' => 'int',
+              'description' => 'The order id.',
+              'source' => array('data' => 'order_id'),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      )
+    ),
+  );
+
+  return $commerce_checkout_resources;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function commerce_checkout_services_resource_pane_retrieve().
+ *
+ * @param string $pane
+ *   Checkout pane name.
+ * @param string $field
+ *   Checkout pane form field name.
+ * @param string $attribute
+ *   Checkout pane form field attribute name.
+ *
+ * @return array
+ *   Checkout data array.
+ */
+function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field = NULL, $attribute = NULL) {
+  // Get all enabled checkout panes.
+  $panes = commerce_checkout_panes(array(
+    'enabled' => TRUE,
+    'page' => 'checkout',
+  ));
+  // Check whether pane is available.
+  if (!empty($pane) && isset($panes[$pane])) {
+    // Get checkout form id.
+    $form_id = commerce_checkout_pane_callback($panes[$pane], 'checkout_form');
+    // Check form id.
+    if ($form_id !== FALSE) {
+      // Get full checkout form.
+      $form = drupal_get_form($form_id);
+      // Check field
+      if (!empty($field) && isset($form[$field])) {
+        // Check field attribute.
+        if (!empty($attribute)
+          && (isset($form[$field][$attribute]) || isset($form[$field]['#' . $attribute]))
+        ) {
+          // Return form field attribute array.
+          return isset($form[$field][$attribute]) ? $form[$field][$attribute] : $form[$field]['#' . $attribute];
+        }
+        // Return form field array.
+        return $form[$field];
+      }
+      // Return form array.
+      return $form;
+    }
+    // Return specific checkout pane info.
+    return $panes[$pane];
+  }
+  // Return all available checkout pane name.
+  return array_keys($panes);
+}
+
+/**
+ * Function commerce_checkout_services_resource_process().
+ *
+ * @param array $checkout
+ *   Checkout data.
+ *
+ * @return object
+ *   Order object.
+ */
+function commerce_checkout_services_resource_process($checkout) {
+  global $user;
+
+  // Get user's order.
+  $order = commerce_cart_order_load($user->uid);
+  // Check whether order can checkout.
+  if ($order !== FALSE && commerce_checkout_order_can_checkout($order)) {
+    // Check for non empty checkout data.
+    if (!empty($checkout)) {
+      // Load commerce_checkout.pages.inc file.
+      module_load_include('inc', 'commerce_checkout', 'includes/commerce_checkout.pages');
+
+      // Define checkout input data.
+      $input = '';
+      $checkout = isset($checkout[0]) ? $checkout[0] : $checkout;
+      foreach ($checkout as $name => $value) {
+        $input .= $name . '=' . $value . '&';
+      }
+      // Parse string data.
+      parse_str($input, $input);
+
+      // Define form state.
+      $form_state = array();
+      $form_state['checkout_page']['page_id'] = 'checkout';
+      $form_state['checkout_page']['status_cart'] = TRUE;
+      $form_state['checkout_page']['buttons'] = TRUE;
+      $form_state['checkout_page']['next_page'] = 'payment';
+      $form_state['checkout_page']['prev_page'] = NULL;
+      $form_state['checkout_page']['help'] = '';
+      $form_state['checkout_page']['submit_value'] = t('Continue to next step');
+      $form_state['rebuild'] = TRUE;
+      $form_state['order'] = $order;
+
+      // Set form state values.
+      $form_state['values'] = $input;
+      $form_state['values']['commerce_payment']['payment_methods'] = commerce_checkout_services_resource_pane_retrieve('commerce_payment', 'payment_methods', '#value');
+      $form_state['values']['op'] = t('Continue to next step');
+      $form_state['triggering_element']['#array_parents'] = array('continue');
+
+      // Get checkout form array.
+      $form = drupal_get_form('commerce_checkout_form_checkout', $order, $form_state['checkout_page']);
+
+      // Call checkout form validation function.
+      commerce_checkout_form_validate($form, $form_state);
+
+      // Check whether error is occured.
+      if (isset($form_state['storage']['messages'])) {
+        // Looping for each messages.
+        foreach ($form_state['storage']['messages'] as $pane => $message) {
+          if (isset($message['error'][0]) && !empty($message['error'][0])) {
+            // Return service error: form errors.
+            return services_error($message['error'][0], 406, array(
+              'form_errors' => array($pane => $message['error'][0]),
+            ));
+          }
+        }
+      }
+
+      // Call checkout form submission function.
+      commerce_checkout_form_submit($form, $form_state);
+
+      // Get order object.
+      $order = $form_state['order'];
+      // Return order object.
+      return _commerce_cart_services_order($order);
+    }
+    // Reach this means error: invalid checkout data.
+    return services_error(t('Invalid checkout data'), 406);
+  }
+
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
+}
+
+/**
+ * Function commerce_checkout_services_resource_complete().
+ *
+ * @param int $order_id
+ *   Order id.
+ *
+ * @return mixed
+ *   TRUE if success, error message otherwise.
+ */
+function commerce_checkout_services_resource_complete($order_id) {
+  global $user;
+  // Get user's order.
+  $order = commerce_order_load($order_id);
+  // Check whether order can checkout.
+  if ($order !== FALSE
+    && commerce_checkout_order_can_checkout($order)
+    && $user->uid == $order->uid
+  ) {
+    // Complete the order.
+    commerce_checkout_complete($order);
+    // Return TRUE.
+    return TRUE;
+  }
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
+}
+
+/**
+ * Function commerce_checkout_services_resource_pane_retrieve_doc().
+ *
+ * Services documentation callback.
+ *
+ * return array
+ *   Documentation array.
+ */
+function commerce_checkout_services_resource_pane_retrieve_doc() {
+  global $base_url;
+  $response = '
+  // Response: api/checkout/index.json
+  [
+      "cart_contents",
+      "account",
+      "commerce_payment",
+      "stock_validation_checkout_pane"
+  ]
+  // Response: api/checkout/commerce_payment/payment_method/options.json
+  {
+      "commerce_payment_example|commerce_payment_commerce_payment_example": "Example payment",
+      "commerce_veritrans|commerce_payment_commerce_veritrans": "Veritrans Payment Gateway"
+  }
+  ';
+  $element = array(
+    '#name' => t('Checkout pane retriever'),
+    '#description' => t('Retrieve information related to checkout pane. Usable to get checkout form input name and valid value.'),
+    '#auth' => FALSE,
+    '#path' => 'checkout',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/checkout/index.json<br />GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />GET',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function commerce_checkout_services_resource_process_doc().
+ *
+ * Services documentation callback.
+ *
+ * return array
+ *   Documentation array.
+ */
+function commerce_checkout_services_resource_process_doc() {
+  global $base_url;
+  $response = '
+  {
+      "order_number": "65",
+      "revision_uid": 0,
+      "mail": "andre4s_y@yahoo.com",
+      "status": "checkout_payment",
+      "log": "Customer continued to the next checkout page via a submit button.",
+      "revision_timestamp": 1426163834,
+      "revision_hostname": "127.0.0.1",
+      "data": {
+          "last_cart_refresh": 1426163832,
+          "payment_method": "commerce_payment_example|commerce_payment_commerce_payment_example",
+          "commerce_payment_example": {
+              "credit_card": {
+                  "number": "4111--------1111",
+                  "exp_month": "03",
+                  "exp_year": "2015"
+              }
+          },
+          "commerce_payment_order_paid_in_full_invoked": true
+      },
+      "order_id": "65",
+      "type": "commerce_order",
+      "uid": "0",
+      "created": "1426163832",
+      "changed": 1426163834,
+      "hostname": "127.0.0.1",
+      "commerce_line_items": [
+          {
+              "line_item_id": "198",
+              "order_id": "65",
+              "type": "mobile_prepaid",
+              "line_item_label": "SMPT50",
+              "quantity": "1.00",
+              "created": "1426163832",
+              "changed": 1426163834,
+              "data": [],
+              "commerce_unit_price": {
+                  "amount": "51000",
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": "51000",
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_total": {
+                  "amount": 51000,
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": 51000,
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_product": {
+                  "revision_id": "7",
+                  "sku": "SMPT50",
+                  "title": "Rp 50.000",
+                  "revision_uid": "14",
+                  "status": "1",
+                  "log": "",
+                  "revision_timestamp": "1425589241",
+                  "data": false,
+                  "product_id": "5",
+                  "type": "pulsa",
+                  "language": "und",
+                  "uid": "1",
+                  "created": "1419919510",
+                  "changed": "1425589241",
+                  "commerce_price": {
+                      "und": [
+                          {
+                              "amount": "51000",
+                              "currency_code": "IDR",
+                              "data": {
+                                  "components": []
+                              }
+                          }
+                      ]
+                  },
+                  "field_api_provider": {
+                      "und": [
+                          {
+                              "value": "poin2000"
+                          }
+                      ]
+                  },
+                  "field_credit_amount": {
+                      "und": [
+                          {
+                              "value": "50000"
+                          }
+                      ]
+                  },
+                  "field_package_code": {
+                      "und": [
+                          {
+                              "value": "HS50"
+                          }
+                      ]
+                  },
+                  "rdf_mapping": []
+              },
+              "commerce_display_path": "",
+              "field_phone_number": "08122545393",
+              "field_topup_status": 3,
+              "field_topup_data": [
+                  "b:0;"
+              ],
+              "rdf_mapping": []
+          }
+      ],
+      "commerce_order_total": {
+          "amount": 51000,
+          "currency_code": "IDR",
+          "data": {
+              "components": [
+                  {
+                      "name": "base_price",
+                      "price": {
+                          "amount": 51000,
+                          "currency_code": "IDR",
+                          "data": []
+                      },
+                      "included": true
+                  }
+              ]
+          }
+      },
+      "commerce_customer_billing": [],
+      "rdf_mapping": [],
+      "payment_methods": {
+          "commerce_payment_example|commerce_payment_commerce_payment_example": {
+              "method_id": "commerce_payment_example",
+              "settings": [],
+              "rule_name": "commerce_payment_commerce_payment_example",
+              "weight": 0
+          },
+          "commerce_veritrans|commerce_payment_commerce_veritrans": {
+              "method_id": "commerce_veritrans",
+              "settings": {
+                  "type": "credit_card",
+                  "credit_card": {
+                      "card_types": {
+                          "visa": "visa",
+                          "mastercard": "mastercard",
+                          "amex": 0,
+                          "discover": 0,
+                          "dc": 0,
+                          "dci": 0,
+                          "cb": 0,
+                          "jcb": 0,
+                          "maestro": 0,
+                          "visaelectron": 0,
+                          "laser": 0,
+                          "solo": 0,
+                          "switch": 0
+                      },
+                      "bank": "bni",
+                      "type": "twoclick",
+                      "3ds": 1
+                  },
+                  "prefix": "",
+                  "url": "https://api.sandbox.veritrans.co.id/v2",
+                  "client_key": "8791560d-dc80-4e3c-b3af-d56d502c36e8",
+                  "server_key": "9b8f02a3-b5a2-42a1-b38d-e26617d9b8b8",
+                  "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js"
+              },
+              "rule_name": "commerce_payment_commerce_veritrans",
+              "weight": 1
+          }
+      },
+      "old_revision_id": "275",
+      "revision_id": "276"
+  }
+  ';
+  $element = array(
+    '#name' => t('Checkout form processor'),
+    '#description' => t('Process checkout form based on checkout input.'),
+    '#auth' => TRUE,
+    '#path' => 'checkout/process',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/checkout/process.json<br />POST<br />
+    {
+        "checkout":[{
+            "account[login][mail]":"andre4s_y@yahoo.com",
+            "commerce_payment[payment_method]":"commerce_payment_example|commerce_payment_commerce_payment_example",
+            "commerce_payment[payment_details][credit_card][number]":"4111111111111111",
+            "commerce_payment[payment_details][credit_card][exp_month]":"03",
+            "commerce_payment[payment_details][credit_card][exp_year]":"2015"
+        }]
+    }
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+      'invalid_order' => array(
+        '#question' => '406 Not Acceptable: Invalid order',
+        '#description' => t('Unable to get valid order. Check user session.'),
+        '#response' => '
+        [
+            "Invalid order"
+        ]',
+      ),
+      'invalid_checkout' => array(
+        '#question' => '406 Not Acceptable: Invalid checkout data',
+        '#description' => t('Checkout process need valid checkout input data.'),
+        '#response' => '
+        [
+            "Invalid checkout data"
+        ]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '406 Not Acceptable: @field is required/not valid.',
+        '#description' => t('There is error with checkout input which not pass checkout form validation.'),
+        '#response' => '
+        {
+            "form_errors": {
+                "@field": "@field_name error message."
+            }
+        }',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function commerce_checkout_services_resource_complete_doc().
+ *
+ * Services documentation callback.
+ *
+ * return array
+ *   Documentation array.
+ */
+function commerce_checkout_services_resource_complete_doc() {
+  global $base_url;
+  $response = '
+  [
+      true
+  ]
+  ';
+  $element = array(
+    '#name' => t('Checkout complete'),
+    '#description' => t('Complete the checkout process (which run rules action "Completing the checkout process").'),
+    '#auth' => TRUE,
+    '#path' => 'checkout/complete',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/checkout/complete.json<br />POST data application/json: {"order_id":58}',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+      'invalid_order' => array(
+        '#question' => '406 Not Acceptable: Invalid order',
+        '#description' => t('Unable to get valid order. Check user session.'),
+        '#response' => '
+        [
+            "Invalid order"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}

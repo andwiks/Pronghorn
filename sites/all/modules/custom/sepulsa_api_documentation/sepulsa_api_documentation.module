@@ -32,6 +32,7 @@ function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpo
   $resources['user']['operations']['update']['documentation callback'] = $resources['user']['operations']['update']['callback'] . '_doc';
   $resources['user']['operations']['update']['args'][0]['source']['param'] = 'uid';
   $resources['node']['operations']['index']['documentation callback'] = $resources['node']['operations']['index']['callback'] . '_doc';
+  $resources['node']['operations']['retrieve']['documentation callback'] = $resources['node']['operations']['retrieve']['callback'] . '_doc';
 }
 
 /**
@@ -434,9 +435,225 @@ function _node_resource_index_doc() {
     '#auth' => FALSE,
     '#path' => 'node',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/node<br />GET @todo<br />',
+    '#request_url' => '
+    <ul>
+      <li>Get all node type banner which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=banner&parameters[status]=1</li>
+      <li>Get all node type coupon which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=coupon&parameters[status]=1</li>
+      <li>Get all user owned simple coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_simple_coupon&parameters[uid]=@uid</li>
+      <li>Get all user owned unique coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_unique_coupon&parameters[field_order_id]=@order_id</li>
+    </ul>
+    ',
     // Example response. E.g., a JSON array.
-    '#response' => '@todo',
+    '#response' => '
+    // Get all node type banner which are currently active:
+    [
+        {
+            "nid": "2698",
+            "vid": "2698",
+            "type": "banner",
+            "language": "id",
+            "title": "Isi pulsa paling gampang ? Ya di SEPULSA",
+            "uid": "92",
+            "status": "1",
+            "created": "1425881582",
+            "changed": "1425881582",
+            "comment": "0",
+            "promote": "0",
+            "sticky": "0",
+            "tnid": "0",
+            "translate": "0",
+            "uri": "http://dev.sepulsa.com/api/node/2698"
+        },
+        {
+            "nid": "2697",
+            "vid": "2697",
+            "type": "banner",
+            "language": "id",
+            "title": "Temukan deal-deal menarik hanya di SEPULSA",
+            "uid": "92",
+            "status": "1",
+            "created": "1425881520",
+            "changed": "1425984181",
+            "comment": "0",
+            "promote": "0",
+            "sticky": "0",
+            "tnid": "0",
+            "translate": "0",
+            "uri": "http://dev.sepulsa.com/api/node/2697"
+        },
+        {
+            "nid": "2696",
+            "vid": "2696",
+            "type": "banner",
+            "language": "id",
+            "title": "Isi pulsa sekarang gratis",
+            "uid": "92",
+            "status": "1",
+            "created": "1425881497",
+            "changed": "1425984181",
+            "comment": "0",
+            "promote": "0",
+            "sticky": "0",
+            "tnid": "0",
+            "translate": "0",
+            "uri": "http://dev.sepulsa.com/api/node/2696"
+        }
+    ]
+    ',
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'no_controller' => array(
+        '#question' => '404 Not found: Could not find the controller.',
+        '#description' => t('Service output nothing. Possible missing UID input or POST data (supposed use GET).'),
+        '#response' => '',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for node operations retrieve.
+ */
+function _node_resource_retrieve_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Node retrieve Service'),
+    '#description' => t('Retrieve a node data.'),
+    '#auth' => FALSE,
+    '#path' => 'node',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => '
+    <ul>
+      <li>Get node data type banner, which has node id 2698:<br />GET ' . $base_url .'/api/node/2698</li>
+    </ul>
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => '
+    {
+        "vid": "2698",
+        "uid": "92",
+        "title": "Isi pulsa paling gampang ? Ya di SEPULSA",
+        "log": "",
+        "status": "1",
+        "comment": "0",
+        "promote": "0",
+        "sticky": "0",
+        "nid": "2698",
+        "type": "banner",
+        "language": "id",
+        "created": "1425881582",
+        "changed": "1425881582",
+        "tnid": "0",
+        "translate": "0",
+        "revision_timestamp": "1425881582",
+        "revision_uid": "92",
+        "body": {
+            "und": [
+                {
+                    "value": "Juga cepat, aman dan menguntungkan",
+                    "summary": "",
+                    "format": "filtered_html",
+                    "safe_value": "<p>Juga cepat, aman dan menguntungkan</p>\n",
+                    "safe_summary": ""
+                }
+            ]
+        },
+        "field_banner_image": {
+            "und": [
+                {
+                    "fid": "52",
+                    "uid": "92",
+                    "filename": "banner3.jpg",
+                    "uri": "public://banner/banner3.jpg",
+                    "filemime": "image/jpeg",
+                    "filesize": "51185",
+                    "status": "1",
+                    "timestamp": "1425881582",
+                    "rdf_mapping": [],
+                    "alt": "",
+                    "title": "",
+                    "width": "770",
+                    "height": "446"
+                }
+            ]
+        },
+        "rdf_mapping": {
+            "rdftype": [
+                "sioc:Item",
+                "foaf:Document"
+            ],
+            "title": {
+                "predicates": [
+                    "dc:title"
+                ]
+            },
+            "created": {
+                "predicates": [
+                    "dc:date",
+                    "dc:created"
+                ],
+                "datatype": "xsd:dateTime",
+                "callback": "date_iso8601"
+            },
+            "changed": {
+                "predicates": [
+                    "dc:modified"
+                ],
+                "datatype": "xsd:dateTime",
+                "callback": "date_iso8601"
+            },
+            "body": {
+                "predicates": [
+                    "content:encoded"
+                ]
+            },
+            "uid": {
+                "predicates": [
+                    "sioc:has_creator"
+                ],
+                "type": "rel"
+            },
+            "name": {
+                "predicates": [
+                    "foaf:name"
+                ]
+            },
+            "comment_count": {
+                "predicates": [
+                    "sioc:num_replies"
+                ],
+                "datatype": "xsd:integer"
+            },
+            "last_activity": {
+                "predicates": [
+                    "sioc:last_activity_date"
+                ],
+                "datatype": "xsd:dateTime",
+                "callback": "date_iso8601"
+            }
+        },
+        "name": "el7cosmos",
+        "picture": "0",
+        "data": "a:2:{s:7:\"contact\";i:1;s:17:\"mimemail_textonly\";i:0;}",
+        "print_html_display": 0,
+        "print_html_display_comment": 0,
+        "print_html_display_urllist": 0,
+        "print_pdf_display": 0,
+        "print_pdf_display_comment": 0,
+        "print_pdf_display_urllist": 0,
+        "print_pdf_size": "",
+        "print_pdf_orientation": "",
+        "path": "http://dev.sepulsa.com/node/2698"
+    }
+    ',
     // Resource prefix.
     '#verb' => 'operations',
     // Errors.

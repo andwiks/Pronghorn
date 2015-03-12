@@ -31,6 +31,7 @@ function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpo
   $resources['user']['operations']['create']['documentation callback'] = $resources['user']['operations']['create']['callback'] . '_doc';
   $resources['user']['operations']['update']['documentation callback'] = $resources['user']['operations']['update']['callback'] . '_doc';
   $resources['user']['operations']['update']['args'][0]['source']['param'] = 'uid';
+  $resources['node']['operations']['index']['documentation callback'] = $resources['node']['operations']['index']['callback'] . '_doc';
 }
 
 /**
@@ -411,6 +412,39 @@ function _user_resource_update_doc() {
                 "@field": "@field_name field is required."
             }
         }',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for node operations index.
+ */
+function _node_resource_index_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Node index Service'),
+    '#description' => t('List of nodes.'),
+    '#auth' => FALSE,
+    '#path' => 'node',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/node<br />GET @todo<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => '@todo',
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'no_controller' => array(
+        '#question' => '404 Not found: Could not find the controller.',
+        '#description' => t('Service output nothing. Possible missing UID input or POST data (supposed use GET).'),
+        '#response' => '',
       ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',

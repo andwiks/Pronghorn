@@ -214,7 +214,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['checkout_completion_message']['message']['#markup'] .= '<h2 class="box-title">Terimakasih, Transaksi Anda Sukses</h2>';
       $form['checkout_completion_message']['message']['#markup'] .= '<br>';
       $form['checkout_completion_message']['message']['#markup'] .= '<div class="tqbox">';
-      $form['checkout_completion_message']['message']['#markup'] .= 'Segera bayar transaksi anda melalui Bank Transfer, untuk mengetahui detail pembayaran klik disini';
+      $form['checkout_completion_message']['message']['#markup'] .= 'Segera bayar transaksi anda melalui Bank Transfer, untuk konfirmasi pembayaran klik ' . l('disini', 'konfirmasi');
       $form['checkout_completion_message']['message']['#markup'] .= '<br>';
       $form['checkout_completion_message']['message']['#markup'] .= 'Pulsa anda akan masuk setelah pembayaran sukses dan dikonfirmasi, anda bisa mamantau status pulsa anda atau histori transaksi ' . l('disini', 'user/' . $order->uid);
       $form['checkout_completion_message']['message']['#markup'] .= '<br>';

@@ -1,0 +1,8 @@
+name = Userpoints Sepulsa
+description = Some extension related with contrib userpoints module
+core = 7.x
+package = Sepulsa
+
+dependencies[] = referral
+dependencies[] = userpoints
+dependencies[] = commerce_userpoints

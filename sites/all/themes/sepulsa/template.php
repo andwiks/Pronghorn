@@ -153,13 +153,13 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';
       $form['commerce_payment']['payment_details']['bank_details']['#suffix'] = '</p>';
       $form['commerce_payment']['payment_details']['bank_details']['account_bank'] = array(
-        '#markup' => '<br>' . t('Banking institution') . ' : ' . $details['account_bank'],
+        '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $details['account_bank'] . '</strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_number'] = array(
-        '#markup' => '<br>' . t('Account number') . ' : ' . $details['account_number'],
+        '#markup' => '<br>' . t('Account number') . ' : <strong>' . $details['account_number'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_owner'] = array(
-        '#markup' => '<br>' . t('Account owner') . ' : ' . $details['account_owner'],
+        '#markup' => '<br>' . t('Account owner') . ' : <strong>' . $details['account_owner'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_branch'] = array(
         '#markup' => '<br>' . t('Branch office') . ' : ' . $details['account_branch'],

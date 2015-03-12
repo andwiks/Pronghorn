@@ -27,21 +27,30 @@ function commerce_checkout_services_services_resources() {
               'name' => 'pane',
               'type' => 'string',
               'description' => 'Checkout pane data information.',
-              'source' => array('path' => 0),
+              'source' => array(
+                'path' => 0,
+                'param' => 0,
+              ),
               'optional' => TRUE,
             ),
             array(
               'name' => 'field',
               'type' => 'string',
               'description' => 'Checkout form field data information.',
-              'source' => array('path' => 1),
+              'source' => array(
+                'path' => 1,
+                'param' => 1,
+              ),
               'optional' => TRUE,
             ),
             array(
               'name' => 'attribute',
               'type' => 'string',
               'description' => 'Checkout form field attribute data information.',
-              'source' => array('path' => 2),
+              'source' => array(
+                'path' => 2,
+                'param' => 2,
+              ),
               'optional' => TRUE,
             ),
           ),
@@ -58,8 +67,12 @@ function commerce_checkout_services_services_resources() {
               'name' => 'checkout',
               'type' => 'array',
               'description' => 'The order data',
-              'source' => array('data' => 'checkout'),
+              'source' => array(
+                'data' => 'checkout',
+                'param' => 'checkout',
+              ),
               'optional' => FALSE,
+              'http_method' => 'POST',
             ),
           ),
         ),
@@ -73,8 +86,12 @@ function commerce_checkout_services_services_resources() {
               'name' => 'order_id',
               'type' => 'int',
               'description' => 'The order id.',
-              'source' => array('data' => 'order_id'),
+              'source' => array(
+                'data' => 'order_id',
+                'param' => 'order_id',
+              ),
               'optional' => FALSE,
+              'http_method' => 'POST',
             ),
           ),
         ),
@@ -522,7 +539,7 @@ function commerce_checkout_services_resource_process_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
+    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -586,7 +603,7 @@ function commerce_checkout_services_resource_complete_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
+    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

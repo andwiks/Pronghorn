@@ -36,8 +36,12 @@ function commerce_cart_services_services_resources() {
               'name' => 'product',
               'type' => 'array',
               'description' => 'The product data to be added',
-              'source' => array('data' => 'product'),
+              'source' => array(
+                'data' => 'product',
+                'param' => 'product'
+              ),
               'optional' => FALSE,
+              'http_method' => 'POST',
             ),
           ),
         ),
@@ -51,8 +55,12 @@ function commerce_cart_services_services_resources() {
               'name' => 'line_item_id',
               'type' => 'int',
               'description' => 'A valid line item product id.',
-              'source' => array('data' => 'line_item_id'),
+              'source' => array(
+                'data' => 'line_item_id',
+                'param' => 'line_item_id'
+              ),
               'optional' => TRUE,
+              'http_method' => 'POST',
             ),
           ),
         ),
@@ -333,7 +341,7 @@ function commerce_cart_services_resource_add_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
+    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -461,7 +469,7 @@ function commerce_cart_services_resource_delete_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
+    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

@@ -3,5 +3,6 @@ description = "Integrates Commerce Cart with Services module"
 core = "7.x"
 
 dependencies[] = commerce_cart
+dependencies[] = order_services
 dependencies[] = services
 dependencies[] = services_documentation

@@ -233,7 +233,7 @@ function commerce_checkout_services_resource_process($checkout) {
       // Get order object.
       $order = $form_state['order'];
       // Return order object.
-      return _commerce_cart_services_order($order);
+      return order_services_order($order);
     }
     // Reach this means error: invalid checkout data.
     return services_error(t('Invalid checkout data'), 406);

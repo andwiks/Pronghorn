@@ -40,6 +40,22 @@ global $base_url;
     </div>
   </section>
 
+  <section id="front_first" class="front_first">
+    <?php print render($page['front_first']); ?>
+  </section>
+
+  <section id="front_second" class="front_second">
+    <?php print render($page['front_second']); ?>
+  </section>
+
+  <section id="front_third" class="front_third">
+    <?php print render($page['front_third']); ?>
+  </section>
+
+   <section id="front_fourth" class="front_fourth">
+    <?php print render($page['front_fourth']); ?>
+  </section>
+
   <?php include "footer.tpl.php"; ?>
 
 </div>

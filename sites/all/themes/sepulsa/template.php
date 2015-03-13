@@ -207,22 +207,18 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   }
   elseif ($form_id == 'commerce_checkout_form_complete' && !empty($form_state['build_info']['args'][0]) && is_object($form_state['build_info']['args'][0])) {
     $order = $form_state['build_info']['args'][0];
-    if (!empty($order->data['payment_method']) && $order->data['payment_method'] == 'bank_transfer|commerce_payment_bank_transfer') {
-      $form['checkout_completion_message']['message']['#markup'] = '<div class="checkout-completion-message">';
-      $form['checkout_completion_message']['message']['#markup'] .= '<div class="container">';
-      $form['checkout_completion_message']['message']['#markup'] .= '<div class="heading-box">';
-      $form['checkout_completion_message']['message']['#markup'] .= '<h2 class="box-title">Terimakasih, Transaksi Anda Sukses</h2>';
-      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
-      $form['checkout_completion_message']['message']['#markup'] .= '<div class="tqbox">';
-      $form['checkout_completion_message']['message']['#markup'] .= 'Segera bayar transaksi anda melalui Bank Transfer, untuk konfirmasi pembayaran klik ' . l('disini', 'konfirmasi');
-      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
-      $form['checkout_completion_message']['message']['#markup'] .= 'Pulsa anda akan masuk setelah pembayaran sukses dan dikonfirmasi, anda bisa mamantau status pulsa anda atau histori transaksi ' . l('disini', 'user/' . $order->uid);
-      $form['checkout_completion_message']['message']['#markup'] .= '<br>';
-      $form['checkout_completion_message']['message']['#markup'] .= 'Cek juga kupon-kupon yang anda dapatkan ' . l('disini', 'user/' . $order->uid) . ', atau anda bisa kembali ke ' . l('halaman depan', '<front>');
-      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
-      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
-      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
-      $form['checkout_completion_message']['message']['#markup'] .= '</div>';
+    if (!empty($order->data['payment_method'])) {
+      $payment_method = explode('|', $order->data['payment_method']);
+      $payment_method = reset($payment_method);
+      $form['checkout_completion_message']['message'] = array(
+        '#theme' => 'sepulsa_checkout_completion_message',
+        '#payment_method' => $payment_method,
+      );
+
+      if ($payment_method == 'bank_transfer') {
+        $method_instance = commerce_payment_method_instance_load($order->data['payment_method']);
+        $form['checkout_completion_message']['message']['#payment_details'] = $method_instance['settings']['details'];
+      }
     }
   }
 }
@@ -279,7 +275,6 @@ function sepulsa_preprocess_block(&$vars, $hook) {
     }
   }
 }
-
 
 function sepulsa_form_element($variables) {
   $element = &$variables['element'];
@@ -342,4 +337,32 @@ function sepulsa_form_element($variables) {
   //$output .= "</div>\n";
 
   return $output;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function sepulsa_theme($existing, $type, $theme, $path) {
+  return array(
+    'sepulsa_checkout_completion_message' => array(
+      'variables' => array(
+        'user' => NULL,
+        'payment_method' => NULL,
+        'payment_details' => NULL,
+        'authenticated' => FALSE,
+      ),
+      'path' => $path . '/templates/checkout',
+      'template' => 'sepulsa-checkout-completion-message',
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_sepulsa_checkout_completion_message().
+ */
+function sepulsa_preprocess_sepulsa_checkout_completion_message(&$variables) {
+  $variables['user'] = $GLOBALS['user'];
+  if ($variables['user']->uid) {
+    $variables['authenticated'] = TRUE;
+  }
 }

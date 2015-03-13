@@ -1,0 +1,7 @@
+name = "Sepulsa Services Integration"
+description = "Integrates Sepulsa with Services module"
+core = "7.x"
+
+dependencies[] = sepulsa
+dependencies[] = services
+dependencies[] = services_documentation

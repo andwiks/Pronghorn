@@ -1,0 +1,152 @@
+<?php
+/**
+ * @file
+ * sepulsa_services.module
+ *
+ * @author andre4s_y
+ * @since Februari 21st, 2015
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function sepulsa_services_services_resources() {
+  $sepulsa_resources = array(
+    'sepulsa' => array(
+      'operations' => array(
+        'index' => array(
+          'help' => 'List all sepulsa operator data',
+          'callback' => '_sepulsa_services_resource_index',
+          'documentation callback' => '_sepulsa_services_index_doc',
+          'args' => array(),
+          'access arguments' => array('access content'),
+        ),
+      )
+    ),
+  );
+
+  return $sepulsa_resources;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function _sepulsa_services_resource_index().
+ *
+ * Resources callback for sepulsa resource index.
+ */
+function _sepulsa_services_resource_index() {
+  return sepulsa_get_all_operator_data();
+}
+
+/**
+ * Function _sepulsa_services_index_doc().
+ *
+ * Documentation callback for index actions sepulsa.
+ */
+function _sepulsa_services_index_doc() {
+  global $base_url;
+  $response = '
+  {                                         // List of Taxonomy Mobile Operator.
+      "19": {                               // Taxonomy Term ID.
+          "operator": "Telkomsel",          // Taxonomy Term Label.
+          "prefix": [                       // Taxonomy field_operator_prefix.
+              "0811",
+              "0812",
+              "0813",
+              "0821",
+              "0822",
+              "0823",
+              "0852",
+              "0853"
+          ],
+          "cardtype": {                     // List of Product Display.
+              "3": "Telkomsel Simpati",     // Node ID: Node Pulsa Title.
+              "10": "Telkomsel Test"
+          },
+          "packet": {                       // Product Variations.
+              "3": [                        // Product Display Node ID.
+                  {                         // List of product variation.
+                      "id": "5",            // Product ID.
+                      "title": "Rp 50.000", // Product Title.
+                      "price": "51000"      // Product Price.
+                  },
+                  {
+                      "id": "6",
+                      "title": "Rp 100.000",
+                      "price": "101000"
+                  }
+              ],
+              "10": [
+                  {
+                      "id": "12",
+                      "title": "Rp 5.000",
+                      "price": "6000"
+                  }
+              ]
+          }
+      },
+      "20": {
+          "operator": "XL",
+          "prefix": [
+              "0817",
+              "0818",
+              "0819",
+              "0859",
+              "0877",
+              "0878",
+              "0879"
+          ],
+          "cardtype": {
+              "2": "XL Reguler"
+          },
+          "packet": {
+              "2": [
+                  {
+                      "id": "3",
+                      "title": "Rp 5.000",
+                      "price": "7000"
+                  }
+              ]
+          }
+      },
+      "21": {
+          "operator": "Axis",
+          "prefix": [
+              "0831",
+              "0832",
+              "0838"
+          ],
+          "cardtype": [],
+          "packet": []
+      },
+  }
+  ';
+  $element = array(
+    '#name' => t('Sepulsa Index'),
+    '#description' => t('List all sepulsa operator data.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'operations',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

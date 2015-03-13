@@ -7,6 +7,20 @@
  * @since February 2nd 2015
  */
 
+/**
+ * Implements hook_block_view_alter().
+ */
+function sepulsa_block_view_alter(&$data, $block) {
+  if ($block->region == 'sidebar_first' && !empty($data['content']['#theme_wrappers'])) {
+    foreach ($data['content']['#theme_wrappers'] as $key => $theme_wrapper) {
+      if (strpos($theme_wrapper, 'menu_tree') === 0) {
+        $data['content']['#theme_wrappers'][] = 'menu_tree__sidebar';
+        break;
+      }
+    }
+  }
+}
+
 function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
   $commer_form_id = substr($form_id, 0, 25);
@@ -267,12 +281,25 @@ function sepulsa_menu_local_tasks(&$variables) {
   return $output;
 }
 
+function sepulsa_menu_tree__sidebar($variables) {
+  return '<ul class="arrow-circle hover-effect filter-options">' . $variables['tree'] . '</ul>';
+}
+
 function sepulsa_preprocess_block(&$vars, $hook) {
   //drupal_set_message("<pre>".print_r($vars, true)."</pre>");
   foreach ($vars['classes_array'] as $key => $value) {
     if ($value == 'block') {
       $vars['classes_array'][$key] = NULL;
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_link ().
+ */
+function sepulsa_preprocess_menu_link (&$variables) {
+  if ($variables['element']['#original_link']['in_active_trail']) {
+    $variables['element']['#attributes']['class'][] = 'active';
   }
 }
 

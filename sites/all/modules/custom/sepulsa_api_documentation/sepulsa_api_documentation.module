@@ -432,7 +432,7 @@ function _node_resource_index_doc() {
   global $base_url;
   $element = array(
     '#name' => t('Node index Service'),
-    '#description' => t('List of nodes.'),
+    '#description' => t('List of nodes. By default has 20 page size.'),
     '#auth' => FALSE,
     '#path' => 'node',
     // Example request. E.g., a request URL, headers, and a JSON array.

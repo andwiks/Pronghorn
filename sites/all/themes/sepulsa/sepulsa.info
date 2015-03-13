@@ -8,6 +8,11 @@ regions[content] = Content
 regions[banner] = Front page banner
 regions[footer] = Footer
 
+regions[front_first] = Front First
+regions[front_second] = Front Second
+regions[front_third] = Front Third
+regions[front_fourth] = Front Fourth
+
 regions[right] = Right Bar
 regions[user_login] = User Login
 regions[user_signup] = User Signup

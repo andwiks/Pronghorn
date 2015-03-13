@@ -6,9 +6,9 @@
 
       <div class="tqbox">
         <?php if ($payment_method == 'bank_transfer'): ?>
-          <p style="margin-bottom:0">Mohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun berikut:</p>
+          <p>Mohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun berikut:</p>
 
-          <p class="text-left" style="display:inline-block;margin-bottom:0">
+          <p class="text-left well" style="display:inline-block">
             <?php print t('Banking institution'); ?> : <strong><?php print $payment_details['account_bank']; ?></strong>
             <br><?php print t('Account number'); ?> : <strong><?php print $payment_details['account_number']; ?></strong>
             <br><?php print t('Account owner'); ?> : <strong><?php print $payment_details['account_owner']; ?></strong>

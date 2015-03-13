@@ -120,6 +120,11 @@ function commerce_checkout_services_services_resources() {
  *   Checkout data array.
  */
 function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field = NULL, $attribute = NULL) {
+  global $user;
+
+  // Get user's order: do not care the result, only to satisfy drupal get form.
+  $order = commerce_cart_order_load($user->uid);
+
   // Get all enabled checkout panes.
   $panes = commerce_checkout_panes(array(
     'enabled' => TRUE,
@@ -132,7 +137,7 @@ function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field 
     // Check form id.
     if ($form_id !== FALSE) {
       // Get full checkout form.
-      $form = drupal_get_form($form_id);
+      $form = drupal_get_form($form_id, $panes[$pane], $order);
       // Check field
       if (!empty($field) && isset($form[$field])) {
         // Check field attribute.

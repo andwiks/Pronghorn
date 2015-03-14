@@ -52,7 +52,7 @@ global $base_url;
     <?php print render($page['front_third']); ?>
   </section>
 
-   <section id="front_fourth" class="front_fourth">
+  <section id="front_fourth" class="front_fourth">
     <?php print render($page['front_fourth']); ?>
   </section>
 

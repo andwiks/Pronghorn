@@ -46,7 +46,7 @@ function deduct_point_line_item_after_order($order, $line_item) {
           'points' => $amount,
           'uid' => $order->uid,
           'operation' => 'commerce_userpoints_discount_credit',
-          'tid' => variable_get('commerce_userpoints_discount_default_termid', userpoints_get_default_tid()),
+          //'tid' => variable_get('commerce_userpoints_discount_default_termid', userpoints_get_default_tid()),
           'display' => FALSE,
           'entity_id' => $order->order_id,
           'entity_type' => 'commerce_order',

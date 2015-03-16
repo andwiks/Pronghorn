@@ -134,7 +134,7 @@ function commerce_cart_services_resource_add($product) {
       // Return line item object.
       $line_item = commerce_cart_product_add($user->uid, $line_item);
       if ($line_item !== FALSE) {
-        return _commerce_cart_services_line_item($line_item);
+        return order_services_line_item($line_item);
       }
       else {
         return services_error(t('Unable to add product'), 406);
@@ -177,7 +177,7 @@ function commerce_cart_services_resource_delete($line_item_id = 0) {
       $order = commerce_cart_order_empty($order);
     }
     // Return order object which already language compatible.
-    return _commerce_cart_services_order($order);
+    return order_services_order($order);
   }
 
   // Reach this means error: unable to get user's shopping cart.
@@ -198,7 +198,7 @@ function commerce_cart_services_resource_index() {
   // Check whether commerce cart can get user's shopping cart.
   if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
     // Return order object which already language compatible.
-    return _commerce_cart_services_order($order);
+    return order_services_order($order);
   }
 
   // Reach this means error: unable to get user's shopping cart.
@@ -325,19 +325,10 @@ function commerce_cart_services_resource_add_doc() {
     '#auth' => TRUE,
     '#path' => 'cart/add',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/cart/add.json<br />POST data application/json:
-    {
-        "product":
-        {
-            "product_id": 5,
-            "type": "mobile_prepaid",
-            "quantity": 1,
-            "fields": [
-                {"field_phone_number":"08122545393"}
-            ]
-        }
-
-    }',
+    '#request_url' => $base_url . '/api/cart/add.json<br />
+    POST topup data application/json: { "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } } <br />
+    POST coupon data application/json: { "product": { "product_id": 11, "type": "coupon", "quantity": 1 } } <br />
+    ',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
@@ -705,84 +696,4 @@ function commerce_cart_services_resource_index_doc() {
     ),
   );
   return $element;
-}
-
-/**
- * Private Functions.
- */
-
-/**
- * Function _commerce_cart_services_order().
- *
- * Order object which more language compatible.
- *
- * @param object $order
- *   Order object.
- *
- * @return mixed
- *   Order object or string error.
- */
-function _commerce_cart_services_order($order) {
-  // Wrap around using try and catch.
-  try {
-    // Get order wrapper.
-    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    // Proccess order line item: remove language none (und).
-    $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
-    // Looping foreach line item.
-    foreach ((array) $order->commerce_line_items as $key => $line_item) {
-      $order->commerce_line_items[$key] = _commerce_cart_services_line_item($line_item);
-    }
-    // Proccess order total: remove language none (und).
-    $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
-    // Return order object.
-    return $order;
-  }
-  catch (EntityMetadataWrapperException $exception) {
-    // Log this condition.
-    watchdog('commerce_cart_services', 'Load order error at @location. Trace:<pre>@trace</pre>', array(
-      '@location' => __FUNCTION__,
-      '@trace' => $exception->getTraceAsString(),
-    ), WATCHDOG_ERROR, t('Cart: Order'));
-  }
-  // Other condition return error;
-  return services_error(t('Invalid Order'), 406);
-}
-
-/**
- * Function _commerce_cart_services_line_item().
- *
- * Line item object which more language compatible.
- *
- * @param object $line_item
- *   Line item object.
- *
- * @return mixed
- *   Line item object or string error.
- */
-function _commerce_cart_services_line_item($line_item) {
-  // Wrap around using try and catch.
-  try {
-    // Get line item wrapper.
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-    // Get all commerce_line_item fields.
-    $fields = field_info_instances('commerce_line_item', $line_item->type);
-    // Proccess order line item: remove language none (und).
-    foreach ($fields as $field_name => $field_data) {
-      if (isset($line_item->$field_name)) {
-        $line_item->$field_name = $line_item_wrapper->$field_name->value();
-      }
-    }
-    // Return line item object.
-    return $line_item;
-  }
-  catch (EntityMetadataWrapperException $exception) {
-    // Log this condition.
-    watchdog('commerce_cart_services', 'Load line item error at @location. Trace:<pre>@trace</pre>', array(
-      '@location' => __FUNCTION__,
-      '@trace' => $exception->getTraceAsString(),
-    ), WATCHDOG_ERROR, t('Cart: Line Item'));
-  }
-  // Other condition return error;
-  return services_error(t('Invalid Line Item'), 406);
 }

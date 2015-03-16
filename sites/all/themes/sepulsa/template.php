@@ -212,6 +212,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $payment_method = reset($payment_method);
       $form['checkout_completion_message']['message'] = array(
         '#theme' => 'sepulsa_checkout_completion_message',
+        '#order' => $order,
         '#payment_method' => $payment_method,
       );
 
@@ -347,6 +348,7 @@ function sepulsa_theme($existing, $type, $theme, $path) {
     'sepulsa_checkout_completion_message' => array(
       'variables' => array(
         'user' => NULL,
+        'order' => NULL,
         'payment_method' => NULL,
         'payment_details' => NULL,
         'authenticated' => FALSE,

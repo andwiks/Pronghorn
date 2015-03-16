@@ -48,6 +48,8 @@ function userpoints_sepulsa_menu_alter(&$items) {
 function userpoints_list_transaction(){
     $rows = [];
     global $user;
+    $user_uid = arg(1);
+    if (!isset($user_uid)) $user_uid = $user->uid;
     
     $settings = array(
       'show_user' => FALSE,
@@ -56,7 +58,7 @@ function userpoints_list_transaction(){
     //$query = db_select('userpoints_txn', 'p')->extend('PagerDefault')->extend('TableSort')
     $query = db_select('userpoints_txn', 'p')->extend('TableSort')
         ->fields('p')
-        ->condition('p.uid', $user->uid)
+        ->condition('p.uid', $user_uid)
         ->condition('p.status', '0') // only show approved userpoints
         ->orderByHeader($header)
         ->orderBy('p.txn_id', 'DESC');

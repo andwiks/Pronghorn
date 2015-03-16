@@ -82,7 +82,7 @@ function userpoints_sepulsa_user_view_alter(&$build) {
     global $user;
     $amount = userpoints_get_current_points($user->uid);
     $amount = number_format($amount,0,",",".");
-    $build['userpoints']['title']['#markup'] = "Sepulsa Kredit: Rp. ".$amount;
+    $build['userpoints']['title']['#markup'] = "";
     $build['userpoints']['actions']['#links'] = [];
-    //$build['userpoints']['list']['#items'][0] = "Sepulsa Kredit: Rp. ".$amount;
+    $build['userpoints']['list']['#items'][0] = "Sepulsa Kredit: Rp. ".$amount;
 }

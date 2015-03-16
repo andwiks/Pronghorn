@@ -1,0 +1,13 @@
+name = "Commerce Reports Geckoboard"
+description = "Provides integration for Drupal Commerce with Geckoboard."
+core = "7.x"
+dependencies[] = "commerce"
+dependencies[] = "commerce_reports"
+dependencies[] = "geckoboardapi"
+
+; Information added by Drupal.org packaging script on 2014-09-06
+version = "7.x-4.0-beta1"
+core = "7.x"
+project = "commerce_reports"
+datestamp = "1410012952"
+

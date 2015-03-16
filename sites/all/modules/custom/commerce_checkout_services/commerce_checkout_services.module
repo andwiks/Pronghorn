@@ -300,7 +300,9 @@ function commerce_checkout_services_resource_pane_retrieve_doc() {
     '#auth' => FALSE,
     '#path' => 'checkout',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/checkout/index.json<br />GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />GET',
+    '#request_url' => $base_url . '/api/checkout/index.json<br />
+    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />
+    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_methods/value.json<br />',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

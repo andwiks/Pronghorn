@@ -325,19 +325,10 @@ function commerce_cart_services_resource_add_doc() {
     '#auth' => TRUE,
     '#path' => 'cart/add',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/cart/add.json<br />POST data application/json:
-    {
-        "product":
-        {
-            "product_id": 5,
-            "type": "mobile_prepaid",
-            "quantity": 1,
-            "fields": [
-                {"field_phone_number":"08122545393"}
-            ]
-        }
-
-    }',
+    '#request_url' => $base_url . '/api/cart/add.json<br />
+    POST topup data application/json: { "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } } <br />
+    POST coupon data application/json: { "product": { "product_id": 11, "type": "coupon", "quantity": 1 } } <br />
+    ',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

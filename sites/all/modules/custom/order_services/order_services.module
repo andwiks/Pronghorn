@@ -22,12 +22,12 @@ function order_services_services_resources() {
           'access callback' => 'services_access_menu',
           'args' => array(
             array(
-              'name' => 'orderid',
-              'type' => 'string',
+              'name' => 'order_id',
+              'type' => 'int',
               'description' => 'A valid order id',
               'source' => array(
-                'data' => 'orderid',
-                'param' => 'orderid',
+                'data' => 'order_id',
+                'param' => 'order_id',
               ),
               'optional' => FALSE,
               'http_method' => 'POST',
@@ -39,7 +39,44 @@ function order_services_services_resources() {
           'callback' => '_order_services_list',
           'documentation callback' => 'order_services_list_doc',
           'access callback' => 'services_access_menu',
-          'args' => array(),
+          'args' => array(
+            array(
+              'name' => 'page',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'The zero-based index of the page to get, defaults to 0.',
+              'default value' => 0,
+              'source' => array(
+                'data' => 'page',
+                'param' => 'page'
+              ),
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'parameters',
+              'optional' => TRUE,
+              'type' => 'array',
+              'description' => 'Parameters array',
+              'default value' => array(),
+              'source' => array(
+                'data' => 'parameters',
+                'param' => 'parameters',
+              ),
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'pagesize',
+              'optional' => TRUE,
+              'type' => 'int',
+              'description' => 'Number of records to get per page.',
+              'default value' => variable_get('services_order_index_page_size', 20),
+              'source' => array(
+                'data' => 'pagesize',
+                'param' => 'pagesize'
+              ),
+              'http_method' => 'POST',
+            ),
+          ),
         ),
       ),
     ),
@@ -54,369 +91,280 @@ function order_services_services_resources() {
 /**
  * Resources callback for order detail.
  */
-function _order_services_detail($orderid){
-  $order = commerce_order_load($orderid);
-  return $order;
+function _order_services_detail($order_id){
+  // Load commerce order.
+  $order = commerce_order_load($order_id);
+  // Check whether order is valid.
+  if ($order !== FALSE) {
+    return order_services_order($order);
+  }
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
 }
-
-/**
- * Callback Functions.
- */
 
 /**
  * Resources callback for order list.
  */
-function _order_services_list(){
-    global $user;
-    if (isset($user) && $user->uid > 0) {
-        $result = db_query("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed') AND uid = :uid", array('uid' => $user->uid));
-        foreach ($result as $user_order) {
-           $user_orders[] = $user_order->order_id;
+function _order_services_list($page, $parameters, $page_size){
+  global $user;
+
+  // Define order list array return value.
+  $list = array();
+
+  // Check user uid.
+  if (isset($user->uid) && $user->uid > 0) {
+    // Use entity field query.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_order');
+    $query->propertyCondition('uid', $user->uid);
+    // Define property conditions.
+    $property_conditions = array();
+    // Process query parameter for entity properties only.
+    if (isset($parameters[0]) && is_array($parameters[0])) {
+      // Get order properties list.
+      $properties = entity_get_property_info('commerce_order');
+      // Looping foreach parameter.
+      foreach ($parameters[0] as $property_name => $property_value) {
+        if (isset($properties['properties'][$property_name])) {
+          if (isset($property_conditions[$property_name])
+            && is_array($property_conditions[$property_name])
+          ) {
+            array_push($property_conditions[$property_name], $property_value);
+          }
+          else {
+            $property_conditions[$property_name] = isset($property_conditions[$property_name]) ? array($property_conditions[$property_name], $property_value) : $property_value;
+          }
         }
-        $order = commerce_order_load_multiple($user_orders);
-        return $order;
-    } else {
-        return "Invalid user";
+      }
     }
+    // Check whether property conditon is not empty.
+    if (!empty($property_conditions)) {
+      foreach ($property_conditions as $property_name => $property_value) {
+        $query->propertyCondition($property_name, $property_value);
+      }
+    }
+    else {
+      // By default only query for status: invoiced and completed.
+      $query->propertyCondition('status', array('invoiced', 'completed'));
+    }
+    // Define default limit.
+    $default_limit = variable_get("services_{$resource}_index_page_size", 20);
+    if (!user_access('perform unlimited index queries') && $page_size > $default_limit) {
+      $page_size = $default_limit;
+    }
+    // Define query range.
+    $query->range($page * $page_size, $page_size);
+    // Execute the query.
+    $result = $query->execute();
+    // Check the result.
+    if (isset($result['commerce_order']) && !empty($result['commerce_order'])) {
+      // Looping for each commerce order.
+      foreach ((array) $result['commerce_order'] as $order_id => $order_data) {
+        $list[] = $order_data;
+      }
+    }
+  }
+  // Return order list.
+  return $list;
 }
 
 /**
- * Documentation callback for user actions order detail.
+ * Documentation callback for order actions order detail.
  */
 function order_services_detail_doc() {
   global $base_url;
   $response = '
-    stdClass Object
-    (
-    [order_number] => 123
-    [revision_id] => 451
-    [revision_uid] => 50
-    [mail] => user@mail.com
-    [status] => pending
-    [log] => Order state updated via Rules.
-    [revision_timestamp] => 1425204461
-    [revision_hostname] => ::1
-    [data] => Array
-        (
-            [last_cart_refresh] => 1425204460
-            [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
-            [commerce_payment_example] => Array
-                (
-                    [credit_card] => Array
-                        (
-                            [valid_types] => Array
-                                (
-                                )
-                            [number] => 4111--------1111
-                            [exp_month] => 03
-                            [exp_year] => 2015
-                        )
-                )
-            [commerce_payment_order_paid_in_full_invoked] => 1
-        )
-
-    [order_id] => 123
-    [type] => commerce_order
-    [uid] => 50
-    [created] => 1425204461
-    [changed] => 1425204461
-    [hostname] => ::1
-    [commerce_line_items] => Array
-        (
-            [und] => Array
-                (
-                    [0] => Array
-                        (
-                            [line_item_id] => 509
-                        )
-
-                    [1] => Array
-                        (
-                            [line_item_id] => 510
-                        )
-                )
-        )
-
-    [commerce_order_total] => Array
-        (
-            [und] => Array
-                (
-                    [0] => Array
-                        (
-                            [amount] => 100000
-                            [currency_code] => IDR
-                            [data] => Array
-                                (
-                                    [components] => Array
-                                        (
-                                            [0] => Array
-                                                (
-                                                    [name] => base_price
-                                                    [price] => Array
-                                                        (
-                                                            [amount] => 100000
-                                                            [currency_code] => IDR
-                                                            [data] => Array
-                                                                (
-                                                                )
-                                                        )
-                                                    [included] => 1
-                                                )
-                                        )
-                                )
-                        )
-                )
-        )
-
-    [commerce_customer_billing] => Array
-        (
-        )
-
-    [rdf_mapping] => Array
-        (
-        )
-
-)
+  {
+      "order_number": "32",
+      "revision_id": "165",
+      "revision_uid": "14",
+      "mail": "andre4s_y@yahoo.com",
+      "status": "pending",
+      "log": "Order state updated via Rules.",
+      "revision_timestamp": "1425480126",
+      "revision_hostname": "127.0.0.1",
+      "data": {
+          "last_cart_refresh": 1425480123,
+          "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans",
+          "commerce_veritrans": {
+              "tokens": "481111d39820dc-3f7d-414c-be86-0c8ace4db46d",
+              "code2": "123",
+              "token": "481111-1114-4fd4d9dc-000a-4937-b352-c785043cc040",
+              "response": {
+                  "status_code": "200",
+                  "status_message": "Success, Credit Card 3D Secure transaction is successful",
+                  "transaction_id": "b409a62c-ca4b-4020-85a9-cf6aff0167c9",
+                  "masked_card": "481111-1114",
+                  "order_id": "32",
+                  "payment_type": "credit_card",
+                  "transaction_time": "2015-03-04 21:42:04",
+                  "transaction_status": "capture",
+                  "fraud_status": "accept",
+                  "approval_code": "1425480125393",
+                  "bank": "bni",
+                  "gross_amount": "101000.00"
+              },
+              "phone": "08122545393",
+              "amount": "101000",
+              "currency_code": "IDR"
+          },
+          "commerce_payment_order_paid_in_full_invoked": true
+      },
+      "order_id": "32",
+      "type": "commerce_order",
+      "uid": "14",
+      "created": "1425480126",
+      "changed": "1425480126",
+      "hostname": "127.0.0.1",
+      "commerce_line_items": [
+          {
+              "line_item_id": "162",
+              "order_id": "32",
+              "type": "mobile_prepaid",
+              "line_item_label": "SMPT100",
+              "quantity": "1.00",
+              "created": "1425480102",
+              "changed": "1425481032",
+              "data": [],
+              "commerce_unit_price": {
+                  "amount": "101000",
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": "101000",
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_total": {
+                  "amount": "101000",
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": 101000,
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_product": {
+                  "revision_id": "8",
+                  "sku": "SMPT100",
+                  "title": "Rp 100.000",
+                  "revision_uid": "14",
+                  "status": "1",
+                  "log": "",
+                  "revision_timestamp": "1425480091",
+                  "data": false,
+                  "product_id": "6",
+                  "type": "pulsa",
+                  "language": "und",
+                  "uid": "1",
+                  "created": "1419919510",
+                  "changed": "1425480091",
+                  "commerce_price": {
+                      "und": [
+                          {
+                              "amount": "101000",
+                              "currency_code": "IDR",
+                              "data": {
+                                  "components": []
+                              }
+                          }
+                      ]
+                  },
+                  "field_api_provider": {
+                      "und": [
+                          {
+                              "value": "rajabiller"
+                          }
+                      ]
+                  },
+                  "field_credit_amount": {
+                      "und": [
+                          {
+                              "value": "100000"
+                          }
+                      ]
+                  },
+                  "field_package_code": {
+                      "und": [
+                          {
+                              "value": "S100H"
+                          }
+                      ]
+                  },
+                  "rdf_mapping": []
+              },
+              "commerce_display_path": "",
+              "field_phone_number": "08122545393",
+              "field_topup_status": null,
+              "field_topup_data": [],
+              "rdf_mapping": []
+          }
+      ],
+      "commerce_order_total": {
+          "amount": "101000",
+          "currency_code": "IDR",
+          "data": {
+              "components": [
+                  {
+                      "name": "base_price",
+                      "price": {
+                          "amount": 101000,
+                          "currency_code": "IDR",
+                          "data": []
+                      },
+                      "included": true
+                  }
+              ]
+          }
+      },
+      "commerce_customer_billing": [],
+      "rdf_mapping": []
+  }
   ';
   $element = array(
     '#name' => t('Order Detail Service'),
     '#description' => t('Get Order Detail'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'order/order_detail',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/order/order_detail.json<br />POST data x-www-form-urlencoded: orderid=123 <br />POST data application/json: {"orderid": "123"}<br />',
+    '#request_url' => $base_url . '/api/order/order_detail.json<br />POST application/json: {"order_id": 32}',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
     '#verb' => 'actions',
     // Errors.
     '#errors' => array(
-      'missing_requirement' => array(
-        '#question' => '401 Unauthorized: Missing required argument @arg',
-        '#description' => t('Required argument: orderid.'),
+      'invalid_order' => array(
+        '#question' => '406 Not Acceptable: Invalid Order',
+        '#description' => t('Unable to get order object. Check user session.'),
         '#response' => '
         [
-            "Missing required argument @arg"
+            "Invalid Order"
         ]',
       ),
-      'internal_server' => array(
-        '#question' => '500 Internal Server Error',
-        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
-        '#response' => '',
-      ),
-    ),
-  );
-  return $element;
-}
-
-/**
- * Documentation callback for user actions order list.
- */
-function order_services_list_doc() {
-  global $base_url;
-  $response = '
-    Array
-    (
-        [123] => stdClass Object
-            (
-            [order_number] => 123
-            [revision_id] => 123
-            [revision_uid] => 50
-            [mail] => user@mail.com
-            [status] => pending
-            [log] => Order state updated via Rules.
-            [revision_timestamp] => 1425204461
-            [revision_hostname] => ::1
-            [data] => Array
-                (
-                    [last_cart_refresh] => 1425204460
-                    [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
-                    [commerce_payment_example] => Array
-                        (
-                            [credit_card] => Array
-                                (
-                                    [valid_types] => Array
-                                        (
-                                        )
-                                    [number] => 4111--------1111
-                                    [exp_month] => 03
-                                    [exp_year] => 2015
-                                )
-                        )
-                    [commerce_payment_order_paid_in_full_invoked] => 1
-                )
-
-            [order_id] => 123
-            [type] => commerce_order
-            [uid] => 50
-            [created] => 1425204461
-            [changed] => 1425204461
-            [hostname] => ::1
-            [commerce_line_items] => Array
-                (
-                    [und] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [line_item_id] => 509
-                                )
-
-                            [1] => Array
-                                (
-                                    [line_item_id] => 510
-                                )
-                        )
-                )
-
-            [commerce_order_total] => Array
-                (
-                    [und] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [amount] => 100000
-                                    [currency_code] => IDR
-                                    [data] => Array
-                                        (
-                                            [components] => Array
-                                                (
-                                                    [0] => Array
-                                                        (
-                                                            [name] => base_price
-                                                            [price] => Array
-                                                                (
-                                                                    [amount] => 100000
-                                                                    [currency_code] => IDR
-                                                                    [data] => Array
-                                                                        (
-                                                                        )
-                                                                )
-                                                            [included] => 1
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-
-            [commerce_customer_billing] => Array
-                (
-                )
-
-            [rdf_mapping] => Array
-                (
-                )
-        )
-        
-        [456] => stdClass Object
-            (
-            [order_number] => 456
-            [revision_id] => 456
-            [revision_uid] => 50
-            [mail] => user@mail.com
-            [status] => pending
-            [log] => Order state updated via Rules.
-            [revision_timestamp] => 1425204461
-            [revision_hostname] => ::1
-            [data] => Array
-                (
-                    [last_cart_refresh] => 1425204460
-                    [payment_method] => commerce_payment_example|commerce_payment_commerce_payment_example
-                    [commerce_payment_example] => Array
-                        (
-                            [credit_card] => Array
-                                (
-                                    [valid_types] => Array
-                                        (
-                                        )
-                                    [number] => 4111--------1111
-                                    [exp_month] => 03
-                                    [exp_year] => 2015
-                                )
-                        )
-                    [commerce_payment_order_paid_in_full_invoked] => 1
-                )
-
-            [order_id] => 456
-            [type] => commerce_order
-            [uid] => 50
-            [created] => 1425204461
-            [changed] => 1425204461
-            [hostname] => ::1
-            [commerce_line_items] => Array
-                (
-                    [und] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [line_item_id] => 509
-                                )
-
-                            [1] => Array
-                                (
-                                    [line_item_id] => 510
-                                )
-                        )
-                )
-
-            [commerce_order_total] => Array
-                (
-                    [und] => Array
-                        (
-                            [0] => Array
-                                (
-                                    [amount] => 100000
-                                    [currency_code] => IDR
-                                    [data] => Array
-                                        (
-                                            [components] => Array
-                                                (
-                                                    [0] => Array
-                                                        (
-                                                            [name] => base_price
-                                                            [price] => Array
-                                                                (
-                                                                    [amount] => 100000
-                                                                    [currency_code] => IDR
-                                                                    [data] => Array
-                                                                        (
-                                                                        )
-                                                                )
-                                                            [included] => 1
-                                                        )
-                                                )
-                                        )
-                                )
-                        )
-                )
-
-            [commerce_customer_billing] => Array
-                (
-                )
-
-            [rdf_mapping] => Array
-                (
-                )
-        )
-    )
-  ';
-  $element = array(
-    '#name' => t('Order List Service'),
-    '#description' => t('Get Order List'),
-    '#auth' => TRUE,
-    '#path' => 'order/order_list',
-    '#args' => 'none',
-    // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/order/order_list.json<br />POST data x-www-form-urlencoded<br />POST data application/json<br />',
-    // Example response. E.g., a JSON array.
-    '#response' => $response,
-    // Resource prefix.
-    '#verb' => 'actions',
-    // Errors.
-    '#errors' => array(
       'csrf_validation' => array(
         '#question' => '401 Unauthorized: CSRF Validation Failed',
-        '#description' => t('When drupal detect that the user already login from other site. Header X-CSRF-Token is needed.'),
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
         '#response' => '
         [
           "CSRF validation failed"
@@ -430,4 +378,148 @@ function order_services_list_doc() {
     ),
   );
   return $element;
+}
+
+/**
+ * Documentation callback for order actions order list.
+ */
+function order_services_list_doc() {
+  global $base_url;
+  $response = '
+  [
+      {
+          "order_id": "32",
+          "revision_id": "165",
+          "type": "commerce_order"
+      },
+      {
+          "order_id": "49",
+          "revision_id": "233",
+          "type": "commerce_order"
+      },
+      {
+          "order_id": "52",
+          "revision_id": "240",
+          "type": "commerce_order"
+      }
+  ]
+  ';
+  $element = array(
+    '#name' => t('Order List Service'),
+    '#description' => t('Get Order List. By default page size is 20 order id.'),
+    '#auth' => TRUE,
+    '#path' => 'order/order_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/order/order_list.json<br />
+    POST data application/json:
+    {
+        "parameters":[{
+            "status":["completed", "invoiced"]
+        }],
+        "page": 0,
+        "page_size": 20
+    }
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function order_services_order().
+ *
+ * Order object which more language compatible.
+ *
+ * @param object $order
+ *   Order object.
+ *
+ * @return mixed
+ *   Order object or string error.
+ */
+function order_services_order($order) {
+  // Wrap around using try and catch.
+  try {
+    // Get order wrapper.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Proccess order line item: remove language none (und).
+    $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
+    // Looping foreach line item.
+    foreach ((array) $order->commerce_line_items as $key => $line_item) {
+      $order->commerce_line_items[$key] = order_services_line_item($line_item);
+    }
+    // Proccess order total: remove language none (und).
+    $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
+    // Return order object.
+    return $order;
+  }
+  catch (EntityMetadataWrapperException $exception) {
+    // Log this condition.
+    watchdog('order_services', 'Load order error at @location. Trace:<pre>@trace</pre>', array(
+      '@location' => __FUNCTION__,
+      '@trace' => $exception->getTraceAsString(),
+    ), WATCHDOG_ERROR, t('Order Services'));
+  }
+  // Other condition return error;
+  return services_error(t('Invalid Order'), 406);
+}
+
+/**
+ * Function order_services_line_item().
+ *
+ * Line item object which more language compatible.
+ *
+ * @param object $line_item
+ *   Line item object.
+ *
+ * @return mixed
+ *   Line item object or string error.
+ */
+function order_services_line_item($line_item) {
+  // Wrap around using try and catch.
+  try {
+    // Get line item wrapper.
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    // Get all commerce_line_item fields.
+    $fields = field_info_instances('commerce_line_item', $line_item->type);
+    // Proccess order line item: remove language none (und).
+    foreach ($fields as $field_name => $field_data) {
+      if (isset($line_item->$field_name)) {
+        $line_item->$field_name = $line_item_wrapper->$field_name->value();
+      }
+    }
+    // Return line item object.
+    return $line_item;
+  }
+  catch (EntityMetadataWrapperException $exception) {
+    // Log this condition.
+    watchdog('order_services', 'Load line item error at @location. Trace:<pre>@trace</pre>', array(
+      '@location' => __FUNCTION__,
+      '@trace' => $exception->getTraceAsString(),
+    ), WATCHDOG_ERROR, t('Order Services: Line Item'));
+  }
+  // Other condition return error;
+  return services_error(t('Invalid Line Item'), 406);
 }

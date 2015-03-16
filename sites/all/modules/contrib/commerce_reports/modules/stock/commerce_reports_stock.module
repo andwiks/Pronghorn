@@ -1,0 +1,218 @@
+<?php
+
+/**
+ * @file
+ * This module provides advanced stock reporting for Drupal Commerce.
+ */
+
+
+/**
+ * Implements hook_views_api().
+ */
+function commerce_reports_stock_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'commerce_reports_stock') . '/includes/views',
+  );
+}
+
+/**
+ * Implements hook_views_pre_execute().
+ */
+function commerce_reports_stock_views_pre_execute(&$view) {
+  // Prime the stock reports data set into static cache.
+  _commerce_reports_stock_calculate_dataset();
+}
+
+
+/**
+ * Calculate all the stock reports data.
+ *
+ * Returns data for all products, or specific item.
+ *
+ * @todo : This is dirty and heavy. Can we trim this up / streamline?
+ *          Our view is technically querying all products twice :/
+ *
+ * @param null $sku
+ * @param null $key
+ * @param bool $reset
+ * @return array
+ */
+function _commerce_reports_stock_calculate_dataset($sku = NULL, $key = NULL, $reset = FALSE) {
+  $data = &drupal_static(__FUNCTION__);
+
+  // If there is no static cache for dataset yet or a reset was specified...
+  if (!isset($data) || $reset) {
+    $products = _commerce_reports_stock_get_stock_enabled_products();
+
+    $start = variable_get('commerce_reports_stock_historyperiod', '3 months ago');
+    $start = strtotime($start);
+    $weekly_sales = _commerce_reports_stock_api_sales('W', $start);
+    $monthly_sales = _commerce_reports_stock_api_sales('M', $start);
+
+    $data = array();
+    $lifetimes = array();
+    $in_stock = array();
+
+    // Go through each product and make calculations
+    foreach ($products as $product) {
+      $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+
+      $sku = $product_wrapper->sku->value();
+      $stock =  (int) $product_wrapper->commerce_stock->value();
+
+      // Compute the number of weeks since start.
+      $now = new DateTime();
+
+      // Check if that product is more recent than the history period.
+      if ($start < $product_wrapper->created->value()) {
+        $start_datetime = new DateTime();
+        $start_datetime->setTimestamp($product_wrapper->created->value());
+      }
+      else {
+        $start_datetime = new DateTime(variable_get('commerce_reports_stock_historyperiod', '3 months ago'));
+      }
+
+      $number_of_weeks = max($now->diff($start_datetime)->days / 7, 1);
+
+      $weekly_burn = 0;
+      if (isset($weekly_sales[$sku])) {
+        $weekly_burn = _commerce_reports_stock_calculate_average_sales($weekly_sales[$sku], $number_of_weeks);
+      }
+
+      // Compute the number of month since start.
+      $number_of_month = max($now->diff($start_datetime)->m, 1);
+
+      $monthly_burn = 0;
+      if (isset($monthly_sales[$sku])) {
+        $monthly_burn = _commerce_reports_stock_calculate_average_sales($monthly_sales[$sku], $number_of_month);
+      }
+
+      $lifetimes[$sku] = _commerce_reports_stock_calculate_lifetime($stock, $weekly_burn);
+      $in_stock[$sku] = (bool) $stock;
+      $data[$sku] = array(
+        'sku' => $sku,
+        'stock' => $stock,
+        'weeklysales' => sprintf('%0.1f', $weekly_burn),
+        'monthlysales' => sprintf('%0.1f', $monthly_burn),
+        'lifetime' => $lifetimes[$sku],
+      );
+    }
+
+    array_multisort($in_stock, SORT_NUMERIC, $lifetimes, SORT_NUMERIC, $data);
+  }
+
+  // Check to see if we should return specific data, or whole array.
+  if ($sku !== NULL && isset($data[$sku])) {
+    // If we have a key return that, else the whole sku entry.
+    if ($key !== NULL && isset($data[$sku][$key])) {
+      return $data[$sku][$key];
+    }
+    else {
+      return $data[$sku];
+    }
+  }
+  return $data;
+}
+
+/**
+ * Calculate the stock lifetime.
+ *
+ * @param $stock
+ * @param $weekly_burn
+ * @return int
+ */
+function _commerce_reports_stock_calculate_lifetime($stock, $weekly_burn) {
+  // Why does this mean it is 1000?
+  if ($weekly_burn === 0) {
+    return 1000;
+  }
+  return (int) ($stock / ($weekly_burn / 7));
+}
+
+/**
+ * Calculate the average sales.
+ *
+ * This is simplistic, we could do more.
+ *
+ * @param $sales
+ * @param $period
+ * @return float|int
+ */
+function _commerce_reports_stock_calculate_average_sales($sales, $period) {
+  return (empty($sales)) ? 0 : array_sum($sales) / $period;
+}
+
+/**
+ * Get the stock enabled products.
+ *
+ * @param bool $reset
+ * @return array
+ */
+function _commerce_reports_stock_get_stock_enabled_products($reset = FALSE) {
+  $product_list = &drupal_static(__FUNCTION__);
+
+  // If there is no static cache for dataset yet or a reset was specified...
+  if (!isset($product_list) || $reset) {
+    $product_list = array();
+
+    // Grab all products that have stock enabled.
+    $product_query = new EntityFieldQuery();
+    $product_query->entityCondition('entity_type', 'commerce_product')
+      ->propertyCondition('status', 1, '=')
+      ->fieldCondition('commerce_stock', 'value', 'NULL', '!=');
+    $products_result = $product_query->execute();
+
+    if (!empty($products_result)) {
+      $products_result = reset($products_result);
+      $products = entity_load('commerce_product', array_keys($products_result));
+    }
+
+    // Key the list by SKU
+    // @todo: Is there a way to do this already in core Commerce?
+    foreach ($products as $pid => $product) {
+      $product_list[$product->sku] = $product;
+    }
+  }
+  return $product_list;
+}
+
+/**
+ * Group sales by year, month, day or week.
+ *
+ * @param string $interval
+ * @param int $start
+ * @return array
+ */
+function _commerce_reports_stock_api_sales($interval = 'D', $start = 0) {
+  $formats = array(
+    'D' => '%Y-%m-%d',
+    'W' => '%Y-%u',
+    'M' => '%Y-%m',
+    'Y' => '%Y',
+  );
+  $format = $formats[$interval];
+
+  $query = sprintf("
+       SELECT DATE_FORMAT(FROM_UNIXTIME(o.created), '%s') AS date,
+              line_item_label AS sku,
+              SUM(quantity) AS sales
+         FROM commerce_line_item li
+    LEFT JOIN commerce_order o
+           ON li.order_id = o.order_id
+        WHERE o.status = 'completed'
+          AND li.type = 'product'
+          AND o.created >= :created
+     GROUP BY li.line_item_label, date", $format);
+
+  $res = db_query($query, array(
+      ':created' => $start,
+      ));
+
+  $data = array();
+  foreach ($res as $row) {
+    $data[$row->sku][$row->date] = (int) $row->sales;
+  }
+
+  return $data;
+}

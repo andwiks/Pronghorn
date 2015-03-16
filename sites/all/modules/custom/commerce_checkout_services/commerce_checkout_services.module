@@ -120,6 +120,11 @@ function commerce_checkout_services_services_resources() {
  *   Checkout data array.
  */
 function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field = NULL, $attribute = NULL) {
+  global $user;
+
+  // Get user's order: do not care the result, only to satisfy drupal get form.
+  $order = commerce_cart_order_load($user->uid);
+
   // Get all enabled checkout panes.
   $panes = commerce_checkout_panes(array(
     'enabled' => TRUE,
@@ -132,7 +137,7 @@ function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field 
     // Check form id.
     if ($form_id !== FALSE) {
       // Get full checkout form.
-      $form = drupal_get_form($form_id);
+      $form = drupal_get_form($form_id, $panes[$pane], $order);
       // Check field
       if (!empty($field) && isset($form[$field])) {
         // Check field attribute.
@@ -228,7 +233,7 @@ function commerce_checkout_services_resource_process($checkout) {
       // Get order object.
       $order = $form_state['order'];
       // Return order object.
-      return _commerce_cart_services_order($order);
+      return order_services_order($order);
     }
     // Reach this means error: invalid checkout data.
     return services_error(t('Invalid checkout data'), 406);
@@ -295,7 +300,9 @@ function commerce_checkout_services_resource_pane_retrieve_doc() {
     '#auth' => FALSE,
     '#path' => 'checkout',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/checkout/index.json<br />GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />GET',
+    '#request_url' => $base_url . '/api/checkout/index.json<br />
+    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />
+    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_methods/value.json<br />',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

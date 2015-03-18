@@ -12,12 +12,17 @@ global $base_url;
 ?>
 <div id="page-wrapper">
   <?php include "header.tpl.php"; ?>
-        
+
   <section id="content">
     <div class="container">
-      <div id="main">
+      <?php if (!empty($page['sidebar_first'])): ?>
+        <div class="sidebar col-sm-4 col-sm-3">
+          <?php print render($page['sidebar_first']); ?>
+        </div>
+      <?php endif; ?>
+      <div id="main"<?php if (!empty($page['sidebar_first'])) print ' class="col-sm-8 col-md-9"'; ?>>
         <?php print render($page['header']); ?>
-        
+
         <?php if ($tabs['#primary']): ?><div id="tabs-wrapper" class="tab-container full-width style1 box"><?php endif; ?>
         <?php print render($title_prefix); ?>
         <?php if ($title): ?>
@@ -48,11 +53,11 @@ global $base_url;
             <?php print render($page['content']); ?>
           </div>
         <?php } ?>
-        
+
       </div>
     </div>
   </section>
-        
+
   <?php include "footer.tpl.php"; ?>
-    
+
 </div>

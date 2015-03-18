@@ -7,6 +7,20 @@
  * @since February 2nd 2015
  */
 
+/**
+ * Implements hook_block_view_alter().
+ */
+function sepulsa_block_view_alter(&$data, $block) {
+  if ($block->region == 'sidebar_first' && !empty($data['content']['#theme_wrappers'])) {
+    foreach ($data['content']['#theme_wrappers'] as $key => $theme_wrapper) {
+      if (strpos($theme_wrapper, 'menu_tree') === 0) {
+        $data['content']['#theme_wrappers'][] = 'menu_tree__sidebar';
+        break;
+      }
+    }
+  }
+}
+
 function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
   $commer_form_id = substr($form_id, 0, 25);
@@ -147,23 +161,29 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
-      $details = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings']['details'];
+      $settings = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings'];
 
       $form['commerce_payment']['payment_details']['bank_details'] = array();
       $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';
       $form['commerce_payment']['payment_details']['bank_details']['#suffix'] = '</p>';
       $form['commerce_payment']['payment_details']['bank_details']['account_bank'] = array(
-        '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $details['account_bank'] . '</strong>',
+        '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $settings['details']['account_bank'] . '</strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_number'] = array(
-        '#markup' => '<br>' . t('Account number') . ' : <strong>' . $details['account_number'] . ' </strong>',
+        '#markup' => '<br>' . t('Account number') . ' : <strong>' . $settings['details']['account_number'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_owner'] = array(
-        '#markup' => '<br>' . t('Account owner') . ' : <strong>' . $details['account_owner'] . ' </strong>',
+        '#markup' => '<br>' . t('Account owner') . ' : <strong>' . $settings['details']['account_owner'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_branch'] = array(
-        '#markup' => '<br>' . t('Branch office') . ' : ' . $details['account_branch'],
+        '#markup' => '<br>' . t('Branch office') . ' : ' . $settings['details']['account_branch'],
       );
+
+      if (!empty($settings['policy'])) {
+        $form['commerce_payment']['payment_details']['policy'] = array(
+          '#markup' => '<p>' . $settings['policy'] . '</p>',
+        );
+      }
     }
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
@@ -218,7 +238,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
       if ($payment_method == 'bank_transfer') {
         $method_instance = commerce_payment_method_instance_load($order->data['payment_method']);
-        $form['checkout_completion_message']['message']['#payment_details'] = $method_instance['settings']['details'];
+        $form['checkout_completion_message']['message']['#payment_settings'] = $method_instance['settings'];
       }
     }
   }
@@ -268,12 +288,25 @@ function sepulsa_menu_local_tasks(&$variables) {
   return $output;
 }
 
+function sepulsa_menu_tree__sidebar($variables) {
+  return '<ul class="arrow-circle hover-effect filter-options">' . $variables['tree'] . '</ul>';
+}
+
 function sepulsa_preprocess_block(&$vars, $hook) {
   //drupal_set_message("<pre>".print_r($vars, true)."</pre>");
   foreach ($vars['classes_array'] as $key => $value) {
     if ($value == 'block') {
       $vars['classes_array'][$key] = NULL;
     }
+  }
+}
+
+/**
+ * Implements hook_preprocess_menu_link ().
+ */
+function sepulsa_preprocess_menu_link (&$variables) {
+  if ($variables['element']['#original_link']['in_active_trail']) {
+    $variables['element']['#attributes']['class'][] = 'active';
   }
 }
 
@@ -350,7 +383,7 @@ function sepulsa_theme($existing, $type, $theme, $path) {
         'user' => NULL,
         'order' => NULL,
         'payment_method' => NULL,
-        'payment_details' => NULL,
+        'payment_settings' => NULL,
         'authenticated' => FALSE,
       ),
       'path' => $path . '/templates/checkout',

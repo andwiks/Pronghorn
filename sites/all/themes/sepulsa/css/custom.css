@@ -8,3 +8,7 @@
 
 #hotel-features article img.custom_amenity:hover {
   opacity: 1; }
+
+select.selector:not(.hasCustomSelect) {
+  opacity: 1;
+}

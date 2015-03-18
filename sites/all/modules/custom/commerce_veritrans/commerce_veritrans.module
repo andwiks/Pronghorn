@@ -232,6 +232,7 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#title' => t('BIN Promo'),
     '#description' => t('Enter comma separated BINs promo number if any'),
     '#default_value' => (isset($settings['credit_card']['bin_promo'])) ? $settings['credit_card']['bin_promo'] : NULL,
+    '#maxlength' => 512,
   );
 
   // Order ID Prefix.

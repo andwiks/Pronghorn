@@ -818,6 +818,12 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     $transaction_data['credit_card']['save_token_id'] = (!empty($pane_values['veritrans']['credit_card']['save']));
   }
 
+  // Apply BIN Promo if any
+  if (!empty($payment_method['settings']['credit_card']['bin_promo'])) {
+    $bin_promo = preg_split("/[,]+/", $payment_method['settings']['credit_card']['bin_promo']);
+    $transaction_data['credit_card']['bins'] = array_map('trim', $bin_promo);
+  }
+
   // Add billing information.
   if (!empty($billing)) {
     $transaction_data['customer_details']['billing_address'] = $billing;

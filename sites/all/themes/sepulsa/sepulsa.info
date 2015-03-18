@@ -47,4 +47,5 @@ scripts[] = js/jquery.stellar.min.js
 scripts[] = js/waypoints.min.js
 scripts[] = js/jquery.plugins.js
 scripts[] = js/jquery.popupoverlay.js
+scripts[] = js/script.js
 scripts[] = js/main.js

@@ -9,10 +9,15 @@
           <p>Mohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun berikut dalam jangka waktu kurang dari 24 jam. Jika tidak pesanan kamu akan dibatalkan.</p>
 
           <p class="text-left well" style="display:inline-block">
-            <?php print t('Banking institution'); ?> : <strong><?php print $payment_details['account_bank']; ?></strong>
-            <br><?php print t('Account number'); ?> : <strong><?php print $payment_details['account_number']; ?></strong>
-            <br><?php print t('Account owner'); ?> : <strong><?php print $payment_details['account_owner']; ?></strong>
-            <br><?php print t('Branch office'); ?> : <?php print $payment_details['account_branch']; ?>
+            <?php print t('Banking institution'); ?> : <strong><?php print $payment_settings['details']['account_bank']; ?></strong>
+            <br><?php print t('Account number'); ?> : <strong><?php print $payment_settings['details']['account_number']; ?></strong>
+            <br><?php print t('Account owner'); ?> : <strong><?php print $payment_settings['details']['account_owner']; ?></strong>
+            <br><?php print t('Branch office'); ?> : <?php print $payment_settings['details']['account_branch']; ?>
+            <br>
+            <?php if (!empty($payment_settings['policy'])): ?>
+              <br><?php print $payment_settings['policy']; ?>
+              <br>
+            <?php endif; ?>
             <br>Keterangan transfer : Sepulsa Order <?php print $order->order_id; ?>
           </p>
 

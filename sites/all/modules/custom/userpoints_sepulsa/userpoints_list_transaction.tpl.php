@@ -28,5 +28,5 @@
             }?>
         </tbody>
     </table>
-    Total Sepulsa Kredit : Rp.<?php print $content['totalamount'] ?>
+    <strong>Total Sepulsa Kredit : Rp.<?php print $content['totalamount'] ?></strong>
 <?php } ?>

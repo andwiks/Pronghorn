@@ -6,8 +6,8 @@
   Drupal.behaviors.commerceVeritrans = {
     attach: function (context, settings) {
       function toggleCCForm(toggle) {
-        $("#edit-commerce-payment-payment-details-veritrans-credit-card").toggleClass("collapsed", toggle).toggle(!toggle);
-        $("#edit-commerce-payment-payment-details-veritrans-code2").toggle(toggle).prev("label").toggle(toggle);
+        $('fieldset[id^="edit-commerce-payment-payment-details-veritrans-credit-card"]').toggleClass('collapsed', toggle).toggle(!toggle);
+        $(':input[name="commerce_payment[payment_details][veritrans][code2]"]').toggle(toggle).prev('label').toggle(toggle);
       }
 
       function openDialog(url) {
@@ -27,6 +27,7 @@
       }
 
       function callback(response) {
+        $form = $('form#commerce-checkout-form-checkout');
         if (response.redirect_url) {
           openDialog(response.redirect_url);
         }
@@ -42,7 +43,8 @@
           else {
             $("#error_message").val(response.status_message);
           }
-          $("form#commerce-checkout-form-checkout", context).submit();
+
+          $form.submit();
         }
       }
 
@@ -53,25 +55,25 @@
       }).done(function (script, textStatus) {
         Veritrans.url = settings.vt_url + '/token';
         Veritrans.client_key = settings.vt_client;
-        $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").hide();
-        if ($("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")) {
-          toggleCCForm($("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0");
+        $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').hide();
+        if ($(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')) {
+          toggleCCForm($(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0');
         }
-        if ($("#edit-commerce-payment-payment-details-veritrans-credit-card-phone").is("select")
-          && $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone").val() == "0"
+        if ($(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]').is('select')
+          && $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]').val() == '0'
         ) {
-          $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").show();
+          $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').show();
         }
       });
 
       var card = function () {
         if (settings.vt_type == "twoclick"
-          && $("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")
-          && $("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0"
+          && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')
+          && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0'
         ) {
           return {
-            "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-code2").val(),
-            "token_id" : $("#edit-commerce-payment-payment-details-veritrans-tokens").val(),
+            "card_cvv": $(':input[name="commerce_payment[payment_details][veritrans][code2]"]').val(),
+            "token_id" : $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val(),
             "two_click" : true,
             "secure": settings.vt_secure,
             "bank": settings.vt_bank,
@@ -79,10 +81,10 @@
           }
         }
         return {
-          "card_number": $("#edit-commerce-payment-payment-details-veritrans-credit-card-number").val(),
-          "card_exp_month": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-month").val(),
-          "card_exp_year": $("#edit-commerce-payment-payment-details-veritrans-credit-card-exp-year").val(),
-          "card_cvv": $("#edit-commerce-payment-payment-details-veritrans-credit-card-code").val(),
+          "card_number": $(':input[name="commerce_payment[payment_details][veritrans][credit_card][number]"]').val(),
+          "card_exp_month": $(':input[name="commerce_payment[payment_details][veritrans][credit_card][exp_month]"]').val(),
+          "card_exp_year": $(':input[name="commerce_payment[payment_details][veritrans][credit_card][exp_year]"]').val(),
+          "card_cvv": $(':input[name="commerce_payment[payment_details][veritrans][credit_card][code]"]').val(),
           "secure": settings.vt_secure,
           "bank": settings.vt_bank,
           "gross_amount": settings.vt_amount
@@ -93,12 +95,12 @@
         /**
          * Check only if commerce_veritrans is selected as payment method
          */
-        if ($(':input[name="commerce_payment[payment_method]"][value="commerce_veritrans|commerce_payment_commerce_veritrans"]').is(':checked')) {
+        if ($(':input[name="commerce_payment[payment_method]"][value^="commerce_veritrans"]').is(':checked')) {
           if (settings.vt_type == "oneclick"
-            && $("#edit-commerce-payment-payment-details-veritrans-tokens").is("select")
-            && $("#edit-commerce-payment-payment-details-veritrans-tokens").val() != "0"
+            && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')
+            && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0'
           ) {
-            $("#token_id").val($("#edit-commerce-payment-payment-details-veritrans-tokens").val());
+            $('#token_id').val($(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val());
             return true;
           }
           event.preventDefault();
@@ -111,16 +113,16 @@
         };
       });
 
-      $("#edit-commerce-payment-payment-details-veritrans-credit-card-code, #edit-commerce-payment-payment-details-veritrans-code2", context).on("focus", function (event) {
-        $(this).removeAttr("readonly").off(event);
+      $(':input[name="commerce_payment[payment_details][veritrans][credit_card][code]"], :input[name="commerce_payment[payment_details][veritrans][code2]"]', context).on('focus', function (event) {
+        $(this).removeAttr('readonly').off(event);
       });
 
-      $("select#edit-commerce-payment-payment-details-veritrans-credit-card-phone", context).on("change", function () {
-        $("#edit-commerce-payment-payment-details-veritrans-credit-card-phone-other").toggle(($(this).val() == "0"));
+      $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]', context).on('change', function () {
+        $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').toggle(($(this).val() == '0'));
       });
 
-      $("#edit-commerce-payment-payment-details-veritrans-tokens", context).on("change", function () {
-        toggleCCForm(($(this).val() != "0"));
+      $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]', context).on('change', function () {
+        toggleCCForm(($(this).val() != '0'));
       });
     }
   }

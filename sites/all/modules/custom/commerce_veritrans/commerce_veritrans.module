@@ -226,6 +226,14 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#default_value' => (isset($settings['credit_card']['3ds'])) ? $settings['credit_card']['3ds'] : '1',
     '#description' => t('If this option enable, at checkout, form will always try to use 3-D Secure.'),
   );
+  // BIN Promo
+  $form['credit_card']['bin_promo'] = array(
+    '#type' => 'textfield',
+    '#title' => t('BIN Promo'),
+    '#description' => t('Enter comma separated BINs promo number if any'),
+    '#default_value' => (isset($settings['credit_card']['bin_promo'])) ? $settings['credit_card']['bin_promo'] : NULL,
+  );
+
   // Order ID Prefix.
   $form['prefix'] = array(
     '#type' => 'textfield',
@@ -810,6 +818,12 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     $transaction_data['credit_card']['save_token_id'] = (!empty($pane_values['veritrans']['credit_card']['save']));
   }
 
+  // Apply BIN Promo if any
+  if (!empty($payment_method['settings']['credit_card']['bin_promo'])) {
+    $bin_promo = preg_split("/[,]+/", $payment_method['settings']['credit_card']['bin_promo']);
+    $transaction_data['credit_card']['bins'] = array_map('trim', $bin_promo);
+  }
+
   // Add billing information.
   if (!empty($billing)) {
     $transaction_data['customer_details']['billing_address'] = $billing;
@@ -917,10 +931,23 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
 
   // @todo: review this section.
   if (isset($payment->status_message)) {
-    drupal_set_message(t('@type: @message', array(
-      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-      '@message' => $payment->status_message,
-    )), $status_message);
+    // Check if this BIN limited
+    if (!empty($payment_method['settings']['credit_card']['bin_promo'])
+        && !empty($payment->validation_messages)
+        && in_array('credit card number does not match with the list of credit_card.bins', $payment->validation_messages, TRUE)) {
+      list($method_id, $rule_name) = explode('|', $payment_method['instance_id']);
+
+      $rule = rules_config_load($rule_name);
+      drupal_set_message(t('Validation error, kartu anda bukan termasuk @method', array(
+        '@method' => $rule->label,
+      )), $status_message);
+    }
+    else {
+      drupal_set_message(t('@type: @message', array(
+        '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+        '@message' => $payment->status_message,
+      )), $status_message);
+    }
   }
   // User get redirected to checkout payment first.
   // DSM already called there before complete page.

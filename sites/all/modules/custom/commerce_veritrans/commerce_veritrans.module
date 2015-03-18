@@ -226,6 +226,14 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#default_value' => (isset($settings['credit_card']['3ds'])) ? $settings['credit_card']['3ds'] : '1',
     '#description' => t('If this option enable, at checkout, form will always try to use 3-D Secure.'),
   );
+  // BIN Promo
+  $form['credit_card']['bin_promo'] = array(
+    '#type' => 'textfield',
+    '#title' => t('BIN Promo'),
+    '#description' => t('Enter comma separated BINs promo number if any'),
+    '#default_value' => (isset($settings['credit_card']['bin_promo'])) ? $settings['credit_card']['bin_promo'] : NULL,
+  );
+
   // Order ID Prefix.
   $form['prefix'] = array(
     '#type' => 'textfield',

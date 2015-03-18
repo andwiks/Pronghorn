@@ -931,10 +931,23 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
 
   // @todo: review this section.
   if (isset($payment->status_message)) {
-    drupal_set_message(t('@type: @message', array(
-      '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-      '@message' => $payment->status_message,
-    )), $status_message);
+    // Check if this BIN limited
+    if (!empty($payment_method['settings']['credit_card']['bin_promo'])
+        && !empty($payment->validation_messages)
+        && in_array('credit card number does not match with the list of credit_card.bins', $payment->validation_messages, TRUE)) {
+      list($method_id, $rule_name) = explode('|', $payment_method['instance_id']);
+
+      $rule = rules_config_load($rule_name);
+      drupal_set_message(t('Validation error, kartu anda bukan termasuk @method', array(
+        '@method' => $rule->label,
+      )), $status_message);
+    }
+    else {
+      drupal_set_message(t('@type: @message', array(
+        '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
+        '@message' => $payment->status_message,
+      )), $status_message);
+    }
   }
   // User get redirected to checkout payment first.
   // DSM already called there before complete page.

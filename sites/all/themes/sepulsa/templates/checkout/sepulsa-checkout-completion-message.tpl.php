@@ -18,8 +18,7 @@
               <br><?php print $payment_settings['policy']; ?>
               <br>
             <?php endif; ?>
-            <br>Keterangan transfer : <strong>Sepulsa Order <?php print $order->order_id; ?></strong>
-            <br>
+            <br><strong>Keterangan transfer : Sepulsa Order <?php print $order->order_id; ?></strong>
             <br>Selalu masukkan keterangan transfer diatas ketika melakukan transfer. Hal ini untuk memudahkan proses pembayaran kamu dikonfirmasi dengan cepat.
           </p>
 

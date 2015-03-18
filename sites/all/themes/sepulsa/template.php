@@ -161,23 +161,29 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
-      $details = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings']['details'];
+      $settings = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings'];
 
       $form['commerce_payment']['payment_details']['bank_details'] = array();
       $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';
       $form['commerce_payment']['payment_details']['bank_details']['#suffix'] = '</p>';
       $form['commerce_payment']['payment_details']['bank_details']['account_bank'] = array(
-        '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $details['account_bank'] . '</strong>',
+        '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $settings['details']['account_bank'] . '</strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_number'] = array(
-        '#markup' => '<br>' . t('Account number') . ' : <strong>' . $details['account_number'] . ' </strong>',
+        '#markup' => '<br>' . t('Account number') . ' : <strong>' . $settings['details']['account_number'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_owner'] = array(
-        '#markup' => '<br>' . t('Account owner') . ' : <strong>' . $details['account_owner'] . ' </strong>',
+        '#markup' => '<br>' . t('Account owner') . ' : <strong>' . $settings['details']['account_owner'] . ' </strong>',
       );
       $form['commerce_payment']['payment_details']['bank_details']['account_branch'] = array(
-        '#markup' => '<br>' . t('Branch office') . ' : ' . $details['account_branch'],
+        '#markup' => '<br>' . t('Branch office') . ' : ' . $settings['details']['account_branch'],
       );
+
+      if (!empty($settings['policy'])) {
+        $form['commerce_payment']['payment_details']['policy'] = array(
+          '#markup' => '<p>' . $settings['policy'] . '</p>',
+        );
+      }
     }
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
@@ -232,7 +238,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
       if ($payment_method == 'bank_transfer') {
         $method_instance = commerce_payment_method_instance_load($order->data['payment_method']);
-        $form['checkout_completion_message']['message']['#payment_details'] = $method_instance['settings']['details'];
+        $form['checkout_completion_message']['message']['#payment_settings'] = $method_instance['settings'];
       }
     }
   }
@@ -377,7 +383,7 @@ function sepulsa_theme($existing, $type, $theme, $path) {
         'user' => NULL,
         'order' => NULL,
         'payment_method' => NULL,
-        'payment_details' => NULL,
+        'payment_settings' => NULL,
         'authenticated' => FALSE,
       ),
       'path' => $path . '/templates/checkout',

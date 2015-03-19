@@ -17,6 +17,13 @@
           $(this).closest('.checkbox').removeClass('checked');
         }
       });
+
+      $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]', context).on('change', function () {
+        $('select.selector').next('span.selector').remove();
+        $('select.selector').removeClass('hasCustomSelect');
+        $('select.selector').removeAttr('style');
+        $('select.selector').customSelect();
+      });
     }
   }
 

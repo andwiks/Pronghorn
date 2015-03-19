@@ -1085,6 +1085,11 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       '#validated' => TRUE,
       '#maxlength' => 14,
       '#size' => 14,
+      '#states' => array(
+        'visible' => array(
+          ':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]' => array('value' => 0),
+        ),
+      ),
     );
   }
   else {
@@ -1123,15 +1128,12 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
         '#description' => t('Your first 6 digits and 4 last digits of credit card number and phone number for the last transactions.'),
         '#weight' => 0,
       );
-      // Check default value.
-      if (!(isset($default['tokens']) && $default['tokens'] === '0')) {
-        // Collapsed standard credit card form.
-        $form['credit_card']['#collapsible'] = TRUE;
-        $form['credit_card']['#collapsed'] = TRUE;
-        $form['credit_card']['#attributes'] = array(
-          'style' => array('display: none;'),
-        );
-      }
+
+      $form['credit_card']['#states'] = array(
+        'visible' => array(
+          ':input[name="commerce_payment[payment_details][veritrans][tokens]"]' => array('value' => 0),
+        ),
+      );
 
       // Twoclick need cvv2 input.
       if ($fields['type'] == 'twoclick') {
@@ -1147,6 +1149,11 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
             'autocomplete' => 'off',
             'readonly' => 'readonly',
             'placeholder' => '',
+          ),
+          '#states' => array(
+            'invisible' => array(
+              ':input[name="commerce_payment[payment_details][veritrans][tokens]"]' => array('value' => 0),
+            ),
           ),
         );
       }

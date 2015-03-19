@@ -132,7 +132,8 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['code2'])) {
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#title'] = NULL;
-        $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = "<p></p> <label for='edit-commerce-payment-payment-details-veritrans-code2' style='display: block;'> <h6><strong>".t('Card CVV')."</strong></h6></label>";
+        $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = '<div class="form-item"><p></p> <label for="edit-commerce-payment-payment-details-veritrans-code2" style="display: block;"> <h6><strong>' . t('Card CVV') . '</strong></h6></label>';
+        $form['commerce_payment']['payment_details']['veritrans']['code2']['#suffix'] = '</div>';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['class'] = array('input-text');
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
@@ -143,7 +144,8 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
 
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = "<p></p>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['class'] = array('input-text');
 

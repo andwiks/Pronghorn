@@ -5,10 +5,6 @@
 ;(function($) {
   Drupal.behaviors.commerceVeritrans = {
     attach: function (context, settings) {
-      function toggleCCForm(toggle) {
-        $('fieldset[id^="edit-commerce-payment-payment-details-veritrans-credit-card"]').toggleClass('collapsed', toggle).toggle(!toggle);
-        $(':input[name="commerce_payment[payment_details][veritrans][code2]"]').toggle(toggle).prev('label').toggle(toggle);
-      }
 
       function openDialog(url) {
         $.fancybox({
@@ -55,15 +51,6 @@
       }).done(function (script, textStatus) {
         Veritrans.url = settings.vt_url + '/token';
         Veritrans.client_key = settings.vt_client;
-        $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').hide();
-        if ($(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')) {
-          toggleCCForm($(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0');
-        }
-        if ($(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]').is('select')
-          && $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]').val() == '0'
-        ) {
-          $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').show();
-        }
       });
 
       var card = function () {
@@ -117,13 +104,7 @@
         $(this).removeAttr('readonly').off(event);
       });
 
-      $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]', context).on('change', function () {
-        $(':input[name="commerce_payment[payment_details][veritrans][credit_card][phone_other]"]').toggle(($(this).val() == '0'));
-      });
 
-      $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]', context).on('change', function () {
-        toggleCCForm(($(this).val() != '0'));
-      });
     }
   }
 })(jQuery);

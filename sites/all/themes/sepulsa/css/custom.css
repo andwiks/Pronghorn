@@ -1,6 +1,11 @@
 /*
  * Title:   Custom Style File
  */
+
+.commerce_payment .form-radios input[type="radio"] {
+  margin: -4px 20px 0 20px;
+}
+
 #hotel-features article img.custom_amenity {
   margin-top: 5px;
   margin-right: 5px;

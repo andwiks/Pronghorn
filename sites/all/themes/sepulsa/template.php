@@ -158,7 +158,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       if (isset($form['commerce_payment']['payment_details']['veritrans']['tokens'])) {
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title'] = NULL;
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#prefix'] = "<p></p><h6><strong>".t('Saved Credit Card')."</strong></h6>";
-        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['style'] = 'width:250px !important; margin-right:10px';
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
       }
     }

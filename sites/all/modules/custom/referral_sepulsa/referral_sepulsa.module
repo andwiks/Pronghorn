@@ -1,3 +1,13 @@
 <?php
 
-// For future extend
+// Override Hook User View from Userpoints Module
+function referral_sepulsa_user_view_alter(&$build) {
+    //drupal_set_message("<pre>".print_r($build, true)."</pre>");
+    global $user;
+    $referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+    $output = "<p><input class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
+    $output .= "<div class='share_referral'>Share in: <a href='#'>Facebook</a> <a href='#'>Twitter</a> <a href='#'>Copy</a></div>";
+    $build['Referrals'][0]['#markup'] = $output;
+    //$amount = userpoints_get_current_points($user->uid);
+    //$amount = number_format($amount,0,",",".");
+}

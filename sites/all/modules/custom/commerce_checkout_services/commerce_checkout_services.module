@@ -116,6 +116,9 @@ function commerce_checkout_services_services_resources() {
  * @param string $attribute
  *   Checkout pane form field attribute name.
  *
+ * @todo Remove payment setting which marked confidential
+ * @todo Payment setting which numeric prefix must add _.
+ *
  * @return array
  *   Checkout data array.
  */
@@ -614,7 +617,7 @@ function commerce_checkout_services_resource_process_doc() {
     {
         "checkout":[{
             "account[login][mail]":"andre4s_y@yahoo.com",
-            "commerce_payment[payment_method]":"commerce_payment_example|commerce_payment_commerce_payment_example",
+            "commerce_payment[payment_method]":"commerce_veritrans|commerce_payment_commerce_veritrans",
             "commerce_payment[payment_details][veritrans][token]":"481111-1114-b0c2f250-2968-4ee4-b153-9bbfee3ec0fe",
             "commerce_payment[payment_details][veritrans][response]":"",
             "commerce_payment[payment_details][error]":"",

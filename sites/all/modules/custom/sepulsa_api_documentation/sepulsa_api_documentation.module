@@ -696,10 +696,13 @@ function services_views_retrieve_doc() {
     '#request_url' => '
     <ul>
       <li>Get views coupon:<br />GET ' . $base_url .'/api/views/coupon?display_id=coupon</li>
+      <li>Get views front banner:<br />GET ' . $base_url .'/api/views/front_banner?display_id=banner</li>
+      <li>Get views user owned coupon:<br />GET ' . $base_url .'/api/views/user_owned_coupon?display_id=user_owned_coupon</li>
     </ul>
     ',
     // Example response. E.g., a JSON array.
     '#response' => '
+    // List coupon output.
     [
         {
             "product_id": "44",
@@ -720,6 +723,46 @@ function services_views_retrieve_doc() {
             "nid": "37",
             "website": "www.shopdeca.com",
             "website_link": "http://www.shopdeca.com"
+        }
+    ]
+    // Front banner output.
+    [
+        {
+            "nid": "2696",
+            "image": "http://dev.sepulsa.com/sites/default/files/banner/banner1.jpg",
+            "title": "Isi pulsa sekarang gratis",
+            "body": "Dapatkan cashback dengan isi ulang di SEPULSA"
+        },
+        {
+            "nid": "2697",
+            "image": "http://dev.sepulsa.com/sites/default/files/banner/banner2b.jpg",
+            "title": "Temukan deal-deal menarik hanya di SEPULSA",
+            "body": null
+        },
+        {
+            "nid": "2698",
+            "image": "http://dev.sepulsa.com/sites/default/files/banner/banner3.jpg",
+            "title": "Isi pulsa paling gampang ? Ya di SEPULSA",
+            "body": "Juga cepat, aman dan menguntungkan"
+        }
+    ]
+    // User owned coupon output.
+    [
+        {
+            "nid": "91",
+            "title": "Diskon 100 ribu di Lolalola",
+            "image": "http://dev.sepulsa.com/sites/default/files/styles/thumbnail/public/coupon_product/LL-SEPULSA-BANNER.gif?itok=JcISWhoe",
+            "expired": "1433005200",
+            "code": "SEPULSA100-1853",
+            "detail": "SEPULSA100-1853 <p>Masukkan kode promo ketika melakukan pembayaran.</p>\ "
+        },
+        {
+            "nid": "2706",
+            "title": "Diskon 100 ribu di Sportdeca",
+            "image": "http://dev.sepulsa.com/sites/default/files/styles/thumbnail/public/coupon_product/sportdeca_100.jpg?itok=r6FQjXom",
+            "expired": "1433005200",
+            "code": null,
+            "detail": " <p>Masukkan kode promo <b>PULSA100</b> ketika melakukan pembayaran.</p>\ "
         }
     ]
     ',

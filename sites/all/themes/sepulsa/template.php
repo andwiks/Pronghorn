@@ -103,7 +103,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     $form['account']['#title'] = NULL;
     if ($user->uid == 0) {
-      $form['account']['login']['mail']['#title'] = NULL;
+      $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
       $form['account']['login']['#prefix'] = '<div class="cart-collaterals row col-sm-6 col-md-6 box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
@@ -114,49 +114,49 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#attributes']['class'] = array('input-text');
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#prefix'] = "<p></p><h6><strong>".t('Card Number')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#suffix'] = "<p></p><h6><strong>".t('Expiration')."</strong></h6>";
 
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['style'] = 'width:75px !important; margin-right:10px; display:inline';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['class'] = array('selector');
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#suffix'] = NULL;
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['style'] = 'width:85px; display:inline';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['class'] = array('selector');
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#prefix'] = "<p></p><h6><strong>".t('Card CVV')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['class'] = array('input-text');
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['style'] = "width:75px !important";
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['code2'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['code2']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['code2']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = '<div class="form-item"><p></p> <label for="edit-commerce-payment-payment-details-veritrans-code2" style="display: block;"> <h6><strong>' . t('Card CVV') . '</strong></h6></label>';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#suffix'] = '</div>';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['class'] = array('input-text');
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<p></p><h6><strong>".t('Phone Number')."</strong></h6>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title'] = NULL;
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['class'] = array('input-text');
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['credit_card']['save'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><label><div class="checkbox">';
         $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</div></label>';
       }
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['tokens'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#prefix'] = "<p></p><h6><strong>".t('Saved Credit Card')."</strong></h6>";
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
       }

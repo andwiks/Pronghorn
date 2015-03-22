@@ -598,7 +598,8 @@ function commerce_checkout_services_resource_process_doc() {
     '#auth' => TRUE,
     '#path' => 'checkout/process',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/checkout/process.json<br />POST<br />
+    '#request_url' => $base_url . '/api/checkout/process.json<br />POST
+    <pre>
     // Example payment input.
     {
         "checkout":[{
@@ -620,6 +621,7 @@ function commerce_checkout_services_resource_process_doc() {
             "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393"
         }]
     }
+    </pre>
     ',
     // Example response. E.g., a JSON array.
     '#response' => $response,

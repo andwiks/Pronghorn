@@ -293,22 +293,88 @@ function commerce_checkout_services_resource_pane_retrieve_doc() {
       "commerce_payment_example|commerce_payment_commerce_payment_example": "Example payment",
       "commerce_veritrans|commerce_payment_commerce_veritrans": "Veritrans Payment Gateway"
   }
+  // Response: api/checkout/commerce_payment/payment_methods/value.json
+  {
+      "commerce_veritrans|commerce_payment_commerce_veritrans": {
+          "method_id": "commerce_veritrans",
+          "settings": {
+              "type": "credit_card",
+              "credit_card": {
+                  "card_types": {
+                      "visa": "visa",
+                      "mastercard": "mastercard",
+                      "amex": 0,
+                      "discover": 0,
+                      "dc": 0,
+                      "dci": 0,
+                      "cb": 0,
+                      "jcb": 0,
+                      "maestro": 0,
+                      "visaelectron": 0,
+                      "laser": 0,
+                      "solo": 0,
+                      "switch": 0
+                  },
+                  "bank": "bni",
+                  "type": "oneclick",
+                  "3ds": 1
+              },
+              "prefix": "",
+              "url": "https://api.sandbox.veritrans.co.id/v2",
+              "client_key": "VT-client-jcrIz-zt1xgruE62",
+              "server_key": "VT-server-ee92NebFBtA7IZ-lSkrDQXux",
+              "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js"
+          },
+          "rule_name": "commerce_payment_commerce_veritrans",
+          "weight": 0
+      },
+      "commerce_payment_example|commerce_payment_commerce_payment_example": {
+          "method_id": "commerce_payment_example",
+          "settings": [],
+          "rule_name": "commerce_payment_commerce_payment_example",
+          "weight": 1
+      },
+      "bank_transfer|commerce_payment_bank_transfer": {
+          "method_id": "bank_transfer",
+          "settings": {
+              "details": {
+                  "account_owner": "PT Sepulsa Teknologi Indonesia",
+                  "account_number": "168 0000 696482",
+                  "account_iban": "",
+                  "bank_code_appellation": "",
+                  "bank_code": "",
+                  "account_swift": "",
+                  "account_bank": "Mandiri",
+                  "account_branch": "Jakarta Galeria Niaga Mediterania"
+              },
+              "subject_oid": 0,
+              "policy": ""
+          },
+          "rule_name": "commerce_payment_bank_transfer",
+          "weight": 2
+      }
+  }
   ';
   $element = array(
     '#name' => t('Checkout pane retriever'),
     '#description' => t('Retrieve information related to checkout pane. Usable to get checkout form input name and valid value.'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'checkout',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/checkout/index.json<br />
     GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_method/options.json<br />
-    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_methods/value.json<br />',
+    GET<br />' . $base_url . '/api/checkout/commerce_payment/payment_methods/value.json (warning: user must have cart)<br />',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
     '#verb' => 'operations',
     // Errors.
     '#errors' => array(
+      'invalid_order' => array(
+        '#question' => '500 Internal Server Error : An error occurred (0): Missing bundle property on entity of type commerce_order.',
+        '#description' => t('Unable to get user valid cart. User must have cart order. Check using cart services.'),
+        '#response' => '',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
@@ -533,6 +599,7 @@ function commerce_checkout_services_resource_process_doc() {
     '#path' => 'checkout/process',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/checkout/process.json<br />POST<br />
+    // Example payment input.
     {
         "checkout":[{
             "account[login][mail]":"andre4s_y@yahoo.com",
@@ -540,6 +607,17 @@ function commerce_checkout_services_resource_process_doc() {
             "commerce_payment[payment_details][credit_card][number]":"4111111111111111",
             "commerce_payment[payment_details][credit_card][exp_month]":"03",
             "commerce_payment[payment_details][credit_card][exp_year]":"2015"
+        }]
+    }
+    // Veritrans standard valid credit card input.
+    {
+        "checkout":[{
+            "account[login][mail]":"andre4s_y@yahoo.com",
+            "commerce_payment[payment_method]":"commerce_payment_example|commerce_payment_commerce_payment_example",
+            "commerce_payment[payment_details][veritrans][token]":"481111-1114-b0c2f250-2968-4ee4-b153-9bbfee3ec0fe",
+            "commerce_payment[payment_details][veritrans][response]":"",
+            "commerce_payment[payment_details][error]":"",
+            "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393"
         }]
     }
     ',

@@ -7,9 +7,9 @@ function commerce_veritrans_rules_condition_info() {
   $conditions['commerce_veritrans_method_instance_comparison'] = array(
     'label' => t('Payment method instance comparison'),
     'parameter' => array(
-      'commerce_payment_transaction' => array(
-        'label' => t('Payment Transaction'),
-        'type' => 'commerce_payment_transaction',
+      'commerce_order' => array(
+        'label' => t('Order'),
+        'type' => 'commerce_order',
       ),
       'instance_id' => array(
         'type' => 'text',
@@ -38,6 +38,13 @@ function commerce_veritrans_rules_payment_method_instance_options_list() {
   return $options;
 }
 
-function commerce_veritrans_rules_compare_selected_payment_method_instance($payment_transaction, $instance_id) {
-  return $payment_transaction->instance_id ==  implode('|', array($payment_transaction->payment_method, $instance_id));
+function commerce_veritrans_rules_compare_selected_payment_method_instance($order, $instance_id) {
+  if (!empty($order->data['payment_method'])) {
+    list($selected_method_id, $selected_instance_id) = explode('|', $order->data['payment_method']);
+  }
+  else {
+    $selected_instance_id = '-none-';
+  }
+
+  return $instance_id == $selected_instance_id;
 }

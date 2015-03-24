@@ -803,7 +803,7 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
                 case '00':
                   // 00 means query is success: but necessaryly topup success.
                   // Check container 9: KETERANGAN.
-                  if (isset($container[9]) && preg_match('#^' . $topup['ref2'] . ' #', $container[9])) {
+                  if (isset($container[9]) && preg_match('#^' . $topup['ref2'] . '#', $container[9])) {
                     if (preg_match('#sedang\s+diproses#i', $container[9])) {
                       return TOPUP_PENDING;
                     }
@@ -814,7 +814,7 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
                       return TOPUP_SUCCESS;
                     }
                   }
-                  // Other: return pending -> be safe, need administer.
+                  // Other: return error -> be safe, need administer.
                   return TOPUP_ERROR;
 
                 case '':

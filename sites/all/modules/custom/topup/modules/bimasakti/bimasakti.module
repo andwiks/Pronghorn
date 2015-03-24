@@ -815,7 +815,7 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
                     }
                   }
                   // Other: return pending -> be safe, need administer.
-                  return TOPUP_PENDING;
+                  return TOPUP_ERROR;
 
                 case '':
                   // Return: topup pending.

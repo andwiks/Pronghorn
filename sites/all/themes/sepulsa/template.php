@@ -110,7 +110,10 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     }
 
     $form['commerce_payment']['#title'] = NULL;
-    $form['commerce_payment']['#prefix'] = '<p></p><h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#prefix'] = '<div id="commerce-payment-ajax-wrapper">';
+    $form['commerce_payment']['#prefix'] .= '<p></p><h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#suffix'] = '</div>';
+
 
     if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#attributes']['class'] = array('input-text');
@@ -187,6 +190,11 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       }
     }
 
+    if (!empty($form['commerce_coupon'])) {
+      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
+    }
+
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
 
@@ -254,6 +262,14 @@ function sepulsa_form_webform_client_form_alter(&$form, &$form_state, $form_id) 
     $form['actions']['submit']['#attributes']['class'][] = 'btn';
     $form['actions']['submit']['#attributes']['class'][] = 'style1';
   }
+}
+
+/**
+ * Implements hook_commerce_coupon_add_coupon_ajax_alter().
+ */
+function sepulsa_commerce_coupon_add_coupon_ajax_alter(&$commands, $form, &$form_state) {
+  $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
+  $commands[] = ajax_command_replace('#commerce-payment-ajax-wrapper', drupal_render($rebuild['commerce_payment']));
 }
 
 /**

@@ -321,6 +321,8 @@ function bimasakti_topup_query($topup, $settings, &$output = NULL) {
     $topup_time_end = date('YmdHis', $topup_time_start + 1800);
     $topup_time_start = date('YmdHis', $topup_time_start);
   }
+  // Configure time start: always 00:00:00
+  $topup_time_start = preg_replace('#\d{6}$#', '000000', $topup_time_start);
 
   // Check topup time.
   if (!empty($topup_time_start)) {
@@ -801,6 +803,10 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
 
                 case '':
                   // Return: topup pending.
+                  return TOPUP_PENDING;
+
+                case '06':
+                  // No transaction data: return pending data.
                   return TOPUP_PENDING;
 
                 default:

@@ -341,15 +341,15 @@ function bimasakti_topup_query($topup, $settings, &$output = NULL) {
     // Add value: Transaction ID.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', $topup['request_id']);
+    $value->addChild('string', $topup['ref2']);
     // Add value: product code.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
     $value->addChild('string', $topup['field_topup_code']);
-    // Add value: Customer ID.
+    // Add value: Customer ID => phone number.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', $topup['ref2']);
+    $value->addChild('string', $topup['field_topup_phone_number']);
     // Add value: limit.
     $param = $params->addChild('param');
     $value = $param->addChild('value');

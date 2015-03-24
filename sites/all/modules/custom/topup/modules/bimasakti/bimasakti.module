@@ -790,9 +790,8 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
           // Store output if necessary.
           if (!is_null($output)) {
             $output = $debug;
-            $topup['topup_data']['data'][$topup['request_id']] = array(
-              'note' => (isset($container[9])) ? $container[9] : '-',
-            );
+            // Update note information.
+            $topup['topup_data']['data'][$topup['request_id']]['note'] = (isset($container[9])) ? $container[9] : '-';
             $output['topup_data'] = $topup['topup_data']['data'];
           }
           // 1. Check value: Phone number [3].

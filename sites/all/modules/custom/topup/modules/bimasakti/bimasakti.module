@@ -791,15 +791,28 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
             $output = $debug;
             $output['topup_data'] = $topup['topup_data']['data'];
           }
-          // 1. Check value: Ref2 [3].
+          // 1. Check value: Phone number [3].
           // 2. Check value: RESPONSECODE [7].
           if (isset($container[3]) && isset($container[7])) {
-            // Check whether ref2 is correct.
-            if ($topup['ref2'] == $container[3]) {
+            // Check whether phone number is correct.
+            if ($topup['field_topup_phone_number'] == $container[3]) {
               switch ($container[7]) {
                 case '00':
-                  // Return: topup success.
-                  return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+                  // 00 means query is success: but necessaryly topup success.
+                  // Check container 9: KETERANGAN.
+                  if (isset($container[9]) && preg_match('#^' . $topup['ref2'] . ' #', $container[9])) {
+                    if (preg_match('#sedang\s+diproses#i', $container[9])) {
+                      return TOPUP_PENDING;
+                    }
+                    if (preg_match('#gagal#i', $container[9])) {
+                      return TOPUP_FAILED;
+                    }
+                    if (preg_match('#berhasil#i', $container[9])) {
+                      return TOPUP_SUCCESS;
+                    }
+                  }
+                  // Other: return pending -> be safe, need administer.
+                  return TOPUP_PENDING;
 
                 case '':
                   // Return: topup pending.

@@ -761,16 +761,8 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
                 return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
 
               case '15':
-                // 1. Check try parameter: try must bigger than 1.
-                // 2. Check keterangan: "Order telah sukses".
-                if ($topup['try'] > 1
-                  && isset($container[9])
-                  && preg_match('#order telah sukses#i', $container[9])
-                ) {
-                  return TOPUP_SUCCESS;
-                }
-                // Other condition: return failed.
-                return TOPUP_FAILED;
+                // Return error: try to topup twice a day.
+                return TOPUP_ERROR;
 
               case '':
                 // Save the ref 2 response.

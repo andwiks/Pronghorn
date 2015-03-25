@@ -478,7 +478,8 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
     $response['token_id'] = '-filtered-';
   }
   // Log payment response data: even for failed condition.
-  watchdog('commerce_veritrans', 'Payment AJAX Response Validation: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
+  watchdog('commerce_veritrans', 'Payment AJAX Response Validation: Web<pre>@payment</pre> Services<pre>@post</pre> Payment Method<pre>@pmethod</pre> Order<pre>@order</pre>', array(
+    '@post' => (isset($_POST) && !empty($_POST)) ? print_r($_POST, TRUE) : '-',
     '@payment' => (!empty($response)) ? print_r($response, TRUE) : print_r($pane_values['veritrans']['response'], TRUE),
     '@pmethod' => print_r($payment_method, TRUE),
     '@order' => print_r($order, TRUE),

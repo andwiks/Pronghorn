@@ -205,6 +205,12 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     if (!empty($form['commerce_coupon'])) {
       $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
       $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
+
+      if (!empty($form_state['order']->commerce_coupons)) {
+        $form['commerce_coupon']['coupon_code']['#access'] = FALSE;
+        $form['commerce_coupon']['coupon_add']['#access'] = FALSE;
+        $form['commerce_coupon']['redeemed_coupons']['#prefix'] = '<label style="margin-bottom:-10px">' . t('Coupon Code') . '</label>';
+      }
     }
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
@@ -282,7 +288,14 @@ function sepulsa_form_webform_client_form_alter(&$form, &$form_state, $form_id) 
  */
 function sepulsa_commerce_coupon_add_coupon_ajax_alter(&$commands, $form, &$form_state) {
   $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
-  $commands[] = ajax_command_replace('#commerce-payment-ajax-wrapper', drupal_render($rebuild['commerce_payment']));
+  $commerce_payment = $rebuild['commerce_payment'];
+
+  if (!in_array($form_state['input']['commerce_payment']['payment_method'], array_keys($commerce_payment['payment_method']['#options']))) {
+    $payment_method = reset(array_keys($commerce_payment['payment_method']['#options']));
+    $form_state['input']['commerce_payment']['payment_method'] = $payment_method;
+    $form_state['values']['commerce_payment']['payment_method'] = $payment_method;
+  }
+  $commands[] = ajax_command_replace('#commerce-payment-ajax-wrapper', drupal_render($commerce_payment));
 }
 
 /**

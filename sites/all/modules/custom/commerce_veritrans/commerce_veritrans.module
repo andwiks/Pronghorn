@@ -1274,7 +1274,7 @@ function commerce_veritrans_api($data, $settings) {
   }
 
   // Log this condition, everything get log.
-  watchdog('veritrans', 'Send API with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+  watchdog('commerce_veritrans', 'Send API with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
     '@status' => (isset($result->code) && $result->code == 200) ? 'OK' : 'BAD',
     '!debug' => print_r($result, TRUE),
     '!options' => print_r($http_options, TRUE),

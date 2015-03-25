@@ -23,6 +23,26 @@ select.selector:not(.hasCustomSelect) {
   opacity: 1;
 }
 
+/**
+ * Cart Contents
+ */
+.woocommerce table.shop_table tfoot tr {
+  border-left: 1px solid #ddd;
+  background:#f7f7f7;
+}
+.woocommerce table.shop_table tfoot tr:last-child {
+  border-bottom: 1px solid #ddd;
+}
+.woocommerce table.shop_table tfoot td {
+  padding: 5px;
+}
+.woocommerce table.shop_table tfoot tr:first-child td {
+  padding-top: 14px;
+}
+.woocommerce table.shop_table tfoot tr:last-child td {
+  padding-bottom: 14px;
+}
+
 /*
  * Payment Detail
  */

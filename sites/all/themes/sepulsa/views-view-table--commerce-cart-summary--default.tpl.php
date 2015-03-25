@@ -18,49 +18,29 @@
  *   field id, then row number. This matches the index in $rows.
  * @ingroup views_templates
  */
-
-/*TO DO : Move this to module*/
-global $user;
-$order = commerce_cart_order_load($user->uid);
-$wrapper = entity_metadata_wrapper('commerce_order', $order);
-$order_total = $wrapper->commerce_order_total->value();
-
 ?>
-<table class="shop_table cart box-sm" <?php print $attributes; ?>>
-   <?php if (!empty($title) || !empty($caption)) : ?>
-     <caption><?php print $caption . $title; ?></caption>
-  <?php endif; ?>
-  <?php if (!empty($header)) : ?>
-    <thead>
-      <tr>
-        <?php foreach ($header as $field => $label): ?>
-          <th <?php if ($header_classes[$field]) { print 'class="'. $header_classes[$field] . '" '; } ?>>
-            <strong><?php print $label; ?></strong>
-          </th>
-        <?php endforeach; ?>
-      </tr>
-    </thead>
-  <?php endif; ?>
-  <tbody>
-    <?php foreach ($rows as $row_count => $row): ?>
-      <tr class="cart_item" style="border: 1px solid #ddd;">
-        <?php foreach ($row as $field => $content): ?>
-          <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
-            <?php print $content; ?>
-          </td>
-        <?php endforeach; ?>
-      </tr>
+<?php if (!empty($title) || !empty($caption)) : ?>
+  <caption><?php print $caption . $title; ?></caption>
+<?php endif; ?>
+<?php if (!empty($header)) : ?>
+<thead>
+  <tr>
+    <?php foreach ($header as $field => $label): ?>
+      <th <?php if ($header_classes[$field]) { print 'class="'. $header_classes[$field] . '" '; } ?>>
+        <strong><?php print $label; ?></strong>
+      </th>
     <?php endforeach; ?>
-      
-    <tr class="cart_item" style="border: 1px solid #ddd; background:#f7f7f7">
-        <td class="product-name">&nbsp;</td>
-        <td class="product-price">&nbsp;</td>
-        <td class="product-price">
-            <strong>TOTAL:</strong>
+  </tr>
+</thead>
+<?php endif; ?>
+<tbody>
+  <?php foreach ($rows as $row_count => $row): ?>
+    <tr class="cart_item" style="border: 1px solid #ddd;">
+      <?php foreach ($row as $field => $content): ?>
+        <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
+          <?php print $content; ?>
         </td>
-        <td class="product-subtotal">
-            <span class="amount"><strong><?php print commerce_currency_format($order_total['amount'], $order_total['currency_code']); ?></strong></span>
-        </td>
+      <?php endforeach; ?>
     </tr>
-  </tbody>
-</table>
+  <?php endforeach; ?>
+</tbody>

@@ -97,9 +97,12 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
   } else if ($form_id == "commerce_checkout_form_checkout") {
     global $user;
+    $form['#attributes']['class'][] = 'row';
 
     //drupal_set_message("<pre>".print_r($form['commerce_payment'], true)."</pre>");
     $form['cart_contents']['#title'] = NULL;
+    $form['cart_contents']['#prefix'] = '<div class="col-md-7"><h4><strong>Detail Transaksi</strong></h4>';
+    $form['cart_contents']['#suffix'] = '</div><div class="col-md-5">';
 
     $form['account']['#title'] = NULL;
     if ($user->uid == 0) {
@@ -153,12 +156,12 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#suffix'] = "</div>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
-       
+
 
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-left: 30%; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['class'] = array('input-text');
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['credit_card']['save'])) {
@@ -207,6 +210,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
 
+    $form['buttons']['#suffix'] = '</div>';
   } else if ($form_id == "views_form_commerce_cart_block_default") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     global $base_url;

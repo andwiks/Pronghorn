@@ -181,6 +181,13 @@ function commerce_checkout_services_resource_process($checkout) {
   if ($order !== FALSE && commerce_checkout_order_can_checkout($order)) {
     // Check for non empty checkout data.
     if (!empty($checkout)) {
+      // Log checkout input data.
+      watchdog('commerce_checkout_services', 'Checkout Process Order @oid Data <pre>@checkout</pre> Order <pre>@order</pre>', array(
+        '@oid' => $order->order_id,
+        '@checkout' => print_r($checkout, TRUE),
+        '@order' => print_r($order, TRUE),
+      ), WATCHDOG_INFO, 'Checkout Services: Process ' . $order->order_id);
+
       // Load commerce_checkout.pages.inc file.
       module_load_include('inc', 'commerce_checkout', 'includes/commerce_checkout.pages');
 

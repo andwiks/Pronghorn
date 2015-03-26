@@ -9,6 +9,7 @@ function sepulsa_campaign_form_rules_ui_edit_element_alter(&$form, &$form_state,
   }
 
   if (in_array($form_state['rules_element']->getElementName(), $actions)) {
+    $campaign = empty($form_state['element_settings']['payment_method']['settings']['sepulsa_campaign']['value']) ? NULL : $form_state['element_settings']['payment_method']['settings']['sepulsa_campaign']['value'];
     $form['parameter']['payment_method']['settings']['payment_method']['settings']['sepulsa_campaign'] = array(
       '#type' => 'text_format',
       '#title' => t('Special Campaign'),

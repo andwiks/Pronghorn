@@ -23,7 +23,6 @@
       }
 
       function callback(response) {
-        $form = $('form#commerce-checkout-form-checkout');
         if (response.redirect_url) {
           openDialog(response.redirect_url);
         }
@@ -40,7 +39,7 @@
             $("#error_message").val(response.status_message);
           }
 
-          $form.submit();
+          $('#edit-continue').click();
         }
       }
 
@@ -82,7 +81,7 @@
         /**
          * Check only if commerce_veritrans is selected as payment method
          */
-        if ($(':input[name="commerce_payment[payment_method]"][value^="commerce_veritrans"]').is(':checked')) {
+        if (typeof event.isTrigger === 'undefined' && $(':input[name="commerce_payment[payment_method]"][value^="commerce_veritrans"]').is(':checked')) {
           if (settings.vt_type == "oneclick"
             && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')
             && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0'

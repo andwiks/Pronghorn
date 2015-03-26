@@ -96,16 +96,29 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
 
   } else if ($form_id == "commerce_checkout_form_checkout") {
-    global $user;
     $form['#attributes']['class'][] = 'row';
 
-    //drupal_set_message("<pre>".print_r($form['commerce_payment'], true)."</pre>");
     $form['cart_contents']['#title'] = NULL;
     $form['cart_contents']['#prefix'] = '<div class="col-md-7"><h4><strong>Detail Transaksi</strong></h4>';
-    $form['cart_contents']['#suffix'] = '</div><div class="col-md-5">';
+    // $form['cart_contents']['#suffix'] = '</div><div class="col-md-5">';
 
-    $form['account']['#title'] = NULL;
-    if ($user->uid == 0) {
+    if (!empty($form['commerce_coupon'])) {
+      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
+      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'full-width';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'style1';
+
+      if (!empty($form_state['order']->commerce_coupons)) {
+        $form['commerce_coupon']['coupon_code']['#access'] = FALSE;
+        $form['commerce_coupon']['coupon_add']['#access'] = FALSE;
+        $form['commerce_coupon']['redeemed_coupons']['#prefix'] = '<label style="margin-bottom:-10px">' . t('Coupon Code') . '</label>';
+      }
+
+      $form['commerce_coupon']['#suffix'] .= '</div><div class="col-md-5">';
+    }
+
+    if (!empty($form['account'])) {
+      $form['account']['#title'] = NULL;
       $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
       $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
@@ -199,17 +212,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_payment']['payment_details']['policy'] = array(
           '#markup' => '<p>' . $settings['policy'] . '</p>',
         );
-      }
-    }
-
-    if (!empty($form['commerce_coupon'])) {
-      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
-      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
-
-      if (!empty($form_state['order']->commerce_coupons)) {
-        $form['commerce_coupon']['coupon_code']['#access'] = FALSE;
-        $form['commerce_coupon']['coupon_add']['#access'] = FALSE;
-        $form['commerce_coupon']['redeemed_coupons']['#prefix'] = '<label style="margin-bottom:-10px">' . t('Coupon Code') . '</label>';
       }
     }
 

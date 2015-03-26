@@ -1116,7 +1116,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       // Define token options.
       $token_options = array();
       foreach ($tokens as $token) {
-        $token_options[$token->token] = commerce_veritrans_token_format($token, TRUE);
+        $token_options[$token->token] = commerce_veritrans_token_format($token, FALSE);
       }
       // Add last options.
       $token_options[0] = t('New Credit Card');

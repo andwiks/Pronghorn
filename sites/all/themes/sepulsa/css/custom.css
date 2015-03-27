@@ -66,9 +66,9 @@ div#payment-details .form-item .commerce-month-year-divider {
     text-align: center;
     display: inline-block;
     position: relative;
-    top: -15px;
     height: 20px;
     line-height: 20px;
+    margin: 0 0 0 -10px;
 }
 
 #payment-details {

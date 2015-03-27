@@ -1125,7 +1125,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
         '#type' => 'select',
         '#title' => t('Saved Credit Card'),
         '#options' => $token_options,
-        '#description' => t('Your first 6 digits and 4 last digits of credit card number and phone number for the last transactions.'),
+        '#description' => t('Your first 6 digits and 4 last digits of credit card number for the last transactions.'),
         '#weight' => 0,
       );
 

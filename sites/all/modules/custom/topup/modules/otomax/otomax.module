@@ -585,6 +585,10 @@ function otomax_send($data, $settings, $topup, &$output = NULL) {
             // Return: topup pending.
             return TOPUP_PENDING;
 
+          case '94':
+            // Return error: try to topup more than once a day.
+            return TOPUP_ERROR;
+
           default:
             // Return: topup failed.
             return TOPUP_FAILED;

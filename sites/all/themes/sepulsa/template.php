@@ -99,8 +99,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['#attributes']['class'][] = 'row';
 
     $form['cart_contents']['#title'] = NULL;
-    $form['cart_contents']['#prefix'] = '<div class="col-md-7"><h4><strong>Detail Transaksi</strong></h4>';
-    // $form['cart_contents']['#suffix'] = '</div><div class="col-md-5">';
 
     if (!empty($form['commerce_coupon'])) {
       $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
@@ -113,8 +111,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_coupon']['coupon_add']['#access'] = FALSE;
         $form['commerce_coupon']['redeemed_coupons']['#prefix'] = '<label style="margin-bottom:-10px">' . t('Coupon Code') . '</label>';
       }
-
-      $form['commerce_coupon']['#suffix'] .= '</div><div class="col-md-5">';
     }
 
     if (!empty($form['account'])) {
@@ -217,8 +213,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
-
-    $form['buttons']['#suffix'] = '</div>';
   } else if ($form_id == "views_form_commerce_cart_block_default") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     global $base_url;
@@ -349,7 +343,7 @@ function sepulsa_preprocess_block(&$vars, $hook) {
 /**
  * Implements hook_preprocess_menu_link ().
  */
-function sepulsa_preprocess_menu_link (&$variables) {
+function sepulsa_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
   }
@@ -475,6 +469,11 @@ function sepulsa_status_messages($variables) {
  */
 function sepulsa_theme($existing, $type, $theme, $path) {
   return array(
+    'commerce_checkout_form_checkout' => array(
+      'render element' => 'form',
+      'path' => $path . '/templates/checkout',
+      'template' => 'commerce-checkout-form-checkout',
+    ),
     'sepulsa_checkout_completion_message' => array(
       'variables' => array(
         'user' => NULL,

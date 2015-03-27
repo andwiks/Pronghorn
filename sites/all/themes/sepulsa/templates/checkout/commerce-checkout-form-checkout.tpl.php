@@ -1,5 +1,7 @@
 <div class="col-md-7">
+  <h4><strong>Detail Transaksi</strong></h4>
   <?php print render($form['cart_contents']); ?>
+
   <?php print render($form['commerce_coupon']); ?>
 </div>
 

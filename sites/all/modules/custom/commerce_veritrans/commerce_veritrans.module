@@ -478,7 +478,7 @@ function commerce_veritrans_submit_form_validate($payment_method, $pane_form, $p
     $response['token_id'] = '-filtered-';
   }
   // Log payment response data: even for failed condition.
-  watchdog('commerce_veritrans', 'Payment AJAX Response Validation: <pre>@payment</pre> <pre>@pmethod</pre> <pre>@order</pre>', array(
+  watchdog('commerce_veritrans', 'Payment AJAX Response Validation: <pre>@payment</pre> Payment Method<pre>@pmethod</pre> Order<pre>@order</pre>', array(
     '@payment' => (!empty($response)) ? print_r($response, TRUE) : print_r($pane_values['veritrans']['response'], TRUE),
     '@pmethod' => print_r($payment_method, TRUE),
     '@order' => print_r($order, TRUE),
@@ -1116,7 +1116,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
       // Define token options.
       $token_options = array();
       foreach ($tokens as $token) {
-        $token_options[$token->token] = commerce_veritrans_token_format($token, TRUE);
+        $token_options[$token->token] = commerce_veritrans_token_format($token, FALSE);
       }
       // Add last options.
       $token_options[0] = t('New Credit Card');
@@ -1125,7 +1125,7 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
         '#type' => 'select',
         '#title' => t('Saved Credit Card'),
         '#options' => $token_options,
-        '#description' => t('Your first 6 digits and 4 last digits of credit card number and phone number for the last transactions.'),
+        '#description' => t('Your first 6 digits and 4 last digits of credit card number for the last transactions.'),
         '#weight' => 0,
       );
 
@@ -1274,7 +1274,7 @@ function commerce_veritrans_api($data, $settings) {
   }
 
   // Log this condition, everything get log.
-  watchdog('veritrans', 'Send API with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
+  watchdog('commerce_veritrans', 'Send API with result (@status) Debug <pre>!debug</pre> <pre>Options: !options</pre>', array(
     '@status' => (isset($result->code) && $result->code == 200) ? 'OK' : 'BAD',
     '!debug' => print_r($result, TRUE),
     '!options' => print_r($http_options, TRUE),

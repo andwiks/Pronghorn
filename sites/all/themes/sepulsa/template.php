@@ -96,69 +96,95 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
 
   } else if ($form_id == "commerce_checkout_form_checkout") {
-    global $user;
+    $form['#attributes']['class'][] = 'row';
 
-    //drupal_set_message("<pre>".print_r($form['commerce_payment'], true)."</pre>");
     $form['cart_contents']['#title'] = NULL;
 
-    $form['account']['#title'] = NULL;
-    if ($user->uid == 0) {
-      $form['account']['login']['mail']['#title'] = NULL;
+    if (!empty($form['commerce_coupon'])) {
+      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
+      $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'full-width';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn-sm';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'style1';
+
+      if (!empty($form_state['order']->commerce_coupons)) {
+        $form['commerce_coupon']['coupon_code']['#access'] = FALSE;
+        $form['commerce_coupon']['coupon_add']['#access'] = FALSE;
+        $form['commerce_coupon']['redeemed_coupons']['#prefix'] = '<label style="margin-bottom:-10px">' . t('Coupon Code') . '</label>';
+      }
+    }
+
+    if (!empty($form['account'])) {
+      $form['account']['#title'] = NULL;
+      $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
-      $form['account']['login']['#prefix'] = '<div class="cart-collaterals row col-sm-6 col-md-6 box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
+      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
     }
 
     $form['commerce_payment']['#title'] = NULL;
-    $form['commerce_payment']['#prefix'] = '<p></p><h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#prefix'] = '<div id="commerce-payment-ajax-wrapper">';
+    $form['commerce_payment']['#prefix'] .= '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#suffix'] = '</div>';
+
 
     if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['#prefix'] = '<div class="clearfix"></div>';
+
+      # This Form attribute for Card Number
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#prefix'] = "<div class='form-item'><label>".t('Card Number')."</label>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#attributes']['class'] = array('input-text');
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#prefix'] = "<p></p><h6><strong>".t('Card Number')."</strong></h6>";
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#suffix'] = "<p></p><h6><strong>".t('Expiration')."</strong></h6>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['number']['#suffix'] = "</div>";
 
+      # This Form attribute for Card Expire
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#prefix'] = '<div class="form-item"><label>'.t("Expiration").'</label>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['style'] = 'width:75px !important; margin-right:10px; display:inline';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['class'] = array('selector');
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#suffix'] = NULL;
+      // $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#attributes']['class'] = array('selector');
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_month']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['style'] = 'width:85px; display:inline';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['class'] = array('selector');
+      // $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#attributes']['class'] = array('selector');
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['exp_year']['#suffix'] = '</div>';
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#prefix'] = "<p></p><h6><strong>".t('Card CVV')."</strong></h6>";
+      # This Form attribute for Card CVV
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#title_display'] = 'invisible';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#prefix'] = "<div class='form-item'><label>".t('Card CVV')."</label>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#suffix'] = "</div>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['class'] = array('input-text');
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['code']['#attributes']['style'] = "width:75px !important";
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['code2'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['code2']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['code2']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#prefix'] = '<div class="form-item"><p></p> <label for="edit-commerce-payment-payment-details-veritrans-code2" style="display: block;"> <h6><strong>' . t('Card CVV') . '</strong></h6></label>';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#suffix'] = '</div>';
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['class'] = array('input-text');
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title'] = NULL;
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<p></p><h6><strong>".t('Phone Number')."</strong></h6>";
+      # This Form attribute for Phone Number
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title_display'] = 'invisible';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<div class='form-item'><label>".t('Phone Number')."</label>";
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#suffix'] = "</div>";
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
+      // $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
 
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title'] = NULL;
+
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-right:10px';
+      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['style'] = 'width:150px !important; margin-left: 30%; margin-right:10px';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#attributes']['class'] = array('input-text');
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['credit_card']['save'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#prefix'] = '<p></p><label><div class="checkbox">';
         $form['commerce_payment']['payment_details']['veritrans']['credit_card']['save']['#suffix'] = t('Save Credit Card').'</div></label>';
       }
 
       if (isset($form['commerce_payment']['payment_details']['veritrans']['tokens'])) {
-        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title'] = NULL;
+        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#title_display'] = 'invisible';
         $form['commerce_payment']['payment_details']['veritrans']['tokens']['#prefix'] = "<p></p><h6><strong>".t('Saved Credit Card')."</strong></h6>";
-        $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
+        // $form['commerce_payment']['payment_details']['veritrans']['tokens']['#attributes']['class'] = array('selector');
       }
     }
     elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
@@ -189,7 +215,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
-
   } else if ($form_id == "views_form_commerce_cart_block_default") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     global $base_url;
@@ -257,6 +282,21 @@ function sepulsa_form_webform_client_form_alter(&$form, &$form_state, $form_id) 
 }
 
 /**
+ * Implements hook_commerce_coupon_add_coupon_ajax_alter().
+ */
+function sepulsa_commerce_coupon_add_coupon_ajax_alter(&$commands, $form, &$form_state) {
+  $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
+  $commerce_payment = $rebuild['commerce_payment'];
+
+  if (!in_array($form_state['input']['commerce_payment']['payment_method'], array_keys($commerce_payment['payment_method']['#options']))) {
+    $payment_method = reset(array_keys($commerce_payment['payment_method']['#options']));
+    $form_state['input']['commerce_payment']['payment_method'] = $payment_method;
+    $form_state['values']['commerce_payment']['payment_method'] = $payment_method;
+  }
+  $commands[] = ajax_command_replace('#commerce-payment-ajax-wrapper', drupal_render($commerce_payment));
+}
+
+/**
  * Implementation of expand_password_confirm.
  */
 function sepulsa_form_process_password_confirm($element) {
@@ -305,7 +345,7 @@ function sepulsa_preprocess_block(&$vars, $hook) {
 /**
  * Implements hook_preprocess_menu_link ().
  */
-function sepulsa_preprocess_menu_link (&$variables) {
+function sepulsa_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
   }
@@ -375,10 +415,67 @@ function sepulsa_form_element($variables) {
 }
 
 /**
+ * Overrides theme_status_messages().
+ */
+function sepulsa_status_messages($variables) {
+  $display = $variables['display'];
+  $output = '';
+
+  $status_heading = array(
+    'status' => t('Status message'),
+    'error' => t('Error message'),
+    'warning' => t('Warning message'),
+    'info' => t('Informative message'),
+  );
+
+  // Map Drupal message types to their corresponding Bootstrap classes.
+  // @see http://twitter.github.com/bootstrap/components.html#alerts
+  $status_class = array(
+    'status' => 'success',
+    'error' => 'error',
+    'warning' => 'notice',
+    // Not supported, but in theory a module could send any type of message.
+    // @see drupal_set_message()
+    // @see theme_status_messages()
+    'info' => 'help',
+  );
+
+  foreach (drupal_get_messages($display) as $type => $messages) {
+    $class = (isset($status_class[$type])) ? ' alert-' . $status_class[$type] : '';
+    $output .= "<div class=\"alert alert-block$class\">\n";
+    // $output .= "  <a class=\"close\" data-dismiss=\"alert\" href=\"#\">&times;</a>\n";
+    $output .= "  <a class=\"close\" data-dismiss=\"alert\" href=\"#\"></a>\n";
+
+    if (!empty($status_heading[$type])) {
+      $output .= '<h4 class="element-invisible">' . $status_heading[$type] . "</h4>\n";
+    }
+
+    if (count($messages) > 1) {
+      $output .= " <ul>\n";
+      foreach ($messages as $message) {
+        $output .= '  <li>' . $message . "</li>\n";
+      }
+      $output .= " </ul>\n";
+    }
+    else {
+      $output .= $messages[0];
+    }
+
+    $output .= "</div>\n";
+  }
+  return $output;
+}
+
+/**
  * Implements hook_theme().
  */
 function sepulsa_theme($existing, $type, $theme, $path) {
   return array(
+    'commerce_checkout_form_checkout' => array(
+      'render element' => 'form',
+      'path' => $path . '/templates/checkout',
+      'template' => 'commerce-checkout-form-checkout',
+    ),
     'sepulsa_checkout_completion_message' => array(
       'variables' => array(
         'user' => NULL,

@@ -23,6 +23,8 @@
         $('select.selector').removeClass('hasCustomSelect');
         $('select.selector').removeAttr('style');
         $('select.selector').customSelect();
+
+        $(this).siblings('.description').toggle(!!parseInt($(this).val()));
       });
     }
   }

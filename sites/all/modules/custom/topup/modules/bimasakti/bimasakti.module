@@ -321,6 +321,8 @@ function bimasakti_topup_query($topup, $settings, &$output = NULL) {
     $topup_time_end = date('YmdHis', $topup_time_start + 1800);
     $topup_time_start = date('YmdHis', $topup_time_start);
   }
+  // Configure time start: always 00:00:00
+  $topup_time_start = preg_replace('#\d{6}$#', '000000', $topup_time_start);
 
   // Check topup time.
   if (!empty($topup_time_start)) {
@@ -339,15 +341,15 @@ function bimasakti_topup_query($topup, $settings, &$output = NULL) {
     // Add value: Transaction ID.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', $topup['request_id']);
+    $value->addChild('string', $topup['ref2']);
     // Add value: product code.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
     $value->addChild('string', $topup['field_topup_code']);
-    // Add value: Customer ID.
+    // Add value: Customer ID => phone number.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
-    $value->addChild('string', $topup['ref2']);
+    $value->addChild('string', $topup['field_topup_phone_number']);
     // Add value: limit.
     $param = $params->addChild('param');
     $value = $param->addChild('value');
@@ -747,6 +749,7 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
             $topup['topup_data']['data'][$topup['request_id']] = array(
               'time' => $container[1],
               'ref2' => $container[7],
+              'note' => (isset($container[9])) ? $container[9] : '-',
             );
             $output['topup_data'] = $topup['topup_data']['data'];
           }
@@ -756,6 +759,10 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
               case '00':
                 // Return: topup success.
                 return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+
+              case '15':
+                // Return error: try to topup twice a day.
+                return TOPUP_ERROR;
 
               case '':
                 // Save the ref 2 response.
@@ -775,20 +782,39 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
           // Store output if necessary.
           if (!is_null($output)) {
             $output = $debug;
+            // Update note information.
+            $topup['topup_data']['data'][$topup['request_id']]['note'] = (isset($container[9])) ? $container[9] : '-';
             $output['topup_data'] = $topup['topup_data']['data'];
           }
-          // 1. Check value: Ref2 [3].
+          // 1. Check value: Phone number [3].
           // 2. Check value: RESPONSECODE [7].
           if (isset($container[3]) && isset($container[7])) {
-            // Check whether ref2 is correct.
-            if ($topup['ref2'] == $container[3]) {
+            // Check whether phone number is correct.
+            if ($topup['field_topup_phone_number'] == $container[3]) {
               switch ($container[7]) {
                 case '00':
-                  // Return: topup success.
-                  return (isset($container[9]) && preg_match('#sedang\s+diproses#i', $container[9])) ? TOPUP_PENDING : TOPUP_SUCCESS;
+                  // 00 means query is success: but necessaryly topup success.
+                  // Check container 9: KETERANGAN.
+                  if (isset($container[9]) && preg_match('#^' . $topup['ref2'] . '#', $container[9])) {
+                    if (preg_match('#sedang\s+diproses#i', $container[9])) {
+                      return TOPUP_PENDING;
+                    }
+                    if (preg_match('#gagal#i', $container[9])) {
+                      return TOPUP_FAILED;
+                    }
+                    if (preg_match('#berhasil#i', $container[9])) {
+                      return TOPUP_SUCCESS;
+                    }
+                  }
+                  // Other: return error -> be safe, need administer.
+                  return TOPUP_ERROR;
 
                 case '':
                   // Return: topup pending.
+                  return TOPUP_PENDING;
+
+                case '06':
+                  // No transaction data: return pending data.
                   return TOPUP_PENDING;
 
                 default:

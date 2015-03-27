@@ -104,6 +104,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'input-text';
       $form['commerce_coupon']['coupon_code']['#attributes']['class'][] = 'full-width';
       $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn';
+      $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'btn-sm';
       $form['commerce_coupon']['coupon_add']['#attributes']['class'][] = 'style1';
 
       if (!empty($form_state['order']->commerce_coupons)) {

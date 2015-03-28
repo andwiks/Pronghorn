@@ -1,13 +1,115 @@
 <?php
 
+function referral_sepulsa_menu() {
+    $items = array();
+    
+    $items['admin/config/people/referral/custom_text'] = array(
+      'title'            => t('Referral Custom Text'),
+      'description'      => t('Referral Custom Page'),
+      'page callback'    => 'drupal_get_form',
+      'page arguments'   => array('referral_custom_text'),
+      'access arguments' => array('administer site configuration'),
+      'type'             => MENU_NORMAL_ITEM,
+    );
+    
+    return $items;
+}
+
+function referral_custom_text() {
+    $form['referral_custom_text'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Referral Custom Text'),
+      '#default_value' => variable_get('referral_custom_text', ''),
+      '#description' => t('Referral Custom text in User Page'),
+    );
+
+    return system_settings_form($form);
+}
+
 // Override Hook User View from Userpoints Module
 function referral_sepulsa_user_view_alter(&$build) {
     //drupal_set_message("<pre>".print_r($build, true)."</pre>");
-    global $user;
+    global $user, $base_url;
+    
+    $logo = theme_get_setting('logo');
+    $inline_script = '<meta property="og:image" content="'.$logo.'" />';
+    $element = array(
+      '#type' => 'markup',
+      '#markup' => $inline_script,
+    );
+    drupal_add_html_head($element, 'facebook_metatag');
+    
+    $path_to_theme = $base_url.'/'.drupal_get_path('theme', 'sepulsa');
     $referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
-    $output = "<p><input class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
-    $output .= "<div class='share_referral'>Share in: <a href='#'>Facebook</a> <a href='#'>Twitter</a> <a href='#'>Copy</a></div>";
+    $output = "<p><input id='referral_text' class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
+    $output .= '
+        <style>
+        .referral_text { background-color: #eee; border: 1px solid #ccc; height: 40px; line-height: 40px; padding: 0 15px; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.1); margin: 10px 0; }
+        .share_referral { margin-bottom: 20px; }
+        .share_referral span { float: left; margin-right: 5px; font-weight: 700; text-transform: uppercase; margin-top: 10px; }
+        .share_referral a { float: left; border: 1px solid #ccc; background: #f9f9f9; padding: 8px 20px; border-radius: 8px; margin-left: 10px; font-size: 14px;}
+        </style>
+        <div class="share_referral clearfix"><span>Share in:</span>
+            <a href="http://www.facebook.com/sharer.php?u='.$base_url.'" target="_blank"><i class="fa fa-facebook"></i> Facebook</a> 
+            <a href="http://twitter.com/share?url='.$referral_link.'&text=TEXT&hashtags=sepulsa" target="_blank""><i class="fa fa-twitter"></i> Twitter</a> 
+            <a href="#"><i class="fa fa-envelope"></i> Copy</a>
+        </div>';
+    
+    $output .= variable_get('referral_custom_text');
     $build['Referrals'][0]['#markup'] = $output;
-    //$amount = userpoints_get_current_points($user->uid);
-    //$amount = number_format($amount,0,",",".");
+}
+
+function referral_sepulsa_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'user_register_form') {
+    if (isset($_COOKIE[REFERRAL_COOKIE])) {
+        $cookie = unserialize($_COOKIE[REFERRAL_COOKIE]);
+        $user = user_load($cookie['uid']);
+        $title = 'Anda diundang bergabung oleh '.$user->mail;
+        drupal_set_title($title);
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function referral_sepulsa_theme($existing, $type, $theme, $path) {
+    return array(
+      'referral_list' => array(
+        'variables' => array('content' => NULL),
+        'template' => 'referral_list',
+        'path' => drupal_get_path('module', 'referral_sepulsa')
+      )
+    );
+}
+
+// Override Point Tab from Userpoints Module
+function referral_sepulsa_menu_alter(&$items) {
+    unset($items['user/%user/points']);
+    $items['referral/view'] = array(
+        'page callback'    => 'referral_list',
+        'title'            => t('Your Referrals'),
+        'access arguments' => array(REFERRAL_PERM_USE),
+        'type'             => MENU_SUGGESTED_ITEM,
+      );
+}
+
+function referral_list(){
+    global $user;
+    $content['header'] = 'header';
+    $content['rows'] = 'rows';
+    $content['totalamount'] = 'total';
+    $query = db_select('referral', 'r');
+    $query->innerJoin('users', 'u', 'r.uid = u.uid');
+    $result = $query
+        ->fields('u', array('uid', 'name'))
+	->fields('r', array('created', 'flag'))
+	->condition('referral_uid', $user->uid)
+	->condition('u.status', 1)
+	->orderBy('r.created', 'DESC')
+	->range(0, REFERRAL_PAGE_COUNT)
+	->extend('TableSort')
+	->execute();
+  
+    return theme('referral_list', array('result' => $result));
 }

@@ -1,0 +1,104 @@
+<?php
+
+// $Id$
+
+define('REGISTRATION_CHANNEL_COOKIE', 'registration_channel');
+
+function channel_sepulsa_menu() {
+    $items['admin/config/people/registration_channel'] = array(
+      'title'            => t('Registration Channel'),
+      'description'      => t('Registration Channel'),
+      'page callback'    => 'registration_channel',
+      'access arguments' => array('administer site configuration'),
+      'type'             => MENU_NORMAL_ITEM,
+    );
+    return $items;
+}
+
+function registration_channel_form($form, &$form_state) {
+    $id = arg(4);
+    $action = arg(5);
+    $channel = '';
+    if ($action == 'edit' && isset($id)) {
+        $channel = db_query_range("SELECT channel FROM {registration_channel} WHERE id = :id", 0, 1, array('id' => $id))->fetchField();
+    }
+    $form['channel'] = array(
+        '#type' => 'textfield', 
+        '#title' => 'Channel',
+        '#required' => true,
+        '#default_value' => $channel,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit', 
+        '#title' => 'Submit',
+        '#value' => 'Submit'
+    );
+
+    return $form;    
+}
+
+function registration_channel_form_submit($form, &$form_state) {
+    global $base_url;
+    $id = arg(4);
+    $action = arg(5);
+    $channel = $form["channel"]["#value"];
+    if ($action == 'edit' && isset($id)) {
+        db_query('UPDATE registration_channel SET channel = :channel WHERE id = :id', array('channel' => $channel, 'id' => $id));
+    } else {
+        db_query('INSERT into registration_channel (channel) VALUES (:channel)', array('channel' => $channel));
+    }
+    drupal_set_message($channel." successfully saved", "notice");
+    drupal_goto($base_url.'/admin/config/people/registration_channel');
+}
+
+function registration_channel() {
+    global $base_url;
+    $id = arg(4);
+    $action = arg(5);
+    $channel = '';
+    if ($action == 'delete' && isset($id)) {
+        db_query('DELETE FROM registration_channel WHERE id = :id', array('id' => $id));
+        drupal_goto($base_url.'/admin/config/people/registration_channel');
+    } else {
+        $my_form = drupal_get_form('registration_channel_form');
+        $output = drupal_render($my_form);
+
+        $result = db_query('SELECT id, channel FROM registration_channel');
+        $output .= '<table><thead><tr><th>Channel</th><th>Operation</th></tr>';
+        foreach ($result as $row) {
+            $output .= '<tr>
+                            <td>'.$row->channel.'</td>
+                            <td>
+                                <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/edit">Edit</a> | 
+                                <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/delete">Delete</a>
+                            </td>
+                        </tr>';
+        }
+        $output .= "</thead></table>";
+        return $output;
+    }
+}
+
+function channel_sepulsa_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'user_register_form') {
+    if (isset($_GET['channel'])) {  
+        $cookie = $_GET['channel'];
+        $cookie_lifetime = 86400; // 1 day
+        setcookie(REGISTRATION_CHANNEL_COOKIE, $cookie, time() + $cookie_lifetime, '/');
+        //print $_COOKIE[REGISTRATION_CHANNEL_COOKIE];
+    }
+  }
+}
+
+function channel_sepulsa_user_presave(&$edit, $account, $category) {
+  if (isset($_COOKIE[REGISTRATION_CHANNEL_COOKIE])) {
+    $channel = $_COOKIE[REGISTRATION_CHANNEL_COOKIE];
+    $channel_exist = db_query_range("SELECT channel FROM {registration_channel} WHERE channel = :channel", 0, 1, array('channel' => $channel))->fetchField();
+    if (!$channel_exist) $channel = 'default';
+    $edit['field_registration_channel'][LANGUAGE_NONE][0]['value'] = $channel;
+    // remove cookie
+    setcookie(REGISTRATION_CHANNEL_COOKIE, '', time() + 86400, '/');
+    drupal_set_message("<pre>".print_r($edit, true)."</pre>");
+  }
+}
+?>

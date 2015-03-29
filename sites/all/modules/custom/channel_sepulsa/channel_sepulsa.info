@@ -1,0 +1,5 @@
+name = Channel Sepulsa
+description = Module to configure registration channel
+core = 7.x
+package = Sepulsa
+

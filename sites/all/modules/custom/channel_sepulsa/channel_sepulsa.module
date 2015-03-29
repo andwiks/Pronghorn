@@ -98,7 +98,6 @@ function channel_sepulsa_user_presave(&$edit, $account, $category) {
     $edit['field_registration_channel'][LANGUAGE_NONE][0]['value'] = $channel;
     // remove cookie
     setcookie(REGISTRATION_CHANNEL_COOKIE, '', time() + 86400, '/');
-    drupal_set_message("<pre>".print_r($edit, true)."</pre>");
   }
 }
 

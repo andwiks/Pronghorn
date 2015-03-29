@@ -64,10 +64,11 @@ function registration_channel() {
         $output = drupal_render($my_form);
 
         $result = db_query('SELECT id, channel FROM registration_channel');
-        $output .= '<table><thead><tr><th>Channel</th><th>Operation</th></tr>';
+        $output .= '<table><thead><tr><th>Channel</th><th>Link</th><th>Operation</th></tr>';
         foreach ($result as $row) {
             $output .= '<tr>
                             <td>'.$row->channel.'</td>
+                            <td>'.$base_url.'/user/register?channel='.$row->channel.'</td>
                             <td>
                                 <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/edit">Edit</a> | 
                                 <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/delete">Delete</a>
@@ -80,6 +81,12 @@ function registration_channel() {
 }
 
 function channel_sepulsa_form_alter(&$form, $form_state, $form_id) {
+  global $user;
+  $arg1 = arg(1);
+  if (arg(0) == 'user' && isset($arg1) && arg(2) == 'edit') {
+      //print "<pre>".print_r($user, true)."</pre>";
+      $form['field_registration_channel']['#access'] = FALSE;
+  }
   if ($form_id == 'user_register_form') {
     if (isset($_GET['channel'])) {  
         $cookie = $_GET['channel'];

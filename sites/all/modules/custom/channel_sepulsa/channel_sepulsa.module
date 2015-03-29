@@ -101,4 +101,10 @@ function channel_sepulsa_user_presave(&$edit, $account, $category) {
     drupal_set_message("<pre>".print_r($edit, true)."</pre>");
   }
 }
+
+// HOOK UNINSTALL
+// REMOVE SCHEMA TABLE (registration_channel)
+function channel_sepulsa_uninstall() {
+  drupal_uninstall_schema('registration_channel');
+}
 ?>

@@ -1,0 +1,31 @@
+<?php
+
+// $Id$
+
+/**
+ * @file Installation file for channel module
+**/
+
+// create table registration_channel
+function channel_sepulsa_schema() {  
+    $schema['registration_channel'] = array(    
+    'description' => 'Storing Registration Channel',
+    'fields' => array(
+        'id' => array(
+            'description' => 'id',
+            'type' => 'serial',
+	),      
+        'channel' => array(
+            'description' => 'Registration Channel',
+            'type' => 'varchar',
+            'length' => 255,
+            'not null' => TRUE,
+            'default' => '',
+        ),
+    ),
+    'primary key' => array('id'),
+  );
+  
+		
+  return $schema;
+}

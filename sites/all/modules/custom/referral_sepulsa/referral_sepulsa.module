@@ -46,10 +46,11 @@ function referral_sepulsa_user_view_alter(&$build) {
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript" src="'.$path_to_theme.'/js/zclip/jquery.zclip.js"></script>
         <script type="text/javascript">
-        $(document).ready(function() {
-            $("#copy-link-wrap").zclip({
+        jQuery(document).ready(function() {
+            jQuery("#copy-link-wrap").zclip({
+                alert("copiend");
                 path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
-                copy: $("#toclip").val(),
+                copy: jQuery("#toclip").val(),
                 afterCopy: function() {
                     alert("copied");
                 }

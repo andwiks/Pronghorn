@@ -448,6 +448,7 @@ function _node_resource_index_doc() {
     <ul>
       <li>Get all node type banner which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=banner&amp;parameters[status]=1</li>
       <li>Get all node type coupon which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=coupon&amp;parameters[status]=1</li>
+      <li>Get all node type page which are currently active:<br />GET ' . $base_url .'/api/node.json?parameters[type]=page&amp;parameters[status]=1</li>
       <li>Get all user owned simple coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_simple_coupon&amp;parameters[uid]=@uid</li>
       <li>Get all user owned unique coupon:<br />GET ' . $base_url .'/api/node.json?parameters[type]=owned_unique_coupon&amp;parameters[field_order_id]=@order_id</li>
     </ul>
@@ -698,6 +699,7 @@ function services_views_retrieve_doc() {
       <li>Get views coupon:<br />GET ' . $base_url .'/api/views/coupon?display_id=coupon</li>
       <li>Get views front banner:<br />GET ' . $base_url .'/api/views/front_banner?display_id=banner</li>
       <li>Get views user owned coupon:<br />GET ' . $base_url .'/api/views/user_owned_coupon?display_id=user_owned_coupon</li>
+      <li>Get views user owned order:<br />GET ' . $base_url .'/api/views/commerce_user_orders?display_id=user_orders</li>
     </ul>
     ',
     // Example response. E.g., a JSON array.
@@ -763,6 +765,30 @@ function services_views_retrieve_doc() {
             "expired": "1433005200",
             "code": null,
             "detail": " <p>Masukkan kode promo <b>PULSA100</b> ketika melakukan pembayaran.</p>\ "
+        }
+    ]
+    // User owned order output.
+    [
+        {
+            "order_id": "325",
+            "created": "1427305295",
+            "updated": "1427305295",
+            "total": "10000",
+            "status": "Pending"
+        },
+        {
+            "order_id": "201503-43",
+            "created": "1427300944",
+            "updated": "1427301013",
+            "total": "10000",
+            "status": "Invoiced"
+        },
+        {
+            "order_id": "201503-42",
+            "created": "1427299633",
+            "updated": "1427300658",
+            "total": "10000",
+            "status": "Invoiced"
         }
     ]
     ',

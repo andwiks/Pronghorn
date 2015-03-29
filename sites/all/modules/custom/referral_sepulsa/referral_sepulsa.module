@@ -48,7 +48,7 @@ function referral_sepulsa_user_view_alter(&$build) {
         <script type="text/javascript">
         jQuery(document).ready(function() {
             jQuery("#copy-link-wrap").zclip({
-                path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
+                path: "http://zeroclipboard.googlecode.com/svn-history/r10/trunk/ZeroClipboard.swf",
                 copy: jQuery("#toclip").val(),
                 afterCopy: function() {
                     alert("copied");

@@ -1,5 +1,5 @@
 /*
- * zClip :: jQuery ZeroClipboard v1.1.1
+ * zClip :: jQuery ZeroClipboard v1.1.4
  * http://steamdev.com/zclip
  *
  * Copyright 2011, SteamDev
@@ -9,14 +9,13 @@
  * Date: Wed Jun 01, 2011
  */
 
+(function (jQuery) {
 
-(function ($) {
-
-    $.fn.zclip = function (params) {
+    jQuery.fn.zclip = function (params) {
 
         if (typeof params == "object" && !params.length) {
 
-            var settings = $.extend({
+            var settings = jQuery.extend({
 
                 path: 'ZeroClipboard.swf',
                 copy: null,
@@ -27,63 +26,68 @@
                 setCSSEffects: true
 
             }, params);
-			
 
             return this.each(function () {
 
-                var o = $(this);
+                var o = jQuery(this);
 
-                if (o.is(':visible') && (typeof settings.copy == 'string' || $.isFunction(settings.copy))) {
+                if (o.is(':visible') && (typeof settings.copy == 'string' || jQuery.isFunction(settings.copy))) {
 
                     ZeroClipboard.setMoviePath(settings.path);
                     var clip = new ZeroClipboard.Client();
-                    
-                    if($.isFunction(settings.copy)){
-                    	o.bind('zClip_copy',settings.copy);
+
+                    if (jQuery.isFunction(settings.copy)) {
+                        o.bind('zClip_copy', settings.copy);
                     }
-                    if($.isFunction(settings.beforeCopy)){
-                    	o.bind('zClip_beforeCopy',settings.beforeCopy);
+
+                    if (jQuery.isFunction(settings.beforeCopy)) {
+                        o.bind('zClip_beforeCopy', settings.beforeCopy);
                     }
-                    if($.isFunction(settings.afterCopy)){
-                    	o.bind('zClip_afterCopy',settings.afterCopy);
-                    }                    
+
+                    if (jQuery.isFunction(settings.afterCopy)) {
+                        o.bind('zClip_afterCopy', settings.afterCopy);
+                    }
 
                     clip.setHandCursor(settings.setHandCursor);
+
                     clip.setCSSEffects(settings.setCSSEffects);
+
                     clip.addEventListener('mouseOver', function (client) {
                         o.trigger('mouseenter');
                     });
+
                     clip.addEventListener('mouseOut', function (client) {
                         o.trigger('mouseleave');
                     });
+
                     clip.addEventListener('mouseDown', function (client) {
 
                         o.trigger('mousedown');
-                        
-			if(!$.isFunction(settings.copy)){
-			   clip.setText(settings.copy);
-			} else {
-			   clip.setText(o.triggerHandler('zClip_copy'));
-			}                        
-                        
-                        if ($.isFunction(settings.beforeCopy)) {
-                            o.trigger('zClip_beforeCopy');                            
+
+                        if (jQuery.isFunction(settings.beforeCopy)) {
+                            o.trigger('zClip_beforeCopy');
+                        }
+
+                        if (!jQuery.isFunction(settings.copy)) {
+                            clip.setText(settings.copy);
+                        } else {
+                            clip.setText(o.triggerHandler('zClip_copy'));
                         }
 
                     });
 
                     clip.addEventListener('complete', function (client, text) {
 
-                        if ($.isFunction(settings.afterCopy)) {
-                            
+                        if (jQuery.isFunction(settings.afterCopy)) {
+
                             o.trigger('zClip_afterCopy');
 
                         } else {
                             if (text.length > 500) {
                                 text = text.substr(0, 500) + "...\n\n(" + (text.length - 500) + " characters not shown)";
                             }
-							
-			    o.removeClass('hover');
+
+                            o.removeClass('hover');
                             alert("Copied text to clipboard:\n\n " + text);
                         }
 
@@ -93,11 +97,9 @@
 
                     });
 
-					
                     clip.glue(o[0], o.parent()[0]);
-					
-		    $(window).bind('load resize',function(){clip.reposition();});
-					
+
+                    jQuery(window).bind('load resize', function () {clip.reposition();});
 
                 }
 
@@ -107,16 +109,21 @@
 
             return this.each(function () {
 
-                var o = $(this);
+                var o = jQuery(this);
 
                 params = params.toLowerCase();
                 var zclipId = o.data('zclipId');
-                var clipElm = $('#' + zclipId + '.zclip');
+                var clipElm = jQuery('#' + zclipId + '.zclip');
+                var clientId = clipElm.attr('id').replace(/^.*_/g, '') || null;
 
                 if (params == "remove") {
 
                     clipElm.remove();
                     o.removeClass('active hover');
+                    o.unbind('zClip_copy');
+                    o.unbind('zClip_beforeCopy');
+                    o.unbind('zClip_afterCopy');
+                    ZeroClipboard.unregister(clientId);
 
                 } else if (params == "hide") {
 
@@ -133,17 +140,9 @@
 
         }
 
-    }	
-	
-	
+    };
 
 })(jQuery);
-
-
-
-
-
-
 
 // ZeroClipboard
 // Simple Set Clipboard System
@@ -157,7 +156,7 @@ var ZeroClipboard = {
     // URL to movie
     nextId: 1,
     // ID of next movie
-    $: function (thingy) {
+    jQuery: function (thingy) {
         // simple DOM lookup utility function
         if (typeof(thingy) == 'string') thingy = document.getElementById(thingy);
         if (!thingy.addClass) {
@@ -200,7 +199,7 @@ var ZeroClipboard = {
     },
 
     dispatch: function (id, eventName, args) {
-        // receive event from flash movie, send to client		
+        // receive event from flash movie, send to client
         var client = this.clients[id];
         if (client) {
             client.receiveEvent(eventName, args);
@@ -210,6 +209,12 @@ var ZeroClipboard = {
     register: function (id, client) {
         // register new client to receive events
         this.clients[id] = client;
+    },
+
+    unregister: function (id) {
+        if (typeof(id) === 'number' && this.clients.hasOwnProperty(id)) {
+            delete this.clients[id];
+        }
     },
 
     getDOMObjectPosition: function (obj, stopObj) {
@@ -222,7 +227,7 @@ var ZeroClipboard = {
         };
 
         if (obj && (obj != stopObj)) {
-			info.left += obj.offsetLeft;
+            info.left += obj.offsetLeft;
             info.top += obj.offsetTop;
         }
 
@@ -264,7 +269,7 @@ ZeroClipboard.Client.prototype = {
     glue: function (elem, appendElem, stylesToAdd) {
         // glue to DOM element
         // elem can be ID or actual DOM element object
-        this.domElement = ZeroClipboard.$(elem);
+        this.domElement = ZeroClipboard.jQuery(elem);
 
         // float just above object, or zIndex 99 if dom element isn't set
         var zIndex = 99;
@@ -273,7 +278,7 @@ ZeroClipboard.Client.prototype = {
         }
 
         if (typeof(appendElem) == 'string') {
-            appendElem = ZeroClipboard.$(appendElem);
+            appendElem = ZeroClipboard.jQuery(appendElem);
         } else if (typeof(appendElem) == 'undefined') {
             appendElem = document.getElementsByTagName('body')[0];
         }
@@ -285,7 +290,7 @@ ZeroClipboard.Client.prototype = {
         this.div = document.createElement('div');
         this.div.className = "zclip";
         this.div.id = "zclip-" + this.movieId;
-        $(this.domElement).data('zclipId', 'zclip-' + this.movieId);
+        jQuery(this.domElement).data('zclipId', 'zclip-' + this.movieId);
         var style = this.div.style;
         style.position = 'absolute';
         style.left = '' + box.left + 'px';
@@ -295,7 +300,7 @@ ZeroClipboard.Client.prototype = {
         style.zIndex = zIndex;
 
         if (typeof(stylesToAdd) == 'object') {
-            for (addedStyle in stylesToAdd) {
+            for (var addedStyle in stylesToAdd) {
                 style[addedStyle] = stylesToAdd[addedStyle];
             }
         }
@@ -343,7 +348,8 @@ ZeroClipboard.Client.prototype = {
             var body = document.getElementsByTagName('body')[0];
             try {
                 body.removeChild(this.div);
-            } catch (e) {;
+            } catch (e) {
+                //do nothing
             }
 
             this.domElement = null;
@@ -355,7 +361,7 @@ ZeroClipboard.Client.prototype = {
         // reposition our floating div, optionally to new container
         // warning: container CANNOT change size, only position
         if (elem) {
-            this.domElement = ZeroClipboard.$(elem);
+            this.domElement = ZeroClipboard.jQuery(elem);
             if (!this.domElement) this.hide();
         }
 
@@ -408,8 +414,9 @@ ZeroClipboard.Client.prototype = {
             // movie claims it is ready, but in IE this isn't always the case...
             // bug fix: Cannot extend EMBED DOM elements in Firefox, must use traditional function
             this.movie = document.getElementById(this.movieId);
+            var self = this;
+
             if (!this.movie) {
-                var self = this;
                 setTimeout(function () {
                     self.receiveEvent('load', null);
                 }, 1);
@@ -418,7 +425,6 @@ ZeroClipboard.Client.prototype = {
 
             // firefox on pc needs a "kick" in order to set these in certain cases
             if (!this.ready && navigator.userAgent.match(/Firefox/) && navigator.userAgent.match(/Windows/)) {
-                var self = this;
                 setTimeout(function () {
                     self.receiveEvent('load', null);
                 }, 100);
@@ -442,10 +448,7 @@ ZeroClipboard.Client.prototype = {
                     this.domElement.addClass('active');
                 }
 
-
             }
-
-
             break;
 
         case 'mouseout':
@@ -491,5 +494,4 @@ ZeroClipboard.Client.prototype = {
         } // user defined handler for event
     }
 
-};	
-
+};

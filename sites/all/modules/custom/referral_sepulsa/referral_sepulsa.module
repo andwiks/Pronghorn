@@ -48,7 +48,6 @@ function referral_sepulsa_user_view_alter(&$build) {
         <script type="text/javascript">
         jQuery(document).ready(function() {
             jQuery("#copy-link-wrap").zclip({
-                alert("copiend");
                 path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
                 copy: jQuery("#toclip").val(),
                 afterCopy: function() {

@@ -43,6 +43,18 @@ function referral_sepulsa_user_view_alter(&$build) {
     $referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
     $output = "<p><input id='referral_text' class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
     $output .= '
+        <script type="text/javascript" src="'.$path_to_theme.'/js/zclip/jquery.zclip.js"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#copy-link-wrap").zclip({
+                path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
+                copy: $("#toclip").val(),
+                afterCopy: function() {
+                    alert("copied");
+                }
+            });
+        });
+        </script>
         <style>
         .referral_text { background-color: #eee; border: 1px solid #ccc; height: 40px; line-height: 40px; padding: 0 15px; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.1); margin: 10px 0; }
         .share_referral { margin-bottom: 20px; }
@@ -52,7 +64,10 @@ function referral_sepulsa_user_view_alter(&$build) {
         <div class="share_referral clearfix"><span>Share in:</span>
             <a href="http://www.facebook.com/sharer.php?u='.$base_url.'" target="_blank"><i class="fa fa-facebook"></i> Facebook</a> 
             <a href="http://twitter.com/share?url='.$referral_link.'&text=TEXT&hashtags=sepulsa" target="_blank""><i class="fa fa-twitter"></i> Twitter</a> 
-            <a href="#"><i class="fa fa-envelope"></i> Copy</a>
+            <a href="#" id="copy-link-wrap">
+            <i class="fa fa-envelope"></i> Copy
+            <input name="toclip" id="toclip" type="hidden" value="'.$referral_link.'">
+            </a>
         </div>';
     
     $output .= variable_get('referral_custom_text');

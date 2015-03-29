@@ -43,6 +43,7 @@ function referral_sepulsa_user_view_alter(&$build) {
     $referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
     $output = "<p><input id='referral_text' class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
     $output .= '
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript" src="'.$path_to_theme.'/js/zclip/jquery.zclip.js"></script>
         <script type="text/javascript">
         $(document).ready(function() {

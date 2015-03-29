@@ -4,7 +4,7 @@
  * Implements hook_views_query_alter().
  */
 function kupon_views_query_alter(&$view, &$query) {
-  if ($view->name == 'coupon' && $view->current_display == 'page') {
+  if ($view->name == 'coupon' && ($view->current_display == 'page' || $view->current_display == 'coupon')) {
     //getting total price on cart
     global $user;
     $order = commerce_cart_order_load($user->uid);

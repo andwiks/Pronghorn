@@ -13,7 +13,7 @@ function sepulsa_campaign_form_rules_ui_edit_element_alter(&$form, &$form_state,
     $form['parameter']['payment_method']['settings']['payment_method']['settings']['sepulsa_campaign'] = array(
       '#type' => 'text_format',
       '#title' => t('Special Campaign'),
-      '#default_value' => $form_state['element_settings']['payment_method']['settings']['sepulsa_campaign']['value'],
+      '#default_value' => $campaign,
     );
   }
 }

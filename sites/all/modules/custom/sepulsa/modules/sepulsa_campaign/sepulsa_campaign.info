@@ -1,0 +1,5 @@
+name = Sepulsa Campaign
+description = Sepulsa Special Campaign feature
+core = "7.x"
+
+files[] = commerce_veritrans.rules.inc

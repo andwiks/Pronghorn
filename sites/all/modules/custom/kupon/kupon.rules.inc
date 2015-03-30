@@ -29,7 +29,7 @@ function kupon_rules_action_info() {
       ),
     ),
   );
-  
+
   return $actions;
 }
 
@@ -39,10 +39,25 @@ function kupon_rules_action_info() {
 function kupon_create_owned_simple_coupon($line_item, $user) {
   if ($line_item->type == "coupon") {
     //drupal_set_message("<pre>".print_r($line_item, true)."</pre>");
+    if (empty($line_item->data['context']['entity']['entity_id'])) {
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'node');
+      $query->fieldCondition('field_product', 'product_id', $line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
+      $result = $query->execute();
+
+      if (!empty($result)) {
+        $node = reset($result['node']);
+        $line_item->data['context']['entity']['entity_id'] = $node->nid;
+      }
+    }
+    if (empty($line_item->data['context']['product_ids'][0])) {
+      $line_item->data['context']['product_ids'][0] = $line_item->commerce_product[LANGUAGE_NONE][0]['product_id'];
+    }
+
     $node_coupon = node_load($line_item->data['context']['entity']['entity_id']);
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
-    
+
     if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique') {
         //$unique_nid = db_query_range("SELECT nid FROM {node} WHERE uid = 1 AND type = 'owned_unique_coupon'", 0, 1)->fetchField();
         $query = "SELECT nid FROM {node} a, {field_data_field_simple_coupon} b "

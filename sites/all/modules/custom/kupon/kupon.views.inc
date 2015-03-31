@@ -10,7 +10,7 @@ function kupon_views_query_alter(&$view, &$query) {
     $order = commerce_cart_order_load($user->uid);
     if (empty($order->commerce_line_items)) {
       //don't allow access coupon page if cart empty
-      drupal_goto("<front>");
+      //drupal_goto("<front>");
     }
     $wrapper = entity_metadata_wrapper('commerce_order', $order);
     $line_items = $wrapper->commerce_line_items;

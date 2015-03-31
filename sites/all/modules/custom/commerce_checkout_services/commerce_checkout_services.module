@@ -128,39 +128,40 @@ function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field 
   // Get user's order: do not care the result, only to satisfy drupal get form.
   $order = commerce_cart_order_load($user->uid);
 
-  // Get all enabled checkout panes.
-  $panes = commerce_checkout_panes(array(
-    'enabled' => TRUE,
-    'page' => 'checkout',
-  ));
+  // Get checkout page object.
+  $checkout_page = commerce_checkout_page_load('checkout');
+
+  // Load commerce_checkout.pages.inc file.
+  module_load_include('inc', 'commerce_checkout', 'includes/commerce_checkout.pages');
+
+  // Load checkout form: based on order and checkout page object.
+  $form = drupal_get_form('commerce_checkout_form_checkout', $order, $checkout_page);
+
+  // Filter sensitive data.
+  $form = _commerce_checkout_services_filter_data($form);
+
   // Check whether pane is available.
-  if (!empty($pane) && isset($panes[$pane])) {
-    // Get checkout form id.
-    $form_id = commerce_checkout_pane_callback($panes[$pane], 'checkout_form');
-    // Check form id.
-    if ($form_id !== FALSE) {
-      // Get full checkout form.
-      $form = drupal_get_form($form_id, $panes[$pane], $order);
-      // Check field
-      if (!empty($field) && isset($form[$field])) {
-        // Check field attribute.
-        if (!empty($attribute)
-          && (isset($form[$field][$attribute]) || isset($form[$field]['#' . $attribute]))
-        ) {
-          // Return form field attribute array.
-          return isset($form[$field][$attribute]) ? $form[$field][$attribute] : $form[$field]['#' . $attribute];
+  if (!empty($pane) && isset($form[$pane])) {
+    // Check field name.
+    if (!empty($field) && isset($form[$pane][$field])) {
+      // Check form pane field attribute.
+      if (!empty($attribute)) {
+        if (isset($form[$pane][$field][$attribute])) {
+          return $form[$pane][$field][$attribute];
         }
-        // Return form field array.
-        return $form[$field];
+        if (isset($form[$pane][$field]['#' . $attribute])) {
+          return $form[$pane][$field]['#' . $attribute];
+        }
       }
-      // Return form array.
-      return $form;
+      // Return form pane field.
+      return $form[$pane][$field];
     }
-    // Return specific checkout pane info.
-    return $panes[$pane];
+    // Return form pane value.
+    return $form[$pane];
   }
-  // Return all available checkout pane name.
-  return array_keys($panes);
+
+  // Return all checkout form key without #.
+  return array_keys($form);
 }
 
 /**
@@ -719,4 +720,40 @@ function commerce_checkout_services_resource_complete_doc() {
     ),
   );
   return $element;
+}
+
+/**
+ * Private Functions.
+ */
+
+/**
+ * Function _commerce_checkout_services_filter_data().
+ *
+ * Filter internal form value and Veritrans Server Key.
+ *
+ * @param $value
+ *   Checkout form array.
+ *
+ * @return array
+ *   Filtered form array.
+ */
+function _commerce_checkout_services_filter_data($form) {
+  // Looping for each form dat.
+  foreach ($form as $key => $value) {
+    // Check for internal form values.
+    if (preg_match('/^\#|^form/', $key)) {
+      unset($form[$key]);
+    }
+    // Check for VT secret key.
+    if (isset($form['commerce_payment']['payment_methods']['#value'])) {
+      // Looping for each payment methods.
+      foreach ($form['commerce_payment']['payment_methods']['#value'] as $payment_key => $payment_value) {
+        if (isset($payment_value['settings']['server_key'])) {
+          unset($form['commerce_payment']['payment_methods']['#value'][$payment_key]['settings']['server_key']);
+        }
+      }
+    }
+  }
+  // Return filtered form.
+  return $form;
 }

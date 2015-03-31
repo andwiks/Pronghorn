@@ -222,6 +222,15 @@ function commerce_checkout_services_resource_process($checkout) {
       // Get checkout form array.
       $form = drupal_get_form('commerce_checkout_form_checkout', $order, $form_state['checkout_page']);
 
+      // Update payment method default value to match payment method input.
+      // Suppose there will be no newly payment method.
+      if (isset($form['commerce_payment']['payment_method']['#default_value'])
+        && isset($form_state['values']['commerce_payment']['payment_method'])
+        && $form['commerce_payment']['payment_method']['#default_value'] != $form_state['values']['commerce_payment']['payment_method']
+      ) {
+        $form['commerce_payment']['payment_method']['#default_value'] = $form_state['values']['commerce_payment']['payment_method'];
+      }
+
       // Call checkout form validation function.
       commerce_checkout_form_validate($form, $form_state);
 

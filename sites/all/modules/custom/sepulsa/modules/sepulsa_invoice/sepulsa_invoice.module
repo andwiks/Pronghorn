@@ -8,7 +8,7 @@ function sepulsa_invoice_query_sepulsa_invoice_line_items_alter(QueryAlterableIn
     $account = $query->getMetaData('account');
     $view = $query->getMetaData('view');
 
-    if (empty($account) && !empty($view) && $view->current_display == 'views_rules_1') {
+    if (empty($account) && !empty($view) && $view->current_display == 'views_rules') {
       $query->addMetaData('account', user_load(1));
     }
   }

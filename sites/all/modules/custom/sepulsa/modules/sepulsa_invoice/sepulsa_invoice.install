@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function sepulsa_invoice_install() {
+  db_update('system')
+    ->fields(array('weight' => -1))
+    ->condition('name', 'sepulsa_invoice', '=')
+    ->execute();
+}

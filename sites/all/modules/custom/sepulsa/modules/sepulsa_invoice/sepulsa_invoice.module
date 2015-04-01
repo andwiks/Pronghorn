@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * Implements hook_query_TAG_alter().
+ */
+function sepulsa_invoice_query_sepulsa_invoice_line_items_alter(QueryAlterableInterface $query) {
+  if (drupal_is_cli()) {
+    $account = $query->getMetaData('account');
+    $view = $query->getMetaData('view');
+
+    if (empty($account) && !empty($view) && $view->current_display == 'views_rules_1') {
+      $query->addMetaData('account', user_load(1));
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function sepulsa_invoice_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'sepulsa_invoice') . '/includes/views',
+  );
+}

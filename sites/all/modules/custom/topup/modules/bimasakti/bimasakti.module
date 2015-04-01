@@ -4,6 +4,8 @@
  * bimasakti.module
  *
  * @author andre4s_y
+ *
+ * @todo Timeout Handler: http://dev.sepulsa.com/admin/reports/event/13230
  */
 
 /**
@@ -101,7 +103,7 @@ function bimasakti_topup_code_info() {
   $codes['IS5H'] = array('price' => 5825, 'title' => t('ISAT IM3 / MENTARI SMS 5RB'),);
 
   $codes['TI100H'] = array('price' => 90000, 'title' => t('ISAT IM3/MENTARI TRANSFER 100RB'),);
-  $codes['TI10=0H'] = array('price' => 9000, 'title' => t('ISAT IM3/MENTARI TRANSFER 10RB'),);
+  $codes['TI10H'] = array('price' => 9000, 'title' => t('ISAT IM3/MENTARI TRANSFER 10RB'),);
   $codes['TI20H'] = array('price' => 18000, 'title' => t('ISAT IM3/MENTARI TRANSFER 20RB'),);
   $codes['TI25H'] = array('price' => 22500, 'title' => t('ISAT IM3/MENTARI TRANSFER 25RB'),);
   $codes['TI50H'] = array('price' => 45000, 'title' => t('ISAT IM3/MENTARI TRANSFER 50RB'),);
@@ -139,7 +141,7 @@ function bimasakti_topup_code_info() {
   $codes['T20H'] = array('price' => 19825, 'title' => t('THREE 20RB'),);
   $codes['T30H'] = array('price' => 29725, 'title' => t('THREE 30RB'),);
   $codes['T50H'] = array('price' => 49525, 'title' => t('THREE 50RB'),);
-  $codes['T50H'] = array('price' => 4975, 'title' => t('THREE 5RB'),);
+  $codes['T5H'] = array('price' => 4975, 'title' => t('THREE 5RB'),);
   $codes['T1H'] = array('price' => 1015, 'title' => t('THREE SERIBU'),);
 
   $codes['XR100H'] = array('price' => 99675, 'title' => t('XLCOM REGULER 100RB'),);

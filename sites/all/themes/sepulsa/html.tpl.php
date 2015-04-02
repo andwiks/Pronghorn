@@ -14,7 +14,7 @@ global $base_url;
 <!--[if IE 9]>          <html class="ie ie9"> <![endif]-->
 <!--[if gt IE 9]><!-->  <html> <!--<![endif]-->
 <head>
-    <title>Sepulsa | Isi Pulsa Gratis</title>
+    <title>Sepulsa | Isi Pulsa Dapat Voucher Diskon</title>
 
     <link rel="shortcut icon" href="<?php print $base_url . '/' . path_to_theme(); ?>/images/favicon.png" />
 

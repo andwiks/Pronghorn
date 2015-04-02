@@ -1,0 +1,34 @@
+<?php
+
+/**
+ * Implements hook_form_FORM_ID_alter() for rules_ui_edit_element().
+ */
+function sepulsa_campaign_form_rules_ui_edit_element_alter(&$form, &$form_state, $form_id) {
+  foreach (commerce_payment_methods() as $payment_method) {
+    $actions[] = 'commerce_payment_enable_' . $payment_method['method_id'];
+  }
+
+  if (in_array($form_state['rules_element']->getElementName(), $actions)) {
+    $campaign = empty($form_state['element_settings']['payment_method']['settings']['sepulsa_campaign']['value']) ? NULL : $form_state['element_settings']['payment_method']['settings']['sepulsa_campaign']['value'];
+    $form['parameter']['payment_method']['settings']['payment_method']['settings']['sepulsa_campaign'] = array(
+      '#type' => 'text_format',
+      '#title' => t('Special Campaign'),
+      '#default_value' => $campaign,
+    );
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_checkout_form_checkout().
+ */
+function sepulsa_campaign_form_commerce_checkout_form_checkout_alter(&$form, &$form_state, $form_id) {
+  $order = $form_state['order'];
+  $selected_payment_method = $form['commerce_payment']['payment_method']['#default_value'];
+
+  if (!empty($order->payment_methods[$selected_payment_method]['settings']['sepulsa_campaign'])) {
+    $campaign = $order->payment_methods[$selected_payment_method]['settings']['sepulsa_campaign'];
+    $form['commerce_payment']['payment_details']['sepulsa_campaign'] = array(
+      '#markup' => check_markup($campaign['value'], $campaign['format']),
+    );
+  }
+}

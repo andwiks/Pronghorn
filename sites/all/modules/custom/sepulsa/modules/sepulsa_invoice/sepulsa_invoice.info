@@ -1,0 +1,8 @@
+name = Sepulsa Invoice
+description = Sepulsa invoice feature
+core = "7.x"
+
+dependencies[] = entity
+dependencies[] = rules
+dependencies[] = views
+dependencies[] = views_rules

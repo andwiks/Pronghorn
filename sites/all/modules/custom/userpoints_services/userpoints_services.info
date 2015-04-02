@@ -1,0 +1,8 @@
+name = "Userpoints Services Integration"
+description = "Integrates Userpoints with Services module"
+core = "7.x"
+
+dependencies[] = commerce
+dependencies[] = services
+dependencies[] = services_documentation
+dependencies[] = userpoints

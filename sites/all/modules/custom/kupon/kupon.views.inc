@@ -163,7 +163,7 @@ function kupon_views_default_views() {
   $handler->display->display_options['filters']['field_active_time_value']['group'] = 1;
   $handler->display->display_options['filters']['field_active_time_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_active_time_value']['expose']['operator_id'] = 'field_active_time_value_op';
-  $handler->display->display_options['filters']['field_active_time_value']['expose']['label'] = 'Active Time -  start date';
+  $handler->display->display_options['filters']['field_active_time_value']['expose']['label'] = 'Active start';
   $handler->display->display_options['filters']['field_active_time_value']['expose']['operator'] = 'field_active_time_value_op';
   $handler->display->display_options['filters']['field_active_time_value']['expose']['identifier'] = 'field_active_time_value';
   $handler->display->display_options['filters']['field_active_time_value']['expose']['remember_roles'] = array(
@@ -180,7 +180,7 @@ function kupon_views_default_views() {
   $handler->display->display_options['filters']['field_active_time_value2']['group'] = 1;
   $handler->display->display_options['filters']['field_active_time_value2']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_active_time_value2']['expose']['operator_id'] = 'field_active_time_value2_op';
-  $handler->display->display_options['filters']['field_active_time_value2']['expose']['label'] = 'Active Time - end date';
+  $handler->display->display_options['filters']['field_active_time_value2']['expose']['label'] = 'Active end';
   $handler->display->display_options['filters']['field_active_time_value2']['expose']['operator'] = 'field_active_time_value2_op';
   $handler->display->display_options['filters']['field_active_time_value2']['expose']['identifier'] = 'field_active_time_value2';
   $handler->display->display_options['filters']['field_active_time_value2']['expose']['remember_roles'] = array(
@@ -193,11 +193,6 @@ function kupon_views_default_views() {
   $handler->display->display_options['filters']['field_coupon_type_value']['id'] = 'field_coupon_type_value';
   $handler->display->display_options['filters']['field_coupon_type_value']['table'] = 'field_data_field_coupon_type';
   $handler->display->display_options['filters']['field_coupon_type_value']['field'] = 'field_coupon_type_value';
-  $handler->display->display_options['filters']['field_coupon_type_value']['value'] = array(
-    'all' => 'all',
-    'simple' => 'simple',
-    'unique' => 'unique',
-  );
   $handler->display->display_options['filters']['field_coupon_type_value']['group'] = 1;
   $handler->display->display_options['filters']['field_coupon_type_value']['exposed'] = TRUE;
   $handler->display->display_options['filters']['field_coupon_type_value']['expose']['operator_id'] = 'field_coupon_type_value_op';
@@ -244,8 +239,8 @@ function kupon_views_default_views() {
     t('.'),
     t(','),
     t('Rubah'),
-    t('Active Time -  start date'),
-    t('Active Time - end date'),
+    t('Active start'),
+    t('Active end'),
     t('Page'),
   );
 

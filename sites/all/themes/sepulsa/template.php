@@ -252,21 +252,8 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
 
   }
   elseif ($form_id == 'commerce_checkout_form_complete' && !empty($form_state['build_info']['args'][0]) && is_object($form_state['build_info']['args'][0])) {
-    $order = $form_state['build_info']['args'][0];
-    if (!empty($order->data['payment_method'])) {
-      $payment_method = explode('|', $order->data['payment_method']);
-      $payment_method = reset($payment_method);
-      $form['checkout_completion_message']['message'] = array(
-        '#theme' => 'sepulsa_checkout_completion_message',
-        '#order' => $order,
-        '#payment_method' => $payment_method,
-      );
-
-      if ($payment_method == 'bank_transfer') {
-        $method_instance = commerce_payment_method_instance_load($order->data['payment_method']);
-        $form['checkout_completion_message']['message']['#payment_settings'] = $method_instance['settings'];
-      }
-    }
+    $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
+    $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
   }
 }
 
@@ -478,11 +465,7 @@ function sepulsa_theme($existing, $type, $theme, $path) {
     ),
     'sepulsa_checkout_completion_message' => array(
       'variables' => array(
-        'user' => NULL,
-        'order' => NULL,
-        'payment_method' => NULL,
-        'payment_settings' => NULL,
-        'authenticated' => FALSE,
+        'message' => NULL,
       ),
       'path' => $path . '/templates/checkout',
       'template' => 'sepulsa-checkout-completion-message',

@@ -1,0 +1,183 @@
+<?php
+/**
+ * @file
+ * adroid_activation_services.module
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function android_activation_services_entity_info() {
+
+  $info = array();
+
+  $info['android'] = array(
+    'label' => t('Android Activation'),
+    'base table' => 'android_activation',
+    'entity keys' => array(
+      'id' => 'id',
+      'label' => 'imei',
+    ),
+    'fieldable' => TRUE,
+    'module' => 'android_activation_services',
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIController',
+  );
+
+  return $info;
+}
+
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function android_activation_services_services_resources() {
+  $definition = array(
+    'android_activation' => array(
+      'actions' => array(
+        'store_data' => array(
+          'help' => 'Store Android Activation Data',
+          'callback' => '_store_android_activation_data',
+          'documentation callback' => 'android_activation_services_doc',
+          'access callback' => 'services_access_menu',
+          'args' => array(
+            array(
+              'name' => 'imei',
+              'type' => 'varchar',
+              'description' => 'Valid IMEI',
+              'source' => array(
+                'data' => 'imei',
+                'param' => 'imei',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'location',
+              'type' => 'varchar',
+              'description' => 'Valid Location',
+              'source' => array(
+                'data' => 'location',
+                'param' => 'location',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'model_number',
+              'type' => 'varchar',
+              'description' => 'Valid model number',
+              'source' => array(
+                'data' => 'model_number',
+                'param' => 'model_number',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'other_data',
+              'type' => 'array',
+              'description' => 'Valid other data',
+              'source' => array(
+                'data' => 'other_data',
+                'param' => 'other_data',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  return $definition;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Resources callback for order detail.
+ */
+function _store_android_activation_data($imei, $location, $model_number, $other_data){
+  // Wrap around using try and catch.
+  try {
+    $t = time();
+    $today = date("Y-m-d h:i:s",$t);
+    if (is_array($other_data)) $other_data = serialize($other_data);
+    
+    $id = db_query_range("SELECT id FROM {android_activation} WHERE imei = :imei", 0, 1, array('imei' => $imei))->fetchField();
+    if ($id) { // udpate imei
+        $android = entity_load('android', array($id));  
+        $android = $android[$id];
+        $android->updated_at = $today;
+    } else { // create new
+        $android = entity_create('android', array());
+        $android->created_at = $today;
+    }
+    $android->imei = $imei;
+    $android->location = $location;
+    $android->model_number = $model_number;
+    $android->other_data = $other_data;
+    $android->save();
+   
+    if (!empty($android->id)) return TRUE;
+    else return FALSE;
+  }
+  catch (Exception $exception) {
+    // Log this condition.
+    watchdog('android_activation_services', 'Error at @location. Trace:<pre>@trace</pre>', array(
+      '@location' => __FUNCTION__,
+      '@trace' => _drupal_render_exception_safe($exception),
+    ), WATCHDOG_ERROR, t('Android Activation Services'));
+  }
+  // Other condition return error;
+  return services_error(t('Invalid Data'), 406);
+}
+
+/**
+ * Documentation callback for order actions order list.
+ */
+function android_activation_services_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Android Activation Service'),
+    '#description' => t('Store Android Activation Data'),
+    '#auth' => TRUE,
+    '#path' => 'android_activation/store_data',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/android_activation/store_data.json<br />
+    POST data application/json:
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => 'TRUE / FALSE',
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+function android_activation_services_uninstall() {
+  drupal_uninstall_schema('android_activation');
+}

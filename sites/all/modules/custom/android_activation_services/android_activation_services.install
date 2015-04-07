@@ -1,0 +1,53 @@
+<?php
+
+// $Id$
+
+/**
+ * @file Installation file for android activation module
+**/
+
+// create table android_activation
+function android_activation_services_schema() {  
+    $schema['android_activation'] = array(    
+    'description' => 'Storing Android Activation Data',
+    'fields' => array(
+        'id' => array(
+            'description' => 'id',
+            'type' => 'serial',
+	),      
+        'imei' => array(
+            'description' => 'IMEI',
+            'type' => 'varchar',
+            'length' => 255,
+        ),      
+        'location' => array(
+            'description' => 'Location',
+            'type' => 'varchar',
+            'length' => 255,
+        ),      
+        'model_number' => array(
+            'description' => 'Model Number',
+            'type' => 'varchar',
+            'length' => 255,
+        ),      
+        'other_data' => array(
+            'description' => 'Other Data',
+            'type' => 'text',
+        ),      
+        'created_at' => array(
+            'description' => 'Created Date',
+            'type' => 'varchar',
+            'mysql_type' => 'DATETIME',
+        ),      
+        'updated_at' => array(
+            'description' => 'Updated Date',
+            'type' => 'varchar',
+            'mysql_type' => 'DATETIME',
+        ),
+    ),
+    'primary key' => array('id'),
+  );
+  
+		
+  return $schema;
+}

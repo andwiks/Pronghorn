@@ -152,7 +152,7 @@ function android_activation_services_doc() {
     '#path' => 'android_activation/store_data',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/android_activation/store_data.json<br />
-    POST data application/json:
+    POST data application/json: {"imei": "123123123","location": "3247324,32463724", "model_number": "GT-3243242", "other_data": ["AAA", "BBB", "CCC"]}
     ',
     // Example response. E.g., a JSON array.
     '#response' => 'TRUE / FALSE',

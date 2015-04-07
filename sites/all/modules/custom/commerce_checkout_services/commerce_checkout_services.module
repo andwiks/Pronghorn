@@ -283,8 +283,10 @@ function commerce_checkout_services_resource_complete($order_id) {
   ) {
     // Complete the order.
     commerce_checkout_complete($order);
-    // Return TRUE.
-    return TRUE;
+
+    return array(
+      'message' => sepulsa_checkout_completion_message_message($order, 'services'),
+    );
   }
   // Reach this means error: invalid order.
   return services_error(t('Invalid order'), 406);

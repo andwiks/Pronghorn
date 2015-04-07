@@ -275,3 +275,19 @@ function kupon_views_query_alter(&$view, &$query) {
     $query->where[1]['conditions'][4]['value'] = $total['amount'];
   }
 }
+
+/**
+ * Implements hook_preprocess_views_view_table().
+ */
+function kupon_preprocess_views_view_table(&$variables) {
+  $view = $variables['view'];
+
+  if ($view->name == 'coupon_report') {
+    foreach ($variables['result'] as $key => $result) {
+      if ($result->field_data_field_coupon_type_field_coupon_type_value == 'simple') {
+        $variables['rows'][$key]['field_simple_coupon'] = 'N/A';
+        $variables['rows'][$key]['expression'] = 'N/A';
+      }
+    }
+  }
+}

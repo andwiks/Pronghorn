@@ -27,6 +27,31 @@ function android_activation_services_entity_info() {
   return $info;
 }
 
+function android_activation_services_menu() {
+    $items['admin/android_activation_admin'] = array(
+      'title'            => t('Android Activation'),
+      'description'      => t('Android Activation'),
+      'page callback'    => 'android_activation_admin',
+      'access arguments' => array('administer site configuration'),
+      'type'             => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function android_activation_admin(){
+    $result = db_query('SELECT * FROM android_activation');
+    $output = '<table><thead><tr><th>IMEI</th><th>Location</th><th>Model Number</th><th>Other Data</th></tr>';
+    foreach ($result as $row) {
+        $output .= '<tr>
+                        <td>'.$row->imei.'</td>
+                        <td>'.$row->location.'</td>
+                        <td>'.$row->model_number.'</td>
+                        <td>'.$row->other_data.'</td>
+                    </tr>';
+    }
+    $output .= "</thead></table>";
+    return $output;
+}
 
 /**
  * Hook Implementations.

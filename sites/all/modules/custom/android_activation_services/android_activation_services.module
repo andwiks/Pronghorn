@@ -43,7 +43,7 @@ function android_activation_services_services_resources() {
           'help' => 'Store Android Activation Data',
           'callback' => '_store_android_activation_data',
           'documentation callback' => 'android_activation_services_doc',
-          'access callback' => 'services_access_menu',
+          'access callback' => '_android_activation_access',
           'args' => array(
             array(
               'name' => 'imei',
@@ -95,6 +95,11 @@ function android_activation_services_services_resources() {
     ),
   );
   return $definition;
+}
+
+/** * Access callback */
+function _android_activation_access() {
+  return TRUE;
 }
 
 /**

@@ -69,11 +69,6 @@ function topup_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'try' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 1,
-      ),
     ),
     'indexes' => array(
       'line_item_id' => array('line_item_id'),
@@ -81,7 +76,6 @@ function topup_schema() {
       'topup_vendor' => array('vendor'),
     ),
     'unique keys' => array(
-      'line_item_try' => array('line_item_id', 'try'),
       'vendor_ref' => array('vendor', 'ref'),
     ),
     'foreign keys' => array(
@@ -130,6 +124,14 @@ function topup_uninstall() {
     ->execute();
   // Clear all cache.
   drupal_flush_all_caches();
+}
+
+/**
+ * Remove try field.
+ */
+function topup_update_7001(&$sandbox) {
+  db_drop_unique_key('topup', 'line_item_try');
+  db_drop_field('topup', 'try');
 }
 
 /**

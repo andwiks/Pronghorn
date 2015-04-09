@@ -882,17 +882,6 @@ function topup_update_topup_data($topup, $result, $output) {
 
 function topup_update_topup_entity($topup, $result, $output) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
-  $topup_entities = entity_load('topup', FALSE, array('line_item_id' => $topup['line_item_id'], 'try' => $topup['try']));
-  if (empty($topup_entities)) {
-    $values = array(
-      'line_item_id' => $topup['line_item_id'],
-      'try' => $topup['try'],
-    );
-    $topup_entity = entity_create('topup', $values);
-  }
-  else {
-    $topup_entity = reset($topup_entities);
-  }
 
   if (is_string($output['topup_data'][$output['request_id']])) {
     if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {
@@ -938,12 +927,31 @@ function topup_update_topup_entity($topup, $result, $output) {
     }
   }
 
+  $vendor = $topup['field_topup_provider'];
+  $ref = empty($ref) ? $output['request_id'] : $ref;
+
+  $conditions = array(
+    'ref' => $ref,
+    'vendor' => $vendor,
+    'line_item_id' => $topup['line_item_id'],
+  );
+  $topup_entities = entity_load('topup', FALSE, $conditions);
+  if (empty($topup_entities)) {
+    $values = array(
+      'ref' => $ref,
+      'vendor' => $vendor,
+      'line_item_id' => $topup['line_item_id'],
+    );
+    $topup_entity = entity_create('topup', $values);
+  }
+  else {
+    $topup_entity = reset($topup_entities);
+  }
+
   $topup_entity->status = $result;
-  $topup_entity->ref = empty($ref) ? $output['request_id'] : $ref;
   $topup_entity->time = empty($time) ? $line_item_wrapper->changed->value() : $time;
   $topup_entity->sn = empty($sn) ? '' : $sn;
   $topup_entity->price = empty($price) ? '' : $price;
-  $topup_entity->vendor = $topup['field_topup_provider'];
 
   entity_save('topup', $topup_entity);
 }

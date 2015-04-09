@@ -85,6 +85,46 @@ function topup_cron_queue_info() {
 }
 
 /**
+ * Implements hook_entity_info().
+ */
+function topup_entity_info() {
+  return array(
+    'topup' => array(
+      'label' => t('Topup'),
+      'entity class' => 'Entity',
+      'controller class' => 'TopupEntityController',
+      'base table' => 'topup',
+      'entity keys' => array(
+        'id' => 'topup_id',
+      ),
+      'module' => 'topup',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function topup_entity_property_info_alter(&$info) {
+  $properties = &$info['topup']['properties'];
+
+  $properties['status']['options list'] = 'topup_entity_property_status_options';
+
+  $properties['created']['type'] = 'date';
+  $properties['changed']['type'] = 'date';
+  $properties['time']['type'] = 'date';
+
+  $properties['vendor']['options list'] = 'topup_entity_property_vendor_options';
+
+  $properties['line_item'] = array(
+    'label' => t('Line item'),
+    'type' => 'commerce_line_item',
+    'description' => t('The line item this process belongs to.'),
+    'schema field' => 'line_item_id',
+  );
+}
+
+/**
  * Implements hook_menu().
  */
 function topup_menu() {
@@ -833,6 +873,98 @@ function topup_update_topup_data($topup, $result, $output) {
   $line_item_wrapper->field_topup_data->set($topup_data);
   // Save line item.
   $line_item_wrapper->save();
+
+  topup_update_topup_entity($topup, $result, $output);
+
   // Return updated topup data.
   return $topup_data;
+}
+
+function topup_update_topup_entity($topup, $result, $output) {
+  $topup_entities = entity_load('topup', FALSE, array('line_item_id' => $topup['line_item_id'], 'try' => $topup['try']));
+  if (empty($topup_entities)) {
+    $values = array(
+      'line_item_id' => $topup['line_item_id'],
+      'try' => $topup['try'],
+    );
+    $topup_entity = entity_create('topup', $values);
+  }
+  else {
+    $topup_entity = reset($topup_entities);
+  }
+
+  if (is_string($output['topup_data'][$output['request_id']])) {
+    if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {
+      if (!empty($matches[1])) {
+        $sn = $matches[1];
+      }
+      if (!empty($matches[2])) {
+        $date = new DateObject($matches[2]);
+        $time = date_format_date($date, 'custom', 'U');
+      }
+      if (!empty($matches[3])) {
+        $price = str_replace('.', '', $matches[3]);
+      }
+    }
+  }
+  else {
+    if (!empty($output['topup_data'][$output['request_id']]['ref'])) {
+      $ref = $output['topup_data'][$output['request_id']]['ref'];
+    }
+
+    if (!empty($output['topup_data'][$output['request_id']]['time'])) {
+      $date = new DateObject($output['topup_data'][$output['request_id']]['time']);
+      $time = date_format_date($date, 'custom', 'U');
+    }
+
+    if (!empty($output['topup_data'][$output['request_id']]['note'])) {
+      if (preg_match('/sn#([\w\d]+)#([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+        if (!empty($matches[1])) {
+          $price = $matches[1];
+        }
+        if (!empty($matches[2])) {
+          $sn = $matches[2];
+        }
+      }
+      elseif (preg_match('/SN=([\w\d]+)\sHarga=([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+        if (!empty($matches[1])) {
+          $sn = $matches[1];
+        }
+        if (!empty($matches[2])) {
+          $price = $matches[2];
+        }
+      }
+    }
+  }
+
+  $topup_entity->status = $result;
+  $topup_entity->ref = empty($ref) ? $output['request_id'] : $ref;
+  $topup_entity->time = empty($time) ? $line_item_wrapper->changed->value() : $time;
+  $topup_entity->sn = empty($sn) ? '' : $sn;
+  $topup_entity->price = empty($price) ? '' : $price;
+  $topup_entity->vendor = $topup['field_topup_provider'];
+
+  entity_save('topup', $topup_entity);
+}
+
+function topup_entity_property_status_options($name, $info, $op) {
+  return array(
+    TOPUP_FAILED => t('Failed'),
+    TOPUP_SUCCESS => t('Success'),
+    TOPUP_PENDING => t('Pending'),
+    TOPUP_INQUEUE => t('In Queue'),
+    TOPUP_CANCELED => t('Canceled'),
+    TOPUP_ERROR => t('Error'),
+    TOPUP_NONE => t('None'),
+  );
+}
+
+function topup_entity_property_vendor_options($name, $info, $op) {
+  $options = array();
+
+  foreach (topup_providers() as $name => $provider) {
+    $options[$name] = $provider['title'];
+  }
+
+  return $options;
 }

@@ -26,7 +26,7 @@ function android_activation_services_entity_info() {
 
   return $info;
 }
-
+/*
 function android_activation_services_menu() {
     $items['admin/android_activation_admin'] = array(
       'title'            => t('Android Activation'),
@@ -52,7 +52,7 @@ function android_activation_admin(){
     $output .= "</thead></table>";
     return $output;
 }
-
+*/
 /**
  * Hook Implementations.
  */
@@ -207,7 +207,7 @@ function android_activation_services_doc() {
   );
   return $element;
 }
-
+/*
 function android_activation_services_uninstall() {
   drupal_uninstall_schema('android_activation');
-}
+}*/

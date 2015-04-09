@@ -881,6 +881,7 @@ function topup_update_topup_data($topup, $result, $output) {
 }
 
 function topup_update_topup_entity($topup, $result, $output) {
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
   $topup_entities = entity_load('topup', FALSE, array('line_item_id' => $topup['line_item_id'], 'try' => $topup['try']));
   if (empty($topup_entities)) {
     $values = array(

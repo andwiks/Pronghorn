@@ -136,13 +136,15 @@ function topup_uninstall() {
  * Add request_id field.
  */
 function topup_update_7002(&$sandbox) {
-  $spec = array(
-    'type' => 'varchar',
-    'length' => 128,
-    'default' => NULL,
-  );
-  db_add_field('topup', 'request_id', $spec);
-  db_add_unique_key('topup', 'request_id', array('request_id'));
+  if (!db_field_exists('topup', 'request_id')) {
+    $spec = array(
+      'type' => 'varchar',
+      'length' => 128,
+      'default' => NULL,
+    );
+    db_add_field('topup', 'request_id', $spec);
+    db_add_unique_key('topup', 'request_id', array('request_id'));
+  }
 }
 
 /**

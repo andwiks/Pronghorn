@@ -162,10 +162,15 @@ function topup_settings_form_validate($form, &$form_state) {
     // Compare old allowed value with new allowed value.
     $lost_keys = array_diff(array_keys($info['settings']['allowed_values']), array_keys(_topup_get_code_options()));
     if (!empty($lost_keys)) {
-      form_set_error('topup_field_code', t('Unable to update field %field because values %values currently in use.', array(
-        '%field' => $form_state['values']['topup_field_code'],
-        '%values' => implode(', ', $lost_keys),
-      )));
+      // Check whether this lost keys are currently in used.
+      if (_list_values_in_use(array(
+        'field_name' => $form_state['values']['topup_field_code'],
+      ), $lost_keys)) {
+        form_set_error('topup_field_code', t('Unable to update field %field because values %values currently in use.', array(
+          '%field' => $form_state['values']['topup_field_code'],
+          '%values' => implode(', ', $lost_keys),
+        )));
+      }
     }
   }
 }

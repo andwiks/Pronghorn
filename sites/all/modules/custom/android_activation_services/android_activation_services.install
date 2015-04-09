@@ -34,12 +34,12 @@ function android_activation_services_schema() {
             'description' => 'Other Data',
             'type' => 'text',
         ),      
-        'created_at' => array(
+        'created' => array(
             'description' => 'Created Date',
             'type' => 'varchar',
             'mysql_type' => 'DATETIME',
         ),      
-        'updated_at' => array(
+        'updated' => array(
             'description' => 'Updated Date',
             'type' => 'varchar',
             'mysql_type' => 'DATETIME',

@@ -16,7 +16,7 @@ function android_activation_services_entity_info() {
     'base table' => 'android_activation',
     'entity keys' => array(
       'id' => 'id',
-      'label' => 'imei',
+      //'label' => 'imei',
     ),
     'fieldable' => TRUE,
     'module' => 'android_activation_services',
@@ -145,10 +145,10 @@ function _store_android_activation_data($imei, $location, $model_number, $other_
     if ($id) { // udpate imei
         $android = entity_load('android', array($id));  
         $android = $android[$id];
-        $android->updated_at = $today;
+        $android->updated = $today;
     } else { // create new
         $android = entity_create('android', array());
-        $android->created_at = $today;
+        $android->created = $today;
     }
     $android->imei = $imei;
     $android->location = $location;

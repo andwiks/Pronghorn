@@ -16,7 +16,7 @@ function android_activation_services_entity_info() {
     'base table' => 'android_activation',
     'entity keys' => array(
       'id' => 'id',
-      'label' => 'imei',
+      //'label' => 'imei',
     ),
     'fieldable' => TRUE,
     'module' => 'android_activation_services',
@@ -207,7 +207,7 @@ function android_activation_services_doc() {
   );
   return $element;
 }
-/*
+
 function android_activation_services_uninstall() {
   drupal_uninstall_schema('android_activation');
-}*/
+}

@@ -131,3 +131,15 @@ function topup_uninstall() {
   // Clear all cache.
   drupal_flush_all_caches();
 }
+
+/**
+ * Create table for topup entity.
+ */
+function topup_update_7000(&$sandbox) {
+  if (!db_table_exists('topup')) {
+    $schema = drupal_get_schema_unprocessed('topup');
+    _drupal_schema_initialize($schema, 'topup', FALSE);
+
+    db_create_table('topup', $schema['topup']);
+  }
+}

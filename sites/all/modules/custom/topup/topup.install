@@ -69,10 +69,10 @@ function topup_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'try' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 1,
+      'request_id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'default' => '',
       ),
     ),
     'indexes' => array(
@@ -81,8 +81,8 @@ function topup_schema() {
       'topup_vendor' => array('vendor'),
     ),
     'unique keys' => array(
-      'line_item_try' => array('line_item_id', 'try'),
       'vendor_ref' => array('vendor', 'ref'),
+      'request_id' => array('request_id'),
     ),
     'foreign keys' => array(
       'topup_line_item' => array(
@@ -130,6 +130,29 @@ function topup_uninstall() {
     ->execute();
   // Clear all cache.
   drupal_flush_all_caches();
+}
+
+/**
+ * Add request_id field.
+ */
+function topup_update_7002(&$sandbox) {
+  if (!db_field_exists('topup', 'request_id')) {
+    $spec = array(
+      'type' => 'varchar',
+      'length' => 128,
+      'default' => NULL,
+    );
+    db_add_field('topup', 'request_id', $spec);
+    db_add_unique_key('topup', 'request_id', array('request_id'));
+  }
+}
+
+/**
+ * Remove try field.
+ */
+function topup_update_7001(&$sandbox) {
+  db_drop_unique_key('topup', 'line_item_try');
+  db_drop_field('topup', 'try');
 }
 
 /**

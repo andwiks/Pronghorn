@@ -901,13 +901,12 @@ function topup_update_topup_entity($topup, $result, $output) {
     }
   }
   else {
-    if (!empty($output['topup_data'][$output['request_id']]['ref'])) {
-      $ref = $output['topup_data'][$output['request_id']]['ref'];
+    if (!empty($output['topup_data'][$output['request_id']]['ref2'])) {
+      $ref = $output['topup_data'][$output['request_id']]['ref2'];
     }
 
     if (!empty($output['topup_data'][$output['request_id']]['time'])) {
-      $date = new DateObject($output['topup_data'][$output['request_id']]['time']);
-      $time = date_format_date($date, 'custom', 'U');
+      $time = strtotime($output['topup_data'][$output['request_id']]['time']);
     }
 
     if (!empty($output['topup_data'][$output['request_id']]['note'])) {

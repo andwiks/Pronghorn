@@ -284,8 +284,9 @@ function commerce_checkout_services_resource_complete($order_id) {
     // Complete the order.
     commerce_checkout_complete($order);
 
+    $message = sepulsa_checkout_completion_message_message($order, 'services');
     return array(
-      'message' => sepulsa_checkout_completion_message_message($order, 'services'),
+      'message' => str_replace("\n", '', $message),
     );
   }
   // Reach this means error: invalid order.

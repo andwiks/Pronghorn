@@ -56,15 +56,13 @@ function _userpoints_services_list(){
     }
     foreach ($query->execute() as $transaction) {
         $userpoints_detail[] = array(
-            'userpoints_detail' => array(
-                'txn_id' => $transaction->txn_id,
-                'uid' => $transaction->uid,
-                'points' => $transaction->points,
-                'description' => $transaction->description,
-                //'time_stamp' => format_date($transaction->time_stamp, 'small'),
-                'time_stamp' => $transaction->time_stamp,
-                'status' => $stati[$transaction->status]
-            )
+            'txn_id' => $transaction->txn_id,
+            'uid' => $transaction->uid,
+            'points' => $transaction->points,
+            'description' => $transaction->description,
+            //'time_stamp' => format_date($transaction->time_stamp, 'small'),
+            'time_stamp' => $transaction->time_stamp,
+            'status' => $stati[$transaction->status]
         );
     }
     $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];

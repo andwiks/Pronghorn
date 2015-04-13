@@ -42,7 +42,8 @@ function _userpoints_services_list(){
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
   try {
-    $userpoints = [];
+    $totalamount = userpoints_get_current_points($user->uid);
+    $totalamount = number_format($totalamount,0,",",".");
     $stati = userpoints_txn_status();
     $query = db_select('userpoints_txn', 'p')
         ->fields('p')
@@ -54,16 +55,19 @@ function _userpoints_services_list(){
       $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
     }
     foreach ($query->execute() as $transaction) {
-        $userpoints[] = array(
-            'txn_id' => $transaction->txn_id,
-            'uid' => $transaction->uid,
-            'points' => $transaction->points,
-            'description' => $transaction->description,
-            //'time_stamp' => format_date($transaction->time_stamp, 'small'),
-            'time_stamp' => $transaction->time_stamp,
-            'status' => $stati[$transaction->status]
+        $userpoints_detail[] = array(
+            'userpoints_detail' => array(
+                'txn_id' => $transaction->txn_id,
+                'uid' => $transaction->uid,
+                'points' => $transaction->points,
+                'description' => $transaction->description,
+                //'time_stamp' => format_date($transaction->time_stamp, 'small'),
+                'time_stamp' => $transaction->time_stamp,
+                'status' => $stati[$transaction->status]
+            )
         );
     }
+    $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
     
     return $userpoints;
   }

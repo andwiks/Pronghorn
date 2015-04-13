@@ -43,6 +43,7 @@ function _userpoints_services_list(){
   // Wrap around using try and catch.
   try {
     $userpoints = [];
+    $stati = userpoints_txn_status();
     $query = db_select('userpoints_txn', 'p')
         ->fields('p')
         ->condition('p.uid', $user->uid)
@@ -58,8 +59,9 @@ function _userpoints_services_list(){
             'uid' => $transaction->uid,
             'points' => $transaction->points,
             'description' => $transaction->description,
+            //'time_stamp' => format_date($transaction->time_stamp, 'small'),
             'time_stamp' => $transaction->time_stamp,
-            'status' => $transaction->status
+            'status' => $stati[$transaction->status]
         );
     }
     

@@ -59,7 +59,8 @@ function _userpoints_services_list(){
             'uid' => $transaction->uid,
             'points' => $transaction->points,
             'description' => $transaction->description,
-            'time_stamp' => format_date($transaction->time_stamp, 'small'),
+            //'time_stamp' => format_date($transaction->time_stamp, 'small'),
+            'time_stamp' => $transaction->time_stamp,
             'status' => $stati[$transaction->status]
         );
     }

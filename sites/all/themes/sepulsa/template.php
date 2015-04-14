@@ -229,6 +229,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['edit_delete'][$children]['#product_id'] = $line_item_wrapper->commerce_product->getIdentifier();
         $form['edit_delete'][$children]['#ajax'] = array(
           'callback' => 'sepulsa_views_form_commerce_cart_block_default_ajax_submit',
+          'progress' => array('type' => 'none'),
         );
       }
     }
@@ -273,6 +274,7 @@ function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state,
     $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
     $form['submit']['#ajax'] = array(
       'callback' => 'sepulsa_commerce_add_to_cart_form_ajax_submit',
+      'progress' => array('type' => 'none'),
     );
   }
 }

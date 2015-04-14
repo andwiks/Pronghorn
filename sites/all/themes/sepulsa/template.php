@@ -59,10 +59,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
     $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
 
-  } else if ($commer_form_id == 'commerce_cart_add_to_cart' && arg(0) == 'coupon') {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
-    $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
-
   } else if ($form_id == "user_login") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
@@ -218,15 +214,22 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   } else if ($form_id == "views_form_commerce_cart_block_default") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     global $base_url;
+    $views = $form_state['build_info']['args'][0];
 
-    foreach ($form['edit_delete'] as &$value) {
-      if (isset($value['#type'])) {
-        //drupal_set_message("<pre>".print_r($value, true)."</pre>");
-        //$value['#type'] = 'image_button';
-        //$value['#attributes']['src'] = $base_url.'/'.drupal_get_path('theme','sepulsa').'/images/ico-close.png';
-        //$value['#attributes']['width'] = '40px';
-        $value['#attributes']['class'][] = 'hapusButton';
-        $value['#value'] = '';
+    foreach (element_children($form['edit_delete']) as $children) {
+      //drupal_set_message("<pre>".print_r($value, true)."</pre>");
+      //$value['#type'] = 'image_button';
+      //$value['#attributes']['src'] = $base_url.'/'.drupal_get_path('theme','sepulsa').'/images/ico-close.png';
+      //$value['#attributes']['width'] = '40px';
+      $form['edit_delete'][$children]['#attributes']['class'][] = 'hapusButton';
+      $form['edit_delete'][$children]['#value'] = '';
+
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $views->result[$children]->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_']['entity']);
+      if ($line_item_wrapper->getBundle() == 'coupon') {
+        $form['edit_delete'][$children]['#product_id'] = $line_item_wrapper->commerce_product->getIdentifier();
+        $form['edit_delete'][$children]['#ajax'] = array(
+          'callback' => 'sepulsa_views_form_commerce_cart_block_default_ajax_submit',
+        );
       }
     }
 
@@ -254,6 +257,23 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
   elseif ($form_id == 'commerce_checkout_form_complete' && !empty($form_state['build_info']['args'][0]) && is_object($form_state['build_info']['args'][0])) {
     $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
     $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for commerce_cart_add_to_cart_form().
+ */
+function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  if (!empty($form_state['line_item']) && $form_state['line_item']->type == 'coupon') {
+    $form['#attached']['library'][] = array('system', 'effects.shake');
+    $form['#attached']['js'][path_to_theme() . '/js/sepulsa-coupon.js'] = array(
+      'group' => JS_THEME,
+    );
+
+    $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
+    $form['submit']['#ajax'] = array(
+      'callback' => 'sepulsa_commerce_add_to_cart_form_ajax_submit',
+    );
   }
 }
 
@@ -335,6 +355,52 @@ function sepulsa_preprocess_block(&$vars, $hook) {
 function sepulsa_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_unformatted().
+ */
+function sepulsa_preprocess_views_view_unformatted(&$variables) {
+  $view = $variables['view'];
+
+  switch ($view->name) {
+    case 'coupon':
+      if ($view->current_display == 'page') {
+        $variables['row_classes'] = array();
+        $products = array();
+        $cart = commerce_cart_order_load($variables['user']->uid);
+        $cart_wrapper = entity_metadata_wrapper('commerce_order', $cart);
+
+        foreach ($cart_wrapper->commerce_line_items as $line_item) {
+          if ($line_item->getBundle() == 'coupon') {
+            $products[] = $line_item->commerce_product->getIdentifier();
+          }
+        }
+
+        foreach ($view->result as $key => $result) {
+          $product_id = $result->field_field_product[0]['raw']['product_id'];
+          if (in_array($product_id, $products)) {
+            $variables['row_classes'][$key] = 'hidden coupon-' . $product_id;
+          }
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_list().
+ */
+function sepulsa_preprocess_views_view_list(&$variables) {
+  $view = $variables['view'];
+
+  switch ($view->name) {
+    case 'commerce_cart_block':
+      foreach ($view->result as $id => $result) {
+        $variables['classes_array'][$id] = 'line-item-' . $result->commerce_line_item_field_data_commerce_line_items_line_item_;
+      }
+      break;
   }
 }
 
@@ -481,4 +547,39 @@ function sepulsa_preprocess_sepulsa_checkout_completion_message(&$variables) {
   if ($variables['user']->uid) {
     $variables['authenticated'] = TRUE;
   }
+}
+
+function sepulsa_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
+  $order = commerce_cart_order_load($GLOBALS['user']->uid);
+  $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
+  $node_id = $form_state['context']['entity_id'];
+  $product_id = $form_state['default_product']->product_id;
+
+  $variables = array(
+    'order' => $order,
+    'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id), $_GET['q']),
+  );
+
+  $commands = array(
+    array(
+      'command' => 'select_coupon',
+      'selector' => '#node-' . $node_id,
+    ),
+  );
+  $commands[] = ajax_command_invoke('#node-' . $node_id, 'addClass', array('hidden coupon-' . $product_id));
+  $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
+  $commands[] = ajax_command_replace('.commerce-cart-add-to-cart-form-' . $product_id, render($rebuild));
+  $commands[] = ajax_command_prepend('.region-content', theme('status_messages'));
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+function sepulsa_views_form_commerce_cart_block_default_ajax_submit($form, $form_state) {
+  $product_id = $form_state['triggering_element']['#product_id'];
+
+  $commands = array();
+  $commands[] = ajax_command_remove('.line-item-' . $form_state['triggering_element']['#line_item_id']);
+  $commands[] = ajax_command_invoke('.hidden.coupon-' . $product_id, 'removeClass', array('hidden coupon-' . $product_id));
+
+  return array('#type' => 'ajax', '#commands' => $commands);
 }

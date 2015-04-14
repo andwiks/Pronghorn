@@ -8,7 +8,7 @@
  */
 ?>
 <?php foreach ($rows as $id => $row): ?>
-  <div class="col-sm-6 col-md-3">
+  <div id="node-<?php print $view->result[$id]->nid; ?>" class="col-sm-6 col-md-3<?php print isset($row_classes[$id]) ? ' ' . $row_classes[$id] : ''; ?>">
     <article class="post post-grid">
       <?php print $row; ?>
     </article>

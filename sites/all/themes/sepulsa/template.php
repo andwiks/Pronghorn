@@ -552,24 +552,31 @@ function sepulsa_preprocess_sepulsa_checkout_completion_message(&$variables) {
 }
 
 function sepulsa_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
+  if (!function_exists('commerce_order_rules_contains_product')) {
+    module_load_include('rules.inc', 'commerce_order');
+  }
+
+  $commands = array();
   $order = commerce_cart_order_load($GLOBALS['user']->uid);
   $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
-  $node_id = $form_state['context']['entity_id'];
-  $product_id = $form_state['default_product']->product_id;
 
-  $variables = array(
-    'order' => $order,
-    'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id), $_GET['q']),
-  );
+  if (commerce_order_rules_contains_product($order, $form_state['default_product']->sku, '>', 0)) {
+    $node_id = $form_state['context']['entity_id'];
+    $product_id = $form_state['default_product']->product_id;
 
-  $commands = array(
-    array(
+    $variables = array(
+      'order' => $order,
+      'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id)),
+    );
+
+    $commands[] = array(
       'command' => 'select_coupon',
       'selector' => '#node-' . $node_id,
-    ),
-  );
-  $commands[] = ajax_command_invoke('#node-' . $node_id, 'addClass', array('hidden coupon-' . $product_id));
-  $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
+    );
+    $commands[] = ajax_command_invoke('#node-' . $node_id, 'addClass', array('hidden coupon-' . $product_id));
+    $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
+  }
+
   $commands[] = ajax_command_replace('.commerce-cart-add-to-cart-form-' . $product_id, render($rebuild));
   $commands[] = ajax_command_prepend('.region-content', theme('status_messages'));
 

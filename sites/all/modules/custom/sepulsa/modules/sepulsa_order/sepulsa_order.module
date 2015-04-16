@@ -1,0 +1,175 @@
+<?php
+
+/**
+ * Implements hook_cronapi().
+ */
+function sepulsa_order_cronapi() {
+  $items = array();
+
+  $items ['sepulsa_order_query_order'] = array(
+    'title' => t('Sepulsa Order Query'),
+    'callback' => 'sepulsa_order_query_order',
+    'callback arguments' => array(
+      'start' => '-1 day',
+      'end' => NULL,
+    ),
+    'enabled' => TRUE,
+    'tags' => array('sepulsa'),
+    'scheduler' => array(
+      'name' => 'crontab',
+      'crontab' => array(
+        'rules' => array('* 1 * * *'),
+      ),
+    ),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function sepulsa_order_cron_queue_info() {
+  $queues ['sepulsa_order_process_order'] = array(
+    'worker callback' => 'sepulsa_order_process_order',
+  );
+  return $queues;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function sepulsa_order_entity_info() {
+  return array(
+    'sepulsa_order' => array(
+      'label' => t('Sepulsa Order'),
+      'entity class' => 'Entity',
+      'controller class' => 'EntityAPIController',
+      'base table' => 'sepulsa_order',
+      'entity keys' => array(
+        'id' => 'order_id',
+      ),
+      'module' => 'sepulsa_order',
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_order_menu() {
+  $items = array();
+  $items['admin/commerce/reports/orders-detail/query'] = array(
+    'title' => 'Query Order',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_order_query_order_form'),
+    'access arguments' => array('access commerce reports'),
+    'file' => 'sepulsa_order.admin.inc',
+    'type' => MENU_LOCAL_ACTION,
+  );
+  return $items;
+}
+
+function sepulsa_order_query_order($job, $arguments, $start = '-1 day', $end = NULL) {
+  extract($arguments);
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_order');
+
+  if (!empty($start) && !empty($end)) {
+    $query->propertyCondition('changed', array(strtotime($start), strtotime($end)), 'BETWEEN');
+  }
+  elseif (!empty($start)) {
+    $query->propertyCondition('changed', strtotime($start), '>');
+  }
+  elseif (!empty($end)) {
+    $query->propertyCondition('changed', strtotime($end), '<');
+  }
+
+  $query->propertyCondition('status', array_keys(commerce_order_statuses(array('state' => 'checkout'))), 'NOT IN');
+  $query->propertyCondition('status', array_keys(commerce_order_statuses(array('state' => 'cart'))), 'NOT IN');
+
+  $result = $query->execute();
+
+  if (!empty($result)) {
+    $queue = DrupalQueue::get('sepulsa_order_process_order');
+    foreach ($result['commerce_order'] as $order_id => $commerce_order) {
+      $queue->createItem($order_id);
+    }
+  }
+
+  return $query->count()->execute();
+}
+
+function sepulsa_order_process_order($order_id) {
+  $order = commerce_order_load($order_id);
+
+  if ($order) {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    $sepulsa_order = entity_load_single('sepulsa_order', $order_id);
+    if (!$sepulsa_order) {
+      $sepulsa_order = entity_create('sepulsa_order', array('order_id' => $order_id));
+    }
+
+    $sepulsa_order_wrapper = entity_metadata_wrapper('sepulsa_order', $sepulsa_order);
+    $sepulsa_order_wrapper->mail->set($order->mail);
+    $sepulsa_order_wrapper->status->set($order->status);
+    $sepulsa_order_wrapper->created->set($order->created);
+    $sepulsa_order_wrapper->changed->set($order->changed);
+
+    foreach ($order_wrapper->commerce_line_items as $id => $line_item_wrapper) {
+      switch ($line_item_wrapper->getBundle()) {
+        case 'mobile_prepaid':
+          $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
+          $sepulsa_order_wrapper->phone->set($line_item_wrapper->field_phone_number->value());
+          break;
+
+        case 'coupon':
+          $property = 'coupon_' . $id;
+          $sepulsa_order_wrapper->$property->set($line_item_wrapper->commerce_product->value());
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    $sepulsa_order_wrapper->amount->set($order_wrapper->commerce_order_total->amount->value());
+    $sepulsa_order_wrapper->currency_code->set($order_wrapper->commerce_order_total->currency_code->value());
+
+    if (!empty($order->data['payment_method'])) {
+      $payment = array();
+      list($payment['method'], $payment['instance']) = explode('|', $order->data['payment_method']);
+
+      $sepulsa_order_wrapper->payment_method->set($payment['method']);
+      $sepulsa_order_wrapper->payment_instance->set($payment['instance']);
+    }
+
+    return entity_save('sepulsa_order', $sepulsa_order);
+  }
+}
+
+function sepulsa_order_status_options_list($op = 'view') {
+  $options = array();
+  $states = commerce_order_states();
+  foreach ($states as $name => $state) {
+    if ($name != 'cart' && $name != 'checkout') {
+      foreach (commerce_order_statuses(array('state' => $name)) as $order_status) {
+        $options[$order_status ['name']] = $order_status ['title'];
+      }
+    }
+  }
+  return $options;
+}
+
+function sepulsa_order_payment_instance_options_list($op = 'view') {
+  $rules = entity_load('rules_config', FALSE, array('active' => TRUE, 'event' => 'commerce_payment_methods'));
+
+  $options = array();
+  foreach ($rules as $rule) {
+    $options[$rule->name] = $rule->label;
+  }
+
+  return $options;
+}

@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function sepulsa_order_schema() {
+  $schema['sepulsa_order'] = array(
+    'description' => 'The base table for Sepulsa Order entity',
+    'fields' => array(
+      'order_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'mail' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'prepaid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'phone' => array(
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'coupon_1' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),
+      'coupon_2' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),
+      'coupon_3' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),
+      'amount' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'currency_code' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+      ),
+      'payment_method' => array(
+        'type' => 'varchar',
+        'length' => 128,
+      ),
+      'payment_instance' => array(
+        'type' => 'varchar',
+        'length' => 64,
+      ),
+    ),
+    'unique keys' => array(
+      'order_id' => array('order_id'),
+    ),
+    'foreign keys' => array(
+      'order' => array(
+        'table' => 'commerce_order',
+        'columns' => array('order_id' => 'order_id'),
+      ),
+      'prepaid' => array(
+        'table' => 'commerce_product',
+        'columns' => array('prepaid' => 'product_id'),
+      ),
+      'coupon_1' => array(
+        'table' => 'commerce_product',
+        'columns' => array('coupon_1' => 'product_id'),
+      ),
+      'coupon_2' => array(
+        'table' => 'commerce_product',
+        'columns' => array('coupon_2' => 'product_id'),
+      ),
+      'coupon_3' => array(
+        'table' => 'commerce_product',
+        'columns' => array('coupon_3' => 'product_id'),
+      ),
+      'payment_instance' => array(
+        'table' => 'rules_config',
+        'columns' => array('payment_instance' => 'name'),
+      ),
+    ),
+  );
+
+  return $schema;
+}

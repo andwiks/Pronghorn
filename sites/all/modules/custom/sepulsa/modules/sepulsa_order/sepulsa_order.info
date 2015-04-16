@@ -1,0 +1,5 @@
+name = Sepulsa Order
+description = Extends commerce order
+core = "7.x"
+
+; files[] = includes/sepulsa_order.controller.inc

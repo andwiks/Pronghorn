@@ -583,5 +583,7 @@ function sepulsa_views_form_commerce_cart_block_default_ajax_submit($form, $form
   $commands[] = ajax_command_remove('.line-item-' . $form_state['triggering_element']['#line_item_id']);
   $commands[] = ajax_command_invoke('.hidden.coupon-' . $product_id, 'removeClass', array('hidden coupon-' . $product_id));
 
+  drupal_get_messages('status');
+
   return array('#type' => 'ajax', '#commands' => $commands);
 }

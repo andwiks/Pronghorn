@@ -558,11 +558,11 @@ function sepulsa_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
 
   $commands = array();
   $order = commerce_cart_order_load($GLOBALS['user']->uid);
+  $product_id = $form_state['default_product']->product_id;
   $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
 
   if (commerce_order_rules_contains_product($order, $form_state['default_product']->sku, '>', 0)) {
     $node_id = $form_state['context']['entity_id'];
-    $product_id = $form_state['default_product']->product_id;
 
     $variables = array(
       'order' => $order,

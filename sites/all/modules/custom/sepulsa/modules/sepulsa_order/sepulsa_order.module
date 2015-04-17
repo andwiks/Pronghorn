@@ -18,7 +18,7 @@ function sepulsa_order_cronapi() {
     'scheduler' => array(
       'name' => 'crontab',
       'crontab' => array(
-        'rules' => array('* 1 * * *'),
+        'rules' => array('0 1 * * *'),
       ),
     ),
   );

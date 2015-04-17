@@ -1,0 +1,7 @@
+name = "Android Activation Services Integration"
+description = "Integrates Android Activation with Services module"
+core = "7.x"
+
+dependencies[] = entity
+dependencies[] = services
+dependencies[] = services_documentation

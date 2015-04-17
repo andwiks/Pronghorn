@@ -1,6 +1,14 @@
 <?php
 
 /**
+ * Implements hook_commerce_order_status_info_alter().
+ */
+function sepulsa_invoice_commerce_order_status_info_alter(&$order_statuses) {
+  $order_statuses['invoiced']['state'] = 'completed';
+  $order_statuses['invoiced']['weight'] = 10;
+}
+
+/**
  * Implements hook_query_TAG_alter().
  */
 function sepulsa_invoice_query_sepulsa_invoice_line_items_alter(QueryAlterableInterface $query) {

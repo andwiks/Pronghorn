@@ -17,7 +17,7 @@
               <?php print l('Syarat Penggunaan', 'ga-terms-conditions'); ?>
             </li>
           </ul>
-          <div class="c-sepulsa">© 2014 sepulsa</div>
+          <div class="c-sepulsa">© 2015 sepulsa</div>
         </nav>
 
         <div class="keamanan">

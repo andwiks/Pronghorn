@@ -7,6 +7,96 @@
  */
 
 /**
+ * Implements hook_schema().
+ */
+function topup_schema() {
+  $schema['topup'] = array(
+    'description' => 'The base table for topup.',
+    'fields' => array(
+      'topup_id' => array(
+        'description' => 'The primary identifier for a topup process.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the topup was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the topup was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'ref' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'sn' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'price' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vendor' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'request_id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'default' => '',
+      ),
+    ),
+    'indexes' => array(
+      'line_item_id' => array('line_item_id'),
+      'topup_status' => array('status'),
+      'topup_vendor' => array('vendor'),
+    ),
+    'unique keys' => array(
+      'vendor_ref' => array('vendor', 'ref'),
+      'request_id' => array('request_id'),
+    ),
+    'foreign keys' => array(
+      'topup_line_item' => array(
+        'table' => 'commerce_line_item',
+        'columns' => array('line_item_id' => 'line_item_id'),
+      ),
+    ),
+    'primary key' => array('topup_id'),
+  );
+
+  return $schema;
+}
+
+/**
  * Implements hook_install().
  */
 function topup_install() {
@@ -40,4 +130,39 @@ function topup_uninstall() {
     ->execute();
   // Clear all cache.
   drupal_flush_all_caches();
+}
+
+/**
+ * Add request_id field.
+ */
+function topup_update_7002(&$sandbox) {
+  if (!db_field_exists('topup', 'request_id')) {
+    $spec = array(
+      'type' => 'varchar',
+      'length' => 128,
+      'default' => NULL,
+    );
+    db_add_field('topup', 'request_id', $spec);
+    db_add_unique_key('topup', 'request_id', array('request_id'));
+  }
+}
+
+/**
+ * Remove try field.
+ */
+function topup_update_7001(&$sandbox) {
+  db_drop_unique_key('topup', 'line_item_try');
+  db_drop_field('topup', 'try');
+}
+
+/**
+ * Create table for topup entity.
+ */
+function topup_update_7000(&$sandbox) {
+  if (!db_table_exists('topup')) {
+    $schema = drupal_get_schema_unprocessed('topup');
+    _drupal_schema_initialize($schema, 'topup', FALSE);
+
+    db_create_table('topup', $schema['topup']);
+  }
 }

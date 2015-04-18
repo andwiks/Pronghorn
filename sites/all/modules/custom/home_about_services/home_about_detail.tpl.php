@@ -63,9 +63,9 @@
           <div class="col-sm-6">
             <div class="row">
                 <?php
-                foreach($content['nodes'] as $node) {
-                    $field_merchant_image = field_get_items('node', $node, 'field_merchant_image');
-                    $image_url = file_create_url($field_merchant_image[0]['uri']);
+                foreach($content['merchants'] as $merchant) {
+                    $field_merchant_image = $merchant->field_field_merchant_image[0]['raw']['uri'];
+                    $image_url = file_create_url($field_merchant_image);
                 ?>
                     <div class="col-sm-6">
                         <div class="post-image">

@@ -1,0 +1,7 @@
+name = "Home About Services Integration"
+description = "Integrates Home About with Services module"
+core = "7.x"
+
+dependencies[] = services
+dependencies[] = services_documentation
+dependencies[] = block

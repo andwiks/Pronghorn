@@ -1,0 +1,220 @@
+<?php
+/**
+ * @file
+ * home_about_services.module
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_block_info().
+ */
+function home_about_services_block_info() {
+  $blocks = array();
+  $blocks['home_about'] = array(
+    'info' => t('Home About'),
+  );
+  
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_configure().
+ */
+function home_about_services_block_configure($delta='') {
+  $form = array();
+  
+  switch($delta) {
+    case 'home_about' :
+      // Text field form element
+      $form['home_about_text'] = array(
+        '#type' => 'text_format',
+        '#title' => t('Home About Text'),
+        '#default_value' => variable_get('home_about_text', ''),
+      );
+
+      break;
+  }
+  return $form;
+}
+
+/**
+ * Implements hook_block_save().
+ */
+function home_about_services_block_save($delta = '', $edit = array()) {
+  switch($delta) {
+    case 'home_about' :
+      // Saving the WYSIWYG text      
+      variable_set('home_about_text', $edit['home_about_text']['value']);
+      break;
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function home_about_services_block_view($delta='') {
+  $block = array();
+  
+  switch($delta) {
+    case 'home_about' :
+      $block['content'] = home_about_view();
+      break;
+  }
+  
+  return $block;
+}
+
+/**
+ * Custom function to assemble renderable array for block content.
+ * Returns a renderable array with the block content.
+ * @return
+ *   returns a renderable array of block content.
+ */
+function home_about_view() {
+    $block = array();
+    $merchant_logo = '';
+
+    $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'merchant');
+    $result = $query->execute();
+    $nodes = array();
+    if (!empty($result['node'])) {
+      $nodes = node_load_multiple(array_keys($result['node']));
+    }
+
+    $content['home_about_text'] = variable_get('home_about_text', '');
+    $content['nodes'] = $nodes;
+    return theme('home_about_detail', array('content' => $content));
+}
+
+/**
+ * Implements hook_theme().
+ */
+function home_about_services_theme($existing, $type, $theme, $path) {
+    return array(
+      'home_about_detail' => array(
+        'variables' => array('content' => NULL),
+        'template' => 'home_about_detail', // place you file in 'theme' folder of you module folder
+        'path' => drupal_get_path('module', 'home_about_services')
+      )
+    );
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function home_about_services_services_resources() {
+  $definition = array(
+    'home_about' => array(
+      'actions' => array(
+        'home_about_detail' => array(
+          'help' => 'Get Home About Detail',
+          'callback' => '_home_about_services_detail',
+          'documentation callback' => 'home_about_services_detail_doc',
+          'access callback' => '_home_about_access',
+          'args' => array(
+            // no parameter
+          ),
+        ),
+      ),
+    ),
+  );
+  return $definition;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/** * Access callback */
+function _home_about_access() {
+  return TRUE;
+}
+
+/**
+ * Resources callback for home about detail.
+ */
+function _home_about_services_detail(){
+  // Wrap around using try and catch.
+  try {
+    $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'merchant');
+    $result = $query->execute();
+    $nodes = array();
+    if (!empty($result['node'])) {
+      $nodes = node_load_multiple(array_keys($result['node']));
+    }
+    foreach($nodes as $node) {
+        $field_merchant_image = field_get_items('node', $node, 'field_merchant_image');
+        $image_url = file_create_url($field_merchant_image[0]['uri']);
+        $merchant_images[] = $image_url;
+    }
+    $home_about = ['home_about_text' => variable_get('home_about_text', ''), 'field_merchant_images' => $merchant_images];
+    
+    return $home_about;
+  }
+  catch (Exception $exception) {
+    // Log this condition.
+    watchdog('home_about_services', 'Error at @location. Trace:<pre>@trace</pre>', array(
+      '@location' => __FUNCTION__,
+      '@trace' => _drupal_render_exception_safe($exception),
+    ), WATCHDOG_ERROR, t('Home About Services'));
+  }
+  // Other condition return error;
+  return services_error(t('Invalid Service'), 406);
+}
+
+/**
+ * Documentation callback for order home_about detail.
+ */
+function home_about_services_detail_doc() {
+  global $base_url;
+  $response = '
+  {
+    "home_about_text": "<h3>Isi Pulsa Dapat Voucher Diskon</h3><p>Setiap kali kamu melakukan isi ulang pulsa di Sepulsa, kamu bisa memilih voucher diskon di berbagai macam e-commerce website di Indonesia senilai pulsa kamu (atau lebih!). Bukan hanya satu, kamu bisa memilih sampai TIGA voucher diskon.</p><p>Tidak hanya itu, kami juga akan berupaya untuk terus memberikan banyak kejutan lainnya untuk konsumen Sepulsa. Isi pulsa jadi sangat menyenangkan di Sepulsa.com</p>",
+    "field_merchant_images": [
+        "http://dev.sepulsa.id/sites/dev.sepulsa.com/files/logo-bilna.png",
+        "http://dev.sepulsa.id/sites/dev.sepulsa.com/files/bhinneka-no-1-online-store_0.png",
+        "http://dev.sepulsa.id/sites/dev.sepulsa.com/files/lensza-logo-300x100.png",
+        "http://dev.sepulsa.id/sites/dev.sepulsa.com/files/qraved_logo-02.png",
+        "http://dev.sepulsa.id/sites/dev.sepulsa.com/files/logo-zalora.png"
+    ]
+}
+  ';
+  $element = array(
+    '#name' => t('Home About Service'),
+    '#description' => t('Get Home About Detail'),
+    '#auth' => TRUE,
+    '#path' => 'home_about/home_about_detail',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/home_about/home_about_detail.json<br />
+    POST data application/json:
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    '#verb' => 'actions',
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

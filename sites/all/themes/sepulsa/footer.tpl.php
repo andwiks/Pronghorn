@@ -16,6 +16,9 @@
             <li class="dropdown menu-item-has-children">
               <?php print l('Syarat Penggunaan', 'ga-terms-conditions'); ?>
             </li>
+            <li class="dropdown menu-item-has-children">
+              <?php print l('Blog', 'blog'); ?>
+            </li>
           </ul>
           <div class="c-sepulsa">© 2015 sepulsa</div>
         </nav>

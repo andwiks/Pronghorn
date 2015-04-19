@@ -39,7 +39,8 @@
       });
       
       $("#edit-phone", context).on("keyup blur", function(event) {
-        phone = new RegExp("^0\\d{3}");
+        //phone = new RegExp("^0\\d{3}");
+        phone = new RegExp("\\d{4}");
         number = $(this).val();
         prefix = phone.exec(number);
           

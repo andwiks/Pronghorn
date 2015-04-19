@@ -56,7 +56,9 @@
     <div class="container">
         <div class="row">
           <div class="col-sm-6">
-            <div class="post-content"><?php print $content['home_about_text'] ?>
+            <div class="post-content">
+                <h3><?php print $content['home_about_title'] ?></h3>
+                <?php print $content['home_about_text'] ?>
             </div>
           </div>
 

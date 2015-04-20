@@ -42,6 +42,17 @@ function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpo
     $resources['views']['operations']['retrieve']['documentation callback'] = $resources['views']['operations']['retrieve']['callback'] . '_doc';
     $resources['views']['operations']['retrieve']['args']['view_name']['source']['param'] = '0';
   }
+  if (isset($resources['webform'])) {
+    $resources['webform']['operations']['index']['documentation callback'] = '_webform_resource_index_doc';
+  }
+  if (isset($resources['submission'])) {
+    $resources['submission']['operations']['create']['documentation callback'] = '_webform_service_submission_create_doc';
+
+    foreach ($resources['submission']['operations']['create']['args'] as $key => &$args) {
+      $args['source']['param'] = $args['source']['data'];
+      $args['http_method'] = 'POST';
+    }
+  }
 }
 
 /**
@@ -826,5 +837,97 @@ function services_views_retrieve_doc() {
       ),
     ),
   );
+  return $element;
+}
+
+/**
+ * Documentation callback for webform operations index.
+ */
+function _webform_resource_index_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $resources = &drupal_static('sepulsa_api_documentation_resource', services_get_resources());
+  $method = $resources['webform']['operations']['index'];
+
+  module_load_include('inc', 'services', 'includes/services.runtime');
+  module_load_include($method['file']['type'], $method['file']['module'], $method['file']['name']);
+
+  $element = array(
+    '#name' => 'index',
+    // '#verb' => 'GET',
+    '#description' => $method['help'],
+    '#request_url' => '/api/webform',
+    '#response' => json_encode(_webform_resource_index(0, 1, $method['args'][2]['default value']), $options),
+    '#errors' => array(),
+    '#auth' => FALSE,
+  );
+
+  return $element;
+}
+
+/**
+ * Documentation callback for submission operations create.
+ */
+function _webform_service_submission_create_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $resources = &drupal_static('sepulsa_api_documentation_resource', services_get_resources());
+  $method = $resources['submission']['operations']['create'];
+
+  module_load_include('inc', 'services', 'includes/services.runtime');
+  module_load_include($method['file']['type'], $method['file']['module'], $method['file']['name']);
+
+  $nodes = node_load_multiple(FALSE, array('title' => 'Konfirmasi Pembayaran', 'type' => 'webform'));
+  $node = reset($nodes);
+
+  $data = array(
+    'submission' => array('data' => array()),
+    'webform' => $node->uuid,
+  );
+
+  $response = array(
+    'data' => array(),
+    'sid' => $node->webform['next_serial'],
+    'submitted' => REQUEST_TIME,
+    'user' => $GLOBALS['user']->uuid,
+    'uuid' => $node->uuid,
+    'webform' => url('api/webform/' . $node->uuid, array('absolute' => TRUE)),
+  );
+
+  foreach ($node->webform['components'] as $cid => $component) {
+    $data['submission']['data'][$cid]['values'] = array($component['name']);
+    $response['data'][$cid] = array(
+      'cid' => $cid,
+      'form_key' => $component['form_key'],
+      'type' => $component['type'],
+      'values' => array($component['name']),
+    );
+  }
+  ksort($data['submission']['data'], SORT_NUMERIC);
+  ksort($response['data'], SORT_NUMERIC);
+
+
+  $element = array(
+    '#name' => 'create',
+    // '#verb' => 'POST',
+    '#request_url' => '/api/submission',
+    '#request_data' => json_encode($data, $options),
+    '#response' => json_encode($response, $options),
+    '#errors' => array(
+      'not_found' => array(
+        '#question' => '404 Not found : Could not find the controller.',
+        '#description' => t('Service output nothing. Possible request is using POST data (supposed use GET).'),
+      ),
+      'missing_argument' => array(
+        '#question' => '401 Unauthorized: Missing required argument @argument',
+        '#description' => t('Required argument: webform as uuid or submission.'),
+        '#response' => json_encode(array('Missing required argument @argument'), $options),
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+      ),
+    ),
+    '#auth' => FALSE,
+  );
+
   return $element;
 }

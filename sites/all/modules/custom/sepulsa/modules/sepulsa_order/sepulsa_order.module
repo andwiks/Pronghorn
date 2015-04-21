@@ -173,30 +173,3 @@ function sepulsa_order_payment_instance_options_list($op = 'view') {
 
   return $options;
 }
-
-function sepulsa_order_get_payment_instruction_property($data, array $options, $name, $type, $info) {
-  if (!empty($data->data['payment_method'])) {
-    list($payment_method, $payment_instance) = explode('|', $data->data['payment_method']);
-
-    if ($payment_method == 'bank_transfer') {
-      $rules_config = rules_config_load($payment_instance);
-
-      foreach ($rules_config->actions() as $action) {
-        $settings = $action->settings;
-      }
-
-      $payment_settings = $settings['payment_method']['settings'];
-
-      $payment_instruction = t('Banking institution') . ' : ' . '<strong>' . $payment_settings['details']['account_bank'] . '</strong><br>' . "\n";
-      $payment_instruction .= t('Account number') . ' : ' . '<strong>' . $payment_settings['details']['account_number'] . '</strong><br>' . "\n";
-      $payment_instruction .= t('Account owner') . ' : ' . '<strong>' . $payment_settings['details']['account_owner'] . '</strong><br>' . "\n";
-      $payment_instruction .= t('Branch office') . ' : ' . $payment_settings['details']['account_branch'] . '<br>' . "\n";
-
-      if (!empty($payment_settings['policy'])) {
-        $payment_instruction .= '<br>' . $payment_settings['policy'];
-      }
-
-      return $payment_instruction;
-    }
-  }
-}

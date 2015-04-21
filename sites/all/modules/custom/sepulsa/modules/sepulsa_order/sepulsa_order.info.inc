@@ -107,3 +107,16 @@ function sepulsa_order_entity_property_info() {
 
   return $info;
 }
+
+/**
+ * Implements hook_entity_property_info_alter().
+ */
+function sepulsa_order_entity_property_info_alter(&$info) {
+  $properties = &$info ['commerce_order']['bundles']['commerce_order']['properties'];
+
+  $properties ['payment_instruction'] = array(
+    'label' => t('Payment Instruction'),
+    'type' => 'text',
+    'getter callback' => 'sepulsa_order_get_payment_instruction_property',
+  );
+}

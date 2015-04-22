@@ -641,7 +641,8 @@ function commerce_checkout_services_resource_process_doc() {
             "commerce_payment[payment_details][veritrans][token]":"481111-1114-b0c2f250-2968-4ee4-b153-9bbfee3ec0fe",
             "commerce_payment[payment_details][veritrans][response]":"",
             "commerce_payment[payment_details][error]":"",
-            "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393"
+            "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393",
+            "commerce_payment[payment_details][veritrans][credit_card][save]":true
         }]
     }
     </pre>

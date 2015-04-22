@@ -855,7 +855,7 @@ function _webform_resource_index_doc() {
     '#name' => 'index',
     // '#verb' => 'GET',
     '#description' => $method['help'],
-    '#request_url' => '/api/webform',
+    '#request_url' => 'api/webform',
     '#response' => json_encode(_webform_resource_index(0, 1, $method['args'][2]['default value']), $options),
     '#errors' => array(),
     '#auth' => FALSE,
@@ -908,18 +908,18 @@ function _webform_service_submission_create_doc() {
   $element = array(
     '#name' => 'create',
     // '#verb' => 'POST',
-    '#request_url' => '/api/submission',
+    '#request_url' => 'api/submission/create',
     '#request_data' => json_encode($data, $options),
     '#response' => json_encode($response, $options),
     '#errors' => array(
-      'not_found' => array(
-        '#question' => '404 Not found : Could not find the controller.',
-        '#description' => t('Service output nothing. Possible request is using POST data (supposed use GET).'),
-      ),
       'missing_argument' => array(
         '#question' => '401 Unauthorized: Missing required argument @argument',
         '#description' => t('Required argument: webform as uuid or submission.'),
         '#response' => json_encode(array('Missing required argument @argument'), $options),
+      ),
+      'not_found' => array(
+        '#question' => '404 Not found : Could not find the controller.',
+        '#description' => t('Service output nothing. Possible request is using POST data (supposed use GET).'),
       ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',

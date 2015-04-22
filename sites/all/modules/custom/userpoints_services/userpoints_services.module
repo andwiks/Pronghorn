@@ -118,7 +118,6 @@ function userpoints_services_list_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'csrf_validation' => array(

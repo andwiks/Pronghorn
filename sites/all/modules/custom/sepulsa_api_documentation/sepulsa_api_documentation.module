@@ -79,7 +79,6 @@ function _user_resource_logout_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'csrf_validation' => array(
@@ -136,7 +135,6 @@ function _user_resource_get_token_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'access_denied' => array(
@@ -177,7 +175,6 @@ function _user_resource_request_new_password_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'mail_problem' => array(
@@ -243,7 +240,6 @@ function _user_resource_create_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'missing_argument' => array(
@@ -342,7 +338,6 @@ function _user_resource_retrieve_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'access_denied' => array(
@@ -400,7 +395,6 @@ function _user_resource_update_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'csrf_validation' => array(
@@ -522,7 +516,6 @@ function _node_resource_index_doc() {
     ]
     ',
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'no_controller' => array(
@@ -676,7 +669,6 @@ function _node_resource_retrieve_doc() {
     }
     ',
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'no_controller' => array(
@@ -804,7 +796,6 @@ function services_views_retrieve_doc() {
     ]
     ',
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'missing_display_id' => array(
@@ -853,7 +844,6 @@ function _webform_resource_index_doc() {
 
   $element = array(
     '#name' => 'index',
-    // '#verb' => 'GET',
     '#description' => $method['help'],
     '#request_url' => 'api/webform',
     '#response' => json_encode(_webform_resource_index(0, 1, $method['args'][2]['default value']), $options),
@@ -907,7 +897,6 @@ function _webform_service_submission_create_doc() {
 
   $element = array(
     '#name' => 'create',
-    // '#verb' => 'POST',
     '#request_url' => 'api/submission/create',
     '#request_data' => json_encode($data, $options),
     '#response' => json_encode($response, $options),

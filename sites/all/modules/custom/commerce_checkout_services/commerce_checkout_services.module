@@ -390,7 +390,6 @@ function commerce_checkout_services_resource_pane_retrieve_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'invalid_order' => array(
@@ -650,7 +649,6 @@ function commerce_checkout_services_resource_process_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -714,7 +712,6 @@ function commerce_checkout_services_resource_complete_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

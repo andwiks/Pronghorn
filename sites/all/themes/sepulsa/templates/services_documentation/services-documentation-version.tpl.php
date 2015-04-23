@@ -23,7 +23,7 @@
   <?php endif; ?>
 
   <?php if ($table_of_contents): ?>
-    <div class="services-documentation-toc col-sm-4 affix-top" data-spy="affix" data-offset-top="120" data-offset-bottom="150">
+    <div class="services-documentation-toc col-sm-4 affix-top" data-spy="affix" data-offset-top="200" data-offset-bottom="150">
       <h2 class="toc-title">Resources</h2>
       <?php print render($table_of_contents); ?>
     </div>

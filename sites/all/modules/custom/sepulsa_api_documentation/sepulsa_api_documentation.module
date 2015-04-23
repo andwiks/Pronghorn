@@ -887,7 +887,6 @@ function _webform_service_submission_create_doc() {
     'data' => array(),
     'sid' => $node->webform['next_serial'],
     'submitted' => REQUEST_TIME,
-    'user' => $GLOBALS['user']->uuid,
     'uuid' => $node->uuid,
     'webform' => url('api/webform/' . $node->uuid, array('absolute' => TRUE)),
   );

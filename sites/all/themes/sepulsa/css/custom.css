@@ -148,3 +148,7 @@ div#commerce-checkout-coupon-ajax-wrapper .description {
 .services-documentation-toc.affix {
   top: 20px;
 }
+
+.services-documentation-resource pre.panel-footer {
+  max-height: 300px;
+}

@@ -49,7 +49,6 @@ function sepulsa_api_documentation_services_resources_alter(&$resources, &$endpo
     $resources['submission']['operations']['create']['documentation callback'] = '_webform_service_submission_create_doc';
 
     foreach ($resources['submission']['operations']['create']['args'] as $key => &$args) {
-      $args['source']['param'] = $args['source']['data'];
       $args['http_method'] = 'POST';
     }
   }

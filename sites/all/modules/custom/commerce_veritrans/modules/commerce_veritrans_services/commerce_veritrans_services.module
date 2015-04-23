@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * commerce_veritrans_services.module
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function commerce_veritrans_services_services_resources() {
+  $resources = array(
+    'saved_card' => array(
+      'operations' => array(
+        'delete' => array(
+          'help' => "Delete a customer's saved credit card.",
+          'callback' => '_saved_card_resource_delete',
+          'access callback' => 'user_is_logged_in',
+          'documentation callback' => '_saved_card_resource_delete_doc',
+          'args' => array(
+            array(
+              'name' => 'token_id',
+              'type' => 'int',
+              'description' => 'The id of saved card token',
+              'optional' => FALSE,
+              'source' => array(
+                'path' => 0,
+              ),
+            ),
+          ),
+        ),
+        'index' => array(
+          'help' => "List of customer's saved credit card.",
+          'callback' => '_saved_card_resource_index',
+          'access callback' => 'user_is_logged_in',
+          // 'documentation callback' => '_saved_card_resource_index_doc',
+        ),
+      ),
+    ),
+  );
+
+  return $resources;
+}
+
+function _saved_card_resource_delete($token_id) {
+  $uid = $GLOBALS['user']->uid;
+  $deleted = db_delete('commerce_veritrans_token')
+    ->condition('token_id', $token_id)
+    ->condition('uid', $uid)
+    ->execute();
+
+  if (!$deleted) {
+    return services_error(t('Card with token id @token_id for user @uid is not found', array('@token_id' => $token_id, '@uid' => $uid)), 404);
+  }
+  else {
+    return $deleted;
+  }
+}
+
+function _saved_card_resource_index() {
+  return commerce_veritrans_token_get($GLOBALS['user']->uid);
+}
+
+function _saved_card_resource_delete_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $element = array(
+    '#name' => 'delete',
+    '#path' => 'saved_card/%token_id',
+    '#description' => "Delete a customer's saved credit card.",
+    '#request_url' => 'api/sepulsa/1',
+    '#response' => json_encode(array(1), $options),
+    '#errors' => array(),
+    '#auth' => TRUE,
+  );
+
+  return $element;
+}
+
+function _saved_card_resource_index_doc() {
+  $element = array();
+  return $element;
+}

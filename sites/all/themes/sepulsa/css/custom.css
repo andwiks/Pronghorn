@@ -2,6 +2,55 @@
  * Title:   Custom Style File
  */
 
+/**
+ * Follow Social Top
+ */
+
+section.follow-top + section#content {
+  padding-top: 0;
+}
+
+.follow-content {
+  text-align: center;
+  line-height: 30px;
+  padding: 20px 0;
+}
+
+h4.follow-label {
+  margin: 0;
+  display: inline-block;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 1.1em;
+  line-height: 30px;
+  margin-right: 10px;
+}
+
+ul.follow-icon {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+
+ul.follow-icon > li {
+  display: inline-block;
+}
+
+ul.follow-icon > li > a {
+  display: block;
+  font-size: 1.6em;
+  padding: 0 2px;
+  line-height: 30px;
+}
+
+
+
+
+
+/**
+ * Cart Contents
+ */
+
 .commerce_payment .form-radios input[type="radio"] {
   margin: -4px 2px 0 2px;
 }

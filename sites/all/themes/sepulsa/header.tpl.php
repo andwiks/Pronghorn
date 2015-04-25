@@ -91,3 +91,22 @@ global $base_url, $user;
 <div class="page-title-container">
   <div class="page-title"></div>
 </div>
+
+<section class="follow-top">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="follow-content">
+          <h4 class="follow-label">
+            Follow Sepulsa on:
+          </h4>
+          <ul class="follow-icon">
+            <li><a href="#"><i class="fa fa-facebook-square"></i></a></li>
+            <li><a href="#"><i class="fa fa-twitter-square"></i></a></li>
+            <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -58,6 +58,8 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
 
+    dpm(array($node_coupon, $product, $expiry));
+
     if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique') {
         //$unique_nid = db_query_range("SELECT nid FROM {node} WHERE uid = 1 AND type = 'owned_unique_coupon'", 0, 1)->fetchField();
         $query = "SELECT nid FROM {node} a, {field_data_field_simple_coupon} b "

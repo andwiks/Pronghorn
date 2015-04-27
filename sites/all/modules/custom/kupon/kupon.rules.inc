@@ -37,6 +37,7 @@ function kupon_rules_action_info() {
  * The action function for 'kupon_create_owned_simple_coupon'.
  */
 function kupon_create_owned_simple_coupon($line_item, $user) {
+  dpm(get_defined_vars());
   if ($line_item->type == "coupon") {
     //drupal_set_message("<pre>".print_r($line_item, true)."</pre>");
     if (empty($line_item->data['context']['entity']['entity_id'])) {

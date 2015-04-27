@@ -1,0 +1,4 @@
+name = "Bank Transfer Notification Queue"
+description = "Send Notification Email for Pending Bank Transfer Transaction"
+core = "7.x"
+

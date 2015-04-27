@@ -1,0 +1,33 @@
+<?php
+
+// $Id$
+
+/**
+ * @file Installation file for bank_transfer_notification_queue module
+**/
+
+// create table bank_transfer_notification_queue
+function bank_transfer_notification_queue_schema() {  
+    $schema['bank_transfer_notification_queue'] = array(    
+    'description' => 'Storing Order ID and notification queue for bank transfer transaction',
+    'fields' => array(
+        'id' => array(
+            'description' => 'id',
+            'type' => 'serial',
+	),      
+        'order_id' => array(
+            'description' => 'Order ID',
+            'type' => 'varchar',
+            'length' => 255,
+        ),      
+        'status' => array(
+            'description' => 'Queue Status',
+            'type' => 'int',
+        ),     
+    ),
+    'primary key' => array('id'),
+  );
+  
+		
+  return $schema;
+}

@@ -37,7 +37,6 @@ function kupon_rules_action_info() {
  * The action function for 'kupon_create_owned_simple_coupon'.
  */
 function kupon_create_owned_simple_coupon($line_item, $user) {
-  dpm(get_defined_vars());
   if ($line_item->type == "coupon") {
     //drupal_set_message("<pre>".print_r($line_item, true)."</pre>");
     if (empty($line_item->data['context']['entity']['entity_id'])) {
@@ -58,8 +57,6 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
     $node_coupon = node_load($line_item->data['context']['entity']['entity_id']);
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
-
-    dpm(array($node_coupon, $product, $expiry));
 
     if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique') {
         //$unique_nid = db_query_range("SELECT nid FROM {node} WHERE uid = 1 AND type = 'owned_unique_coupon'", 0, 1)->fetchField();

@@ -101,9 +101,8 @@ global $base_url, $user;
             Follow Sepulsa on:
           </h4>
           <ul class="follow-icon">
-            <li><a href="#"><i class="fa fa-facebook-square"></i></a></li>
-            <li><a href="#"><i class="fa fa-twitter-square"></i></a></li>
-            <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+            <li><a href="https://www.facebook.com/sepulsa" alt="Facebook Sepulsa" target="_blank"><i class="fa fa-facebook-square"></i></a></li>
+            <li><a href="https://twitter.com/sepulsa_id" alt="Twitter Sepulsa" target="_blank"><i class="fa fa-twitter-square"></i></a></li>
           </ul>
         </div>
       </div>

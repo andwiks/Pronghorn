@@ -19,12 +19,15 @@ function sepulsa_checkout_completion_message_pane_settings_form($checkout_pane) 
 
   $message = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
 
-  foreach (commerce_payment_methods() as $method_id => $payment_method) {
-    $form['container']['commerce_checkout_completion_message'][$method_id] = array(
+  $rules = entity_load('rules_config', FALSE, array('active' => TRUE, 'event' => 'commerce_payment_methods'));
+
+  foreach ($rules as $rule) {
+    $form['container']['commerce_checkout_completion_message'][$rule->name] = array(
       '#type' => 'text_format',
-      '#title' => t('Checkout completion message for %payment_method', array('%payment_method' => $payment_method['title'])),
-      '#default_value' => isset($message[$method_id]) ? $message[$method_id]['value'] : NULL,
-      '#format' => isset($message[$method_id]) ? $message[$method_id]['format'] : NULL,
+      '#title' => t('Checkout completion message for %payment_method', array('%payment_method' => $rule->label)),
+      '#default_value' => isset($message[$rule->name]) ? $message[$rule->name]['value'] : NULL,
+      '#format' => isset($message[$rule->name]) ? $message[$rule->name]['format'] : NULL,
+      '#weight' => $rule->weight,
     );
   }
 
@@ -33,12 +36,14 @@ function sepulsa_checkout_completion_message_pane_settings_form($checkout_pane) 
     '#title' => t('Checkout completion message for anonymous user'),
     '#default_value' => isset($message['anonymous']) ? $message['anonymous']['value'] : NULL,
     '#format' => isset($message['anonymous']) ? $message['anonymous']['format'] : NULL,
+    '#weight' => 10,
   );
   $form['container']['commerce_checkout_completion_message']['authenticated'] = array(
     '#type' => 'text_format',
     '#title' => t('Checkout completion message for authenticated user'),
     '#default_value' => isset($message['authenticated']) ? $message['authenticated']['value'] : NULL,
     '#format' => isset($message['authenticated']) ? $message['authenticated']['format'] : NULL,
+    '#weight' => 10,
   );
 
   return $form;
@@ -56,13 +61,13 @@ function sepulsa_checkout_completion_message_pane_checkout_form($form, &$form_st
 
 function sepulsa_checkout_completion_message_message($order, $format = NULL) {
   $role = user_is_logged_in() ? 'authenticated' : 'anonymous';
-  $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
+  list($method_id, $instance_id) = explode('|', $order->data['payment_method']);
   $markup = '';
 
   // Load the completion message.
   $message = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
 
-  foreach (array($payment_method['method_id'], $role) as $part) {
+  foreach (array($instance_id, $role) as $part) {
     // Perform translation.
     $message[$part]['value'] = commerce_i18n_string('commerce:checkout:complete:message', $message[$part]['value'], array('sanitize' => FALSE));
 

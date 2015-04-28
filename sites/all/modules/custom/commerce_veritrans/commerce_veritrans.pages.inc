@@ -169,3 +169,47 @@ function commerce_veritrans_user_token_form_submit($form, &$form_state) {
     }
   }
 }
+
+function commerce_veritrans_notification_callback() {
+  if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    drupal_add_http_header('status', '405 Method Not Allowed');
+    return;
+  }
+
+  $headers = getallheaders();
+
+  if ($headers['User-Agent'] != 'Veritrans') {
+    drupal_add_http_header('status', '417 Expectation Failed');
+    return;
+  }
+
+  $raw_body = empty($_POST) ? file_get_contents('php://input') : $_POST;
+
+  if (!empty($raw_body)) {
+    $body = drupal_json_decode($raw_body);
+    extract($body);
+
+    if (!empty($status_code) && $status_code == 200 && !empty($transaction_status) && $transaction_status != 'cancel' && !empty($order_id)) {
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_payment_transaction');
+      $query->propertyCondition('remote_id', $order_id);
+      $query->propertyCondition('status', COMMERCE_PAYMENT_STATUS_PENDING);
+      $query->propertyOrderBy('revision_id', 'DESC');
+      $query->range(0, 1);
+
+      $result = $query->execute();
+
+      if (!empty($result)) {
+        $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
+        drupal_json_output($balance);
+        if (!empty($transaction_id) && !empty($transaction->data['transaction_id']) && $transaction_id == $transaction->data['transaction_id']) {
+          $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+          commerce_payment_transaction_save($transaction);
+          drupal_json_output($transaction);
+        }
+      }
+    }
+  }
+
+  return;
+}

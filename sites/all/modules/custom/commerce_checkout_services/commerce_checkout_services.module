@@ -390,7 +390,6 @@ function commerce_checkout_services_resource_pane_retrieve_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'invalid_order' => array(
@@ -621,8 +620,8 @@ function commerce_checkout_services_resource_process_doc() {
     '#auth' => TRUE,
     '#path' => 'checkout/process',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/checkout/process.json<br />POST
-    <pre>
+    '#request_url' => 'api/checkout/process',
+    '#request_data' => '
     // Example payment input.
     {
         "checkout":[{
@@ -641,7 +640,8 @@ function commerce_checkout_services_resource_process_doc() {
             "commerce_payment[payment_details][veritrans][token]":"481111-1114-b0c2f250-2968-4ee4-b153-9bbfee3ec0fe",
             "commerce_payment[payment_details][veritrans][response]":"",
             "commerce_payment[payment_details][error]":"",
-            "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393"
+            "commerce_payment[payment_details][veritrans][credit_card][phone]":"08122545393",
+            "commerce_payment[payment_details][veritrans][credit_card][save]":true
         }]
     }
     </pre>
@@ -649,7 +649,6 @@ function commerce_checkout_services_resource_process_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -709,11 +708,11 @@ function commerce_checkout_services_resource_complete_doc() {
     '#auth' => TRUE,
     '#path' => 'checkout/complete',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/checkout/complete.json<br />POST data application/json: {"order_id":58}',
+    '#request_url' => 'api/checkout/complete',
+    '#request_data' => json_encode(array('order_id' => rand(1, 100)), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES),
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

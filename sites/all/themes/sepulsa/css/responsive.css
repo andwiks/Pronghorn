@@ -412,15 +412,8 @@
         text-align: center;
         margin-top: 30px; }
 
-  #header {
-    background: none;
-    height: 75px; }
-    #header .logo {
-      margin: 0 !important; }
-      #header .logo a {
-        color: #fff !important; }
-    #header .branding {
-      text-align: left !important; }
+  
+    
     #header .header-top-nav > li {
       margin: 0; }
       #header .header-top-nav > li > a {

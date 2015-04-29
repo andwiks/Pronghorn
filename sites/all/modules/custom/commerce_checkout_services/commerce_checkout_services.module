@@ -281,6 +281,10 @@ function commerce_checkout_services_resource_complete($order_id) {
     && commerce_checkout_order_can_checkout($order)
     && $user->uid == $order->uid
   ) {
+    // Menandai order ini dibuat dari apps
+    $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'apps';
+    commerce_order_save($order);
+    
     // Complete the order.
     commerce_checkout_complete($order);
 

@@ -332,7 +332,6 @@ function commerce_cart_services_resource_add_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -460,7 +459,6 @@ function commerce_cart_services_resource_delete_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'internal_server' => array(
@@ -661,7 +659,6 @@ function commerce_cart_services_resource_index_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

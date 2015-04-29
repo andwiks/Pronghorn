@@ -1,0 +1,8 @@
+name = Veritrans services integration
+description = Integration for Veritrans and services
+package = Commerce (payment)
+
+core = 7.x
+
+dependencies[] = commerce_veritrans
+dependencies[] = services

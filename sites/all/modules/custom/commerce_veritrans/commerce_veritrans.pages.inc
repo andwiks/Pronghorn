@@ -203,7 +203,10 @@ function commerce_veritrans_notification_callback() {
         $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
         drupal_json_output($balance);
         if (!empty($transaction_id) && !empty($transaction->data['transaction_id']) && $transaction_id == $transaction->data['transaction_id']) {
+          $transaction->data = array_merge($transaction->data, $body);
           $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+          $transaction->remote_status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+          $transaction->revision = TRUE;
           commerce_payment_transaction_save($transaction);
           drupal_json_output($transaction);
         }

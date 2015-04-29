@@ -26,7 +26,7 @@ function bank_transfer_notification_queue_cron() {
             WHERE
             a.status = 'pending'
             AND b.payment_method = 'bank_transfer'
-            AND from_unixtime(a.created) > NOW() - INTERVAL 2 HOUR
+            AND from_unixtime(a.changed) > NOW() - INTERVAL 2 HOUR
             AND c.id is null";
     $result = db_query($query);
     foreach ($result as $row) {
@@ -82,10 +82,6 @@ function send_notification_email($order_id, $amount, $email){
     //$test = strtotime('24-04-2015 17:00:00');
     //print $test; exit;
     $payment = commerce_payment_method_instance_load('bank_transfer|commerce_payment_bank_transfer');
-    //print "<pre>".print_r($payment['settings'], true)."</pre>";
-    // send email
-    //$order_id = '1123';
-    //$amount = '123';
     $to = $email;
     $subject = "Order ".$order_id." at Sepulsa Belum Dibayar";
     $message = '

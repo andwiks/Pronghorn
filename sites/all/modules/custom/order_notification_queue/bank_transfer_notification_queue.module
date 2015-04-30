@@ -13,6 +13,16 @@ function bank_transfer_notification_queue_menu() {
       'access arguments' => array('administer site configuration'),
       'type'             => MENU_CALLBACK,
     );
+	
+    $items['admin/config/people/bank_transfer_notification_queue'] = array(
+      'title'            => t('Bank Transfer Notification Setting'),
+      'description'      => t('Bank Transfer Notification Setting'),
+      'page callback'    => 'drupal_get_form',
+      'page arguments'   => array('bank_transfer_notification_queue_setting'),
+      'access arguments' => array('administer site configuration'),
+      'type'             => MENU_NORMAL_ITEM,
+    );
+	
     return $items;
 }
 
@@ -20,6 +30,19 @@ function bank_transfer_notification_queue(){
     $test = strtotime('30-04-2015 10:30:00');
     $time = date('d/m/y H:i:s', $test);
     print $test."<br />".$time;
+}
+
+function bank_transfer_notification_queue_setting() {
+    $form['bank_transfer_notification_queue_setting'] = array(
+      //'#type' => 'text_format',
+      '#type' => 'textarea',
+      '#title' => t('Bank Transfer Notification Setting'),
+      '#default_value' => variable_get('bank_transfer_notification_queue_setting', ''),
+      '#description' => t('Bank Transfer Notification Setting'),
+	  //'#format' => 'filtered_html',
+    );
+
+    return system_settings_form($form);
 }
 
 function bank_transfer_notification_queue_cron() {
@@ -88,75 +111,21 @@ function send_notification_email($order_id, $amount, $email){
     //$test = strtotime('24-04-2015 17:00:00');
     //print $test; exit;
     $payment = commerce_payment_method_instance_load('bank_transfer|commerce_payment_bank_transfer');
+	$bank_detail = '
+	  <p>
+		Nama Bank : <strong>'.$payment['settings']['details']['account_bank'].'</strong><br>
+		Nomor rekening : <strong>'.$payment['settings']['details']['account_number'].'</strong><br>
+		Atas nama : <strong>'.$payment['settings']['details']['account_owner'].'</strong><br>
+		Kantor cabang : '.$payment['settings']['details']['account_branch'].'
+	  </p>
+	  '.$payment['settings']['policy'];
     $to = $email;
     $subject = "Order ".$order_id." at Sepulsa Belum Dibayar";
-    $message = '
-        <table width="600" cellspacing="0" cellpadding="20" border="0" style="margin:auto;border:1px solid #dddddd">
-            <tr><td valign="top" align="center" style="background-color:#f4f4f4">
-                <table width="100%" cellspacing="0" cellpadding="20" border="0" style="font-family:open sans,helvetica,arial,sans-serif;font-size:14px;line-height:20px;color:#606060">
-                  <tr><td valign="top" align="center">
-                    <table cellspacing="0" cellpadding="0" border="0">
-                    <tr>
-                      <td align="left">
-                        <a href="#14ce464c30a17991_14ce09e594ea3ad0_"><img width="200" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/logo.png" class="CToWUd"></a>
-                      </td>
-                      <td align="right">
-                        <table width="200" cellspacing="5" cellpadding="0"><tbody><tr><td width="25" valign="middle" align="right"><a target="_blank" href="https://www.facebook.com/sepulsa"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-facebook.png" class="CToWUd"></a></td>
-                        <td width="25" valign="middle" align="right"><a target="_blank" href="https://twitter.com/sepulsa_id"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-twitter.png" class="CToWUd"></a></td>
-                        <td width="25" valign="middle" align="right"><a target="_blank" href="https://www.sepulsa.com/"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-link.png" class="CToWUd"></a></td>
-                        <td width="25" valign="middle" align="right"><a target="_blank" href="mailto:info@sepulsa.com"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-mail.png" class="CToWUd"></a></td>
-                        </tr></tbody></table>
-                    </td></tr>
-                    </table>
-
-                  </td></tr>
-                </table>
-            </td></tr>
-            
-            <tr><td valign="top" align="center">
-                <table width="100%" cellspacing="0" cellpadding="20" border="0" style="font-family:open sans,helvetica,arial,sans-serif;font-size:14px;line-height:20px;color:#606060">
-                  <tr><td valign="top" align="center">
-                    <table cellspacing="0" cellpadding="0" border="0">
-                    <tr><td>
-                        <p>Nomor transaksi '.$order_id.' anda sebesar Rp. '.$amount.' belum dibayar. Segera lakukan transfer sebelum order anda dibayarkan</p>
-                        <h4 style="margin-top:0;margin-bottom:15px;font-size:16px">Info cara transfer</h4>
-                        <p>
-                          Nama Bank : <strong>'.$payment['settings']['details']['account_bank'].'</strong><br>
-                          Nomor rekening : <strong>'.$payment['settings']['details']['account_number'].'</strong><br>
-                          Atas nama : <strong>'.$payment['settings']['details']['account_owner'].'</strong><br>
-                          Kantor cabang : '.$payment['settings']['details']['account_branch'].'
-                        </p>
-                        '.$payment['settings']['policy'].'
-                        <p>
-                          <strong>Keterangan transfer : Sepulsa Order 3502</strong><br>
-                          Selalu masukkan keterangan transfer diatas ketika melakukan transfer. Hal ini untuk memudahkan proses pembayaran kamu dikonfirmasi dengan cepat.
-                        </p>
-                        <p>&nbsp;</p>
-                        <p><span>Silahkan hubungi kami di <a target="_blank" style="color:#dc2c27;text-decoration:none;font-weight:bold" href="mailto:info@sepulsa.com">info@sepulsa.com</a> jika anda ada pertanyaan lebih lanjut mengenai pesanan anda.</span></p>
-                    </td></tr>
-                    </table>
-
-                  </td></tr>
-                </table>
-            </td></tr>
-            
-            <tr><td valign="top" align="center">
-            <table width="100%" cellspacing="0" cellpadding="20" border="0"><tbody><tr><td valign="top" align="center">
-            <div style="border-top:1px solid #ddd;width:100%;display:block;min-height:1px;margin-top:15px;margin-bottom:15px"></div>
-            <table width="150px" cellspacing="0" cellpadding="5"><tbody><tr><td width="25" valign="top" align="center"><a target="_blank" href="https://www.facebook.com/sepulsa"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-facebook.png" class="CToWUd"></a></td>
-            <td width="25" valign="top" align="center"><a target="_blank" href="https://twitter.com/sepulsa_id"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-twitter.png" class="CToWUd"></a></td>
-            <td width="25" valign="top" align="center"><a target="_blank" href="https://www.sepulsa.com/"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-link.png" class="CToWUd"></a></td>
-            <td width="25" valign="top" align="center"><a target="_blank" href="mailto:info@sepulsa.com"><img width="24px" alt="" src="https://www.sepulsa.com/sites/all/themes/sepulsa/images/icon-mail.png" class="CToWUd"></a></td>
-            </tr></tbody></table><table cellspacing="0" cellpadding="0"><tbody><tr><td height="10"></td>
-            </tr><tr><td>
-                              <span style="font-family:open sans,helvetica,arial,sans-serif;font-size:12px;line-height:1em;color:#606060">PT. Sepulsa Indonesia &copy; 2015, All Right Reserved.</span>
-                            </td>
-            </tr></tbody></table></td>
-            </tr></tbody></table></td>
-            </tr>
-
-        </table>
-            ';	
+    $message = variable_get('bank_transfer_notification_queue_setting');
+	$message = str_replace("[ORDERID]", $order_id, $message);
+	$message = str_replace("[AMOUNT]", number_format($amount,0,",","."), $message);
+	$message = str_replace("[BANK_DETAIL]", $bank_detail, $message);
+	
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=iso-8859-1" . "\r\n";
     $headers .= "From: <info@sepulsa.com>" . "\r\n";

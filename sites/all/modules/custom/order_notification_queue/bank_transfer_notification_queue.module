@@ -26,7 +26,7 @@ function bank_transfer_notification_queue_cron() {
             WHERE
             a.status = 'pending'
             AND b.payment_method = 'bank_transfer'
-            AND from_unixtime(a.changed) > NOW() - INTERVAL 2 HOUR
+            AND from_unixtime(a.changed) > NOW() + INTERVAL 2 HOUR
             AND c.id is null";
     $result = db_query($query);
     foreach ($result as $row) {
@@ -56,9 +56,9 @@ function send_notification_email_queue($item) {
         $sent = send_notification_email($item['order_id'], $item['amount'], $item['email']);
         if ($sent) {
             db_query("INSERT INTO bank_transfer_notification_queue (order_id, status) VALUES ('".$item['order_id']."', 1)");
+            watchdog('bank_transfer_email_reminder', 'Email Successfully Sent <br /><pre>'.print_r($item, true).'</pre>');
         }
     }
-    watchdog('test drupal queue cron', '<pre>'.print_r($item, true).'</pre>');
 }
 
 // HOOK MAIL

@@ -981,10 +981,10 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   );
 
   if (is_object($payment)) {
-    $transaction->data = get_object_vars($payment);
+    $transaction->payload = get_object_vars($payment);
   }
   elseif (is_array($payment)) {
-    $transaction->data = $payment;
+    $transaction->payload = $payment;
   }
 
   commerce_payment_transaction_save($transaction);

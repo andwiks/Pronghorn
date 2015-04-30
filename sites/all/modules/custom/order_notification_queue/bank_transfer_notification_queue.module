@@ -60,10 +60,10 @@ function bank_transfer_notification_queue_cron() {
     $result = db_query($query);
     foreach ($result as $row) {
 	  $order = commerce_order_load($row->order_id);
-	  //if ($order->status == 'pending' || $order->status == 'processing') {
+	  if ($order->status == 'pending' || $order->status == 'processing') {
 		$queue_item = array('order_id' => $row->order_id, 'email' => $row->mail, 'amount' => $row->amount);
 		$queue->createItem($queue_item);
-	  //}
+	  }
     }
 }
 

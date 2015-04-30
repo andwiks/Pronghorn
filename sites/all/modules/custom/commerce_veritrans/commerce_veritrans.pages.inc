@@ -202,6 +202,7 @@ function commerce_veritrans_notification_callback() {
       }
     }
 
+
     extract($payload);
 
     $query = new EntityFieldQuery();
@@ -217,7 +218,7 @@ function commerce_veritrans_notification_callback() {
       $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
       if (!empty($transaction->payload['transaction_id']) && $transaction_id == $transaction->payload['transaction_id']) {
         // check the signature key
-        $instance = commerce_payment_method_instance_load($transaction->instanced_id);
+        $instance = commerce_payment_method_instance_load($transaction->instance_id);
         $hash = hash('sha512', $order_id . $status_code . $gross_amount . $instance['settings']['server_key']);
 
         if ($hash == $signature_key) {

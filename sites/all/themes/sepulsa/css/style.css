@@ -1754,7 +1754,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-success {
-  background:#a5de37
+  background:#1E9C4D
 }
 
 .alert.alert-success:before {
@@ -1766,7 +1766,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-error {
-  background:#ff4351
+  background:#C5232D
 }
 
 .alert.alert-error:before {
@@ -12141,20 +12141,29 @@ ul.tnc li {
   }
 
   .alert {
-    padding: 15px 25px 15px 40px;
+    padding: 12px 25px 12px 40px;
+    margin-left: -20px;
+    margin-right: -20px;
+    text-align: center;
   }
 
   .alert:before {
-    margin-top: -15px;
+    margin-top: -13px;
     width: 25px;
     height: 25px;
     line-height: 25px;
     left: 6px;
   }
 
+  .alert a:hover,
+  .alert a:focus,
+  .alert a:active {
+    text-decoration: underline;
+    color: #fff;
+  }
+
   .alert .close {
-    top: 0;
-    right: 0;
+    display: none;
   }
 }
 

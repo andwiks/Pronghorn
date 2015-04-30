@@ -53,9 +53,9 @@ function bank_transfer_notification_queue_cron() {
             INNER JOIN commerce_payment_transaction b ON a.order_id = b.order_id
             LEFT OUTER JOIN bank_transfer_notification_queue c ON a.order_id = c.order_id
             WHERE
-            a.status = 'pending'
-            AND b.payment_method = 'bank_transfer'
-            AND from_unixtime(a.created) + INTERVAL 2 HOUR < NOW()
+            (a.status = 'pending' || a.status = 'processing') 
+            AND b.payment_method = 'bank_transfer' 
+            AND from_unixtime(a.created) + INTERVAL 2 HOUR < NOW() 
             AND c.id is null";
     $result = db_query($query);
     foreach ($result as $row) {

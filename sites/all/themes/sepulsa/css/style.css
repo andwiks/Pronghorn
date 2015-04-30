@@ -1719,7 +1719,7 @@ label.radio,.radio label {
   -moz-border-radius:50%;
   -ms-border-radius:50% 50% 50% 50%;
   border-radius:50% 50% 50% 50%;
-  background:#fff;
+  background: rgba(0,0,0,0.2);
   text-align:center;
   line-height:32px
 }
@@ -1762,7 +1762,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-success .close {
-  color:#a5de37
+  color:#fff
 }
 
 .alert.alert-error {
@@ -1774,7 +1774,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-error .close {
-  color:#ff4351
+  color:#fff
 }
 
 .alert.alert-help {

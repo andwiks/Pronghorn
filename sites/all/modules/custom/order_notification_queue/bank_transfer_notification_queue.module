@@ -14,7 +14,7 @@ function bank_transfer_notification_queue_menu() {
       'type'             => MENU_CALLBACK,
     );
 	
-    $items['admin/config/people/bank_transfer_notification_queue'] = array(
+    $items['admin/commerce/config/bank_transfer_notification_queue'] = array(
       'title'            => t('Bank Transfer Notification Setting'),
       'description'      => t('Bank Transfer Notification Setting'),
       'page callback'    => 'drupal_get_form',
@@ -27,9 +27,9 @@ function bank_transfer_notification_queue_menu() {
 }
 
 function bank_transfer_notification_queue(){
-    $test = strtotime('30-04-2015 10:30:00');
-    $time = date('d/m/y H:i:s', $test);
-    print $test."<br />".$time;
+    //$test = strtotime('30-04-2015 10:30:00');
+    //$time = date('d/m/y H:i:s', $test);
+    //print $test."<br />".$time;
 }
 
 function bank_transfer_notification_queue_setting() {

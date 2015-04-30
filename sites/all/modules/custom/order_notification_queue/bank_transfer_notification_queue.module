@@ -59,8 +59,11 @@ function bank_transfer_notification_queue_cron() {
             AND c.id is null";
     $result = db_query($query);
     foreach ($result as $row) {
-        $queue_item = array('order_id' => $row->order_id, 'email' => $row->mail, 'amount' => $row->amount);
-        $queue->createItem($queue_item);
+	  $order = commerce_order_load($row->order_id);
+	  //if ($order->status == 'pending' || $order->status == 'processing') {
+		$queue_item = array('order_id' => $row->order_id, 'email' => $row->mail, 'amount' => $row->amount);
+		$queue->createItem($queue_item);
+	  //}
     }
 }
 
@@ -83,34 +86,17 @@ function send_notification_email_queue($item) {
     $exist_order_id = db_query_range("SELECT order_id FROM {bank_transfer_notification_queue} WHERE order_id = :order_id", 0, 1, array('order_id' => $item['order_id']))->fetchField(); 
     if ($exist_order_id == null) {
         $sent = send_notification_email($item['order_id'], $item['amount'], $item['email']);
-        if ($sent) {
-            db_query("INSERT INTO bank_transfer_notification_queue (order_id, status) VALUES ('".$item['order_id']."', 1)");
-            watchdog('bank_transfer_email_reminder', 'Email Successfully Sent <br /><pre>'.print_r($item, true).'</pre>');
-        }
+		db_query("INSERT INTO bank_transfer_notification_queue (order_id, status) VALUES ('".$item['order_id']."', 1)");
+		watchdog('bank_transfer_email_reminder', 'Email Successfully Sent <br /><pre>'.print_r($item, true).'</pre>');
     }
 }
 
-// HOOK MAIL
-function bank_transfer_notification_queue_mail($key, &$message, $params) {
-    $message['subject'] = $params['subject'];
-    $message['body'] = $params['body'];
-    
-    $headers = array(
-        'MIME-Version' => '1.0',
-        'Content-Type' => 'text/html;charset=iso-8859-1',
-        'X-Mailer' => 'Drupal'
-      );
-    
-    foreach ($headers as $key => $value) {
-        $message['headers'][$key] = $value;
-      }
-}
 
 function send_notification_email($order_id, $amount, $email){
     //$time = date('d/m/y H:i:s', '1429880400');
     //$test = strtotime('24-04-2015 17:00:00');
     //print $test; exit;
-    $payment = commerce_payment_method_instance_load('bank_transfer|commerce_payment_bank_transfer');
+    /*$payment = commerce_payment_method_instance_load('bank_transfer|commerce_payment_bank_transfer');
 	$bank_detail = '
 	  <p>
 		Nama Bank : <strong>'.$payment['settings']['details']['account_bank'].'</strong><br>
@@ -132,8 +118,60 @@ function send_notification_email($order_id, $amount, $email){
 
     $sent_email = mail($to,$subject,$message,$headers);
     if ($sent_email) return true;
-    else return false;
+    else return false;*/
+	
+  $payment = commerce_payment_method_instance_load('bank_transfer|commerce_payment_bank_transfer');
+  $bank_detail = '
+	<p>
+	  Nama Bank : <strong>'.$payment['settings']['details']['account_bank'].'</strong><br>
+	  Nomor rekening : <strong>'.$payment['settings']['details']['account_number'].'</strong><br>
+	  Atas nama : <strong>'.$payment['settings']['details']['account_owner'].'</strong><br>
+	  Kantor cabang : '.$payment['settings']['details']['account_branch'].'
+	</p>
+	'.$payment['settings']['policy'];
+  
+  $to = $email;
+  $from = "info@sepulsa.com";
+  $subject = "Order ".$order_id." di Sepulsa Belum Dibayar";
+  $message = variable_get('bank_transfer_notification_queue_setting');
+  $message = str_replace("[ORDERID]", $order_id, $message);
+  $message = str_replace("[AMOUNT]", number_format($amount,0,",","."), $message);
+  $message = str_replace("[BANK_DETAIL]", $bank_detail, $message);
+
+  //params is the array passed to hook_mail function 
+  $params = array(
+	  'subject' => $subject,
+	  'body' => $message,
+	  );
+
+  drupal_mail('bank_transfer_notification_queue', 'information', $to, language_default(), $params, $from);
 }
+
+function bank_transfer_notification_queue_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'information':
+      $message['subject'] = $params['subject'];
+      $message['body'] = array(0=>$params['body']);
+    break;
+    }
+}
+/*
+// HOOK MAIL
+function bank_transfer_notification_queue_mail($key, &$message, $params) {
+    $message['subject'] = $params['subject'];
+    $message['body'] = $params['body'];
+    
+    $headers = array(
+        'MIME-Version' => '1.0',
+        'Content-Type' => 'text/html;charset=iso-8859-1',
+        'X-Mailer' => 'Drupal'
+      );
+    
+    foreach ($headers as $key => $value) {
+        $message['headers'][$key] = $value;
+      }
+}
+*/
 
 function bank_transfer_notification_queue_uninstall() {
   drupal_uninstall_schema('bank_transfer_notification_queue');

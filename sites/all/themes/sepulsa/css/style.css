@@ -1719,7 +1719,7 @@ label.radio,.radio label {
   -moz-border-radius:50%;
   -ms-border-radius:50% 50% 50% 50%;
   border-radius:50% 50% 50% 50%;
-  background:#fff;
+  background: rgba(0,0,0,0.2);
   text-align:center;
   line-height:32px
 }
@@ -1754,7 +1754,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-success {
-  background:#a5de37
+  background:#1E9C4D
 }
 
 .alert.alert-success:before {
@@ -1762,11 +1762,11 @@ label.radio,.radio label {
 }
 
 .alert.alert-success .close {
-  color:#a5de37
+  color:#fff
 }
 
 .alert.alert-error {
-  background:#ff4351
+  background:#C5232D
 }
 
 .alert.alert-error:before {
@@ -1774,7 +1774,7 @@ label.radio,.radio label {
 }
 
 .alert.alert-error .close {
-  color:#ff4351
+  color:#fff
 }
 
 .alert.alert-help {
@@ -3963,14 +3963,14 @@ ul.filter-categories > li li:last-child {
 /* 3. Header ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /* 3.1. Main Header ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 #header {
-  height:84px;
+  height:75px;
   position:absolute;
   top:0;
   width:100%;
   z-index:101;
   left:0;
-  color:#444
-/*@include transition((height 0.4s ease 0s, opacity 0.3s ease 0s));*/
+  color:#444;
+  background:url(../images/inner/style1-pattern.png) repeat;
 }
 
 #header.header-color-white {
@@ -4003,6 +4003,20 @@ ul.filter-categories > li li:last-child {
   display:table;
   width:100%;
   position:relative
+}
+
+#header .header-inner .branding {
+    width: 225px;
+  }
+
+#header .header-inner .branding a {
+  display: block;
+}
+
+@media screen and (max-width:768px) {
+  #header .header-inner .branding {
+    width: 180px;
+  }
 }
 
 #header .header-top-nav {
@@ -4152,8 +4166,8 @@ ul.filter-categories > li li:last-child {
 
 /* 3.3. Page Title Container ~~~~~~~~~~~~~~~~~~~~~~~ */
 .page-title-container {
-  background:url(../images/inner/style1-pattern.png) repeat;
   position:relative;
+  padding-top: 75px;
   overflow:visible
 }
 
@@ -4162,10 +4176,6 @@ ul.filter-categories > li li:last-child {
   font-size:3.3333em;
   color:#343434;
   text-align:center
-}
-
-.page-title-container .page-title {
-  padding:60px 0 25px
 }
 
 .page-title-container .breadcrumbs {
@@ -12088,10 +12098,10 @@ ul.tnc li {
 }
 
 @media screen and (max-width:768px) {
-  .nav {
-    margin:0 auto;
+  #footer .nav {
+    margin:0 auto 10px;
     list-style:none;
-    padding-bottom:10px
+    text-align: center;
   }
 
   .footer-bottom-area .secondary-menu {
@@ -12100,32 +12110,60 @@ ul.tnc li {
     display:block
   }
 
-  .nav-pills>li {
+  #footer .nav-pills > li {
     float:none;
+    display: inline-block;
     text-align:center
   }
 
-  .howto {
+  #footer .howto {
     padding:0 10px 10px!important
   }
 
-  .c-sepulsa {
-    text-align:center;
-    margin:0 0 10px!important
-  }
-
-  .keamanan,
-  .pembayaran {
+  #footer .keamanan,
+  #footer .pembayaran {
     float:none!important;
     display:block;
     text-align:center!important;
-    margin-left:0!important
+    margin-left:0!important;
+    margin-bottom: 10px;
+  }
+
+  #footer .keamanan img,
+  #footer .pembayaran img {
+    max-height: 25px !important;
   }
 
   .follow-content_footer {
     text-align: center;
     margin-top: 0;
     margin-bottom: 10px;
+  }
+
+  .alert {
+    padding: 12px 25px 12px 40px;
+    margin-left: -20px;
+    margin-right: -20px;
+    text-align: center;
+  }
+
+  .alert:before {
+    margin-top: -13px;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    left: 6px;
+  }
+
+  .alert a:hover,
+  .alert a:focus,
+  .alert a:active {
+    text-decoration: underline;
+    color: #fff;
+  }
+
+  .alert .close {
+    display: none;
   }
 }
 

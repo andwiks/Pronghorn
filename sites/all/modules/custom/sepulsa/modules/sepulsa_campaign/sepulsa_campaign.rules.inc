@@ -11,8 +11,8 @@ function sepulsa_campaign_rules_condition_info() {
         'label' => t('Order'),
         'type' => 'commerce_order',
       ),
-      'instance_id' => array(
-        'type' => 'text',
+      'instance_ids' => array(
+        'type' => 'list<text>',
         'label' => t('Payment method instance'),
         'options list' => 'sepulsa_campaign_rules_payment_method_instance_options_list',
         'restriction' => 'input',
@@ -24,7 +24,7 @@ function sepulsa_campaign_rules_condition_info() {
   return $conditions;
 }
 
-function sepulsa_campaign_method_instance_comparison_execute($order, $instance_id) {
+function sepulsa_campaign_method_instance_comparison_execute($order, $instance_ids) {
   if (!empty($order->data['payment_method'])) {
     list($selected_method_id, $selected_instance_id) = explode('|', $order->data['payment_method']);
   }
@@ -32,7 +32,7 @@ function sepulsa_campaign_method_instance_comparison_execute($order, $instance_i
     $selected_instance_id = '-none-';
   }
 
-  return $instance_id == $selected_instance_id;
+  return in_array($selected_instance_id, $instance_ids);
 }
 
 function sepulsa_campaign_rules_payment_method_instance_options_list() {

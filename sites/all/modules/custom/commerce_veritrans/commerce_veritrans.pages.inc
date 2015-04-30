@@ -169,3 +169,97 @@ function commerce_veritrans_user_token_form_submit($form, &$form_state) {
     }
   }
 }
+
+function commerce_veritrans_notification_callback() {
+  if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    drupal_add_http_header('status', '405 Method Not Allowed');
+    return;
+  }
+
+  $headers = getallheaders();
+
+  if ($headers['User-Agent'] != 'Veritrans') {
+    drupal_add_http_header('status', '417 Expectation Failed');
+    return;
+  }
+
+  $body = file_get_contents('php://input');
+
+  if (!empty($body)) {
+    $payload = drupal_json_decode($body);
+    // check required parameters
+    $required_params = array(
+      'status_code',
+      'transaction_id',
+      'order_id',
+      'transaction_status',
+      'signature_key',
+      'gross_amount',
+    );
+    foreach ($required_params as $param) {
+      if (empty($payload[$param])) {
+        return;
+      }
+    }
+
+
+    extract($payload);
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_payment_transaction');
+    $query->propertyCondition('remote_id', $order_id);
+    $query->propertyCondition('status', COMMERCE_PAYMENT_STATUS_PENDING);
+    $query->propertyOrderBy('revision_id', 'DESC');
+    $query->range(0, 1);
+
+    $result = $query->execute();
+
+    if (!empty($result)) {
+      $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
+      if (!empty($transaction->payload['transaction_id']) && $transaction_id == $transaction->payload['transaction_id']) {
+        // check the signature key
+        $instance = commerce_payment_method_instance_load($transaction->instance_id);
+        $hash = hash('sha512', $order_id . $status_code . $gross_amount . $instance['settings']['server_key']);
+
+        if ($hash == $signature_key) {
+          switch ($transaction_status) {
+            case 'capture':
+              if (!empty($fraud_status) && strtolower($fraud_status) == 'challenge') {
+                $status = COMMERCE_PAYMENT_STATUS_PENDING;
+              }
+              else {
+                $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+              }
+              break;
+
+            case 'settlement':
+              $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+              break;
+
+            case 'pending':
+              $status = COMMERCE_PAYMENT_STATUS_PENDING;
+              break;
+
+            case 'cancel':
+            case 'deny':
+            case 'expire':
+              $status = COMMERCE_PAYMENT_STATUS_FAILURE;
+              break;
+          }
+
+          if ($transaction->status != $status) {
+            $transaction->payload = $payload;
+            $transaction->log = $status_message;
+            $transaction->status = $status;
+            $transaction->remote_status = $transaction_status;
+            $transaction->revision = TRUE;
+            commerce_payment_transaction_save($transaction);
+            drupal_json_output($transaction);
+          }
+        }
+      }
+    }
+  }
+
+  return;
+}

@@ -120,7 +120,7 @@ function send_notification_email($order_id, $amount, $email){
 	  </p>
 	  '.$payment['settings']['policy'];
     $to = $email;
-    $subject = "Order ".$order_id." at Sepulsa Belum Dibayar";
+    $subject = "Order ".$order_id." di Sepulsa Belum Dibayar";
     $message = variable_get('bank_transfer_notification_queue_setting');
 	$message = str_replace("[ORDERID]", $order_id, $message);
 	$message = str_replace("[AMOUNT]", number_format($amount,0,",","."), $message);

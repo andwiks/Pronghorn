@@ -16,6 +16,12 @@ function bank_transfer_notification_queue_menu() {
     return $items;
 }
 
+function bank_transfer_notification_queue(){
+    $test = strtotime('30-04-2015 10:30:00');
+    $time = date('d/m/y H:i:s', $test);
+    print $test."<br />".$time;
+}
+
 function bank_transfer_notification_queue_cron() {
     $queue = DrupalQueue::get('queue_bank_transfer_notification');
     
@@ -26,7 +32,7 @@ function bank_transfer_notification_queue_cron() {
             WHERE
             a.status = 'pending'
             AND b.payment_method = 'bank_transfer'
-            AND from_unixtime(a.changed) > NOW() + INTERVAL 2 HOUR
+            AND from_unixtime(a.changed) + INTERVAL 2 HOUR < NOW()
             AND c.id is null";
     $result = db_query($query);
     foreach ($result as $row) {

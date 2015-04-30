@@ -145,7 +145,6 @@ function _sepulsa_services_index_doc() {
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
-    '#verb' => 'operations',
     // Errors.
     '#errors' => array(
       'internal_server' => array(

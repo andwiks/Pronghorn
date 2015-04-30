@@ -1,0 +1,110 @@
+<?php
+
+/**
+ * @file
+ * commerce_veritrans_services.module
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function commerce_veritrans_services_services_resources() {
+  $resources = array(
+    'saved_card' => array(
+      'operations' => array(
+        'delete' => array(
+          'help' => "Delete a customer's saved credit card.",
+          'callback' => '_saved_card_resource_delete',
+          'access callback' => 'user_is_logged_in',
+          'documentation callback' => '_saved_card_resource_delete_doc',
+          'args' => array(
+            array(
+              'name' => 'token_id',
+              'type' => 'int',
+              'description' => 'The id of saved card token',
+              'optional' => FALSE,
+              'source' => array(
+                'path' => 0,
+              ),
+            ),
+          ),
+        ),
+        'index' => array(
+          'help' => "List of customer's saved credit card.",
+          'callback' => '_saved_card_resource_index',
+          'access callback' => 'user_is_logged_in',
+          'documentation callback' => '_saved_card_resource_index_doc',
+        ),
+      ),
+    ),
+  );
+
+  return $resources;
+}
+
+function _saved_card_resource_delete($token_id) {
+  $uid = $GLOBALS['user']->uid;
+  $deleted = db_delete('commerce_veritrans_token')
+    ->condition('token_id', $token_id)
+    ->condition('uid', $uid)
+    ->execute();
+
+  if (!$deleted) {
+    return services_error(t('Card with token id @token_id for user @uid is not found', array('@token_id' => $token_id, '@uid' => $uid)), 404);
+  }
+  else {
+    return $deleted;
+  }
+}
+
+function _saved_card_resource_index() {
+  return commerce_veritrans_token_get($GLOBALS['user']->uid);
+}
+
+function _saved_card_resource_delete_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $element = array(
+    '#name' => 'delete',
+    '#path' => 'saved_card/%token_id',
+    '#description' => "Delete a customer's saved credit card.",
+    '#request_url' => 'api/saved_card/1',
+    '#response' => json_encode(array(1), $options),
+    '#errors' => array(
+      'not_found' => array(
+        '#question' => '404 Not found : Card with token id @token_id for user @user is not found',
+        '#response' => json_encode(array('Card with token id @token_id for user @user is not found'), $options),
+      ),
+    ),
+    '#auth' => TRUE,
+  );
+
+  return $element;
+}
+
+function _saved_card_resource_index_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $response = array(
+    'expired' => '1745395901',
+    'first' => '481111',
+    'last' => '1114',
+    'order_id' => '1',
+    'phone' => '08888888888',
+    'token' => '48111111f3ea7e-3c31-4e85-a56a-0d736cbad214',
+    'token_id' => '1',
+    'uid' => '1',
+  );
+
+  $element = array(
+    '#name' => 'index',
+    '#description' => "List of customer's saved credit card.",
+    '#request_url' => 'api/saved_card',
+    '#response' => json_encode(array($response), $options),
+    '#errors' => array(),
+    '#auth' => TRUE,
+    '#method' => array(
+      'args' => array(),
+    ),
+  );
+
+  return $element;
+}

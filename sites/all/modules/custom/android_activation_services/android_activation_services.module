@@ -187,7 +187,6 @@ function android_activation_services_doc() {
     // Example response. E.g., a JSON array.
     '#response' => 'TRUE / FALSE',
     // Resource prefix.
-    '#verb' => 'actions',
     // Errors.
     '#errors' => array(
       'csrf_validation' => array(

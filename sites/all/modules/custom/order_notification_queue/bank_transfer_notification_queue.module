@@ -55,7 +55,7 @@ function bank_transfer_notification_queue_cron() {
             WHERE
             (a.status = 'pending' || a.status = 'processing') 
             AND b.payment_method = 'bank_transfer' 
-            AND from_unixtime(a.created) + INTERVAL 1 HOUR < NOW() 
+            AND from_unixtime(a.created) + INTERVAL 2 HOUR < NOW() 
 			AND from_unixtime(a.created) > NOW() - INTERVAL 12 HOUR
             AND c.id is null";
     $result = db_query($query);

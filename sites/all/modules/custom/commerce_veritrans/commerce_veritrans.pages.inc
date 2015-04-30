@@ -223,7 +223,7 @@ function commerce_veritrans_notification_callback() {
         if ($hash == $signature_key) {
           switch ($transaction_status) {
             case 'capture':
-              if (!empty($fraud_status) && strtolower($fraud_status) == 'challenge' {
+              if (!empty($fraud_status) && strtolower($fraud_status) == 'challenge') {
                 $status = COMMERCE_PAYMENT_STATUS_PENDING;
               }
               else {

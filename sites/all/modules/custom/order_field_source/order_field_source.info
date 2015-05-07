@@ -1,0 +1,5 @@
+name = "Order Field Source"
+description = "Module to check the order source (Web or Apps)"
+core = "7.x"
+
+dependencies[] = entity

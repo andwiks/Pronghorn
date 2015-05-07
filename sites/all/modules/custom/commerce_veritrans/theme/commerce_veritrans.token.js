@@ -78,10 +78,10 @@
       };
 
       $("#edit-continue", context).on("click", function (event) {
-        /**
-         * Check only if commerce_veritrans is selected as payment method
-         */
-        if (typeof event.isTrigger === 'undefined' && $(':input[name="commerce_payment[payment_method]"][value^="commerce_veritrans"]').is(':checked')) {
+        // Check only if credit_card is selected as payment method
+        if (typeof event.isTrigger === 'undefined'
+          && typeof settings.vtCreditCardPayments !== 'undefined'
+          && $.inArray($(':input[name="commerce_payment[payment_method]"]:checked').val(), settings.vtCreditCardPayments) > -1) {
           if (settings.vt_type == "oneclick"
             && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').is('select')
             && $(':input[name="commerce_payment[payment_details][veritrans][tokens]"]').val() != '0'

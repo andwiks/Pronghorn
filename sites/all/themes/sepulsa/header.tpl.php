@@ -15,7 +15,7 @@ global $base_url, $user;
     <div class="header-inner">
       <div class="branding">
         <a href="<?php print $base_url; ?>">
-          <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/logo@2x.png" alt="" width="225">
+          <img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/logo@2x.png" alt="Seplusa Logo">
         </a>
       </div>
       <nav id="nav">

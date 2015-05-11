@@ -31,19 +31,31 @@ function sepulsa_checkout_completion_message_pane_settings_form($checkout_pane) 
     );
   }
 
+
+  foreach (commerce_line_item_types() as $type => $line_item_type) {
+    if ($line_item_type['product']) {
+      $form['container']['commerce_checkout_completion_message'][$type] = array(
+        '#type' => 'text_format',
+        '#title' => t('Checkout completion message for line item %type', array('%type' => $line_item_type['name'])),
+        '#default_value' => isset($message[$type]) ? $message[$type]['value'] : NULL,
+        '#format' => isset($message[$type]) ? $message[$type]['format'] : NULL,
+        '#weight' => 10,
+      );
+    }
+  }
   $form['container']['commerce_checkout_completion_message']['anonymous'] = array(
     '#type' => 'text_format',
     '#title' => t('Checkout completion message for anonymous user'),
     '#default_value' => isset($message['anonymous']) ? $message['anonymous']['value'] : NULL,
     '#format' => isset($message['anonymous']) ? $message['anonymous']['format'] : NULL,
-    '#weight' => 10,
+    '#weight' => 50,
   );
   $form['container']['commerce_checkout_completion_message']['authenticated'] = array(
     '#type' => 'text_format',
     '#title' => t('Checkout completion message for authenticated user'),
     '#default_value' => isset($message['authenticated']) ? $message['authenticated']['value'] : NULL,
     '#format' => isset($message['authenticated']) ? $message['authenticated']['format'] : NULL,
-    '#weight' => 10,
+    '#weight' => 50,
   );
 
   return $form;
@@ -67,7 +79,19 @@ function sepulsa_checkout_completion_message_message($order, $format = NULL) {
   // Load the completion message.
   $message = variable_get('commerce_checkout_completion_message', commerce_checkout_completion_message_default());
 
-  foreach (array($instance_id, $role) as $part) {
+  $parts = array(
+    $instance_id,
+  );
+
+  foreach (entity_metadata_wrapper('commerce_order', $order)->commerce_line_items->value() as $line_item) {
+    if (!in_array($line_item->type, $parts)) {
+      $parts[] = $line_item->type;
+    }
+  }
+
+  $parts[] = $role;
+
+  foreach ($parts as $part) {
     // Perform translation.
     $message[$part]['value'] = commerce_i18n_string('commerce:checkout:complete:message', $message[$part]['value'], array('sanitize' => FALSE));
 

@@ -22,11 +22,17 @@ global $base_url;
           <div class="col-sm-6 col-md-8">
             <div class="tab-container full-width style1 box">
               <ul class="tabs clearfix">
-                <li class="active"><a href="#tab1-1" data-toggle="tab">Isi Pulsa</a></li>
+                <li<?php if($active_tab == 'topup') print ' class="active"';?>><a href="#topup" data-toggle="tab">Isi Pulsa</a></li>
+                <li<?php if($active_tab == 'token_reload') print ' class="active"';?>><a href="#token-reload" data-toggle="tab">Listrik</a></li>
               </ul>
-              <div id="tab1-1" class="tab-content in active">
+              <div id="topup" class="tab-content<?php if($active_tab == 'topup') print ' in active';?>">
                 <div class="tab-pane">
                   <?php print render($page['content']); ?>
+                </div>
+              </div>
+              <div id="token-reload" class="tab-content<?php if($active_tab == 'token_reload') print ' in active';?>">
+                <div class="tab-pane">
+                  <?php print render($token_reload_form); ?>
                 </div>
               </div>
             </div>

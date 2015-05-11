@@ -67,7 +67,16 @@ function token_reload_request_call($data, $method = 'inq') {
       );
 
       $result = drupal_http_request($url, $options);
-      $response = $result->data;
+
+      // Check the result:
+      // 1. Must have 200 http code.
+      // 2. Must have data.
+      if ($result->code == 200 && !empty($result->data)) {
+        $response = $result->data;
+      }
+      else {
+        return FALSE;
+      }
       break;
   }
 

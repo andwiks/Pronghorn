@@ -62,6 +62,7 @@ function token_reload_request_call($data, $method = 'inq') {
           'Content-Type' => 'application/xml',
         ),
         'method' => 'POST',
+        'timeout' => $settings['timeout'];
         'data' => $data,
       );
 

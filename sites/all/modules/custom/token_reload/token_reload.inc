@@ -17,7 +17,7 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   $xml->addChild('methodName', 'fastpay.' . $method);
   $xml_params = $xml->addChild('params');
   // Add value: Kode Produk.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', 'KODEPRODUK');
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
   // Add value: Id Pelanggan 1.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
   // Add value: Id Pelanggan 2.

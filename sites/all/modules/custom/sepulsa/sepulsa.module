@@ -193,3 +193,24 @@ function sepulsa_get_all_operator_data($reset = FALSE) {
   // Return operator array.
   return $operators;
 }
+
+
+
+function sepulsa_get_existing_number () {
+  global $user;
+  $existing_number = [];
+  $query = "SELECT distinct(field_phone_number_value) 
+			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c	
+			WHERE
+			a.order_id = b.order_id 
+			AND b.line_item_id = c.entity_id
+			AND (a.status = 'completed' OR a.status = 'invoiced')
+			AND a.uid = :uid
+			ORDER BY a.created DESC";
+  $result = db_query($query, array(':uid' => $user->uid));
+  foreach ($result as $row) {
+	$existing_number[] = $row->field_phone_number_value;
+  }
+  
+  return $existing_number;
+}

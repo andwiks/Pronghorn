@@ -13,6 +13,7 @@
         $("#edit-packet option").remove();
         $("#sepulsa-autocomplete-packets").hide();
         $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", true).attr("disabled", "disabled");
+        $("#operator-sepulsa").css("display", "none");
       }
       
       function sepulsa_form_packet(oid, pid, ps) {
@@ -33,15 +34,14 @@
         $("#edit-packet").val(select ? ps : sid);
       }
       
-      $(document).ready(function() {
-        $("form#sepulsa-phone-form input[name=op]").attr("disabled", "disabled");
-        $("#edit-phone").trigger("blur").focus().val($("#edit-phone").val());
-      });
-      
-      $("#edit-phone", context).on("keyup blur", function(event) {
-        //phone = new RegExp("^0\\d{3}");
+      function sepulsa_check_number_prefix() {
         phone = new RegExp("\\d{4}");
-        number = $(this).val();
+        if ($("#edit-phone").val() == null || $("#edit-phone").val() == "") {
+            number = $("#edit-existing-phone").val();
+        }
+        else {
+            number = $("#edit-phone").val();
+        }
         prefix = phone.exec(number);
           
         if (prefix != null) {
@@ -50,6 +50,7 @@
               operatorid = operator;
               if ($("#edit-operator").val() != settings.sepulsa[operator].operator) {
                 $("#edit-operator").val(settings.sepulsa[operator].operator);
+                $("#operator-sepulsa").css("display", "inline");
               }
               counter = 0;
               selected = $("#edit-card-type").val();
@@ -74,7 +75,25 @@
             }
           }
         }
-        sepulsa_form_inactive();
+        sepulsa_form_inactive(); 
+      }
+      
+      $(document).ready(function() {
+        $("form#sepulsa-phone-form input[name=op]").attr("disabled", "disabled");
+        $("#edit-phone").trigger("blur").focus().val($("#edit-phone").val());
+        if (!($("#edit-existing-phone").val() == null || $("#edit-existing-phone").val() == "" || $("#edit-existing-phone").val() == "0")) {
+            existing_number = $("#edit-existing-phone").val();
+            $("#phone-sepulsa").css("display", "inline");
+            $("#edit-phone").css("display", "none");
+            $("#edit-phone").val(existing_number);
+            $("#operator-sepulsa").css("display", "inline");
+            sepulsa_check_number_prefix();
+        }
+      });
+      
+      $("#edit-phone", context).on("keyup blur", function(event) {
+        //phone = new RegExp("^0\\d{3}");
+        sepulsa_check_number_prefix();
       });
        
       $("#edit-card-type", context).on("change", function (event) {
@@ -83,6 +102,21 @@
         }
         else {
           sepulsa_form_inactive();
+        }
+      });
+      
+      $("#edit-existing-phone", context).on("change", function (event) {
+        if ($("#edit-existing-phone").val() == "0") {
+            $("#edit-phone").css("display", "inline");
+            $("#phone-sepulsa").css("display", "inline");
+            $("#edit-phone").val('');
+            sepulsa_check_number_prefix();
+        } else {
+            existing_number = $("#edit-existing-phone").val();
+            $("#phone-sepulsa").css("display", "inline");
+            $("#edit-phone").css("display", "none");
+            $("#edit-phone").val(existing_number);
+            sepulsa_check_number_prefix();
         }
       });
     }

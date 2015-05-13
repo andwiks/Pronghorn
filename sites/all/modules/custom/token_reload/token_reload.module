@@ -183,6 +183,7 @@ function token_reload_queue_process($line_item_id) {
       }
 
       $token_reload->status = $status;
+      $token_reload->token_pln = $payment[34];
       $token_reload->ref = $payment[10];
       $token_reload->time = strtotime($payment[1]);
       $token_reload->request_id = $payment[9];

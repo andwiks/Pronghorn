@@ -117,6 +117,10 @@ function token_reload_schema() {
         'length' => 255,
         'not null' => TRUE,
       ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
       'created' => array(
         'description' => 'The Unix timestamp when the token reload was created.',
         'type' => 'int',
@@ -197,6 +201,10 @@ function token_reload_schema() {
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
+      ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
       ),
       'created' => array(
         'description' => 'The Unix timestamp when the token reload was created.',

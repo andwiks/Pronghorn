@@ -60,6 +60,7 @@ function sepulsa_front_page() {
  */
 function sepulsa_phone_form($form, &$form_state) {
   global $user;
+  $existing_phone_options = array();
   // Get sepulsa operator data.
   $operator_data = sepulsa_get_all_operator_data();
 
@@ -107,17 +108,19 @@ function sepulsa_phone_form($form, &$form_state) {
   foreach ($existing_phone as $value) {
 	$existing_phone_options[$value] = $value;
   }
+  if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
   $existing_phone_options['0'] = t('Tambah Nomor Baru');
-  $form['existing_phone'] = array(
-    '#type' => 'select',
-    '#title' => '',
-    '#options' => $existing_phone_options,
-    //'#suffix' => '<div>&nbsp;</div>',
-    '#validated' => TRUE,
-    '#attributes' => array(
-      'class' => array('full-width'),
-    ),
-  );
+	$form['existing_phone'] = array(
+	  '#type' => 'select',
+	  '#title' => '',
+	  '#options' => $existing_phone_options,
+	  //'#suffix' => '<div>&nbsp;</div>',
+	  '#validated' => TRUE,
+	  '#attributes' => array(
+		'class' => array('full-width'),
+	  ),
+	);
+  }
   
   // Show input phone number.
   $form['phone'] = array(

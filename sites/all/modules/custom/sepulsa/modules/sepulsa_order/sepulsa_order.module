@@ -112,6 +112,7 @@ function sepulsa_order_process_order($order_id) {
       $sepulsa_order = entity_create('sepulsa_order', array('order_id' => $order_id));
     }
 
+    $properties = entity_get_property_info('sepulsa_order');
     $sepulsa_order_wrapper = entity_metadata_wrapper('sepulsa_order', $sepulsa_order);
     $sepulsa_order_wrapper->mail->set($order->mail);
     $sepulsa_order_wrapper->status->set($order->status);
@@ -127,7 +128,9 @@ function sepulsa_order_process_order($order_id) {
 
         case 'coupon':
           $property = 'coupon_' . $id;
-          $sepulsa_order_wrapper->$property->set($line_item_wrapper->commerce_product->value());
+          if (isset($properties[$property])) {
+            $sepulsa_order_wrapper->$property->set($line_item_wrapper->commerce_product->value());
+          }
           break;
 
         default:

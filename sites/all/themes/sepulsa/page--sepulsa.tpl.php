@@ -22,7 +22,7 @@ global $base_url;
           <div class="col-sm-6 col-md-8">
             <div class="tab-container full-width style1 box">
               <ul class="tabs clearfix">
-                <li class="active"><a href="#tab1-1" data-toggle="tab">Isi Pulsa</a></li>
+                <li class="active"><a href="#tab1-1" data-toggle="tab">Isi Pulsa & Bolt</a></li>
               </ul>
               <div id="tab1-1" class="tab-content in active">
                 <div class="tab-pane">

@@ -4,3 +4,19 @@ sites/*/settings*.php
 # Ignore paths that contain user-generated content.
 sites/*/files
 sites/*/private
+
+# Ignore test folder
+test
+
+# Ignore lain-lain, latest dumped DB for development, or other
+zzzother
+
+# Ignore mac trash files
+*.DS_Store*
+*.buildpath
+*.project
+*.settings
+nbproject
+
+# Ignore .htaccess
+*.htaccess

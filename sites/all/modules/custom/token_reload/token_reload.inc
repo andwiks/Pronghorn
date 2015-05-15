@@ -47,6 +47,40 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   return $xml->asXML();
 }
 
+function token_reload_request_query_data($params = array()) {
+  $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
+  $params += array(
+    'start' => NULL,
+    'end' => NULL,
+    'ref_2' => NULL,
+    'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
+    'customer_number' => NULL,
+  );
+
+  // Set XML.
+  $xml = new SimpleXMLElement('<methodCall/>');
+  $xml->addChild('methodName', 'fastpay.datatransaksi');
+  $xml_params = $xml->addChild('params');
+  // Add value: Tanggal 1.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['start']);
+  // Add value: Tanggal 2.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['end']);
+  // Add value: REF2.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['ref_2']);
+  // Add value: Kode produk.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
+  // Add value: Id pelanggan.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
+  // Add value: Limit.
+  $xml_params->addChild('param')->addChild('value')->addChild('string');
+  // Add value: UID.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $settings['uid']);
+  // Add value: PIN.
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $settings['pin']);
+
+  return $xml->asXML();
+}
+
 function token_reload_request_call($data, $method = 'inq') {
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
 

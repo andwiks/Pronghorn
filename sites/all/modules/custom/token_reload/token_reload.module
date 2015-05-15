@@ -47,6 +47,11 @@ function token_reload_cron_queue_info() {
     'worker callback' => 'token_reload_queue_process',
     'time' => 120,
   );
+  // Token reload queue query: first part.
+  $queues['token_reload_query'] = array(
+    'worker callback' => 'token_reload_queue_process',
+    'time' => 120,
+  );
 
   // Return queue array.
   return $queues;

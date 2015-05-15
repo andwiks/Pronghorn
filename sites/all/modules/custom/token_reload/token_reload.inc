@@ -3,7 +3,7 @@
 function token_reload_request_data($params = array(), $method = 'inq') {
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
   $params += array(
-    'product_code' => 'PLNPRA',
+    'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
     'customer_number' => NULL,
     'phone_number' => NULL,
     'nominal' => NULL,

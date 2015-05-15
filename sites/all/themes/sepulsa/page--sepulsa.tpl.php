@@ -28,6 +28,7 @@ global $base_url;
                 <div class="tab-pane">
                   <?php print render($page['content']); ?>
                 </div>
+                <div style="color:red; margin-top:10px;">* Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</div>
               </div>
             </div>
           </div>

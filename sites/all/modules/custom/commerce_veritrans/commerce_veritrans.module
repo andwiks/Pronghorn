@@ -257,6 +257,25 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#maxlength' => 512,
   );
 
+  // Provide mandiri bill payment instruction field.
+  $form['echannel'] = array(
+    '#tree' => TRUE,
+    '#type' => 'fieldset',
+    '#title' => t('Mandiri bill payment options'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][type]"]' => array('value' => 'echannel'),
+      ),
+    ),
+  );
+  $form['echannel']['instruction'] = array(
+    '#type' => 'text_format',
+    '#title' => t('Instruction'),
+    '#description' => t('Mandiri bill payment instruction.'),
+    '#default_value' => isset($settings['echannel']['instruction']) ? $settings['echannel']['instruction']['value'] : NULL,
+    '#format' => isset($settings['echannel']['instruction']) ? $settings['echannel']['instruction']['format'] : NULL,
+  );
+
   // Order ID Prefix.
   $form['prefix'] = array(
     '#type' => 'textfield',
@@ -431,6 +450,10 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
         break;
 
       case 'echannel':
+        $instruction = $payment_method['settings']['echannel']['instruction'];
+        $form['instruction'] = array(
+          '#markup' => check_markup($instruction['value'], $instruction['format']),
+        );
         break;
     }
 

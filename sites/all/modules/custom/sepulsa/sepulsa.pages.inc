@@ -131,6 +131,7 @@ function sepulsa_phone_form($form, &$form_state) {
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
     '#attributes' => array(
       'pattern' => '[0-9]*',
+	  'style'=>'margin-top: 15px;'
     ),
 	'#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
     '#suffix' => '</div>',

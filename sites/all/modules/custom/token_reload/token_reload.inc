@@ -118,7 +118,7 @@ function token_reload_request_call($data, $method = 'inq') {
   foreach (simplexml_load_string($response)->params->param->value->array->data->value as $value) {
     $params[] = (string) $value->string;
   }
-  return $params;
+  return array_combine(token_reload_response_keys(), $params);
 }
 
 function token_reload_response_dummy($data, $method = 'inq') {
@@ -201,4 +201,59 @@ function token_reload_response_dummy($data, $method = 'inq') {
   }
 
   return $xml->asXML();
+}
+
+function token_reload_response_keys() {
+  $keys = array(
+    'product_code',
+    'time',
+    'customer_number_1',
+    'customer_number_2',
+    'customer_number_3',
+    'nominal',
+    'admin_fee',
+    'uid',
+    'pin',
+    'ref_1',
+    'ref_2',
+    'ref_3',
+    'status',
+    'note',
+    'switcher_id',
+    'meter_number',
+    'customer_number',
+    'flag',
+    'no_ref_1',
+    'no_ref_2',
+    'vending_receipt_number',
+    'customer_name',
+    'subscriber_segmentation',
+    'power_consuming_category',
+    'minor_admin_charge',
+    'admin_charge',
+    'buying_option',
+    'distribution_code',
+    'service_unit',
+    'service_unit_phone',
+    'max_kwh_limit',
+    'total_repeat_unsold_token',
+    'unsold_1',
+    'unsold_2',
+    'token_pln',
+    'minor_stamp_duty',
+    'stamp_duty',
+    'minor_ppn',
+    'ppn',
+    'minor_ppj',
+    'ppj',
+    'minor_customer_payables_installment',
+    'customer_payables_installment',
+    'minor_power_purchase',
+    'power_purchase',
+    'minor_purchased_kwh_unit',
+    'purchased_kwh_unit',
+    'info',
+  );
+
+  return $keys;
 }

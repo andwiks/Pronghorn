@@ -112,14 +112,11 @@ function token_reload_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'status' => array(
-        'type' => 'varchar',
-        'length' => 255,
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'token_pln' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'default' => 0,
       ),
       'created' => array(
         'description' => 'The Unix timestamp when the token reload was created.',
@@ -133,27 +130,66 @@ function token_reload_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'ref' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ),
       'time' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
-      'line_item_id' => array(
+      'admin_fee' => array(
         'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
       ),
-      'request_id' => array(
+      'status' => array(
         'type' => 'varchar',
-        'length' => 128,
-        'default' => '',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'meter_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'no_ref_2' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'subscriber_segmentation' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'power_consuming_category' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'service_unit' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'ppj' => array(
+        'type' => 'float',
+      ),
+      'power_purchase' => array(
+        'type' => 'float',
+      ),
+      'purchased_kwh_unit' => array(
+        'type' => 'float',
+      ),
+      'info' => array(
+        'type' => 'text',
       ),
       'data' => array(
         'type' => 'blob',
@@ -164,9 +200,7 @@ function token_reload_schema() {
     ),
     'unique keys' => array(
       'vid' => array('vid'),
-      'ref' => array('ref'),
       'line_item_id' => array('line_item_id'),
-      'request_id' => array('request_id'),
     ),
     'foreign keys' => array(
       'token_reload_revision' => array(
@@ -197,14 +231,11 @@ function token_reload_schema() {
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'status' => array(
-        'type' => 'varchar',
-        'length' => 255,
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
         'not null' => TRUE,
-      ),
-      'token_pln' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'default' => 0,
       ),
       'created' => array(
         'description' => 'The Unix timestamp when the token reload was created.',
@@ -218,27 +249,66 @@ function token_reload_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
-      'ref' => array(
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ),
       'time' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
-      'line_item_id' => array(
+      'admin_fee' => array(
         'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
       ),
-      'request_id' => array(
+      'status' => array(
         'type' => 'varchar',
-        'length' => 128,
-        'default' => '',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'meter_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'no_ref_2' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'subscriber_segmentation' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'power_consuming_category' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'service_unit' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'ppj' => array(
+        'type' => 'float',
+      ),
+      'power_purchase' => array(
+        'type' => 'float',
+      ),
+      'purchased_kwh_unit' => array(
+        'type' => 'float',
+      ),
+      'info' => array(
+        'type' => 'text',
       ),
       'data' => array(
         'type' => 'blob',

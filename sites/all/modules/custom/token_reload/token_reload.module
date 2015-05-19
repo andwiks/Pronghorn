@@ -78,6 +78,23 @@ function token_reload_entity_info() {
 }
 
 /**
+ * Implements hook_entity_presave().
+ */
+function token_reload_entity_presave($entity, $type) {
+  if ($type == 'commerce_line_item' && $entity->type == 'electricity_prepaid' && $entity->is_new) {
+    module_load_include('inc', 'token_reload');
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $entity);
+
+    $params = array(
+      'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+      'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+    );
+
+    $entity->data['inquiry'] = token_reload_request_call(token_reload_request_data($params));
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function token_reload_menu() {
@@ -136,6 +153,16 @@ function token_reload_preprocess_page(&$variables) {
 }
 
 /**
+ * Implements hook_views_api().
+ */
+function token_reload_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'token_reload') . '/includes/views',
+  );
+}
+
+/**
  * Callback Functions.
  */
 
@@ -168,40 +195,47 @@ function token_reload_queue_process($line_item_id) {
     'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
     'nominal' => $line_item_wrapper->commerce_total->amount->value(),
     'ref_1' => str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($total++, 4, '0', STR_PAD_LEFT),
+    'ref_2' => $line_item_wrapper->ref_2->value(),
+    'ref_3' => $line_item_wrapper->ref_3->value(),
   );
 
-  if ($inquiry = token_reload_request_call(token_reload_request_data($params))) {
-    $params['ref_2'] = $inquiry[10];
-    $params['ref_3'] = $inquiry[11];
+  if ($payment = token_reload_request_call(token_reload_request_data($params, 'pay'), 'pay')) {
+    switch ($payment['status']) {
+      case '00':
+        $status = 'success';
+        break;
 
-    if ($payment = token_reload_request_call(token_reload_request_data($params, 'pay'), 'pay')) {
-      switch ($payment[12]) {
-        case '00':
-          $status = 'success';
-          break;
+      case '15':
+        $status = 'error';
+        break;
 
-        case '15':
-          $status = 'error';
-          break;
+      case '':
+        $status = 'pending';
+        break;
 
-        case '':
-          $status = 'pending';
-          break;
-
-        default:
-          $status = 'failed';
-          break;
-      }
-
-      $token_reload->status = $status;
-      $token_reload->token_pln = $payment[34];
-      $token_reload->ref = $payment[10];
-      $token_reload->time = strtotime($payment[1]);
-      $token_reload->request_id = $payment[9];
-      $token_reload->data = $payment;
-      $token_reload->revision = TRUE;
-      entity_save('token_reload', $token_reload);
+      default:
+        $status = 'failed';
+        break;
     }
+
+    $info = entity_get_property_info('token_reload');
+    foreach ($payment as $key => $value) {
+      if (isset($info['properties'][$key])) {
+        $token_reload->$key = $value;
+      }
+    }
+
+    $token_reload->status = $status;
+    $token_reload->time = strtotime($payment['time']);
+    $token_reload->data = $payment;
+    $token_reload->revision = TRUE;
+    entity_save('token_reload', $token_reload);
+  }
+}
+
+function token_reload_line_item_inquiry_data($data, $options, $name, $type, $info) {
+  if (!empty($data->data['inquiry'][$name])) {
+    return $data->data['inquiry'][$name];
   }
 }
 

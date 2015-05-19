@@ -8,17 +8,18 @@ function token_reload_rules_action_info() {
 
   $actions['token_reload_queue_request'] = array(
     'label' => t('Queue Token Reload Request'),
-    'parameter' => array(
+     'parameter' => array(
       'commerce_order' => array(
         'type' => 'commerce_order',
         'label' => t('Pending/Payment Received Order'),
-      ),
-    ),
-    'group' => t('Token Reload'),
-    'callbacks' => array(
-      'execute' => 'token_reload_queue_request',
-    ),
-  );
+       ),
+     ),
+     'group' => t('Token Reload'),
+     'callbacks' => array(
+       'execute' => 'token_reload_queue_request',
+     ),
+   );
+
 
   return $actions;
 }

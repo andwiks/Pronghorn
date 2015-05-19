@@ -121,6 +121,11 @@ function sepulsa_order_process_order($order_id) {
 
     foreach ($order_wrapper->commerce_line_items as $id => $line_item_wrapper) {
       switch ($line_item_wrapper->getBundle()) {
+        case 'electricity_prepaid':
+          $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
+          $sepulsa_order_wrapper->phone->set($line_item_wrapper->electricity_phone_number->value());
+          break;
+
         case 'mobile_prepaid':
           $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
           $sepulsa_order_wrapper->phone->set($line_item_wrapper->field_phone_number->value());

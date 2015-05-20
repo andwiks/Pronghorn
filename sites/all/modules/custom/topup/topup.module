@@ -884,7 +884,7 @@ function topup_update_topup_data($topup, $result, $output) {
 }
 
 function topup_update_topup_entity($topup, $result, $output) {
-  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $output['line_item_id']);
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
 
   if (is_string($output['topup_data'][$output['request_id']])) {
     if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {

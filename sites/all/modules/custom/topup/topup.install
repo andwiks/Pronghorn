@@ -80,10 +80,6 @@ function topup_schema() {
       'topup_status' => array('status'),
       'topup_vendor' => array('vendor'),
     ),
-    'unique keys' => array(
-      'vendor_ref' => array('vendor', 'ref'),
-      'request_id' => array('request_id'),
-    ),
     'foreign keys' => array(
       'topup_line_item' => array(
         'table' => 'commerce_line_item',
@@ -130,6 +126,17 @@ function topup_uninstall() {
     ->execute();
   // Clear all cache.
   drupal_flush_all_caches();
+}
+
+/**
+ * Drop vendor_ref and request_id key.
+ */
+function topup_update_7003(&$sandbox) {
+  foreach (array('vendor_ref', 'request_id') as $key) {
+    if (db_index_exists('topup', $key)) {
+      db_drop_unique_key('topup', $key);
+    }
+  }
 }
 
 /**

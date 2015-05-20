@@ -271,6 +271,9 @@ function kupon_views_query_alter(&$view, &$query) {
     $line_items = $wrapper->commerce_line_items;
     $total = commerce_line_items_total($line_items);
 
+    //if more then 100k, default it to 100k
+    if ($total['amount'] > 100000) $total['amount'] = 100000;
+
     //change the views SQL here
     $query->where[1]['conditions'][4]['value'] = $total['amount'];
   }

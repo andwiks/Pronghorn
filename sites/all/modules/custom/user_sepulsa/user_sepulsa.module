@@ -19,9 +19,9 @@ function user_sepulsa_menu_alter(&$items) {
  * Implements hook_page_alter()
  */
 function user_sepulsa_page_alter(&$page) {
-  if (arg(0) == 'user' && arg(1) >= 1) {
-    global $user;
-    drupal_set_title($user->mail);
+  if (arg(0) == 'user' && arg(1) >= 1 && empty(arg(3))) {
+    $u = user_load(arg(1));
+    drupal_set_title($u->mail);
   } else if (arg(0) == 'cart') {
     drupal_goto("<front>");
   }

@@ -1,0 +1,51 @@
+<?php
+
+define('FIELD_ORDER_SOURCE', 'field_order_source');
+define('ENTITY_TYPE', 'commerce_order');
+define('BUNDLE', 'commerce_order');
+
+/**
+ * Implements hook_install().
+ */
+function order_field_source_install() {
+  order_field_source_create_field(FIELD_ORDER_SOURCE, ENTITY_TYPE, BUNDLE); 
+}
+
+function order_field_source_create_field($field_name, $entity_type, $bundle) {
+  if (!field_info_field($field_name)) {
+	$field = array(
+	  'field_name' => $field_name,
+	  'type' => 'text',
+	  'entity_types' => array($entity_type),
+	  'cardinality' => 1,
+	  // Although we would prefer to not allow deleting this field, we can not
+	  // lock it, as it will not allow adding it to other bundles.
+	  'locked' => FALSE,
+	);
+	$field = field_create_field($field);
+  }
+
+  $instance = field_info_instance($entity_type, $field_name, $bundle);
+  if (empty($instance)) {
+	$instance = array(
+	  'field_name' => $field_name,
+	  'bundle' => $bundle,
+	  'entity_type' => $entity_type,
+	  'label' => t('Order Source'),
+	  'description' => t('This is to let us know where this order come from (Web or Apps)'),
+	  'required' => FALSE,
+	  'default_value' => array(array('value' => 'Web'))
+	);
+
+	field_create_instance($instance);
+  }
+}
+
+function order_field_source_uninstall() {
+  if (field_info_field(FIELD_ORDER_SOURCE)) {
+	field_delete_field(FIELD_ORDER_SOURCE);
+  }
+  if ($instance = field_info_instance(ENTITY_TYPE, FIELD_ORDER_SOURCE, BUNDLE)) {
+    field_delete_instance($instance);
+  }
+}

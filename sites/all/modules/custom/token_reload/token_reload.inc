@@ -118,7 +118,9 @@ function token_reload_request_call($data, $method = 'inq') {
   foreach (simplexml_load_string($response)->params->param->value->array->data->value as $value) {
     $params[] = (string) $value->string;
   }
-  return array_combine(token_reload_response_keys(), $params);
+  $params = array_combine(token_reload_response_keys(), $params);
+  $params['power_consuming_category'] = (int) $params['power_consuming_category'];
+  return $params;
 }
 
 function token_reload_response_dummy($data, $method = 'inq') {

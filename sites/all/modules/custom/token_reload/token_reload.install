@@ -165,11 +165,10 @@ function token_reload_schema() {
       ),
       'subscriber_segmentation' => array(
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 128,
       ),
       'power_consuming_category' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'int',
       ),
       'service_unit' => array(
         'type' => 'varchar',
@@ -179,7 +178,16 @@ function token_reload_schema() {
         'type' => 'varchar',
         'length' => 255,
       ),
+      'stamp_duty' => array(
+        'type' => 'float',
+      ),
+      'ppn' => array(
+        'type' => 'float',
+      ),
       'ppj' => array(
+        'type' => 'float',
+      ),
+      'customer_payables_installment' => array(
         'type' => 'float',
       ),
       'power_purchase' => array(
@@ -284,11 +292,10 @@ function token_reload_schema() {
       ),
       'subscriber_segmentation' => array(
         'type' => 'varchar',
-        'length' => 255,
+        'length' => 128,
       ),
       'power_consuming_category' => array(
-        'type' => 'varchar',
-        'length' => 255,
+        'type' => 'int',
       ),
       'service_unit' => array(
         'type' => 'varchar',
@@ -298,7 +305,16 @@ function token_reload_schema() {
         'type' => 'varchar',
         'length' => 255,
       ),
+      'stamp_duty' => array(
+        'type' => 'float',
+      ),
+      'ppn' => array(
+        'type' => 'float',
+      ),
       'ppj' => array(
+        'type' => 'float',
+      ),
+      'customer_payables_installment' => array(
         'type' => 'float',
       ),
       'power_purchase' => array(

@@ -43,17 +43,12 @@ function token_reload_entity_property_info_alter(&$info) {
   );
   $properties['power_consuming_category'] = array(
     'label' => t('Power Consuming Category'),
-    'type' => 'text',
+    'type' => 'integer',
     'getter callback' => 'token_reload_line_item_inquiry_data',
   );
   $properties['purchased_kwh_unit'] = array(
     'label' => t('Purchased KWh Unit'),
-    'type' => 'text',
-    'getter callback' => 'token_reload_line_item_inquiry_data',
-  );
-  $properties['minor_purchased_kwh_unit'] = array(
-    'label' => t('Minor Unit of Purchased KWh Unit'),
-    'type' => 'text',
+    'type' => 'decimal',
     'getter callback' => 'token_reload_line_item_inquiry_data',
   );
 }

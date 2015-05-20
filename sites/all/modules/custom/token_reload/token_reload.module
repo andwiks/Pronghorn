@@ -221,9 +221,10 @@ function token_reload_queue_process($line_item_id) {
     $info = entity_get_property_info('token_reload');
     foreach ($payment as $key => $value) {
       if (isset($info['properties'][$key])) {
-        $token_reload->$key = $value;
+        $token_reload->$key = isset($payment['minor_' . $key]) ? $value / pow(10, $payment['minor_' . $key]) : $value;
       }
     }
+    $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
 
     $token_reload->status = $status;
     $token_reload->time = strtotime($payment['time']);

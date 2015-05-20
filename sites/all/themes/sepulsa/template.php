@@ -307,6 +307,13 @@ function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state,
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
+        $form['submit']['#attributes']['class'][] = 'inactive';
+        $form['submit']['#states'] = array(
+          'enabled' => array(
+            ':input[name="line_item_fields[electricity_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ':input[name="line_item_fields[electricity_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+          ),
+        );
 
         break;
     }

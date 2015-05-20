@@ -136,7 +136,7 @@ function token_reload_schema() {
         'default' => 0,
       ),
       'admin_fee' => array(
-        'type' => 'int',
+        'type' => 'float',
       ),
       'status' => array(
         'type' => 'varchar',
@@ -263,7 +263,7 @@ function token_reload_schema() {
         'default' => 0,
       ),
       'admin_fee' => array(
-        'type' => 'int',
+        'type' => 'float',
       ),
       'status' => array(
         'type' => 'varchar',

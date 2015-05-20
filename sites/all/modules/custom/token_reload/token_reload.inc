@@ -101,7 +101,6 @@ function token_reload_request_call($data, $method = 'inq') {
       );
 
       $result = drupal_http_request($url, $options);
-      dpm($result);
 
       // Check the result:
       // 1. Must have 200 http code.

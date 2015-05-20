@@ -133,8 +133,8 @@ function sepulsa_phone_form($form, &$form_state) {
       'pattern' => '[0-9]*',
 	  'style'=>'margin-top: 15px;'
     ),
-	'#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
-    '#suffix' => '</div>',
+	//'#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
+    //'#suffix' => 'test</div>',
   );
 
   // Add operator options with operator data from phone prefix.
@@ -180,8 +180,8 @@ function sepulsa_phone_form($form, &$form_state) {
     '#default_value' => (isset($operator)) ? $operator : 0,
     '#options' => $operator_options,
     '#disabled' => TRUE,
-	'#prefix' => '<div id="operator-sepulsa" style="display: none;">',
-    '#suffix' => '</div>',
+//	'#prefix' => '<div id="operator-sepulsa" style="display: none;">',
+//    '#suffix' => '</div>',
   );
 
   // Check whether operator input already available.

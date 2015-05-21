@@ -4,6 +4,7 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
   $params += array(
     'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
+    'meter_number' => NULL,
     'customer_number' => NULL,
     'phone_number' => NULL,
     'nominal' => NULL,
@@ -19,9 +20,9 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   // Add value: Kode Produk.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
   // Add value: Id Pelanggan 1.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['meter_number']);
   // Add value: Id Pelanggan 2.
-  $xml_params->addChild('param')->addChild('value')->addChild('string');
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
   // Add value: Id Pelanggan 3.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['phone_number']);
 

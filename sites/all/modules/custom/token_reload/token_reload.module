@@ -168,6 +168,7 @@ function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
     $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_item']);
 
     $params = array(
+      'meter_number' => $line_item_wrapper->electricity_customer_number->value(),
       'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
       'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
     );
@@ -213,6 +214,7 @@ function token_reload_queue_process($line_item_id) {
   }
 
   $params = array(
+    'meter_number' => $line_item_wrapper->electricity_customer_number->value(),
     'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
     'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
     'nominal' => $line_item_wrapper->commerce_total->amount->value(),

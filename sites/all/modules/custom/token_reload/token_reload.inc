@@ -111,7 +111,7 @@ function token_reload_request_call($data, $method = 'inq') {
       if ($result->code == 200 && !empty($result->data)) {
         $response = $result->data;
         if (variable_get('token_reload_log_request', TRUE)) {
-          watchdog('token_reload', '<pre>!request</pre>', array('@note' => $inquiry['note'], '!request' => htmlentities($result->request)), WATCHDOG_DEBUG);
+          watchdog('token_reload', '<pre>!request</pre>', array('!request' => htmlentities($result->request)), WATCHDOG_DEBUG);
         }
       }
       else {

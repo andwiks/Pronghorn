@@ -51,6 +51,7 @@
               if ($("#edit-operator").val() != settings.sepulsa[operator].operator) {
                 $("#edit-operator").val(settings.sepulsa[operator].operator);
                 $("#operator-sepulsa").css("display", "inline");
+                $("#edit-operator").css("display", "inline");
               }
               counter = 0;
               selected = $("#edit-card-type").val();
@@ -109,6 +110,7 @@
         if ($("#edit-existing-phone").val() == "0") {
             $("#edit-phone").css("display", "inline");
             $("#phone-sepulsa").css("display", "inline");
+            $("#edit-operator").css("display", "none");
             $("#edit-phone").val('');
             sepulsa_check_number_prefix();
         } else {

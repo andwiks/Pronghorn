@@ -110,6 +110,9 @@ function token_reload_request_call($data, $method = 'inq') {
       // 2. Must have data.
       if ($result->code == 200 && !empty($result->data)) {
         $response = $result->data;
+        if (variable_get('token_reload_log_request', TRUE)) {
+          watchdog('token_reload', '<pre>!request</pre>', array('!request' => $response), WATCHDOG_DEBUG);
+        }
       }
       else {
         return FALSE;

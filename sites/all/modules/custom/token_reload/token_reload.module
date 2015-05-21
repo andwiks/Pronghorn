@@ -178,7 +178,7 @@ function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
         $form_state['line_item']->data['inquiry'] = $inquiry;
       }
       else {
-        watchdog('token_reload', '@debug', array('@debug' => var_dump($inquiry)), WATCHDOG_ERROR);
+        watchdog('token_reload', '<pre>@debug</pre>', array('@debug' => print_r($inquiry)), WATCHDOG_ERROR);
         form_set_error('inquiry', $inquiry['note']);
       }
     }

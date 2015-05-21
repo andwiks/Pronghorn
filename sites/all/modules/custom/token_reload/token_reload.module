@@ -237,14 +237,17 @@ function token_reload_queue_process($line_item_id) {
 
       case '15':
         $status = 'error';
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!payment' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
 
       case '':
         $status = 'pending';
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!inquiry' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
 
       default:
         $status = 'failed';
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!payment' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
     }
 

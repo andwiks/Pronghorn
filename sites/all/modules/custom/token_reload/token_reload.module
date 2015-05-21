@@ -222,6 +222,7 @@ function token_reload_queue_process($line_item_id) {
     switch ($payment['status']) {
       case '00':
         $status = 'success';
+        commerce_order_status_update($line_item_wrapper->order->value(), 'complete');
         break;
 
       case '15':

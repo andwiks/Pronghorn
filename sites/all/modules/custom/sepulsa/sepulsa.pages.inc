@@ -109,7 +109,7 @@ function sepulsa_phone_form($form, &$form_state) {
 	$existing_phone_options[$value] = $value;
   }
   if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
-  $existing_phone_options['0'] = t('Tambah Nomor Baru');
+  $existing_phone_options['0'] = t('Topup another number');
 	$form['existing_phone'] = array(
 	  '#type' => 'select',
 	  '#title' => '',

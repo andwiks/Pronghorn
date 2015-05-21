@@ -96,9 +96,12 @@ function token_reload_request_call($data, $method = 'inq') {
           'Content-Type' => 'application/xml',
         ),
         'method' => 'POST',
-        'timeout' => $settings['timeout'],
         'data' => $data,
       );
+
+      if ($method != 'inq') {
+        $options['timeout'] = $settings['timeout'];
+      }
 
       $result = drupal_http_request($url, $options);
 

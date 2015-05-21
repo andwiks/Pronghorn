@@ -78,19 +78,11 @@ function token_reload_entity_info() {
 }
 
 /**
- * Implements hook_entity_presave().
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
-function token_reload_entity_presave($entity, $type) {
-  if ($type == 'commerce_line_item' && $entity->type == 'electricity_prepaid' && $entity->is_new) {
-    module_load_include('inc', 'token_reload');
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $entity);
-
-    $params = array(
-      'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
-      'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
-    );
-
-    $entity->data['inquiry'] = token_reload_request_call(token_reload_request_data($params));
+function token_reload_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_state['line_item']->type == 'electricity_prepaid') {
+    $form['#validate'][] = 'token_reload_add_to_cart_form_validate';
   }
 }
 
@@ -165,6 +157,33 @@ function token_reload_views_api() {
 /**
  * Callback Functions.
  */
+
+function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
+  foreach (array_keys($form['submit']['#attributes']['class'], 'inactive') as $key) {
+    unset($form['submit']['#attributes']['class'][$key]);
+  }
+
+  module_load_include('inc', 'token_reload');
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_item']);
+
+  $params = array(
+    'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+    'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+  );
+
+  $inquiry = token_reload_request_call(token_reload_request_data($params));
+  if ($inquiry) {
+    if ($inquiry['status'] == '00') {
+      $form_state['line_item']->data['inquiry'] = $inquiry;
+    }
+    else {
+      form_set_error('inquiry', $inquiry['note']);
+    }
+  }
+  else {
+    form_set_error('inquiry', 'Please retry');
+  }
+}
 
 /**
  * Function token_reload_queue_process().

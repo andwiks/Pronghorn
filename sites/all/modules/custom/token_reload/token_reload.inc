@@ -55,7 +55,7 @@ function token_reload_request_query_data($params = array()) {
     'end' => NULL,
     'ref_2' => NULL,
     'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
-    'customer_number' => NULL,
+    'meter_number' => NULL,
   );
 
   // Set XML.
@@ -63,7 +63,7 @@ function token_reload_request_query_data($params = array()) {
   $xml->addChild('methodName', 'fastpay.datatransaksi');
   $xml_params = $xml->addChild('params');
   // Add value: Tanggal 1.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['start']);
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['start'];
   // Add value: Tanggal 2.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['end']);
   // Add value: REF2.
@@ -71,7 +71,7 @@ function token_reload_request_query_data($params = array()) {
   // Add value: Kode produk.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
   // Add value: Id pelanggan.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['meter_number']);
   // Add value: Limit.
   $xml_params->addChild('param')->addChild('value')->addChild('string');
   // Add value: UID.
@@ -90,6 +90,7 @@ function token_reload_request_call($data, $method = 'inq') {
   switch ($settings['environment']) {
     case 'dev':
       $response = token_reload_response_dummy($data, $method);
+      return FALSE;
       break;
 
     case 'prod':
@@ -129,8 +130,11 @@ function token_reload_request_call($data, $method = 'inq') {
   foreach (simplexml_load_string($response)->params->param->value->array->data->value as $value) {
     $params[] = (string) $value->string;
   }
-  $params = array_combine(token_reload_response_keys(), $params);
-  $params['power_consuming_category'] = (int) $params['power_consuming_category'];
+
+  if ($method != 'datatransaksi') {
+    $params = array_combine(token_reload_response_keys(), $params);
+    $params['power_consuming_category'] = (int) $params['power_consuming_category'];
+  }
   return $params;
 }
 

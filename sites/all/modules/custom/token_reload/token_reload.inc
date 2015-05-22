@@ -63,7 +63,7 @@ function token_reload_request_query_data($params = array()) {
   $xml->addChild('methodName', 'fastpay.datatransaksi');
   $xml_params = $xml->addChild('params');
   // Add value: Tanggal 1.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['start'];
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['start']);
   // Add value: Tanggal 2.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['end']);
   // Add value: REF2.

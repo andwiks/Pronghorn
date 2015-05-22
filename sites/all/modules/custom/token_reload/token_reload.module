@@ -185,8 +185,24 @@ function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
         $form_state['line_item']->data['inquiry'] = $inquiry;
       }
       else {
+        switch ($inquiry['status']) {
+          // NOMOR METER/IDPEL YANG ANDA MASUKKAN SALAH, MOHON TELITI KEMBALI
+          // case '15':
+          //   break;
+
+          // PRODUK TIDAK TERDAFTAR
+          // case '33':
+          //   break;
+
+          // sudah pernah terjadi status sukses
+          // case 'XX':
+          //   break;
+
+          default:
+            form_set_error('inquiry', $inquiry['note']);
+            break;
+        }
         watchdog('token_reload', '@note: <pre>!inquiry</pre>', array('@note' => $inquiry['note'], '!inquiry' => print_r($inquiry, TRUE)), WATCHDOG_ERROR);
-        form_set_error('inquiry', $inquiry['note']);
       }
     }
     else {
@@ -241,6 +257,11 @@ function token_reload_queue_process($line_item_id) {
         break;
 
       case '':
+        $status = 'pending';
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!inquiry' => print_r($payment, TRUE)), WATCHDOG_ERROR);
+        break;
+
+      case '33':
         $status = 'pending';
         watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!inquiry' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;

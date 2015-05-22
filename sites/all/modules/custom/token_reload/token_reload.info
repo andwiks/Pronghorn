@@ -11,6 +11,6 @@ dependencies[] = commerce_order
 dependencies[] = commerce_order_ui
 
 ; Views handlers
-files[] = includes/views/handlers/token_reload_views_handler_inquiry.inc
+files[] = includes/views/handlers/token_reload_views_handler_token_reload_operation.inc
 
 files[] = includes/token_reload.controller.inc

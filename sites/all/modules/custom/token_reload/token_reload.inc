@@ -83,6 +83,8 @@ function token_reload_request_query_data($params = array()) {
 }
 
 function token_reload_request_call($data, $method = 'inq') {
+  drupal_static_reset(__FUNCTION__);
+  $params = &drupal_static(__FUNCTION__);
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
 
   switch ($settings['environment']) {

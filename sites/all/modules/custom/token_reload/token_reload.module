@@ -41,7 +41,7 @@ function token_reload_commerce_product_type_info() {
  * Implements hook_cron_queue_info().
  */
 function token_reload_cron_queue_info() {
-  $queue = array();
+  $queues = array();
   // Token reload queue process: first part.
   $queues['token_reload_process'] = array(
     'worker callback' => 'token_reload_queue_process',
@@ -49,9 +49,26 @@ function token_reload_cron_queue_info() {
   );
   // Token reload queue query: first part.
   $queues['token_reload_query'] = array(
-    'worker callback' => 'token_reload_queue_process',
+    'worker callback' => 'token_reload_queue_query',
     'time' => 120,
   );
+
+  $try = variable_get('token_reload', 2);
+  $try = intval($try);
+  if ($try > 1) {
+    for ($i = 2; $i <= $try; $i++) {
+      // Token reload queue process: for multiple try.
+      $queues['token_reload_process_' . $i] = array(
+        'worker callback' => 'token_reload_queue_process',
+        'time' => 120,
+      );
+      // Token reload queue query: for multiple try.
+      $queues['token_reload_query_' . $i] = array(
+        'worker callback' => 'token_reload_queue_query',
+        'time' => 120,
+      );
+    }
+  }
 
   // Return queue array.
   return $queues;
@@ -75,6 +92,22 @@ function token_reload_entity_info() {
       'module' => 'token_reload',
     ),
   );
+}
+
+/**
+ * Implements hook_forms().
+ */
+function token_reload_forms($form_id, $args) {
+  $forms = array();
+
+  // Construct a valid cart form ID from the arguments.
+  if (strpos($form_id, 'token_reload_operation_form_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'token_reload_operation_form',
+    );
+  }
+
+  return $forms;
 }
 
 /**
@@ -217,7 +250,12 @@ function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
  * @param array $token
  *   Token data array.
  */
-function token_reload_queue_process($line_item_id) {
+function token_reload_queue_process($data) {
+  extract($data);
+  if (empty($try)) {
+    $try = 1;
+  }
+
   module_load_include('inc', 'token_reload');
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
 
@@ -286,8 +324,9 @@ function token_reload_queue_process($line_item_id) {
     $token_reload->revision = TRUE;
     entity_save('token_reload', $token_reload);
   }
-  else {
-    throw new Exception("Error Processing Request", 1);
+  elseif ($try <= variable_get('token_reload', 2)) {
+    $queue = DrupalQueue::get('token_reload_process_' . $try++);
+    $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
   }
 }
 

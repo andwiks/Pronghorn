@@ -54,10 +54,16 @@ function token_reload_entity_property_info_alter(&$info) {
 
   $token_reload = &$info['token_reload']['properties'];
 
-  $token_reload['line_item'] = array(
-    'label' => t('Line item'),
+  $token_reload['line_item_id'] = array(
+    'label' => t('Line item ID'),
     'type' => 'commerce_line_item',
     'description' => t('The line item this token reload belongs to.'),
     'schema field' => 'line_item_id',
   );
+
+  $token_reload['meter_number']['label'] = t('Meter number');
+  $token_reload['customer_number']['label'] = t('Customer number');
+  $token_reload['customer_name']['label'] = t('Customer name');
+
+  $token_reload['time']['type'] = 'date';
 }

@@ -53,7 +53,7 @@ function token_reload_cron_queue_info() {
     'time' => 120,
   );
 
-  $try = variable_get('token_reload', 2);
+  $try = variable_get('token_reload_try', 2);
   $try = intval($try);
   if ($try > 1) {
     for ($i = 2; $i <= $try; $i++) {
@@ -324,7 +324,7 @@ function token_reload_queue_process($data) {
     $token_reload->revision = TRUE;
     entity_save('token_reload', $token_reload);
   }
-  elseif ($try <= variable_get('token_reload', 2)) {
+  elseif ($try <= variable_get('token_reload_try', 2)) {
     $queue = DrupalQueue::get('token_reload_process_' . $try++);
     $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
   }

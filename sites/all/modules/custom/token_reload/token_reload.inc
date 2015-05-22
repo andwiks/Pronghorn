@@ -131,7 +131,10 @@ function token_reload_request_call($data, $method = 'inq') {
     $params[] = (string) $value->string;
   }
 
-  if ($method != 'datatransaksi') {
+  if ($method == 'datatransaksi') {
+    $params = explode('#', $params[9]);
+  }
+  else {
     $params = array_combine(token_reload_response_keys(), $params);
     $params['power_consuming_category'] = (int) $params['power_consuming_category'];
   }

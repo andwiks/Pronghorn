@@ -353,7 +353,7 @@ function token_reload_queue_query($data) {
     $params = array(
       'start' => format_date($token_reload->time - 1, 'custom', 'YmdHis'),
       'end' => format_date($token_reload->time + 1, 'custom', 'YmdHis'),
-      'ref_2' => $token_reload->data['ref2'],
+      'ref_2' => $token_reload->data['ref_2'],
       'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
       'meter_number' => $token_reload->meter_number,
     );

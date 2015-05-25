@@ -1,6 +1,25 @@
 <?php
 
 /**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_order_commerce_order_presave($order) {
+  if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    if (!empty($headers['X-Imei'])) {
+      $imei = $headers['X-Imei'];
+    }
+  }
+  elseif (!empty($_SERVER['HTTP_X_IMEI'])) {
+    $imei = $_SERVER['HTTP_X_IMEI'];
+  }
+
+  if (!empty($imei) && $display_language = field_language('commerce_order', $order, 'field_imei')) {
+    $order->field_imei[$display_language][0]['value'] = $imei;
+  }
+}
+
+/**
  * Implements hook_cronapi().
  */
 function sepulsa_order_cronapi() {

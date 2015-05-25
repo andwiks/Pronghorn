@@ -1,49 +1,54 @@
+<?php global $base_url; ?>
 <?php
-
-/**
- * @file
- * Template to display a view as a table.
- *
- * - $title : The title of this group of rows.  May be empty.
- * - $header: An array of header labels keyed by field id.
- * - $caption: The caption for this table. May be empty.
- * - $header_classes: An array of header classes keyed by field id.
- * - $fields: An array of CSS IDs to use for each field id.
- * - $classes: A class or classes to apply to the table, based on settings.
- * - $row_classes: An array of classes to apply to each row, indexed by row
- *   number. This matches the index in $rows.
- * - $rows: An array of row items. Each row is an array of content.
- *   $rows are keyed by row number, fields within rows are keyed by field ID.
- * - $field_classes: An array of classes to apply to each field, indexed by
- *   field id, then row number. This matches the index in $rows.
- * @ingroup views_templates
- */
+  drupal_add_css(
+    '.post-image { margin-bottom: 0; } @media(min-width:768px){ .blog-posts .post-grid .post-content { height: 150px; } } .popup-box { max-width: 44em; } .popupbox-close { position: absolute; top: 0; right: 0; } .popup-close { width: 40px; background-color: #f5f5f5; border-radius: 50%; } .popup-box h2 { margin-bottom: 5px } .popup-image img { width: 100% }',
+    array(
+      'group' => CSS_THEME,
+      'type' => 'inline',
+      'media' => 'screen'
+    )
+  );
 ?>
-<table class="table style1" <?php print $attributes; ?>>
-   <?php if (!empty($title) || !empty($caption)) : ?>
-     <caption><?php print $caption . $title; ?></caption>
-  <?php endif; ?>
-  <?php if (!empty($header)) : ?>
-    <thead>
-      <tr>
-        <?php foreach ($header as $field => $label): ?>
-          <th <?php if ($header_classes[$field]) { print 'class="'. $header_classes[$field] . '" '; } ?> <?php if ($label == "Kupon") print "style='width:230px;'"; ?>>
-            <?php print $label; ?>
-          </th>
-        <?php endforeach; ?>
-      </tr>
-    </thead>
-  <?php endif; ?>
-  <tbody>
-    <?php foreach ($rows as $row_count => $row): ?>
-      <tr <?php if ($row_classes[$row_count]) { print 'class="' . implode(' ', $row_classes[$row_count]) .'"';  } ?>>
-        <?php foreach ($row as $field => $content): ?>
-          <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
-            <div style="text-align:left;vertical-align:text-top;width:100%;"><?php print $content; ?></div>
-          </td>
-        <?php endforeach; ?>
-      </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
 
+<div class="view-coupon-box">
+  <div class="blog-posts row">
+    <?php foreach ($rows as $row_count => $row): ?>
+      <?php $web_name = $row['field_website']; ?>
+      <?php $web_link = $row['field_website_link']; ?> 
+      <?php if (!isset($web_link)): ?>
+      <?php $web_link = 'http://'.$row['field_website']; ?>
+      <?php endif;
+      ?>
+      <div class="col-sm-3 col-xs-12">
+        <article class="post post-grid">
+          <div class="post-image">
+            <div class="image-container">
+              <a href="#pop<?php print $row['nid']; ?>" class="image pop<?php print $row['nid']; ?>_open"><?php print $row['field_coupon_product_image']; ?></a>
+            </div>
+          </div>
+          <div class="post-content">
+            <div class="post-date"><span><?php print $row['title']; ?></span></div>
+            <?php print ($row['field_description']); ?>
+            <div class="post-link">Syarat penggunaan <a href="#pop<?php print $row['nid']; ?>" class="image pop<?php print $row['nid']; ?>_open" style="color:#dc2c27">klik disini</a></div>
+          </div>
+          <div id="pop<?php print $row['nid']; ?>" class="well popup-box">
+            <a href="#" class="popupbox-close pop<?php print $row['nid']; ?>_close"><img src="<?php print $base_url . '/' . path_to_theme(); ?>/images/ico-close.png" class="popup-close"></a>
+            <p class="popup-image"><?php print ($row['field_coupon_product_image']); ?></p>
+            <h2><strong><?php print $row['title']; ?></strong></h2>
+            <a href="<?php print $web_link; ?>" target="_blank"><?php print $web_name; ?></a>
+            <p><?php print ($row['field_description']); ?>.</p>
+            <hr class="color-text">
+            <p><strong><?php print t('Terms & Conditions'); ?></strong></p>  
+            <?php if (isset($row['field_coupon_tnc'])) print ($row['field_coupon_tnc']); else print "-"; ?>
+          </div>
+        </article>
+          
+      </div>
+      <?php
+      drupal_add_js('jQuery(document).ready(function () { jQuery("#pop'.$row['nid'].'").popup(); });',
+        array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
+      );
+      ?>
+    <?php endforeach; ?>
+  </div>
+</div>

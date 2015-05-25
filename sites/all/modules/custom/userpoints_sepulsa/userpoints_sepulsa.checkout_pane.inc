@@ -11,7 +11,7 @@
  */
 function userpoints_sepulsa_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
     $line_item_id = commerce_userpoints_discount_order_has_userpoint_line_item($order->order_id);
-    $point_amount = userpoints_get_current_points($order->uid);
+    $point_amount = userpoints_get_current_points($order->uid, 'all');
     // If there is no existing userpoints line item, we create a new one.
     if ($line_item_id == NULL && $point_amount > 0) {
         $order_total = $order->commerce_order_total[LANGUAGE_NONE][0]['amount'];

@@ -81,7 +81,7 @@ function userpoints_list_transaction(){
         global $user;
         $user_uid = arg(1);
         if (!isset($user_uid)) $user_uid = $user->uid;
-        $totalamount = userpoints_get_current_points($user_uid);
+        $totalamount = userpoints_get_current_points($user_uid, 'all');
         $totalamount = number_format($totalamount,0,",",".");
 
         $settings = array(

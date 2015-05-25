@@ -42,6 +42,32 @@ function sepulsa_services_services_resources() {
 }
 
 /**
+ * Implements hook_services_request_postprocess_alter().
+ */
+function sepulsa_services_services_request_postprocess_alter($controller, $args, &$result) {
+  $messages = drupal_get_messages();
+
+  if (!empty($messages)) {
+    switch (gettype($result)) {
+      case 'array':
+        $result['sepulsa_messages'] = $messages;
+        break;
+
+      case 'object':
+        $result->sepulsa_messages = $messages;
+        break;
+
+      default:
+        $result = array(
+          $result,
+          'sepulsa_messages' => $messages,
+        );
+        break;
+    }
+  }
+}
+
+/**
  * Callback Functions.
  */
 
@@ -71,9 +97,9 @@ function _sepulsa_services_resource_index() {
 
 function _sepulsa_services_existing_number(){
   $existing_number = sepulsa_get_existing_number();
-  
+
   return $existing_number;
-  
+
 }
 /**
  * Function _sepulsa_services_index_doc().
@@ -181,7 +207,7 @@ function _sepulsa_services_index_doc() {
 function _sepulsa_services_existing_number_doc() {
   global $base_url;
   $response = '
-  [                              
+  [
 	"081314142323",
 	"081523444343"
   ]

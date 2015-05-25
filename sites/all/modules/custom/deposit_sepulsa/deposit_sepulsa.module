@@ -15,7 +15,7 @@ function deposit_sepulsa_commerce_line_item_type_info() {
     'name' => t('Deposit Sepulsa'),
     'description' => t('Deposit Sepulsa.'),
     'product' => TRUE,
-    'add_form_submit_value' => t('Add product'),
+    //'add_form_submit_value' => t('Add product'),
     'base' => 'commerce_product_line_item',
   );
 

@@ -132,7 +132,13 @@ function token_reload_request_call($data, $method = 'inq') {
   }
 
   if ($method == 'datatransaksi') {
-    $params = explode('#', $params[9]);
+    if (count($params) >= 9) {
+      $params = explode('#', $params[9]);
+      $params = array_combine(token_reload_response_query_keys(), $params)
+    }
+    else {
+      return FALSE;
+    }
   }
   else {
     $params = array_combine(token_reload_response_keys(), $params);
@@ -273,6 +279,22 @@ function token_reload_response_keys() {
     'minor_purchased_kwh_unit',
     'purchased_kwh_unit',
     'info',
+  );
+
+  return $keys;
+}
+
+function token_reload_response_query_keys() {
+  $keys = array(
+    'ref_2',
+    'time',
+    'product_code',
+    'product_name',
+    'meter_number',
+    'status',
+    'note',
+    'nominal',
+    'no_ref_2',
   );
 
   return $keys;

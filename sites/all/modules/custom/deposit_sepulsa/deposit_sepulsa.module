@@ -141,7 +141,7 @@ function deposit_sepulsa_form_submit($form, &$form_state) {
   
   // line item
   $product = commerce_product_load($product_id);
-  $line_item = commerce_product_line_item_new($product, 1, $order->order_id, array());
+  $line_item = commerce_product_line_item_new($product, 1, $order->order_id, array(), 'deposit_sepulsa');
   commerce_line_item_save($line_item);
   
   // wrap the order

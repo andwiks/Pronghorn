@@ -16,10 +16,6 @@ function campaign_tracker_boot() {
   
   if (isset($_GET['utm_source'])) {
     setcookie(UTM_SOURCE_COOKIE, check_plain($_GET['utm_source']), time() + $cookie_lifetime, '/');
-  } else {
-    if (!isset($_COOKIE[UTM_SOURCE_COOKIE])) {
-      setcookie(UTM_SOURCE_COOKIE, 'direct', time() + $cookie_lifetime, '/');
-    }
   }
 
   if (isset($_GET['utm_medium'])) {
@@ -39,6 +35,8 @@ function campaign_tracker_user_presave(&$edit, $account, $category) {
     $edit['field_reg_utm_source'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie
     setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
+  } else {
+    $edit['field_reg_utm_source'][LANGUAGE_NONE][0]['value'] = 'direct';
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
     $edit['field_reg_utm_medium'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];
@@ -60,6 +58,8 @@ function campaign_tracker_commerce_order_presave($order) {
     $order->field_utm_source[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie
     setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
+  } else {
+    $edit['field_utm_source'][LANGUAGE_NONE][0]['value'] = 'direct';
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
     $order->field_utm_medium[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];

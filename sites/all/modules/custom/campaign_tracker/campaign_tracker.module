@@ -53,7 +53,7 @@ function campaign_tracker_user_presave(&$edit, $account, $category) {
 /* implement hook_commerce_order_presave() */
 function hook_commerce_order_presave($order) {
   $cookie_lifetime = variable_get('cookie_lifetime', 3600);
-  dpm($order, 'order');
+
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
     $order['field_utm_source'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie

@@ -10,17 +10,18 @@
 function deposit_sepulsa_commerce_line_item_type_info() {
   $line_item_types = array();
 
-  $line_item_types ['deposit_sepulsa'] = array(
+  $line_item_types['deposit_sepulsa'] = array(
     'type' => 'deposit_sepulsa',
     'name' => t('Deposit Sepulsa'),
     'description' => t('Deposit Sepulsa.'),
     'product' => TRUE,
-    //'add_form_submit_value' => t('Add product'),
+    'add_form_submit_value' => t('Add product'),
     'base' => 'commerce_product_line_item',
   );
 
   return $line_item_types;
 }
+
 
 /**
  * Implements hook_commerce_product_type_info().
@@ -28,7 +29,7 @@ function deposit_sepulsa_commerce_line_item_type_info() {
 function deposit_sepulsa_commerce_product_type_info() {
   $product_types = array();
 
-  $product_types ['deposit'] = array(
+  $product_types['deposit'] = array(
     'type' => 'deposit',
     'name' => t('Deposit'),
     'description' => t('Deposit.'),
@@ -36,8 +37,6 @@ function deposit_sepulsa_commerce_product_type_info() {
 
   return $product_types;
 }
-
-
 
 /**
  * Implements hook_node_info().
@@ -53,10 +52,11 @@ function deposit_sepulsa_node_info() {
   );
 }
 
+
 /**
  * Implements hook_preprocess_page().
  */
-function deposit_sepulsa_preprocess_page(&$variables) {
+/*function deposit_sepulsa_preprocess_page(&$variables) {
   if (drupal_is_front_page()) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'commerce_product');
@@ -80,7 +80,7 @@ function deposit_sepulsa_preprocess_page(&$variables) {
       $variables['deposit_sepulsa_form'] = drupal_get_form('commerce_cart_add_to_cart_form', $line_item);
     }
   }
-}
+}*/
 
 
 /**
@@ -138,6 +138,7 @@ function deposit_sepulsa_form_submit($form, &$form_state) {
   $product_id = $form_state["values"]["deposit"];
   // Create the new order in checkout status.
   $order = commerce_order_new($user->uid, 'cart');
+  commerce_order_save($order);
   
   // line item
   $product = commerce_product_load($product_id);

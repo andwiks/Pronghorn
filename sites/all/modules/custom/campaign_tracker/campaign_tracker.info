@@ -1,0 +1,3 @@
+name = Campaign Tracker
+description = module to track campaign using utm
+core = 7.x

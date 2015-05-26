@@ -1,0 +1,75 @@
+<?php
+/**
+ * @file
+ * deposit_sepulsa.install
+ */
+
+/**
+ * Implements hook_install().
+ */
+function deposit_sepulsa_install() {
+  $t = get_t();
+
+  $fields = array(
+    'deposit_amount' => array(
+      'field_name' => 'deposit_amount',
+      'type' => 'text',
+    ),
+  );
+  foreach ($fields as $field) {
+    field_create_field($field);
+  }
+
+  $instances = array(
+    'deposit_amount' => array(
+      'field_name' => 'deposit_amount',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'deposit_sepulsa',
+      'label' => $t('Deposit Amount'),
+      'required' => TRUE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+      'commerce_cart_settings' => array(
+        'field_access' => TRUE,
+      ),
+    ),
+    'field_product' => array(
+      'field_name' => 'field_product',
+      'entity_type' => 'node',
+      'bundle' => 'deposit',
+      'label' => $t('Product variations'),
+      'required' => TRUE,
+      'settings' => array(
+        'field_injection' => TRUE,
+        'referenceable_types' => array('deposit' => 'deposit'),
+      ),
+      'widget' => array(
+        'type' => 'inline_entity_form',
+        'settings' => array(
+          'type_settings' => array(
+            'delete_references' => TRUE,
+          ),
+        ),
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_cart_add_to_cart_form',
+          'settings' => array(
+            'combine' => FALSE,
+            'line_item_type' => 'deposit_sepulsa',
+          ),
+        ),
+      ),
+    ),
+  );
+
+  foreach ($instances as $instance) {
+    field_create_instance($instance);
+  }
+}
+

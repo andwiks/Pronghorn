@@ -409,14 +409,24 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
       // Get line item wrapper.
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
       // Check whether field is available.
-      if (isset($line_item_wrapper->field_phone_number)) {
-        // Check field phone number if not empty.
-        $number = $line_item_wrapper->field_phone_number->value();
-        // @todo: make this settingable.
-        // @todo: field or addressfield phone.
-        if (!empty($number)) {
-          $phone[$number] = $number;
-        }
+
+      switch ($line_item_wrapper->getBundle()) {
+        case 'electricity_prepaid':
+          $phone_number_field = 'electricity_phone_number';
+          break;
+
+        default:
+          $phone_number_field = 'field_phone_number';
+          break;
+      }
+    }
+    if (isset($line_item_wrapper->$phone_number_field)) {
+      // Check field phone number if not empty.
+      $number = $line_item_wrapper->$phone_number_field->value();
+      // @todo: make this settingable.
+      // @todo: field or addressfield phone.
+      if (!empty($number)) {
+        $phone[$number] = $number;
       }
     }
 

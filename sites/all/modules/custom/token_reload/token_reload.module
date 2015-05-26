@@ -1,0 +1,254 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function token_reload_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types ['electricity_prepaid'] = array(
+    'type' => 'electricity_prepaid',
+    'name' => t('Electricity Prepaid'),
+    'description' => t('References an electricity prepaid product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
+ * Implements hook_commerce_product_type_info().
+ */
+function token_reload_commerce_product_type_info() {
+  $product_types = array();
+
+  $product_types ['electricity'] = array(
+    'type' => 'electricity',
+    'name' => t('Electricity'),
+    'description' => t('An electicity prepaid product.'),
+  );
+
+  return $product_types;
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function token_reload_cron_queue_info() {
+  $queue = array();
+  // Token reload queue process: first part.
+  $queues['token_reload_process'] = array(
+    'worker callback' => 'token_reload_queue_process',
+    'time' => 120,
+  );
+  // Token reload queue query: first part.
+  $queues['token_reload_query'] = array(
+    'worker callback' => 'token_reload_queue_process',
+    'time' => 120,
+  );
+
+  // Return queue array.
+  return $queues;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function token_reload_entity_info() {
+  return array(
+    'token_reload' => array(
+      'label' => t('Token Reload'),
+      'entity class' => 'Entity',
+      'controller class' => 'TokenReloadEntityController',
+      'base table' => 'token_reload',
+      'revision table' => 'token_reload_revision',
+      'entity keys' => array(
+        'id' => 'trid',
+        'revision' => 'vid',
+      ),
+      'module' => 'token_reload',
+    ),
+  );
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function token_reload_entity_presave($entity, $type) {
+  if ($type == 'commerce_line_item' && $entity->type == 'electricity_prepaid' && $entity->is_new) {
+    module_load_include('inc', 'token_reload');
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $entity);
+
+    $params = array(
+      'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+      'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+    );
+
+    $entity->data['inquiry'] = token_reload_request_call(token_reload_request_data($params));
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function token_reload_menu() {
+  $items = array();
+  $items['admin/commerce/config/token-reload'] = array(
+    'title' => 'Token reload settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('token_reload_settings_form'),
+    'access arguments' => array('configure store'),
+    'file' => 'token_reload.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function token_reload_node_info() {
+  return array(
+    'electricity' => array(
+      'name' => t('Electricity prepaid'),
+      'base' => 'node_content',
+      'description' => t('Electricity prepaid product display'),
+      'locked' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function token_reload_preprocess_page(&$variables) {
+  if (drupal_is_front_page()) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_product');
+    $query->entityCondition('bundle', 'electricity');
+
+    $result = $query->execute();
+
+    if (!empty($result['commerce_product'])) {
+      $product_ids = array_keys($result['commerce_product']);
+
+      $values = array(
+        'type' => 'electricity_prepaid',
+        'data' => array(
+          'context' => array(
+            'product_ids' => $product_ids,
+          ),
+        ),
+      );
+      $line_item = entity_create('commerce_line_item', $values);
+
+      $variables['token_reload_form'] = drupal_get_form('commerce_cart_add_to_cart_form', $line_item);
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function token_reload_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'token_reload') . '/includes/views',
+  );
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function token_reload_queue_process().
+ *
+ * @param array $token
+ *   Token data array.
+ */
+function token_reload_queue_process($line_item_id) {
+  module_load_include('inc', 'token_reload');
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
+
+  $token_reloads = entity_load('token_reload', FALSE, array('line_item_id' => $line_item_id));
+  if (empty($token_reloads)) {
+    $token_reload = entity_create('token_reload', array('line_item_id' => $line_item_id));
+    $total = 0;
+  }
+  else {
+    $token_reload = reset($token_reloads);
+    $total = db_select('token_reload_revision')
+      ->condition('trid', $token_reload->trid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+  }
+
+  $params = array(
+    'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+    'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+    'nominal' => $line_item_wrapper->commerce_total->amount->value(),
+    'ref_1' => str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($total++, 4, '0', STR_PAD_LEFT),
+    'ref_2' => $line_item_wrapper->ref_2->value(),
+    'ref_3' => $line_item_wrapper->ref_3->value(),
+  );
+
+  if ($payment = token_reload_request_call(token_reload_request_data($params, 'pay'), 'pay')) {
+    switch ($payment['status']) {
+      case '00':
+        $status = 'success';
+        break;
+
+      case '15':
+        $status = 'error';
+        break;
+
+      case '':
+        $status = 'pending';
+        break;
+
+      default:
+        $status = 'failed';
+        break;
+    }
+
+    $info = entity_get_property_info('token_reload');
+    foreach ($payment as $key => $value) {
+      if (isset($info['properties'][$key])) {
+        $token_reload->$key = $value;
+      }
+    }
+
+    $token_reload->status = $status;
+    $token_reload->time = strtotime($payment['time']);
+    $token_reload->data = $payment;
+    $token_reload->revision = TRUE;
+    entity_save('token_reload', $token_reload);
+  }
+}
+
+function token_reload_line_item_inquiry_data($data, $options, $name, $type, $info) {
+  if (!empty($data->data['inquiry'][$name])) {
+    return $data->data['inquiry'][$name];
+  }
+}
+
+/**
+ * Public Functions.
+ */
+
+function token_reload_default_settings() {
+  return array(
+    'environment' => 'dev',
+    'endpoint' => '',
+    'timeout' => 30,
+    'uid' => '',
+    'pin' => '',
+  );
+}

@@ -1,0 +1,16 @@
+name = "Token Reload"
+description = "Provide general functionality for reload token integrations."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/commerce/config/token_reload
+
+dependencies[] = commerce_line_item
+dependencies[] = commerce_line_item_ui
+dependencies[] = commerce_order
+dependencies[] = commerce_order_ui
+
+; Views handlers
+files[] = includes/views/handlers/token_reload_views_handler_inquiry.inc
+
+files[] = includes/token_reload.controller.inc

@@ -17,7 +17,9 @@ function campaign_tracker_boot() {
   if (isset($_GET['utm_source'])) {
     setcookie(UTM_SOURCE_COOKIE, check_plain($_GET['utm_source']), time() + $cookie_lifetime, '/');
   } else {
-    setcookie(UTM_SOURCE_COOKIE, 'direct', time() + $cookie_lifetime, '/');
+    if (!isset($_COOKIE[UTM_SOURCE_COOKIE])) {
+      setcookie(UTM_SOURCE_COOKIE, 'direct', time() + $cookie_lifetime, '/');
+    }
   }
 
   if (isset($_GET['utm_medium'])) {
@@ -51,21 +53,21 @@ function campaign_tracker_user_presave(&$edit, $account, $category) {
 }
 
 /* implement hook_commerce_order_presave() */
-function hook_commerce_order_presave($order) {
+function campaign_tracker_commerce_order_presave($order) {
   $cookie_lifetime = variable_get('cookie_lifetime', 3600);
 
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
-    $order['field_utm_source'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
+    $order->field_utm_source[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie
     setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
-    $order['field_utm_medium'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];
+    $order->field_utm_medium[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];
     // remove cookie
     setcookie(UTM_MEDIUM_COOKIE, '', time() + $cookie_lifetime, '/');
   }
   if (isset($_COOKIE[UTM_CAMPAIGN_COOKIE])) {
-    $order['field_utm_campaign'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_CAMPAIGN_COOKIE];
+    $order->field_utm_campaign[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_CAMPAIGN_COOKIE];
     // remove cookie
     setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
   }  

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * campaign_tracker.module
+ */
 
 define('UTM_SOURCE_COOKIE', 'utm_source_cookie');
 define('UTM_MEDIUM_COOKIE', 'utm_medium_cookie');

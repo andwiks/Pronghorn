@@ -59,6 +59,8 @@ function sepulsa_front_page() {
  *   Form array.
  */
 function sepulsa_phone_form($form, &$form_state) {
+  global $user;
+  $existing_phone_options = array();
   // Get sepulsa operator data.
   $operator_data = sepulsa_get_all_operator_data();
 
@@ -90,6 +92,36 @@ function sepulsa_phone_form($form, &$form_state) {
   // Autocorrect phone prefix.
   $phone = sepulsa_autocorrect_mobile_prefix($phone);
 
+  $query = "SELECT distinct(field_phone_number_value) 
+			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c	
+			WHERE
+			a.order_id = b.order_id 
+			AND b.line_item_id = c.entity_id
+			AND (a.status = 'completed' OR a.status = 'invoiced')
+			AND a.uid = :uid
+			ORDER BY a.created DESC";
+  $result = db_query($query, array(':uid' => $user->uid));
+  foreach ($result as $row) {
+	$existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
+  }
+  $existing_phone = sepulsa_get_existing_number();
+  foreach ($existing_phone as $value) {
+	$existing_phone_options[$value] = $value;
+  }
+  if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
+  $existing_phone_options['0'] = t('Topup another number');
+	$form['existing_phone'] = array(
+	  '#type' => 'select',
+	  '#title' => '',
+	  '#options' => $existing_phone_options,
+	  //'#suffix' => '<div>&nbsp;</div>',
+	  '#validated' => TRUE,
+	  '#attributes' => array(
+		'class' => array('full-width'),
+	  ),
+	);
+  }
+  
   // Show input phone number.
   $form['phone'] = array(
     '#type' => 'textfield',
@@ -99,7 +131,10 @@ function sepulsa_phone_form($form, &$form_state) {
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
     '#attributes' => array(
       'pattern' => '[0-9]*',
+	  'style'=>'margin-top: 15px;'
     ),
+	//'#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
+    //'#suffix' => 'test</div>',
   );
 
   // Add operator options with operator data from phone prefix.
@@ -145,6 +180,8 @@ function sepulsa_phone_form($form, &$form_state) {
     '#default_value' => (isset($operator)) ? $operator : 0,
     '#options' => $operator_options,
     '#disabled' => TRUE,
+//	'#prefix' => '<div id="operator-sepulsa" style="display: none;">',
+//    '#suffix' => '</div>',
   );
 
   // Check whether operator input already available.
@@ -425,3 +462,5 @@ function sepulsa_autocomplete_phone_number($string = '') {
 
   drupal_json_output($matches);
 }
+
+

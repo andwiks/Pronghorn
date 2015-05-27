@@ -25,6 +25,15 @@ function sepulsa_services_services_resources() {
           'args' => array(),
           'access arguments' => array('access content'),
         ),
+      ),
+	  'actions' => array(
+        'get_number' => array(
+          'help' => 'List all user existing number',
+          'callback' => '_sepulsa_services_existing_number',
+          'documentation callback' => '_sepulsa_services_existing_number_doc',
+          'args' => array(),
+          'access arguments' => array('access content'),
+        ),
       )
     ),
   );
@@ -60,6 +69,12 @@ function _sepulsa_services_resource_index() {
   return $return;
 }
 
+function _sepulsa_services_existing_number(){
+  $existing_number = sepulsa_get_existing_number();
+  
+  return $existing_number;
+  
+}
 /**
  * Function _sepulsa_services_index_doc().
  *
@@ -142,6 +157,42 @@ function _sepulsa_services_index_doc() {
     '#path' => 'sepulsa',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+
+/**
+ * Function _sepulsa_services_existing_number_doc().
+ *
+ * Documentation callback for index actions sepulsa.
+ */
+function _sepulsa_services_existing_number_doc() {
+  global $base_url;
+  $response = '
+  [                              
+	"081314142323",
+	"081523444343"
+  ]
+  ';
+  $element = array(
+    '#name' => t('Sepulsa Number'),
+    '#description' => t('List all sepulsa user existing number.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa/get_number',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa/get_number.json',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

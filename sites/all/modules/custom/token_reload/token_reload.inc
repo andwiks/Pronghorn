@@ -90,7 +90,6 @@ function token_reload_request_call($data, $method = 'inq') {
   switch ($settings['environment']) {
     case 'dev':
       $response = token_reload_response_dummy($data, $method);
-      return FALSE;
       break;
 
     case 'prod':
@@ -134,7 +133,7 @@ function token_reload_request_call($data, $method = 'inq') {
   if ($method == 'datatransaksi') {
     if (count($params) >= 9) {
       $params = explode('#', $params[9]);
-      $params = array_combine(token_reload_response_query_keys(), $params)
+      $params = array_combine(token_reload_response_query_keys(), $params);
     }
     else {
       return FALSE;
@@ -156,7 +155,20 @@ function token_reload_response_dummy($data, $method = 'inq') {
   $xml = new SimpleXMLElement('<methodResponse/>');
   $data = $xml->addChild('params')->addChild('param')->addChild('value')->addChild('array')->addChild('data');
 
+  $statuses = array('', '00', '15', '33', '99', 'XX');
   if ($method == 'datatransaksi') {
+    $status = $statuses[array_rand($statuses)];
+    $note = "$params[2]#TRANSAKSIDATETIME#$params[3]#NAMAPRODUK#$params[4]#$status#KETERANGAN#NOMINAL#SN";
+
+    $data->addChild('value')->addChild('string', $params[0]); // TANGGAL1
+    $data->addChild('value')->addChild('string', $params[1]); // TANGGAL2
+    $data->addChild('value')->addChild('string', $params[3]); // KODEPRODUK
+    $data->addChild('value')->addChild('string', $params[4]); // IDPELANGGAN
+    $data->addChild('value')->addChild('string');             // LIMIT
+    $data->addChild('value')->addChild('string', $params[6]); // UID
+    $data->addChild('value')->addChild('string', $params[7]); // UID
+    $data->addChild('value')->addChild('string', $status); // STATUS
+    $data->addChild('value')->addChild('string', $note);      // KETERANGAN
   }
   else {
     $data->addChild('value')->addChild('string', $params[0]); // KODEPRODUK
@@ -185,8 +197,6 @@ function token_reload_response_dummy($data, $method = 'inq') {
         $data->addChild('value')->addChild('string', $params[9]); // REF3
         break;
     }
-
-    $statuses = array('', '00', '15', '99');
 
     $data->addChild('value')->addChild('string', $statuses[array_rand($statuses)]);
     $data->addChild('value')->addChild('string', 'KETERANGAN');

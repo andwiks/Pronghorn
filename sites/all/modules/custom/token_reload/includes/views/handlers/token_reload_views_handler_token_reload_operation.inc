@@ -43,14 +43,14 @@ function token_reload_operation_form_submit($form, &$form_state) {
 
   switch ($form_state['values']['operation']) {
     case 'process':
-      token_reload_queue_process(array('line_item_id' => $token_reload->line_item_id));
       $params = &drupal_static('token_reload_request_call');
+      token_reload_queue_process(array('line_item_id' => $token_reload->line_item_id));
       drupal_set_message('<pre>' . print_r($params, TRUE) . '</pre>');
       break;
 
     case 'query':
-      token_reload_queue_query(array('line_item_id' => $token_reload->line_item_id));
       $params = &drupal_static('token_reload_request_call');
+      token_reload_queue_query(array('line_item_id' => $token_reload->line_item_id));
       drupal_set_message('<pre>' . print_r($params, TRUE) . '</pre>');
       break;
 

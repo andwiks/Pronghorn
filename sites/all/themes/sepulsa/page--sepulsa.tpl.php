@@ -23,7 +23,7 @@ global $base_url;
             <div class="tab-container full-width style1 box">
               <ul class="tabs clearfix">
                 <li<?php if($active_tab == 'topup') print ' class="active"';?>><a href="#topup" data-toggle="tab">Isi Pulsa &amp; Bolt</a></li>
-                <?php if (user_access('view any commerce_product entity of bundle electricity')): ?>
+                <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
                   <li<?php if($active_tab == 'token_reload') print ' class="active"';?>><a href="#token-reload" data-toggle="tab">Listrik</a></li>
                 <?php endif; ?>
               </ul>
@@ -33,7 +33,7 @@ global $base_url;
                 </div>
                 <div style="color:red; margin-top:10px;">* Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</div>
               </div>
-              <?php if (user_access('view any commerce_product entity of bundle electricity')): ?>
+              <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
                 <div id="token-reload" class="tab-content<?php if($active_tab == 'token_reload') print ' in active';?>">
                   <div class="tab-pane">
                     <?php print render($token_reload_form); ?>

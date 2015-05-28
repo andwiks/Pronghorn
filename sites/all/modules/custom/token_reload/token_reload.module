@@ -368,12 +368,19 @@ function token_reload_queue_query($data) {
     if ($query = token_reload_request_call(token_reload_request_query_data($params), 'datatransaksi')) {
       switch ($query['status']) {
         case '00':
-          $status = 'success';
-          commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
+          if (strtolower($query['note']) == 'successful') {
+            $status = 'success';
+            commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
+          }
+          else {
+            $queue = DrupalQueue::get('token_reload_query');
+            $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+            $status = 'pending';
+          }
           break;
 
         case '15':
-          $status = 'error';
+          $status = 'in_queue';
           $queue = DrupalQueue::get('token_reload_process');
           $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
           watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
@@ -384,7 +391,7 @@ function token_reload_queue_query($data) {
           $try++;
           $queue = DrupalQueue::get('token_reload_query_' . $try);
           $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
-          $status = 'pending';
+          $status = 'in_queue';
           watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
           break;
 

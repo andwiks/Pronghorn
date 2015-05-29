@@ -64,6 +64,7 @@ function commerce_coupon_services_resource_redeem($code, $order_id = NULL, $uid 
   $coupon = commerce_coupon_redeem_coupon_code($code, $order, $error);
 
   if ($coupon) {
+    commerce_cart_order_refresh($order);
     return array(
       'coupon' => $coupon,
       'offer' => entity_metadata_wrapper('commerce_coupon', $coupon)->commerce_discount_reference->get(0)->commerce_discount_offer->value(),
@@ -93,6 +94,7 @@ function commerce_coupon_services_resource_remove($coupon_id, $order_id = NULL, 
   $coupon = commerce_coupon_load($coupon_id);
 
   commerce_coupon_remove_coupon_from_order($order, $coupon);
+  commerce_cart_order_refresh($order);
 
   return 'Coupon removed from order';
 }

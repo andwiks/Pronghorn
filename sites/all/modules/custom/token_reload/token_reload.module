@@ -279,6 +279,8 @@ function token_reload_queue_process($data) {
     'ref_3' => $line_item_wrapper->ref_3->value(),
   );
 
+  $max_try = variable_get('token_reload_try', 2);
+
   if ($payment = token_reload_request_call(token_reload_request_data($params, 'pay'), 'pay')) {
     switch ($payment['status']) {
       case '00':
@@ -288,24 +290,29 @@ function token_reload_queue_process($data) {
         }
         else {
           $queue = DrupalQueue::get('token_reload_query');
-          $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
-          $status = 'pending';
+          $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
         }
         break;
 
       case '15':
-        $try++;
-        $queue = DrupalQueue::get('token_reload_process_' . $try);
-        $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
-        $status = 'error';
+        if ($try <= $max_try) {
+          $try++;
+          $queue = DrupalQueue::get('token_reload_process_' . $try);
+          $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
+        }
+        else {
+          $status = 'error';
+        }
         watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!inquiry' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
 
       case '':
       case '33':
         $queue = DrupalQueue::get('token_reload_query');
-        $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
-        $status = 'pending';
+        $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+        $status = 'in_queue';
         break;
 
       default:
@@ -365,6 +372,8 @@ function token_reload_queue_query($data) {
       'meter_number' => $token_reload->meter_number,
     );
 
+    $max_try = variable_get('token_reload_try', 2);
+
     if ($query = token_reload_request_call(token_reload_request_query_data($params), 'datatransaksi')) {
       switch ($query['status']) {
         case '00':
@@ -373,25 +382,31 @@ function token_reload_queue_query($data) {
             commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
           }
           else {
-            $queue = DrupalQueue::get('token_reload_query');
-            $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+            if ($try <= $max_try) {
+              $try++;
+              $queue = DrupalQueue::get('token_reload_query');
+              $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+              $status = 'in_queue';
+            }
             $status = 'pending';
           }
           break;
 
         case '15':
-          $status = 'in_queue';
           $queue = DrupalQueue::get('token_reload_process');
           $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
           watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
           break;
 
         case '':
         case '33':
-          $try++;
-          $queue = DrupalQueue::get('token_reload_query_' . $try);
-          $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
-          $status = 'in_queue';
+          if ($try <= $max_try) {
+            $try++;
+            $queue = DrupalQueue::get('token_reload_query_' . $try);
+            $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+            $status = 'in_queue';
+          }
           watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
           break;
 
@@ -437,5 +452,16 @@ function token_reload_default_settings() {
     'timeout' => 30,
     'uid' => '',
     'pin' => '',
+  );
+}
+
+function token_reload_statuses() {
+  return array(
+    'success' => t('Success'),
+    'pending' => t('Pending'),
+    'failed' => t('Failed'),
+    'double_transaction' => t('Double Transaction'),
+    'error' => t('Error'),
+    'in_queue' => t('In Queue'),
   );
 }

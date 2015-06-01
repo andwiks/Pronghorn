@@ -156,7 +156,7 @@ function token_reload_response_dummy($data, $method = 'inq') {
   $data = $xml->addChild('params')->addChild('param')->addChild('value')->addChild('array')->addChild('data');
 
   $statuses = array('', '00', '15', '33', '99', 'XX');
-  $notes = array('SUCCESFULL', 'KETERANGAN');
+  $notes = array('SUCCESSFUL', 'KETERANGAN');
   if ($method == 'datatransaksi') {
     $status = $statuses[array_rand($statuses)];
     $result = "$params[2]#TRANSAKSIDATETIME#$params[3]#NAMAPRODUK#$params[4]#$status#KETERANGAN#NOMINAL#SN";

@@ -1,16 +1,16 @@
 <?php
 
 function userpoints_sepulsa_menu() {
-  $items['admin/config/people/userpoints/transaction_list'] = array(
-	'title'            => t('Transaction List'),
-	'description'      => t('Transaction List'),
+  $items['admin/people/kredit'] = array(
+	'title'            => t('Kredit'),
+	'description'      => t('Kredit'),
 	'page callback'    => 'userpoints_transaction_list',
 	'access arguments' => array('administer site configuration'),
 	'type'             => MENU_NORMAL_ITEM,
   );
-  $items['admin/config/people/userpoints/transaction_list/%/detail'] = array(
-	'title'            => t('Transaction Detail'),
-	'description'      => t('Transaction Detail'),
+  $items['admin/people/kredit/%/detail'] = array(
+	'title'            => t('Kredit Detail'),
+	'description'      => t('Kredit Detail'),
 	'page callback'    => 'userpoints_transaction_detail',
 	'access arguments' => array('administer site configuration'),
 	'type'             => MENU_NORMAL_ITEM,
@@ -148,7 +148,7 @@ function userpoints_transaction_list() {
   $result = db_query($query);
   foreach ($result as $row) {
 	if ($row->total_point > 0)
-	$rows[] = array($row->mail, $row->total_point, l("detail", "admin/config/people/userpoints/transaction_list/".$row->uid."/detail"));
+	$rows[] = array($row->mail, $row->total_point, l("detail", "admin/people/kredit/".$row->uid."/detail"));
   }
   $return = theme('table', array("header" => $header, "rows" =>$rows));
   
@@ -156,7 +156,7 @@ function userpoints_transaction_list() {
 }
 
 function userpoints_transaction_detail() {
-  $user_uid = arg(5);
+  $user_uid = arg(3);
   $settings = array('show_user' => FALSE);
   $header = array("Point", "Category", "Date", "Reason", "Status");
   $query = db_select('userpoints_txn', 'p')->extend('TableSort')

@@ -144,9 +144,10 @@ function userpoints_sepulsa_user_view_alter(&$build) {
 function userpoints_transaction_list() {
   $header = array("Email", "Points", "Detail");
   
-  $query = "SELECT a.uid, SUM(points) as total_point, b.mail FROM userpoints a, users b WHERE a.uid=b.uid AND total_point>0 GROUP BY uid";
+  $query = "SELECT a.uid, SUM(points) as total_point, b.mail FROM userpoints a, users b WHERE a.uid=b.uid GROUP BY uid";
   $result = db_query($query);
   foreach ($result as $row) {
+	if ($row->total_point > 0)
 	$rows[] = array($row->mail, $row->total_point, l("detail", "admin/config/people/userpoints/transaction_list/".$row->uid."/detail"));
   }
   $return = theme('table', array("header" => $header, "rows" =>$rows));

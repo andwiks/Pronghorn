@@ -9,6 +9,15 @@
  * Implements hook_views_data_alter().
  */
 function token_reload_views_data_alter(&$data) {
+  $data['commerce_line_item']['inquiry'] = array(
+    'title' => t('Inquiry'),
+    'help' => t('Serialized inquiry data.'),
+    'real field' => 'data',
+    'field' => array(
+      'handler' => 'token_reload_views_handler_inquiry',
+    ),
+  );
+
   // Add topup operation button.
   $data['token_reload']['token_reload_operation'] = array(
     'title' => t('Token Reload Operation'),

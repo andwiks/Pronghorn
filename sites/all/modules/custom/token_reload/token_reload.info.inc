@@ -61,6 +61,8 @@ function token_reload_entity_property_info_alter(&$info) {
     'schema field' => 'line_item_id',
   );
 
+  $token_reload['status']['options list'] = 'token_reload_statuses';
+
   $token_reload['meter_number']['label'] = t('Meter number');
   $token_reload['customer_number']['label'] = t('Customer number');
   $token_reload['customer_name']['label'] = t('Customer name');

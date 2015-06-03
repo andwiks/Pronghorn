@@ -60,7 +60,6 @@ function referral_sepulsa_rules_action_info() {
           'label' => t('Point Percentage'),
           'description' => t('Percentage of commerce order total convert into points (eg. 10)'),
         ),
-          /* user default category from userpoints. we don't use taxonomy
         'category' => array(
           'type' => 'text',
           'label' => t('Userpoint Category'),
@@ -68,7 +67,6 @@ function referral_sepulsa_rules_action_info() {
           'options list' => 'referral_sepulsa_userpoint_category_options',
           'restriction' => 'input',
         ),
-           */
       ),
     ),
   );
@@ -101,14 +99,13 @@ function assign_point_to_referrer_user($order, $user, $point_percentage, $catego
         $params = array (
           'uid' => $referrer_uid,
           'points' => $points,
-          //'tid' => $category,
-          'description' => 'User '.$user->mail.' has made first purchase.'
+          'tid' => $category,
+          'description' => $user->mail.' made first purchase.'
         );
         userpoints_userpointsapi($params); 
     }
 }
 
-/* user default category from userpoints. we don't use taxonomy
 function referral_sepulsa_userpoint_category_options() {
     $list = array();
     $vocabulary = taxonomy_vocabulary_machine_name_load('userpoints');
@@ -120,4 +117,3 @@ function referral_sepulsa_userpoint_category_options() {
  
     return $list;
 }
-*/

@@ -26,6 +26,9 @@ global $base_url;
                 <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
                   <li<?php if($active_tab == 'token_reload') print ' class="active"';?>><a href="#token-reload" data-toggle="tab">Listrik</a></li>
                 <?php endif; ?>
+				<?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?>  
+                  <li<?php if($active_tab == 'deposit_sepulsa') print ' class="active"';?>><a href="#deposit-sepulsa" data-toggle="tab">Deposit</a></li>
+				<?php endif; ?>
               </ul>
               <div id="topup" class="tab-content<?php if($active_tab == 'topup') print ' in active';?>">
                 <div class="tab-pane">
@@ -37,6 +40,13 @@ global $base_url;
                 <div id="token-reload" class="tab-content<?php if($active_tab == 'token_reload') print ' in active';?>">
                   <div class="tab-pane">
                     <?php print render($token_reload_form); ?>
+                  </div>
+                </div>
+              <?php endif; ?>
+			  <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
+                <div id="deposit-sepulsa" class="tab-content<?php if($active_tab == 'deposit_sepulsa') print ' in active';?>">
+                  <div class="tab-pane">
+                    <?php print render($deposit_sepulsa_form); ?>
                   </div>
                 </div>
               <?php endif; ?>

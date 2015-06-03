@@ -60,7 +60,6 @@ function referral_sepulsa_rules_action_info() {
           'label' => t('Point Percentage'),
           'description' => t('Percentage of commerce order total convert into points (eg. 10)'),
         ),
-          /* user default category from userpoints. we don't use taxonomy
         'category' => array(
           'type' => 'text',
           'label' => t('Userpoint Category'),
@@ -68,7 +67,6 @@ function referral_sepulsa_rules_action_info() {
           'options list' => 'referral_sepulsa_userpoint_category_options',
           'restriction' => 'input',
         ),
-           */
       ),
     ),
   );
@@ -80,7 +78,7 @@ function referral_sepulsa_rules_action_info() {
  * The condition function for 'user_first_paid_in_full_order'.
  */
 function user_first_paid_in_full_order($order, $user) {
-    $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
+    $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed' OR status = 'processing') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
     
     // if order id prev exists, it means this is not user first order
     if ($order_id_prev) return FALSE;
@@ -101,14 +99,13 @@ function assign_point_to_referrer_user($order, $user, $point_percentage, $catego
         $params = array (
           'uid' => $referrer_uid,
           'points' => $points,
-          //'tid' => $category,
-          'description' => 'User '.$user->mail.' has made first purchase.'
+          'tid' => $category,
+          'description' => $user->mail.' made first purchase.'
         );
         userpoints_userpointsapi($params); 
     }
 }
 
-/* user default category from userpoints. we don't use taxonomy
 function referral_sepulsa_userpoint_category_options() {
     $list = array();
     $vocabulary = taxonomy_vocabulary_machine_name_load('userpoints');
@@ -120,4 +117,3 @@ function referral_sepulsa_userpoint_category_options() {
  
     return $list;
 }
-*/

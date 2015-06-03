@@ -28,6 +28,20 @@ function userpoints_sepulsa_rules_action_info() {
             ),
       ),
     ),
+	'reassign_point_line_item' => array(
+      'label' => t('Reassign Point Line Item'), 
+      'group' => t('Sepulsa'),
+      'parameter' => array(
+           'order' => array(
+                'type' => 'commerce_order',
+                'label' => t('Commerce Order'),
+            ),
+          'line_item' => array(
+                'type' => 'commerce_line_item',
+                'label' => t('Commerce Line Item'),
+            ),
+      ),
+    ),
   );
   
   return $actions;
@@ -38,20 +52,33 @@ function userpoints_sepulsa_rules_action_info() {
  * The action function for 'deduct_point_line_item_after_order'.
  */
 function deduct_point_line_item_after_order($order, $line_item) {
-    if ($line_item->type == "userpoints") {
-        //drupal_set_message("<pre>".print_r($line_item, true)."</pre>"); 
-        $amount = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
-        // Create the userpoints transaction.
-        $userpoints_params = array(
-          'points' => $amount,
-          'uid' => $order->uid,
-          'operation' => 'commerce_userpoints_discount_credit',
-          //'tid' => variable_get('commerce_userpoints_discount_default_termid', userpoints_get_default_tid()),
-          'display' => FALSE,
-          'entity_id' => $order->order_id,
-          'entity_type' => 'commerce_order',
-        );
+  $amount = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
+  userpoints_line_item_transaction($order, $line_item, $amount);
+}
 
-        $result = userpoints_userpointsapi($userpoints_params);
-    }
+/**
+ * The action function for 'reassign_point_line_item'.
+ * Reassign point to user if the order is being canceled
+ */
+function reassign_point_line_item($order, $line_item) {
+  $amount = $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'];
+  userpoints_line_item_transaction($order, $line_item, $amount*-1);
+}
+
+function userpoints_line_item_transaction($order, $line_item, $amount=0){
+  if ($line_item->type == "userpoints") {
+	//drupal_set_message("<pre>".print_r($line_item, true)."</pre>"); 
+	// Create the userpoints transaction.
+	$userpoints_params = array(
+	  'points' => $amount,
+	  'uid' => $order->uid,
+	  'operation' => 'commerce_userpoints_discount_credit',
+	  //'tid' => variable_get('commerce_userpoints_discount_default_termid', userpoints_get_default_tid()),
+	  'display' => FALSE,
+	  'entity_id' => $order->order_id,
+	  'entity_type' => 'commerce_order',
+	);
+
+	$result = userpoints_userpointsapi($userpoints_params);
+  }
 }

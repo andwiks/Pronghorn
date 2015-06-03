@@ -56,31 +56,11 @@ function deposit_sepulsa_node_info() {
 /**
  * Implements hook_preprocess_page().
  */
-/*function deposit_sepulsa_preprocess_page(&$variables) {
+function deposit_sepulsa_preprocess_page(&$variables) {
   if (drupal_is_front_page()) {
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'commerce_product');
-    $query->entityCondition('bundle', 'deposit');
-
-    $result = $query->execute();
-
-    if (!empty($result['commerce_product'])) {
-      $product_ids = array_keys($result['commerce_product']);
-
-      $values = array(
-        'type' => 'deposit_sepulsa',
-        'data' => array(
-          'context' => array(
-            'product_ids' => $product_ids,
-          ),
-        ),
-      );
-      $line_item = entity_create('commerce_line_item', $values);
-
-      $variables['deposit_sepulsa_form'] = drupal_get_form('commerce_cart_add_to_cart_form', $line_item);
-    }
+    $variables['deposit_sepulsa_form'] = drupal_get_form('deposit_sepulsa_form');
   }
-}*/
+}
 
 
 /**
@@ -120,14 +100,26 @@ function deposit_sepulsa_form($form, &$form_state) {
   
   $form['deposit'] = array(
 	'#type' => 'select', 
-	'#title' => 'Deposit',
-	'#required' => true,
-	'#options' => $option
+	'#title' => '',
+	//'#required' => true,
+	'#options' => $option,
+	'#attributes' => array(
+      'class' => array(
+        'input-text full-width'  
+      ),
+    ),
   );
   $form['submit'] = array(
 	'#type' => 'submit', 
 	'#title' => 'Submit',
-	'#value' => 'Submit'
+	'#value' => 'Submit',
+	'#attributes' => array(
+      'class' => array(
+        'btn style1'  
+      ),
+    ),
+	'#prefix' => '<div style="padding-top:10px; float: right;">',
+	'#suffix' => '</div>'
   );
 
   return $form;    

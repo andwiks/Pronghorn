@@ -11,6 +11,18 @@
  */
 
 /**
+ * Implements hook_entity_presave().
+ */
+function commerce_checkout_services_entity_presave($entity, $type) {
+  if ($type == 'payment') {
+    $checkout_services_complete = &drupal_static('commerce_checkout_services_resource_complete');
+    if ($checkout_services_complete) {
+      $entity->finish_callback = 'commerce_checkout_services_payment_finish';
+    }
+  }
+}
+
+/**
  * Implements hook_services_resources().
  */
 function commerce_checkout_services_services_resources() {
@@ -105,6 +117,18 @@ function commerce_checkout_services_services_resources() {
 /**
  * Callback Functions.
  */
+
+function commerce_checkout_services_payment_finish(Payment $payment) {
+  payment_commerce_redirect_pane($payment);
+  $order = commerce_order_load($payment->context_data ['order_id']);
+  if (payment_status_is_or_has_ancestor($payment->getStatus()->status, PAYMENT_STATUS_FAILED)) {
+    $view = '';
+    if (payment_access('view', $payment)) {
+      $view = ' ' . l(t('View payment'), 'payment/' . $payment->pid) . '.';
+    }
+    drupal_set_message(t('Your payment failed.') . $view);
+  }
+}
 
 /**
  * Function commerce_checkout_services_resource_pane_retrieve().
@@ -203,24 +227,17 @@ function commerce_checkout_services_resource_process($checkout) {
 
       // Define form state.
       $form_state = array();
-      $form_state['checkout_page']['page_id'] = 'checkout';
-      $form_state['checkout_page']['status_cart'] = TRUE;
-      $form_state['checkout_page']['buttons'] = TRUE;
-      $form_state['checkout_page']['next_page'] = 'payment';
-      $form_state['checkout_page']['prev_page'] = NULL;
-      $form_state['checkout_page']['help'] = '';
-      $form_state['checkout_page']['submit_value'] = t('Continue to next step');
-      $form_state['rebuild'] = TRUE;
-      $form_state['order'] = $order;
+      $form_state['build_info']['args'][] = $order;
+      $form_state['build_info']['args'][] = commerce_checkout_page_load('checkout');
+
+      // Get checkout form array.
+      $form = drupal_build_form('commerce_checkout_form_checkout', $form_state);
 
       // Set form state values.
       $form_state['values'] = $input;
       $form_state['values']['commerce_payment']['payment_methods'] = commerce_checkout_services_resource_pane_retrieve('commerce_payment', 'payment_methods', '#value');
       $form_state['values']['op'] = t('Continue to next step');
       $form_state['triggering_element']['#array_parents'] = array('continue');
-
-      // Get checkout form array.
-      $form = drupal_get_form('commerce_checkout_form_checkout', $order, $form_state['checkout_page']);
 
       // Update payment method default value to match payment method input.
       // Suppose there will be no newly payment method.
@@ -232,7 +249,11 @@ function commerce_checkout_services_resource_process($checkout) {
       }
 
       // Call checkout form validation function.
-      commerce_checkout_form_validate($form, $form_state);
+      foreach ($form['buttons']['continue']['#validate'] as $validation) {
+        if (function_exists($validation)) {
+          $validation($form, $form_state);
+        }
+      }
 
       // Check whether error is occured.
       if (isset($form_state['storage']['messages'])) {
@@ -248,7 +269,11 @@ function commerce_checkout_services_resource_process($checkout) {
       }
 
       // Call checkout form submission function.
-      commerce_checkout_form_submit($form, $form_state);
+      foreach ($form['buttons']['continue']['#submit'] as $submission) {
+        if (function_exists($submission)) {
+          $submission($form, $form_state);
+        }
+      }
 
       // Get order object.
       $order = $form_state['order'];
@@ -281,14 +306,53 @@ function commerce_checkout_services_resource_complete($order_id) {
     && commerce_checkout_order_can_checkout($order)
     && $user->uid == $order->uid
   ) {
+    $checkout_services_complete = &drupal_static(__FUNCTION__);
+    $checkout_services_complete = TRUE;
+
     // Menandai order ini dibuat dari apps
     $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'apps';
     commerce_order_save($order);
-    
-    // Complete the order.
-    commerce_checkout_complete($order);
+
+    if (!empty($order->data ['payment_method'])) {
+      $payment_method = commerce_payment_method_instance_load($order->data ['payment_method']);
+    }
+    else {
+      $payment_method = FALSE;
+    }
 
     $message = sepulsa_checkout_completion_message_message($order, 'services');
+
+    // If the payment method doesn't exist or does not require a redirect...
+    if (!$payment_method || !$payment_method ['offsite']) {
+      if (!$payment_method) {
+        $log = t('Customer skipped the Payment page because no payment was required.');
+      }
+      else {
+        $log = t('Customer skipped the Payment page because payment was already submitted.');
+      }
+
+      // Advance the customer to the next step of the checkout process.
+      commerce_payment_redirect_pane_next_page($order, $log);
+      return array(
+        'message' => str_replace("\n", ' ', $message),
+      );
+    }
+
+    if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form')) {
+      // Generate a key to use in the return URL from the redirected service if it
+      // does not already exist.
+      if (empty($order->data ['payment_redirect_key'])) {
+        $order->data ['payment_redirect_key'] = drupal_hash_base64(time());
+        commerce_order_save($order);
+      }
+
+      $form = drupal_get_form($callback, $order, $payment_method);
+    }
+    else {
+      // Alert the administrator that the module does not provide a required form.
+      drupal_set_message(t('The %title payment method indicates it is offsite but does not define the necessary form to process the redirect.', array('%title' => $payment_method ['title'])), 'error');
+    }
+
     return array(
       'message' => str_replace("\n", ' ', $message),
     );

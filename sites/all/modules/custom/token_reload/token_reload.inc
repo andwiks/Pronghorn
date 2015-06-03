@@ -156,9 +156,10 @@ function token_reload_response_dummy($data, $method = 'inq') {
   $data = $xml->addChild('params')->addChild('param')->addChild('value')->addChild('array')->addChild('data');
 
   $statuses = array('', '00', '15', '33', '99', 'XX');
+  $notes = array('SUCCESSFUL', 'KETERANGAN');
   if ($method == 'datatransaksi') {
     $status = $statuses[array_rand($statuses)];
-    $note = "$params[2]#TRANSAKSIDATETIME#$params[3]#NAMAPRODUK#$params[4]#$status#KETERANGAN#NOMINAL#SN";
+    $result = "$params[2]#TRANSAKSIDATETIME#$params[3]#NAMAPRODUK#$params[4]#$status#KETERANGAN#NOMINAL#SN";
 
     $data->addChild('value')->addChild('string', $params[0]); // TANGGAL1
     $data->addChild('value')->addChild('string', $params[1]); // TANGGAL2
@@ -166,9 +167,10 @@ function token_reload_response_dummy($data, $method = 'inq') {
     $data->addChild('value')->addChild('string', $params[4]); // IDPELANGGAN
     $data->addChild('value')->addChild('string');             // LIMIT
     $data->addChild('value')->addChild('string', $params[6]); // UID
-    $data->addChild('value')->addChild('string', $params[7]); // UID
-    $data->addChild('value')->addChild('string', $status); // STATUS
-    $data->addChild('value')->addChild('string', $note);      // KETERANGAN
+    $data->addChild('value')->addChild('string', $params[7]); // PIN
+    $data->addChild('value')->addChild('string', $status);    // STATUS
+    $data->addChild('value')->addChild('string', $notes[array_rand($notes)]); // KETERANGAN
+    $data->addChild('value')->addChild('string', $result);      // KETERANGAN
   }
   else {
     $data->addChild('value')->addChild('string', $params[0]); // KODEPRODUK
@@ -199,7 +201,7 @@ function token_reload_response_dummy($data, $method = 'inq') {
     }
 
     $data->addChild('value')->addChild('string', $statuses[array_rand($statuses)]);
-    $data->addChild('value')->addChild('string', 'KETERANGAN');
+    $data->addChild('value')->addChild('string', $notes[array_rand($notes)]);
     $data->addChild('value')->addChild('string', 'SWITCHERID');
     $data->addChild('value')->addChild('string', 'NOMOREMETER');
     $data->addChild('value')->addChild('string', 'IDPELANGGAN');

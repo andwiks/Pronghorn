@@ -419,14 +419,15 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
           $phone_number_field = 'field_phone_number';
           break;
       }
-    }
-    if (isset($line_item_wrapper->$phone_number_field)) {
-      // Check field phone number if not empty.
-      $number = $line_item_wrapper->$phone_number_field->value();
-      // @todo: make this settingable.
-      // @todo: field or addressfield phone.
-      if (!empty($number)) {
-        $phone[$number] = $number;
+
+      if (isset($line_item_wrapper->$phone_number_field)) {
+        // Check field phone number if not empty.
+        $number = $line_item_wrapper->$phone_number_field->value();
+        // @todo: make this settingable.
+        // @todo: field or addressfield phone.
+        if (!empty($number)) {
+          $phone[$number] = $number;
+        }
       }
     }
 

@@ -1,0 +1,42 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_token_info().
+ */
+function sepulsa_common_token_info() {
+  return array(
+    'tokens' => array(
+      'user' => array(
+        'password-recovery-url' => array(
+          'name' => t('Password recovery URL'),
+          'description' => t('The URL of the password recovery page for the user account.'),
+        ),
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function sepulsa_common_tokens($type, $tokens, $data = array(), $options = array()) {
+  $replacements = array();
+
+  if ($type == 'user' && !empty($data['user'])) {
+    $account = $data ['user'];
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'password-recovery-url':
+          $timestamp = REQUEST_TIME;
+          $replacements[$original] = url("user/reset/$account->uid/$timestamp/" . user_pass_rehash($account->pass, $timestamp, $account->login, $account->uid), array('absolute' => TRUE, 'query' => array('resetpwd' => TRUE)));
+          break;
+      }
+    }
+  }
+
+  return $replacements;
+}

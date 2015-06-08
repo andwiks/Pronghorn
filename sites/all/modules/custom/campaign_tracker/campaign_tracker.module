@@ -59,7 +59,7 @@ function campaign_tracker_commerce_order_presave($order) {
     // remove cookie
     setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
   } else {
-    $edit['field_utm_source'][LANGUAGE_NONE][0]['value'] = 'direct';
+    $edit->field_utm_source[LANGUAGE_NONE][0]['value'] = 'direct';
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
     $order->field_utm_medium[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];

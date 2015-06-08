@@ -72,3 +72,21 @@ function campaign_tracker_commerce_order_presave($order) {
     setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
   }  
 }
+
+function campaign_tracker_form_alter(&$form, $form_state, $form_id) {
+  global $user;
+  // Check if the user has the 'administrator' role.
+  if (!in_array('administrator', $user->roles)) {
+    $arg1 = arg(1);
+    if (arg(0) == 'user' && isset($arg1) && arg(2) == 'edit') {
+      $form['field_reg_utm_source']['#access'] = FALSE;
+      $form['field_reg_utm_medium']['#access'] = FALSE;
+      $form['field_reg_utm_campaign']['#access'] = FALSE;
+    }
+    if ($form_id == 'user_register_form') {
+      $form['field_reg_utm_source']['#access'] = FALSE;
+      $form['field_reg_utm_medium']['#access'] = FALSE;
+      $form['field_reg_utm_campaign']['#access'] = FALSE;
+    }
+  }
+}

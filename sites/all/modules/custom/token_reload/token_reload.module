@@ -41,7 +41,7 @@ function token_reload_commerce_product_type_info() {
  * Implements hook_cron_queue_info().
  */
 function token_reload_cron_queue_info() {
-  $queue = array();
+  $queues = array();
   // Token reload queue process: first part.
   $queues['token_reload_process'] = array(
     'worker callback' => 'token_reload_queue_process',
@@ -49,9 +49,26 @@ function token_reload_cron_queue_info() {
   );
   // Token reload queue query: first part.
   $queues['token_reload_query'] = array(
-    'worker callback' => 'token_reload_queue_process',
+    'worker callback' => 'token_reload_queue_query',
     'time' => 120,
   );
+
+  $try = variable_get('token_reload_try', 2);
+  $try = intval($try);
+  if ($try > 1) {
+    for ($i = 2; $i <= $try; $i++) {
+      // Token reload queue process: for multiple try.
+      $queues['token_reload_process_' . $i] = array(
+        'worker callback' => 'token_reload_queue_process',
+        'time' => 120,
+      );
+      // Token reload queue query: for multiple try.
+      $queues['token_reload_query_' . $i] = array(
+        'worker callback' => 'token_reload_queue_query',
+        'time' => 120,
+      );
+    }
+  }
 
   // Return queue array.
   return $queues;
@@ -78,19 +95,27 @@ function token_reload_entity_info() {
 }
 
 /**
- * Implements hook_entity_presave().
+ * Implements hook_forms().
  */
-function token_reload_entity_presave($entity, $type) {
-  if ($type == 'commerce_line_item' && $entity->type == 'electricity_prepaid' && $entity->is_new) {
-    module_load_include('inc', 'token_reload');
-    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $entity);
+function token_reload_forms($form_id, $args) {
+  $forms = array();
 
-    $params = array(
-      'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
-      'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+  // Construct a valid cart form ID from the arguments.
+  if (strpos($form_id, 'token_reload_operation_form_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'token_reload_operation_form',
     );
+  }
 
-    $entity->data['inquiry'] = token_reload_request_call(token_reload_request_data($params));
+  return $forms;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
+ */
+function token_reload_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_state['line_item']->type == 'electricity_prepaid') {
+    $form['#validate'][] = 'token_reload_add_to_cart_form_validate';
   }
 }
 
@@ -127,7 +152,7 @@ function token_reload_node_info() {
  * Implements hook_preprocess_page().
  */
 function token_reload_preprocess_page(&$variables) {
-  if (drupal_is_front_page()) {
+  if (drupal_is_front_page() && user_access('view any commerce_product entity of bundle electricity')) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'commerce_product');
     $query->entityCondition('bundle', 'electricity');
@@ -166,13 +191,68 @@ function token_reload_views_api() {
  * Callback Functions.
  */
 
+function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
+  if ($form_state['submitted']) {
+    foreach (array_keys($form['submit']['#attributes']['class'], 'inactive') as $key) {
+      unset($form['submit']['#attributes']['class'][$key]);
+    }
+
+    module_load_include('inc', 'token_reload');
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['line_item']);
+
+    $params = array(
+      'meter_number' => $line_item_wrapper->electricity_customer_number->value(),
+      'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+      'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+    );
+
+    $inquiry = token_reload_request_call(token_reload_request_data($params));
+    if ($inquiry) {
+      if ($inquiry['status'] != '00') {
+        $params['meter_number'] = NULL;
+        $params['customer_number'] = $line_item_wrapper->electricity_customer_number->value();
+        $inquiry = token_reload_request_call(token_reload_request_data($params));
+      }
+
+      if ($inquiry['status'] == '00') {
+        $form_state['line_item']->data['inquiry'] = $inquiry;
+      }
+      else {
+        switch ($inquiry['status']) {
+          // NOMOR METER/IDPEL YANG ANDA MASUKKAN SALAH, MOHON TELITI KEMBALI
+          // case '15':
+          //   break;
+
+          // PRODUK TIDAK TERDAFTAR
+          // case '33':
+          //   break;
+
+          // sudah pernah terjadi status sukses
+          // case 'XX':
+          //   break;
+
+          default:
+            form_set_error('inquiry', $inquiry['note']);
+            break;
+        }
+        watchdog('token_reload', '@note: <pre>!inquiry</pre>', array('@note' => $inquiry['note'], '!inquiry' => print_r($inquiry, TRUE)), WATCHDOG_ERROR);
+      }
+    }
+    else {
+      form_set_error('inquiry', 'Please retry');
+    }
+  }
+}
+
 /**
  * Function token_reload_queue_process().
- *
- * @param array $token
- *   Token data array.
  */
-function token_reload_queue_process($line_item_id) {
+function token_reload_queue_process($data) {
+  extract($data);
+  if (empty($try)) {
+    $try = 1;
+  }
+
   module_load_include('inc', 'token_reload');
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
 
@@ -191,45 +271,167 @@ function token_reload_queue_process($line_item_id) {
   }
 
   $params = array(
-    'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+    'meter_number' => $line_item_wrapper->meter_number->value(),
     'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
     'nominal' => $line_item_wrapper->commerce_total->amount->value(),
-    'ref_1' => str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($total++, 4, '0', STR_PAD_LEFT),
+    'ref_1' => str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($try, 2, '0', STR_PAD_LEFT) . str_pad($total++, 2, '0', STR_PAD_LEFT),
     'ref_2' => $line_item_wrapper->ref_2->value(),
     'ref_3' => $line_item_wrapper->ref_3->value(),
   );
 
+  $max_try = variable_get('token_reload_try', 2);
+
   if ($payment = token_reload_request_call(token_reload_request_data($params, 'pay'), 'pay')) {
     switch ($payment['status']) {
       case '00':
-        $status = 'success';
+        if (strtolower($payment['note']) == 'successful') {
+          $status = 'success';
+          commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
+        }
+        else {
+          $queue = DrupalQueue::get('token_reload_query');
+          $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
+        }
         break;
 
       case '15':
-        $status = 'error';
+        if ($try <= $max_try) {
+          $try++;
+          $queue = DrupalQueue::get('token_reload_process_' . $try);
+          $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
+        }
+        else {
+          $status = 'error';
+        }
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!inquiry' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
 
       case '':
-        $status = 'pending';
+      case '33':
+        $queue = DrupalQueue::get('token_reload_query');
+        $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+        $status = 'in_queue';
         break;
 
       default:
         $status = 'failed';
+        watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $payment['note'], '!payment' => print_r($payment, TRUE)), WATCHDOG_ERROR);
         break;
     }
 
     $info = entity_get_property_info('token_reload');
     foreach ($payment as $key => $value) {
       if (isset($info['properties'][$key])) {
-        $token_reload->$key = $value;
+        $token_reload->$key = isset($payment['minor_' . $key]) ? $value / pow(10, $payment['minor_' . $key]) : $value;
       }
     }
+    $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
 
     $token_reload->status = $status;
     $token_reload->time = strtotime($payment['time']);
     $token_reload->data = $payment;
     $token_reload->revision = TRUE;
     entity_save('token_reload', $token_reload);
+  }
+  elseif ($try <= variable_get('token_reload_try', 2)) {
+    $try++;
+    $queue = DrupalQueue::get('token_reload_process_' . $try);
+    $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+  }
+  elseif (isset($token_reload->trid)) {
+    $token_reload->status = 'pending';
+    entity_save('token_reload', $token_reload);
+  }
+}
+
+function token_reload_queue_query($data) {
+  extract($data);
+  if (empty($try)) {
+    $try = 1;
+  }
+
+  module_load_include('inc', 'token_reload');
+  $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
+
+  $token_reloads = entity_load('token_reload', FALSE, array('line_item_id' => $line_item_id));
+  if (!empty($token_reloads)) {
+    $token_reload = reset($token_reloads);
+    $total = db_select('token_reload_revision')
+      ->condition('trid', $token_reload->trid)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+
+    $params = array(
+      'start' => format_date($token_reload->time - 1, 'custom', 'YmdHis'),
+      'end' => format_date($token_reload->time + 1, 'custom', 'YmdHis'),
+      'ref_2' => $token_reload->data['ref_2'],
+      'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
+      'meter_number' => $token_reload->meter_number,
+    );
+
+    $max_try = variable_get('token_reload_try', 2);
+
+    if ($query = token_reload_request_call(token_reload_request_query_data($params), 'datatransaksi')) {
+      switch ($query['status']) {
+        case '00':
+          if (strtolower($query['note']) == 'successful') {
+            $status = 'success';
+            commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
+          }
+          else {
+            if ($try <= $max_try) {
+              $try++;
+              $queue = DrupalQueue::get('token_reload_query');
+              $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+              $status = 'in_queue';
+            }
+            $status = 'pending';
+          }
+          break;
+
+        case '15':
+          $queue = DrupalQueue::get('token_reload_process');
+          $queue->createItem(array('line_item_id' => $line_item_wrapper->getIdentifier()));
+          $status = 'in_queue';
+          watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
+          break;
+
+        case '':
+        case '33':
+          if ($try <= $max_try) {
+            $try++;
+            $queue = DrupalQueue::get('token_reload_query_' . $try);
+            $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+            $status = 'in_queue';
+          }
+          watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!inquiry' => print_r($query, TRUE)), WATCHDOG_ERROR);
+          break;
+
+        default:
+          $status = 'failed';
+          watchdog('token_reload', '@note: <pre>!payment</pre>', array('@note' => $query['note'], '!payment' => print_r($query, TRUE)), WATCHDOG_ERROR);
+          break;
+      }
+
+      $token_reload->status = $status;
+      $token_reload->data = $query + $token_reload->data;
+      $token_reload->revision = TRUE;
+      entity_save('token_reload', $token_reload);
+    }
+    elseif ($try <= variable_get('token_reload_try', 2)) {
+      $try++;
+      $queue = DrupalQueue::get('token_reload_query_' . $try);
+      $queue->createItem(array('try' => $try, 'line_item_id' => $line_item_wrapper->getIdentifier()));
+      $token_reload->status = 'in_queue';
+      entity_save('token_reload', $token_reload);
+    }
+    else {
+      $token_reload->status = 'pending';
+      entity_save('token_reload', $token_reload);
+    }
   }
 }
 
@@ -250,5 +452,16 @@ function token_reload_default_settings() {
     'timeout' => 30,
     'uid' => '',
     'pin' => '',
+  );
+}
+
+function token_reload_statuses() {
+  return array(
+    'success' => t('Success'),
+    'pending' => t('Pending'),
+    'failed' => t('Failed'),
+    'double_transaction' => t('Double Transaction'),
+    'error' => t('Error'),
+    'in_queue' => t('In Queue'),
   );
 }

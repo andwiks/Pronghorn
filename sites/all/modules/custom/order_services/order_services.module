@@ -468,6 +468,19 @@ function order_services_order($order) {
     foreach ((array) $order->commerce_line_items as $key => $line_item) {
       $order->commerce_line_items[$key] = order_services_line_item($line_item);
     }
+
+    $order->commerce_coupons = $order_wrapper->commerce_coupons->value();
+    foreach ((array) $order->commerce_coupons as &$coupon) {
+      $coupon_wrapper = entity_metadata_wrapper('commerce_coupon', $coupon);
+      $coupon->commerce_discount_reference = $coupon_wrapper->commerce_discount_reference->value();
+
+      foreach ((array) $coupon->commerce_discount_reference as &$discount) {
+        $discount_wrapper = entity_metadata_wrapper('commerce_discount', $discount);
+        $discount->commerce_discount_offer = $discount_wrapper->commerce_discount_offer->value();
+      }
+      // $order->commerce_coupons[$key] = $coupon;
+    }
+
     // Proccess order total: remove language none (und).
     $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
     // Return order object.

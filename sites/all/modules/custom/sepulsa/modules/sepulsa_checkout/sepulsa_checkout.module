@@ -92,16 +92,18 @@ function sepulsa_checkout_completion_message_message($order, $format = NULL) {
   $parts[] = $role;
 
   foreach ($parts as $part) {
-    // Perform translation.
-    $message[$part]['value'] = commerce_i18n_string('commerce:checkout:complete:message', $message[$part]['value'], array('sanitize' => FALSE));
+    if (isset($message[$part])) {
+      // Perform translation.
+      $message[$part]['value'] = commerce_i18n_string('commerce:checkout:complete:message', $message[$part]['value'], array('sanitize' => FALSE));
 
-    // Perform token replacement.
-    $message[$part]['value'] = token_replace($message[$part]['value'], array('commerce-order' => $order), array('clear' => TRUE));
+      // Perform token replacement.
+      $message[$part]['value'] = token_replace($message[$part]['value'], array('commerce-order' => $order), array('clear' => TRUE));
 
-    // Apply the proper text format.
-    $message[$part]['value'] = check_markup($message[$part]['value'], empty($format) ? $message[$part]['format'] : $format);
+      // Apply the proper text format.
+      $message[$part]['value'] = check_markup($message[$part]['value'], empty($format) ? $message[$part]['format'] : $format);
 
-    $markup .= $message[$part]['value'];
+      $markup .= $message[$part]['value'];
+    }
   }
 
   return $markup;

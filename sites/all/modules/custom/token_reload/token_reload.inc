@@ -4,6 +4,7 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
   $params += array(
     'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
+    'meter_number' => NULL,
     'customer_number' => NULL,
     'phone_number' => NULL,
     'nominal' => NULL,
@@ -19,9 +20,9 @@ function token_reload_request_data($params = array(), $method = 'inq') {
   // Add value: Kode Produk.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
   // Add value: Id Pelanggan 1.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['meter_number']);
   // Add value: Id Pelanggan 2.
-  $xml_params->addChild('param')->addChild('value')->addChild('string');
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
   // Add value: Id Pelanggan 3.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['phone_number']);
 
@@ -54,7 +55,7 @@ function token_reload_request_query_data($params = array()) {
     'end' => NULL,
     'ref_2' => NULL,
     'product_code' => variable_get('token_reload_product_code', 'PLNPRA'),
-    'customer_number' => NULL,
+    'meter_number' => NULL,
   );
 
   // Set XML.
@@ -70,7 +71,7 @@ function token_reload_request_query_data($params = array()) {
   // Add value: Kode produk.
   $xml_params->addChild('param')->addChild('value')->addChild('string', $params['product_code']);
   // Add value: Id pelanggan.
-  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['customer_number']);
+  $xml_params->addChild('param')->addChild('value')->addChild('string', $params['meter_number']);
   // Add value: Limit.
   $xml_params->addChild('param')->addChild('value')->addChild('string');
   // Add value: UID.
@@ -82,6 +83,8 @@ function token_reload_request_query_data($params = array()) {
 }
 
 function token_reload_request_call($data, $method = 'inq') {
+  drupal_static_reset(__FUNCTION__);
+  $params = &drupal_static(__FUNCTION__);
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
 
   switch ($settings['environment']) {
@@ -96,18 +99,26 @@ function token_reload_request_call($data, $method = 'inq') {
           'Content-Type' => 'application/xml',
         ),
         'method' => 'POST',
-        'timeout' => $settings['timeout'],
         'data' => $data,
       );
 
+      if ($method != 'inq') {
+        $options['timeout'] = $settings['timeout'];
+      }
+
       $result = drupal_http_request($url, $options);
-      dpm($result);
 
       // Check the result:
       // 1. Must have 200 http code.
       // 2. Must have data.
       if ($result->code == 200 && !empty($result->data)) {
         $response = $result->data;
+        if (variable_get('token_reload_log_request', TRUE)) {
+          watchdog('token_reload', '<pre>!request</pre>', array('!request' => htmlentities($result->request)), WATCHDOG_DEBUG);
+        }
+        if (variable_get('token_reload_log_response', TRUE)) {
+          watchdog('token_reload', '<pre>!response</pre>', array('!response' => htmlentities($result->data)), WATCHDOG_DEBUG);
+        }
       }
       else {
         return FALSE;
@@ -118,7 +129,21 @@ function token_reload_request_call($data, $method = 'inq') {
   foreach (simplexml_load_string($response)->params->param->value->array->data->value as $value) {
     $params[] = (string) $value->string;
   }
-  return array_combine(token_reload_response_keys(), $params);
+
+  if ($method == 'datatransaksi') {
+    if (count($params) >= 9) {
+      $params = explode('#', $params[9]);
+      $params = array_combine(token_reload_response_query_keys(), $params);
+    }
+    else {
+      return FALSE;
+    }
+  }
+  else {
+    $params = array_combine(token_reload_response_keys(), $params);
+    $params['power_consuming_category'] = (int) $params['power_consuming_category'];
+  }
+  return $params;
 }
 
 function token_reload_response_dummy($data, $method = 'inq') {
@@ -130,7 +155,22 @@ function token_reload_response_dummy($data, $method = 'inq') {
   $xml = new SimpleXMLElement('<methodResponse/>');
   $data = $xml->addChild('params')->addChild('param')->addChild('value')->addChild('array')->addChild('data');
 
+  $statuses = array('', '00', '15', '33', '99', 'XX');
+  $notes = array('SUCCESSFUL', 'KETERANGAN');
   if ($method == 'datatransaksi') {
+    $status = $statuses[array_rand($statuses)];
+    $result = "$params[2]#TRANSAKSIDATETIME#$params[3]#NAMAPRODUK#$params[4]#$status#KETERANGAN#NOMINAL#SN";
+
+    $data->addChild('value')->addChild('string', $params[0]); // TANGGAL1
+    $data->addChild('value')->addChild('string', $params[1]); // TANGGAL2
+    $data->addChild('value')->addChild('string', $params[3]); // KODEPRODUK
+    $data->addChild('value')->addChild('string', $params[4]); // IDPELANGGAN
+    $data->addChild('value')->addChild('string');             // LIMIT
+    $data->addChild('value')->addChild('string', $params[6]); // UID
+    $data->addChild('value')->addChild('string', $params[7]); // PIN
+    $data->addChild('value')->addChild('string', $status);    // STATUS
+    $data->addChild('value')->addChild('string', $notes[array_rand($notes)]); // KETERANGAN
+    $data->addChild('value')->addChild('string', $result);      // KETERANGAN
   }
   else {
     $data->addChild('value')->addChild('string', $params[0]); // KODEPRODUK
@@ -160,10 +200,8 @@ function token_reload_response_dummy($data, $method = 'inq') {
         break;
     }
 
-    $statuses = array('', '00', '15', '99');
-
     $data->addChild('value')->addChild('string', $statuses[array_rand($statuses)]);
-    $data->addChild('value')->addChild('string', 'KETERANGAN');
+    $data->addChild('value')->addChild('string', $notes[array_rand($notes)]);
     $data->addChild('value')->addChild('string', 'SWITCHERID');
     $data->addChild('value')->addChild('string', 'NOMOREMETER');
     $data->addChild('value')->addChild('string', 'IDPELANGGAN');
@@ -253,6 +291,22 @@ function token_reload_response_keys() {
     'minor_purchased_kwh_unit',
     'purchased_kwh_unit',
     'info',
+  );
+
+  return $keys;
+}
+
+function token_reload_response_query_keys() {
+  $keys = array(
+    'ref_2',
+    'time',
+    'product_code',
+    'product_name',
+    'meter_number',
+    'status',
+    'note',
+    'nominal',
+    'no_ref_2',
   );
 
   return $keys;

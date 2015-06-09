@@ -46,7 +46,6 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
       foreach ($tokens as $token) {
         $options[$token->token_id] = array(
           'cc' => commerce_veritrans_token_format($token),
-          'phone' => $token->phone,
           'expired' => format_date($token->expired),
           'order' => l(t('Order @oid', array('@oid' => $token->order_id)), 'user/' . $account->uid . '/orders/' . $token->order_id),
         );
@@ -56,7 +55,6 @@ function commerce_veritrans_user_token_form($form, &$form_state, $account) {
     // Define table.
     $header = array(
       'cc' => t('Masked Card Number'),
-      'phone' => t('Phone Number'),
       'expired' => t('Expired'),
       'order' => t('Use first in order'),
     );

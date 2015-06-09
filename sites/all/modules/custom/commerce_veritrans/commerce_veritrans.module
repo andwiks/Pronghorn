@@ -597,12 +597,6 @@ function commerce_veritrans_submit_form_validate_credit_card($payment_method, $p
       ) {
         // Try to get phone from previous tokens: not from current token.
         $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['tokens']);
-        if (empty($customer_phone)) {
-          form_set_error($prefix . '][token', t('Payment @type unable to get your phone number based on previous transactions.', array(
-            '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-          )));
-          $return_value = FALSE;
-        }
       }
     }
   }

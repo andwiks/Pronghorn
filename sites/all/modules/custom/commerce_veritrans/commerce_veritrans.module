@@ -604,12 +604,6 @@ function commerce_veritrans_submit_form_validate_credit_card($payment_method, $p
           $return_value = FALSE;
         }
       }
-      else {
-        form_set_error($prefix . '][credit_card][phone', t('Payment @type need to verify your phone number.', array(
-          '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-        )));
-        $return_value = FALSE;
-      }
     }
   }
 

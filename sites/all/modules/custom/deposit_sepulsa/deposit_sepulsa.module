@@ -92,10 +92,20 @@ function deposit_sepulsa_block_view($delta='') {
 
 function deposit_sepulsa_form($form, &$form_state) {
   $option = [];
-  $query = "SELECT product_id, title FROM commerce_product WHERE type='deposit' ORDER BY title";
+  /*$query = "SELECT product_id, title FROM commerce_product WHERE type='deposit' ORDER BY title";
   $result = db_query($query);
   foreach ($result as $row) {
 	$option[$row->product_id] = $row->title;
+  }*/
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_product')
+	->propertyCondition('status', 1)
+	->propertyCondition('type', 'deposit')
+	->fieldOrderBy('commerce_price', 'amount', 'ASC');
+  $result = $query->execute();
+  foreach ($result['commerce_product'] as $row) {
+	$product = commerce_product_load($row->product_id);
+	$option[$row->product_id] = $product->title;
   }
   
   $form['deposit'] = array(
@@ -111,8 +121,8 @@ function deposit_sepulsa_form($form, &$form_state) {
   );
   $form['submit'] = array(
 	'#type' => 'submit', 
-	'#title' => 'Submit',
-	'#value' => 'Submit',
+	'#title' => t('Process'),
+	'#value' => t('Process'),
 	'#attributes' => array(
       'class' => array(
         'btn style1'  

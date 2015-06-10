@@ -159,14 +159,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
 
-      # This Form attribute for Phone Number
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title_display'] = 'invisible';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<div class='form-item'><label>".t('Phone Number')."</label>";
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#suffix'] = "</div>";
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
-      // $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
-
-
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';

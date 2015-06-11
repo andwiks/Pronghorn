@@ -259,7 +259,7 @@ function get_deposit_product(){
   $query->entityCondition('entity_type', 'commerce_product')
 	->propertyCondition('status', 1)
 	->propertyCondition('type', 'deposit')
-	->fieldOrderBy('commerce_price', 'amount', 'ASC');
+	->fieldOrderBy('commerce_price', 'amount', 'DESC');
   $result = $query->execute();
   foreach ($result['commerce_product'] as $key=>$row) {
 	$product = commerce_product_load($row->product_id);

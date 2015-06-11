@@ -46,6 +46,7 @@ global $base_url;
 			  <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
                 <div id="deposit-sepulsa" class="tab-content<?php if($active_tab == 'deposit_sepulsa') print ' in active';?>">
                   <div class="tab-pane">
+                    <div style="padding:5px 5px 20px;"> Deposit akan menambah jumlah Sepulsa Kredit yang tersedia di akun kamu. Sepulsa Kredit dapat digunakan untuk melakukan transaksi.</div>
                     <?php print render($deposit_sepulsa_form); ?>
                   </div>
                 </div>

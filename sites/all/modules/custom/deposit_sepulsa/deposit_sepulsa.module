@@ -216,9 +216,16 @@ function _deposit_sepulsa_get_deposit_product_doc() {
   global $base_url;
   $response = '
   {
-    "58": "Deposit Sepulsa 50.000",
-    "59": "Deposit Sepulsa 10.000",
-    "60": "Deposit Sepulsa 25.000"
+	"product_id": 58
+    "title": "Deposit Sepulsa 50.000"
+  },
+  {
+	"product_id": 59
+    "title": "Deposit Sepulsa 25.000"
+  },
+  {
+	"product_id": 60
+    "title": "Deposit Sepulsa 10.000"
   }
   ';
   $element = array(

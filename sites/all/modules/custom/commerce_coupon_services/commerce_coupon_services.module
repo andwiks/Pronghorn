@@ -48,6 +48,7 @@ function commerce_coupon_services_services_resources() {
                 'data' => 'coupon_id',
               ),
               'optional' => FALSE,
+              'http_method' => 'POST',
             ),
           ),
         ),

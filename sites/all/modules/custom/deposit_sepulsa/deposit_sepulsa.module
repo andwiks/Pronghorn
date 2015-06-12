@@ -240,6 +240,14 @@ function _deposit_sepulsa_get_deposit_product_doc() {
     // Resource prefix.
     // Errors.
     '#errors' => array(
+	  'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),

@@ -40,6 +40,7 @@ function sepulsa_services_services_resources() {
       'operations' => array(
         'index' => array(
           'callback' => '_sepulsa_services_resource_product_index',
+          'documentation callback' => '_sepulsa_services_resource_product_index_doc',
           'access arguments' => array('access content'),
           'args' => array(
             'type' => array(
@@ -51,6 +52,7 @@ function sepulsa_services_services_resources() {
                 'param' => 'type',
               ),
               'default value' => NULL,
+              'http_method' => 'GET',
             ),
           ),
         ),
@@ -166,7 +168,12 @@ function _sepulsa_services_resource_product_index($type = NULL) {
     }
   }
 
-  return empty($type) ? $products : $products[$type];
+  if (empty($type)) {
+    return $products;
+  }
+  else {
+    return isset($products[$type]) ? $products[$type] : services_error(t('@type is not a product.', array('@type' => $type)));
+  }
 }
 
 /**
@@ -266,7 +273,6 @@ function _sepulsa_services_index_doc() {
   return $element;
 }
 
-
 /**
  * Function _sepulsa_services_existing_number_doc().
  *
@@ -299,5 +305,26 @@ function _sepulsa_services_existing_number_doc() {
       ),
     ),
   );
+  return $element;
+}
+
+function _sepulsa_services_resource_product_index_doc() {
+  $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+  $products = _sepulsa_services_resource_product_index();
+
+  $element = array(
+    '#name' => 'index',
+    '#request_url' => 'api/product',
+    '#auth' => FALSE,
+    '#response' => json_encode($products, $options),
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+
   return $element;
 }

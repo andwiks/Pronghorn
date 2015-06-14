@@ -51,7 +51,6 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
   global $user;
   // get voucher node
   $voucher = entity_metadata_wrapper('node', $voucher_id);
-  watchdog('offline_coupon', '<pre>' . $voucher . '</pre>');
   if ($voucher) {
     $voucher_code = $voucher
         ->field_simple_coupon

@@ -1,0 +1,79 @@
+<?php
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function offline_coupon_services_resources() {
+  $offline_coupon_resources = array(
+    'offline_coupon' => array(
+      'actions' => array(
+        'redeem' => array(
+          'help' => 'Redeem offline coupon.',
+          'callback' => 'offline_coupon_resource_redeem',
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'offline_coupon_resource_redeem_doc',
+          'args' => array(
+            array(
+              'name' => 'code',
+              'type' => 'string',
+              'description' => 'Merchant code',
+              'source' => array(
+                'data' => 'code',
+                'param' => 'code',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'voucher_id',
+              'type' => 'int',
+              'description' => 'Voucher NID',
+              'source' => array(
+                'data' => 'voucher_id',
+                'param' => 'voucher_id',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+      )
+    ),
+  );
+
+  return $offline_coupon_resources;
+}
+
+function offline_coupon_resource_redeem($code, $voucher_id) {
+  global $user;
+  // get voucher node
+  $voucher = entity_metadata_wrapper('node', $voucher_id);
+  if ($voucher) {
+    $voucher_code = $voucher
+        ->field_simple_coupon
+        ->field_product[0]
+        ->field_merchant_code
+        ->value();
+    // check publish, user and code
+    if ($voucher->author->getIdentifier() == $user->uid &&
+        $voucher->status->value() == 1) {
+      if ($voucher_code != $code) {
+        return services_error(t('Invalid merchant code'), 406);
+      }
+      return $voucher
+        ->field_simple_coupon
+        ->field_product[0]
+        ->field_detail_simple_coupon
+        ->value
+        ->value(array('decode' => TRUE));
+    }
+    return services_error(t('Invalid user'), 406);
+  }
+  else {
+    return services_error(t('Invalid Voucher'), 406);
+  }
+}
+

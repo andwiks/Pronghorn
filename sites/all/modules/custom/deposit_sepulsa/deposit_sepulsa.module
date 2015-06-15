@@ -5,6 +5,27 @@
  */
 
 /**
+ * Implements hook_services_resources().
+ */
+function deposit_sepulsa_services_resources() {
+  $sepulsa_resources = array(
+    'deposit' => array(
+	  'actions' => array(
+        'get_deposit_product' => array(
+          'help' => 'List all deposit product',
+          'callback' => '_deposit_sepulsa_get_deposit_product',
+          'documentation callback' => '_deposit_sepulsa_get_deposit_product_doc',
+          'args' => array(),
+          'access arguments' => array('access content'),
+        ),
+      )
+    ),
+  );
+
+  return $sepulsa_resources;
+}
+
+/**
  * Implements hook_commerce_line_item_type_info().
  */
 function deposit_sepulsa_commerce_line_item_type_info() {
@@ -91,18 +112,15 @@ function deposit_sepulsa_block_view($delta='') {
 }
 
 function deposit_sepulsa_form($form, &$form_state) {
-  $option = [];
-  $query = "SELECT product_id, title FROM commerce_product WHERE type='deposit' ORDER BY title";
-  $result = db_query($query);
-  foreach ($result as $row) {
-	$option[$row->product_id] = $row->title;
+  $option = get_deposit_product();
+  foreach($option as $value) {
+	$deposit[$value['product_id']] = $value['title'];
   }
-  
   $form['deposit'] = array(
 	'#type' => 'select', 
 	'#title' => '',
 	//'#required' => true,
-	'#options' => $option,
+	'#options' => $deposit,
 	'#attributes' => array(
       'class' => array(
         'input-text full-width'  
@@ -111,8 +129,8 @@ function deposit_sepulsa_form($form, &$form_state) {
   );
   $form['submit'] = array(
 	'#type' => 'submit', 
-	'#title' => 'Submit',
-	'#value' => 'Submit',
+	'#title' => t('Process'),
+	'#value' => t('Process'),
 	'#attributes' => array(
       'class' => array(
         'btn style1'  
@@ -183,7 +201,71 @@ function topup_credit_deposit($item) {
   watchdog('topup_credit_deposit', 'Topup Credit Deposit <br /><pre>'.print_r($item, true).'</pre>');
 }
 
+function _deposit_sepulsa_get_deposit_product(){
+  $deposit_product = get_deposit_product();
+
+  return $deposit_product;
+}
+
+/**
+ * Function _deposit_sepulsa_get_deposit_product_doc().
+ *
+ * Documentation callback for index actions deposit.
+ */
+function _deposit_sepulsa_get_deposit_product_doc() {
+  global $base_url;
+  $response = '
+  {
+    "58": "Deposit Sepulsa 50.000",
+    "59": "Deposit Sepulsa 10.000",
+    "60": "Deposit Sepulsa 25.000"
+  }
+  ';
+  $element = array(
+    '#name' => t('Deposit Sepulsa'),
+    '#description' => t('List all deposit product.'),
+    '#auth' => FALSE,
+    '#path' => 'deposit/get_deposit_product',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/deposit/get_deposit_product.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
 /**
  * Public Functions.
  */
 
+function get_deposit_product(){
+  $option = [];
+  $i = 0;
+  /*$query = "SELECT product_id, title FROM commerce_product WHERE type='deposit' ORDER BY title";
+  $result = db_query($query);
+  foreach ($result as $row) {
+	$option[$row->product_id] = $row->title;
+  }*/
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_product')
+	->propertyCondition('status', 1)
+	->propertyCondition('type', 'deposit')
+	->fieldOrderBy('commerce_price', 'amount', 'DESC');
+  $result = $query->execute();
+  foreach ($result['commerce_product'] as $key=>$row) {
+	$product = commerce_product_load($row->product_id);
+	$option[$i] = array('product_id'=>$product->product_id, 'title'=>$product->title);
+	$i = $i+1;
+  } 
+  
+  return $option;
+}

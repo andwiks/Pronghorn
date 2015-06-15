@@ -1,0 +1,353 @@
+<?php
+/**
+ * @file
+ * token_reload.install
+ */
+
+/**
+ * Implements hook_install().
+ */
+function token_reload_install() {
+  $t = get_t();
+
+  $fields = array(
+    'electricity_customer_number' => array(
+      'field_name' => 'electricity_customer_number',
+      'type' => 'text',
+    ),
+    'electricity_phone_number' => array(
+      'field_name' => 'electricity_phone_number',
+      'type' => 'telephone',
+    ),
+  );
+  foreach ($fields as $field) {
+    field_create_field($field);
+  }
+
+  $instances = array(
+    'electricity_customer_number' => array(
+      'field_name' => 'electricity_customer_number',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'electricity_prepaid',
+      'label' => $t('Customer Number'),
+      'required' => TRUE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+      'commerce_cart_settings' => array(
+        'field_access' => TRUE,
+      ),
+    ),
+    'electricity_phone_number' => array(
+      'field_name' => 'electricity_phone_number',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'electricity_prepaid',
+      'label' => $t('Phone Number'),
+      'required' => TRUE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+        ),
+      ),
+      'commerce_cart_settings' => array(
+        'field_access' => TRUE,
+      ),
+    ),
+    'field_product' => array(
+      'field_name' => 'field_product',
+      'entity_type' => 'node',
+      'bundle' => 'electricity',
+      'label' => $t('Product variations'),
+      'required' => TRUE,
+      'settings' => array(
+        'field_injection' => TRUE,
+        'referenceable_types' => array('electricity' => 'electricity'),
+      ),
+      'widget' => array(
+        'type' => 'inline_entity_form',
+        'settings' => array(
+          'type_settings' => array(
+            'delete_references' => TRUE,
+          ),
+        ),
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_cart_add_to_cart_form',
+          'settings' => array(
+            'combine' => FALSE,
+            'line_item_type' => 'electricity_prepaid',
+          ),
+        ),
+      ),
+    ),
+  );
+
+  foreach ($instances as $instance) {
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_schema().
+ */
+function token_reload_schema() {
+  $schema['token_reload'] = array(
+    'description' => 'The base table for token reload.',
+    'fields' => array(
+      'trid' => array(
+        'description' => 'The primary identifier for a token reload process.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'vid' => array(
+        'description' => 'The current {token_reload_revision}.vid version identifier',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the token reload was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the token reload was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'admin_fee' => array(
+        'type' => 'float',
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'meter_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'no_ref_2' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'subscriber_segmentation' => array(
+        'type' => 'varchar',
+        'length' => 128,
+      ),
+      'power_consuming_category' => array(
+        'type' => 'int',
+      ),
+      'service_unit' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'stamp_duty' => array(
+        'type' => 'float',
+      ),
+      'ppn' => array(
+        'type' => 'float',
+      ),
+      'ppj' => array(
+        'type' => 'float',
+      ),
+      'customer_payables_installment' => array(
+        'type' => 'float',
+      ),
+      'power_purchase' => array(
+        'type' => 'float',
+      ),
+      'purchased_kwh_unit' => array(
+        'type' => 'float',
+      ),
+      'info' => array(
+        'type' => 'text',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+      ),
+    ),
+    'unique keys' => array(
+      'vid' => array('vid'),
+      'line_item_id' => array('line_item_id'),
+    ),
+    'foreign keys' => array(
+      'token_reload_revision' => array(
+        'table' => 'token_reload_revision',
+        'columns' => array('vid' => 'vid'),
+      ),
+      'token_reload_line_item' => array(
+        'table' => 'commerce_line_item',
+        'columns' => array('line_item_id' => 'line_item_id'),
+      ),
+    ),
+    'primary key' => array('trid'),
+  );
+
+  $schema['token_reload_revision'] = array(
+    'description' => 'The revision table for token reload.',
+    'fields' => array(
+      'trid' => array(
+        'description' => 'The primary identifier for a token reload process.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid' => array(
+        'description' => 'The current {token_reload_revision}.vid version identifier',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'line_item_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the token reload was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the token reload was most recently saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'time' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'admin_fee' => array(
+        'type' => 'float',
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'meter_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_number' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'no_ref_2' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'customer_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'subscriber_segmentation' => array(
+        'type' => 'varchar',
+        'length' => 128,
+      ),
+      'power_consuming_category' => array(
+        'type' => 'int',
+      ),
+      'service_unit' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'token_pln' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'stamp_duty' => array(
+        'type' => 'float',
+      ),
+      'ppn' => array(
+        'type' => 'float',
+      ),
+      'ppj' => array(
+        'type' => 'float',
+      ),
+      'customer_payables_installment' => array(
+        'type' => 'float',
+      ),
+      'power_purchase' => array(
+        'type' => 'float',
+      ),
+      'purchased_kwh_unit' => array(
+        'type' => 'float',
+      ),
+      'info' => array(
+        'type' => 'text',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'trid' => array('trid'),
+    ),
+    'foreign keys' => array(
+      'versioned_token_reload' => array(
+        'table' => 'token_reload',
+        'columns' => array('trid' => 'trid'),
+      ),
+      'token_reload_line_item' => array(
+        'table' => 'commerce_line_item',
+        'columns' => array('line_item_id' => 'line_item_id'),
+      ),
+    ),
+    'primary key' => array('vid'),
+  );
+
+  return $schema;
+}

@@ -1,6 +1,25 @@
 <?php
 
 /**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_order_commerce_order_presave($order) {
+  if (function_exists('getallheaders')) {
+    $headers = getallheaders();
+    if (!empty($headers['X-Imei'])) {
+      $imei = $headers['X-Imei'];
+    }
+  }
+  elseif (!empty($_SERVER['HTTP_X_IMEI'])) {
+    $imei = $_SERVER['HTTP_X_IMEI'];
+  }
+
+  if (!empty($imei) && $display_language = field_language('commerce_order', $order, 'field_imei')) {
+    $order->field_imei[$display_language][0]['value'] = $imei;
+  }
+}
+
+/**
  * Implements hook_cronapi().
  */
 function sepulsa_order_cronapi() {
@@ -112,7 +131,7 @@ function sepulsa_order_process_order($order_id) {
       $sepulsa_order = entity_create('sepulsa_order', array('order_id' => $order_id));
     }
 
-    $properties = entity_get_property_info('sepulsa_order');
+    $info = entity_get_property_info('sepulsa_order');
     $sepulsa_order_wrapper = entity_metadata_wrapper('sepulsa_order', $sepulsa_order);
     $sepulsa_order_wrapper->mail->set($order->mail);
     $sepulsa_order_wrapper->status->set($order->status);
@@ -121,6 +140,11 @@ function sepulsa_order_process_order($order_id) {
 
     foreach ($order_wrapper->commerce_line_items as $id => $line_item_wrapper) {
       switch ($line_item_wrapper->getBundle()) {
+        case 'electricity_prepaid':
+          $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
+          $sepulsa_order_wrapper->phone->set($line_item_wrapper->electricity_phone_number->value());
+          break;
+
         case 'mobile_prepaid':
           $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
           $sepulsa_order_wrapper->phone->set($line_item_wrapper->field_phone_number->value());
@@ -128,7 +152,7 @@ function sepulsa_order_process_order($order_id) {
 
         case 'coupon':
           $property = 'coupon_' . $id;
-          if (isset($properties[$property])) {
+          if (isset($info['properties'][$property])) {
             $sepulsa_order_wrapper->$property->set($line_item_wrapper->commerce_product->value());
           }
           break;

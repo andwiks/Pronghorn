@@ -2,6 +2,10 @@
 
   Drupal.behaviors.sepulsaTheme = {
     attach: function (context, settings) {
+      $('form[id^="commerce-cart-add-to-cart-form"] :input[name="op"]').on('state:disabled', function(e) {
+        $(this).toggleClass('inactive', e.value);
+      });
+
       // checkbox
       $('.checkbox input[type="checkbox"], .radio input[type="radio"]').each(function() {
         if ($(this).is(':checked')) {

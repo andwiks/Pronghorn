@@ -355,8 +355,10 @@ function sepulsa_phone_form_submit($form, &$form_state) {
     if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
       unset($GLOBALS['_rules_action_drupal_goto_do']);
     }
+    $order = commerce_cart_order_load($user->uid);
     // Redirect to checkout page.
-    $form_state['redirect'] = 'checkout';
+    //$form_state['redirect'] = 'checkout/'.$order->order_number."/".urlencode("?fast_charge=1");
+    drupal_goto('checkout/'.$order->order_number, array("query" => array("fast_charge" => 1) ));
   }
 }
 

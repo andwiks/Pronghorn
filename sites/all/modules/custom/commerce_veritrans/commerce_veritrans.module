@@ -409,9 +409,20 @@ function commerce_veritrans_submit_form($payment_method, $pane_values, $checkout
       // Get line item wrapper.
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
       // Check whether field is available.
-      if (isset($line_item_wrapper->field_phone_number)) {
+
+      switch ($line_item_wrapper->getBundle()) {
+        case 'electricity_prepaid':
+          $phone_number_field = 'electricity_phone_number';
+          break;
+
+        default:
+          $phone_number_field = 'field_phone_number';
+          break;
+      }
+
+      if (isset($line_item_wrapper->$phone_number_field)) {
         // Check field phone number if not empty.
-        $number = $line_item_wrapper->field_phone_number->value();
+        $number = $line_item_wrapper->$phone_number_field->value();
         // @todo: make this settingable.
         // @todo: field or addressfield phone.
         if (!empty($number)) {
@@ -586,18 +597,6 @@ function commerce_veritrans_submit_form_validate_credit_card($payment_method, $p
       ) {
         // Try to get phone from previous tokens: not from current token.
         $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['tokens']);
-        if (empty($customer_phone)) {
-          form_set_error($prefix . '][token', t('Payment @type unable to get your phone number based on previous transactions.', array(
-            '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-          )));
-          $return_value = FALSE;
-        }
-      }
-      else {
-        form_set_error($prefix . '][credit_card][phone', t('Payment @type need to verify your phone number.', array(
-          '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
-        )));
-        $return_value = FALSE;
       }
     }
   }
@@ -820,7 +819,6 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
 
   // Check customer phone.
   $customer_phone = (isset($pane_values['veritrans']['credit_card']['phone'])) ? $pane_values['veritrans']['credit_card']['phone'] : '';
-  $customer_phone = (isset($pane_values['veritrans']['credit_card']['phone_other']) && !empty($pane_values['veritrans']['credit_card']['phone_other'])) ? $pane_values['veritrans']['credit_card']['phone_other'] : $customer_phone;
   if (empty($customer_phone) && !empty($pane_values['veritrans']['tokens'])) {
     // Get phone from previous selected tokens: not from current token.
     $customer_phone = commerce_veritrans_token_get_phone($pane_values['veritrans']['tokens']);
@@ -1208,43 +1206,10 @@ function commerce_veritrans_credit_card_form($fields = array(), $default = array
     ),
   );
 
-  // Check whether default phone is available.
-  if (isset($fields['phone']) && !empty($fields['phone'])) {
-    $form['credit_card']['phone'] = array(
-      '#type' => 'select',
-      '#title' => t('Phone Number'),
-      '#options' => $fields['phone'] + array('0' => t('Other Phone Number')),
-      '#default_value' => key($fields['phone']),
-    );
-    // Provide phone other text field.
-    $form['credit_card']['phone_other'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Other Phone Number'),
-      '#title_display' => 'invisible',
-      '#default_value' => '',
-      '#attributes' => array('autocomplete' => 'off'),
-      '#validated' => TRUE,
-      '#maxlength' => 14,
-      '#size' => 14,
-      '#states' => array(
-        'visible' => array(
-          ':input[name="commerce_payment[payment_details][veritrans][credit_card][phone]"]' => array('value' => 0),
-        ),
-      ),
-    );
-  }
-  else {
-    $form['credit_card']['phone'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Phone Number'),
-      '#default_value' => '',
-      '#attributes' => array('autocomplete' => 'off'),
-      '#required' => TRUE,
-      '#validated' => TRUE,
-      '#maxlength' => 14,
-      '#size' => 14,
-    );
-  }
+  $form['credit_card']['phone'] = array(
+    '#type' => 'value',
+    '#value' => empty($fields['phone']) ? '' : key($fields['phone']),
+  );
 
   if (isset($fields['type']) && in_array($fields['type'], array('oneclick', 'twoclick'))) {
     // Get valid veritrans token.

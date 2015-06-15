@@ -1,0 +1,128 @@
+<?php
+/**
+ * @file
+ * campaign_tracker.install
+ */
+
+/**
+ * Implements hook_install().
+ */
+function campaign_tracker_install() {
+  $t = get_t();
+
+  $fields = array(
+    'field_utm_source' => array(
+      'field_name' => 'field_utm_source',
+      'type' => 'text',
+    ),
+    'field_utm_medium' => array(
+      'field_name' => 'field_utm_medium',
+      'type' => 'text',
+    ),
+    'field_utm_campaign' => array(
+      'field_name' => 'field_utm_campaign',
+      'type' => 'text',
+    ),
+    'field_reg_utm_source' => array(
+      'field_name' => 'field_reg_utm_source',
+      'type' => 'text',
+    ),
+    'field_reg_utm_medium' => array(
+      'field_name' => 'field_reg_utm_medium',
+      'type' => 'text',
+    ),
+    'field_reg_utm_campaign' => array(
+      'field_name' => 'field_reg_utm_campaign',
+      'type' => 'text',
+    ),
+  );
+  foreach ($fields as $field) {
+    field_create_field($field);
+  }
+
+  $instances = array(
+    'field_utm_source' => array(
+      'field_name' => 'field_utm_source',
+      'entity_type' => 'commerce_order',
+      'bundle' => 'commerce_order',
+      'label' => $t('utm_source'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+    'field_utm_medium' => array(
+      'field_name' => 'field_utm_medium',
+      'entity_type' => 'commerce_order',
+      'bundle' => 'commerce_order',
+      'label' => $t('utm_medium'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+    'field_utm_campaign' => array(
+      'field_name' => 'field_utm_campaign',
+      'entity_type' => 'commerce_order',
+      'bundle' => 'commerce_order',
+      'label' => $t('utm_campaign'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+    'field_reg_utm_source' => array(
+      'field_name' => 'field_reg_utm_source',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => $t('reg_utm_source'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+    'field_reg_utm_medium' => array(
+      'field_name' => 'field_reg_utm_medium',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => $t('reg_utm_medium'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+    'field_reg_utm_campaign' => array(
+      'field_name' => 'field_reg_utm_campaign',
+      'entity_type' => 'user',
+      'bundle' => 'user',
+      'label' => $t('reg_utm_campaign'),
+      'required' => FALSE,
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'text_plain',
+        ),
+      ),
+    ),
+  );
+
+  foreach ($instances as $instance) {
+    field_create_instance($instance);
+  }
+}
+

@@ -43,8 +43,10 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
     $form['packet']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Paket');
 
     $form['add']['#prefix'] = '<p></p>';
+    $form['add']['cart']['#value'] = t('Get Voucher');
     $form['add']['cart']['#attributes']['style'] = 'float:right';
-    $form['add']['charge']['#attributes']['style'] = 'float:right;display:none;';
+    $form['add']['charge']['#value'] = t('Pay Now');
+    $form['add']['charge']['#attributes']['style'] = 'float:right;';
 
   } else if ($form_id == "user_login_block") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
@@ -157,14 +159,6 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
         $form['commerce_payment']['payment_details']['veritrans']['code2']['#attributes']['style'] = "width:75px !important";
       }
 
-      # This Form attribute for Phone Number
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#title_display'] = 'invisible';
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#prefix'] = "<div class='form-item'><label>".t('Phone Number')."</label>";
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#suffix'] = "</div>";
-      $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['style'] = 'width:190px !important; margin-right:10px';
-      // $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone']['#attributes']['class'] = array('selector');
-
-
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#title_display'] = 'invisible';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#prefix'] = '<div class="form-item"><p></p>';
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['phone_other']['#suffix'] = '</div>';
@@ -265,17 +259,60 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_form_BASE_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
-  if (!empty($form_state['line_item']) && $form_state['line_item']->type == 'coupon') {
-    $form['#attached']['library'][] = array('system', 'effects.shake');
-    $form['#attached']['js'][path_to_theme() . '/js/sepulsa-coupon.js'] = array(
-      'group' => JS_THEME,
-    );
+  if (!empty($form_state['line_item'])) {
+    switch ($form_state['line_item']->type) {
+      case 'coupon':
+        $form['#attached']['library'][] = array('system', 'effects.shake');
+        $form['#attached']['js'][path_to_theme() . '/js/sepulsa-coupon.js'] = array(
+          'group' => JS_THEME,
+        );
 
-    $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
-    $form['submit']['#ajax'] = array(
-      'callback' => 'sepulsa_commerce_add_to_cart_form_ajax_submit',
-      'progress' => array('type' => 'none'),
-    );
+        $form['submit']['#attributes'] = array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more'));
+        $form['submit']['#ajax'] = array(
+          'callback' => 'sepulsa_commerce_add_to_cart_form_ajax_submit',
+          'progress' => array('type' => 'none'),
+        );
+        break;
+
+      case 'electricity_prepaid':
+        global $active_tab;
+        $active_tab = 'token_reload';
+
+        // $form['product_id']['#weight'] = 5;
+        $form['product_id']['#attributes']['class'][] = 'input-text';
+        $form['product_id']['#attributes']['class'][] = 'full-width';
+        $form['product_id']['#suffix'] = '<p></p>';
+
+        $form['line_item_fields']['#weight'] = 0;
+
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#title'];
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+
+        $form['submit']['#value'] = t('Process');
+        $form['submit']['#attributes']['class'][] = 'btn';
+        $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'pull-right';
+        if ($form_state['submitted'] === FALSE) {
+          $form['submit']['#attributes']['class'][] = 'inactive';
+        }
+        $form['submit']['#states'] = array(
+          'enabled' => array(
+            ':input[name="line_item_fields[electricity_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ':input[name="line_item_fields[electricity_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+          ),
+        );
+
+        break;
+    }
   }
 }
 
@@ -357,6 +394,20 @@ function sepulsa_preprocess_block(&$vars, $hook) {
 function sepulsa_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function sepulsa_preprocess_page(&$variables) {
+  if (drupal_is_front_page()) {
+    if (isset($_POST['form_id']) && $_POST['form_id'] == 'commerce_cart_add_to_cart_form') {
+      $variables['active_tab'] = 'token_reload';
+    }
+    else {
+      $variables['active_tab'] = 'topup';
+    }
   }
 }
 

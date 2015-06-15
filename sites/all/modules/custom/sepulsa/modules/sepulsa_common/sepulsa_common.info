@@ -1,0 +1,4 @@
+name = Sepulsa Common
+description = Common custom functions for Sepulsa.
+core = 7.x
+package = Sepulsa

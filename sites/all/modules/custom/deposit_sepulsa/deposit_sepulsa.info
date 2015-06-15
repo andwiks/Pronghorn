@@ -1,0 +1,9 @@
+name = "Deposit Sepulsa"
+description = "Provide form for User to Deposit in Sepulsa."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = commerce_line_item
+dependencies[] = commerce_line_item_ui
+dependencies[] = commerce_order
+dependencies[] = commerce_order_ui

@@ -28,17 +28,17 @@ function mobile_banner_install_block_configure($delta='') {
   
   switch($delta) {
     case 'mobile_banner_install' :
-      $form['home_about_title'] = array(
-        '#type' => 'text_format',
-        '#title' => t('Home About Title'),
-        '#default_value' => variable_get('home_about_title', ''),
-      );
-        
-      $form['home_about_text'] = array(
-        '#type' => 'text_format',
-        '#title' => t('Home About Text'),
-        '#default_value' => variable_get('home_about_text', ''),
-      );
+     $form['logo'] = array(
+	  '#name' => 'logo',
+	  '#type' => 'managed_file',
+	  '#title' => t('Choose an Image File'),
+	  '#description' => t('Select an Image for the custom block.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
+	  '#default_value' => variable_get('logo_fid', ''),
+	  '#upload_location' => 'public://',
+	  '#upload_validators' => array(
+		'file_validate_extensions' => array('gif png jpg jpeg'),
+	  ),
+	);
 
       break;
   }
@@ -50,10 +50,14 @@ function mobile_banner_install_block_configure($delta='') {
  */
 function mobile_banner_install_block_save($delta = '', $edit = array()) {
   switch($delta) {
-    case 'home_about' :
-      // Saving the WYSIWYG text      
-      variable_set('home_about_title', $edit['home_about_title']['value']);
-      variable_set('home_about_text', $edit['home_about_text']['value']);
+    case 'mobile_banner_install' :
+      // Saving the file, setting it to a permanent state, setting a FID variable
+      $file = file_load($edit['logo']);
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
+      $block = block_load('mobile_banner_install', $delta);
+      file_usage_add($file, 'mobile_banner_install', 'block', $block->bid);
+      variable_set('logo_fid', $file->fid);
       break;
   }
 }
@@ -80,16 +84,32 @@ function mobile_banner_install_block_view($delta='') {
  *   returns a renderable array of block content.
  */
 function mobile_banner_install_view() {
-    $block = array();
-    
+  global $base_url;
+  $content = array();
+  $path = drupal_get_path('module', 'mobile_banner_install');
+
+  if (empty($_COOKIE["mobile_banner_install_cookie"])) {
+	$image_file = file_load(variable_get('logo_fid', ''));
+	$image_path = '';
+
+	if (isset($image_file->filename)) {
+	  $image_path = $base_url.'/sites/default/files/'.$image_file->filename;
+	}
+	$cookie_lifetime = 30;
+	setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
 	$user_agent = $_SERVER['HTTP_USER_AGENT'];
-	drupal_set_message($user_agent);
-	//print strpos($user_agent); exit;
-    $merchants = views_get_view_result('merchant', 'page');
-    $content['home_about_title'] = variable_get('home_about_title', '');
-    $content['home_about_text'] = variable_get('home_about_text', '');
-    $content['merchants'] = $merchants;
-    return theme('home_about_detail', array('content' => $content));
+	//drupal_set_message($user_agent);
+	if(stripos($user_agent, 'android') !== false) {
+	  $content['apps_path'] = "https://play.google.com/store/apps/details?id=com.sepulsa.android";
+	  $content['image_path'] = $image_path;
+	} else if (stripos($user_agent, 'iphone') !== false) {
+	  $content['apps_path'] = "https://itunes.apple.com/us/app/sepulsa/id991045758?ls=1&mt=8";
+	  $content['image_path'] = $image_path;
+	}
+  }
+  
+  if (!empty($content))
+	return theme('mobile_banner_install', array('content' => $content));
 }
 
 /**

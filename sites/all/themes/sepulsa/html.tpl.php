@@ -21,6 +21,7 @@ global $base_url;
     <meta charset="utf-8">
     <meta name="description" content="PT. Sepulsa Teknologi Indonesia | Isi Ulang Pulsa Gratis">
     <meta name="author" content="PT. Sepulsa Teknologi Indonesia">
+	<meta name="apple-itunes-app" content="app-id=991045758">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 

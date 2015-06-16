@@ -22,6 +22,8 @@ global $base_url;
     <meta name="description" content="PT. Sepulsa Teknologi Indonesia | Isi Ulang Pulsa Gratis">
     <meta name="author" content="PT. Sepulsa Teknologi Indonesia">
 	<meta name="apple-itunes-app" content="app-id=991045758">
+	<meta name="google-play-app" content="app-id=com.sepulsa.android"> 
+	<link rel="stylesheet" href="<?php print $base_url . '/' . path_to_theme(); ?>/css/jquery.smartbanner.css" type="text/css" media="screen">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -70,5 +72,8 @@ global $base_url;
   <div id="thawteseal" style="display:none;text-align:center;" title="Click to Verify - This site chose Thawte SSL for secure e-commerce and confidential communications.">
     <div><script type="text/javascript" src="https://seal.thawte.com/getthawteseal?host_name=www.sepulsa.com&amp;size=S&amp;lang=en"></script></div>
   </div>
+  
+  <script src="<?php print $base_url . '/' . path_to_theme(); ?>/js/jquery.smartbanner.js"></script> 
+  <script type="text/javascript"> $().smartbanner(); </script>
 </body>
 </html>

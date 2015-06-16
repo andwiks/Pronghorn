@@ -108,7 +108,7 @@ function mobile_banner_install_view() {
 	}
   }
   
-  if (!empty($content))
+  //if (!empty($content))
 	return theme('mobile_banner_install', array('content' => $content));
 }
 

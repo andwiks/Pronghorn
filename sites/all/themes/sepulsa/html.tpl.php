@@ -74,6 +74,11 @@ global $base_url;
   </div>
   
   <script src="<?php print $base_url . '/' . path_to_theme(); ?>/js/jquery.smartbanner.js"></script> 
-  <script type="text/javascript"> $().smartbanner(); </script>
+  <script type="text/javascript"> 
+  $.smartbanner({
+	title: 'Sepulsa',
+	author: 'Sepulsa'
+  });
+  </script>
 </body>
 </html>

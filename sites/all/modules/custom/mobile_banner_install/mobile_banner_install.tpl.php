@@ -9,7 +9,7 @@
   <table style="text-align: center; width: 100%">
 	<tr>
 	  <td width="10%"><img width="50px" src="<?php print $content['image_path'] ?>" /></td>
-	  <td width="50%">
+	  <td width="50%" style="text-align: left; padding-left: 10px;">
 		Sepulsa.com<br />
 		PT. Sepulsa Technology<br />
 		FREE - In Google Play</td>

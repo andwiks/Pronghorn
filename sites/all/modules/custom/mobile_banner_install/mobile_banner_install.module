@@ -133,7 +133,7 @@ function mobile_banner_install_view() {
 	  $image_path = $base_url.'/sites/default/files/apps_logo/'.$image_file->filename;
 	}
 	$cookie_lifetime = variable_get('mobile_banner_cookies', '');
-	setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
+	//setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
 	$user_agent = $_SERVER['HTTP_USER_AGENT'];
 	//drupal_set_message($user_agent);
 	if(stripos($user_agent, 'android') !== false) {
@@ -144,10 +144,14 @@ function mobile_banner_install_view() {
 	  $content['apps_desc'] = variable_get('mobile_banner_iphone_desc', '');
 	  $content['apps_path'] = variable_get('mobile_banner_iphone_path', '');
 	  $content['image_path'] = $image_path;
+	} else {
+	  $content['apps_desc'] = variable_get('mobile_banner_iphone_desc', '');
+	  $content['apps_path'] = variable_get('mobile_banner_iphone_path', '');
+	  $content['image_path'] = $image_path;
 	}
   }
   
-  if (!empty($content))
+  //if (!empty($content))
   return theme('mobile_banner_install', array('content' => $content));
 }
 

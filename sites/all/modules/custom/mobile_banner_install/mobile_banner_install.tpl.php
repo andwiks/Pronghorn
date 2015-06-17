@@ -13,8 +13,8 @@
 		Sepulsa.com<br />
 		PT. Sepulsa Technology<br />
 		FREE - In Google Play</td>
-	  <td width="50%"><a href="<?php print $content['apps_path'] ?>"><button class="">View</button></a>
-		  <button id="close_banner" class="">Close</button></td>
+	  <td width="50%"><a href="<?php print $content['apps_path'] ?>"><button class="btn">View</button></a>
+		  <button id="close_banner" class="btn">Close</button></td>
 	</tr>
   </table>
  </div>

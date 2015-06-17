@@ -47,10 +47,10 @@
   <table style="text-align: center; width: 100%">
 	<tr>
 	  <td width="20%"><img width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" /></td>
-	  <td width="50%" style="text-align: left; padding-left: 10px;">
+	  <td width="45%" style="text-align: left; padding-left: 10px;">
 		<?php if (isset($content['apps_desc'])) print $content['apps_desc']  ?>
 	  </td>
-	  <td width="30%"><a href="<?php if (isset($content['apps_path'])) print $content['apps_path'] ?>"><button class="myButton">View</button></a>
+	  <td width="35%"><a href="<?php if (isset($content['apps_path'])) print $content['apps_path'] ?>"><button class="myButton">View</button></a>
 		  <button id="close_banner" class="myButton">Close</button></td>
 	</tr>
   </table>

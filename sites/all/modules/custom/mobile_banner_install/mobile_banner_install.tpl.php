@@ -5,7 +5,7 @@
 	});
   });
 </script>
-<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #eee; z-index: 101; text-align: center; padding: 10px;">
+<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #eee; z-index: 101; text-align: center; padding-bottom: 10px;">
   <table style="text-align: center; width: 100%">
 	<tr>
 	  <td width="10%"><img width="50px" src="<?php print $content['image_path'] ?>" /></td>

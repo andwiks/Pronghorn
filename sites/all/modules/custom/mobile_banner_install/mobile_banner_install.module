@@ -34,13 +34,45 @@ function mobile_banner_install_block_configure($delta='') {
 	  '#title' => t('Choose an Image File'),
 	  '#description' => t('Select an Image for the custom block.  Only *.gif, *.png, *.jpg, and *.jpeg images allowed.'),
 	  '#default_value' => variable_get('logo_fid', ''),
-	  '#upload_location' => 'public://',
+	  '#upload_location' => 'public://apps_logo',
 	  '#upload_validators' => array(
 		'file_validate_extensions' => array('gif png jpg jpeg'),
 	  ),
 	);
 
-      break;
+	$form['mobile_banner_cookies'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Cookies Lifetime'),
+	  '#default_value' => variable_get('mobile_banner_cookies', ''),
+	);
+	
+	$form['mobile_banner_iphone_desc'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Iphone Description'),
+	  '#default_value' => variable_get('mobile_banner_iphone_desc', ''),
+	);
+	
+	
+	$form['mobile_banner_android_desc'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Android Description'),
+	  '#default_value' => variable_get('mobile_banner_android_desc', ''),
+	);
+	
+	$form['mobile_banner_iphone_path'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Iphone Path'),
+	  '#default_value' => variable_get('mobile_banner_iphone_path', ''),
+	);
+	
+	
+	$form['mobile_banner_android_path'] = array(
+	  '#type' => 'text_format',
+	  '#title' => t('Android Path'),
+	  '#default_value' => variable_get('mobile_banner_android_path', ''),
+	);
+	
+    break;
   }
   return $form;
 }
@@ -51,6 +83,11 @@ function mobile_banner_install_block_configure($delta='') {
 function mobile_banner_install_block_save($delta = '', $edit = array()) {
   switch($delta) {
     case 'mobile_banner_install' :
+      variable_set('mobile_banner_cookies', $edit['mobile_banner_cookies']['value']);
+      variable_set('mobile_banner_iphone_desc', $edit['mobile_banner_iphone_desc']['value']);
+      variable_set('mobile_banner_android_desc', $edit['mobile_banner_android_desc']['value']);
+      variable_set('mobile_banner_iphone_path', $edit['mobile_banner_iphone_path']['value']);
+      variable_set('mobile_banner_android_path', $edit['mobile_banner_android_path']['value']);
       // Saving the file, setting it to a permanent state, setting a FID variable
       $file = file_load($edit['logo']);
       $file->status = FILE_STATUS_PERMANENT;
@@ -93,35 +130,41 @@ function mobile_banner_install_view() {
 	$image_path = '';
 
 	if (isset($image_file->filename)) {
-	  $image_path = $base_url.'/sites/default/files/'.$image_file->filename;
+	  $image_path = $base_url.'/sites/default/files/apps_logo/'.$image_file->filename;
 	}
-	$cookie_lifetime = 30;
-	//setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
+	$cookie_lifetime = variable_get('mobile_banner_cookies', '');
+	setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
 	$user_agent = $_SERVER['HTTP_USER_AGENT'];
 	//drupal_set_message($user_agent);
 	if(stripos($user_agent, 'android') !== false) {
-	  $content['apps_path'] = "https://play.google.com/store/apps/details?id=com.sepulsa.android";
+	  $content['apps_desc'] = variable_get('mobile_banner_android_desc', '');
+	  $content['apps_path'] = variable_get('mobile_banner_android_path', '');
 	  $content['image_path'] = $image_path;
 	} else if (stripos($user_agent, 'iphone') !== false) {
-	  $content['apps_path'] = "https://itunes.apple.com/us/app/sepulsa/id991045758?ls=1&mt=8";
+	  $content['apps_desc'] = variable_get('mobile_banner_iphone_desc', '');
+	  $content['apps_path'] = variable_get('mobile_banner_iphone_path', '');
 	  $content['image_path'] = $image_path;
 	}
   }
   
-  //if (!empty($content))
-	return theme('mobile_banner_install', array('content' => $content));
+  if (!empty($content))
+  return theme('mobile_banner_install', array('content' => $content));
 }
 
 /**
  * Implements hook_theme().
  */
 function mobile_banner_install_theme($existing, $type, $theme, $path) {
-    return array(
-      'mobile_banner_install' => array(
-        'variables' => array('content' => NULL),
-        'template' => 'mobile_banner_install', // place you file in 'theme' folder of you module folder
-        'path' => drupal_get_path('module', 'mobile_banner_install')
-      )
-    );
+  return array(
+	'mobile_banner_install' => array(
+	  'variables' => array('content' => NULL),
+	  'template' => 'mobile_banner_install', // place you file in 'theme' folder of you module folder
+	  'path' => drupal_get_path('module', 'mobile_banner_install')
+	)
+  );
+}
+
+function mobile_banner_install_install() {
+  mkdir('sites/default/files/apps_logo');
 }
 

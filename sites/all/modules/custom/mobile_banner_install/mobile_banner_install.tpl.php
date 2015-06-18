@@ -43,11 +43,11 @@
 	});
   });
 </script>
-<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #878787; z-index: 101; text-align: center;">
+<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #606060; z-index: 101; text-align: center;">
   <table style="text-align: center; width: 100%">
 	<tr>
-	  <td width="20%"><img width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" /></td>
-	  <td width="45%" style="text-align: left; padding-left: 10px;">
+	  <td width="20%"><img style="padding: 10px;" width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" /></td>
+	  <td width="45%" style="text-align: left; padding-left: 10px; color: #fff;">
 		<?php if (isset($content['apps_desc'])) print $content['apps_desc']  ?>
 	  </td>
 	  <td width="35%"><a href="<?php if (isset($content['apps_path'])) print $content['apps_path'] ?>"><button class="myButton">View</button></a>

@@ -268,6 +268,28 @@ function token_reload_queue_process($data) {
   module_load_include('inc', 'token_reload');
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item_id);
 
+  $params = array(
+    'meter_number' => $line_item_wrapper->electricity_customer_number->value(),
+    'customer_number' => $line_item_wrapper->electricity_customer_number->value(),
+    'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
+  );
+  $inquiry = token_reload_request_call(token_reload_request_data($params));
+  if ($inquiry) {
+    if ($inquiry['status'] != '00') {
+      $params['meter_number'] = NULL;
+      $params['customer_number'] = $line_item_wrapper->electricity_customer_number->value();
+      $inquiry = token_reload_request_call(token_reload_request_data($params));
+    }
+
+    if ($inquiry['status'] == '00') {
+      $line_item_wrapper->value()->data['inquiry'] = $inquiry;
+      $line_item_wrapper->save();
+    }
+    else {
+      watchdog('token_reload', '@note: <pre>!inquiry</pre>', array('@note' => $inquiry['note'], '!inquiry' => print_r($inquiry, TRUE)), WATCHDOG_ERROR);
+    }
+  }
+
   $token_reloads = entity_load('token_reload', FALSE, array('line_item_id' => $line_item_id));
   if (empty($token_reloads)) {
     $token_reload = entity_create('token_reload', array('line_item_id' => $line_item_id));
@@ -282,14 +304,11 @@ function token_reload_queue_process($data) {
       ->fetchField();
   }
 
-  $params = array(
-    'meter_number' => $line_item_wrapper->meter_number->value(),
-    'phone_number' => $line_item_wrapper->electricity_phone_number->value(),
-    'nominal' => $line_item_wrapper->commerce_total->amount->value(),
-    'ref_1' => str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($try, 2, '0', STR_PAD_LEFT) . str_pad($total++, 2, '0', STR_PAD_LEFT),
-    'ref_2' => $line_item_wrapper->ref_2->value(),
-    'ref_3' => $line_item_wrapper->ref_3->value(),
-  );
+  $params['meter_number'] = $line_item_wrapper->meter_number->value();
+  $params['nominal'] = $line_item_wrapper->commerce_total->amount->value();
+  $params['ref_1'] = str_pad($line_item_id, 10, '0', STR_PAD_LEFT) . str_pad($try, 2, '0', STR_PAD_LEFT) . str_pad($total++, 2, '0', STR_PAD_LEFT);
+  $params['ref_2'] = $line_item_wrapper->ref_2->value();
+  $params['ref_3'] = $line_item_wrapper->ref_3->value();
 
   $max_try = variable_get('token_reload_try', 2);
 

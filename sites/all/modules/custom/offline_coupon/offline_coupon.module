@@ -83,11 +83,14 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
 function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   $form = array();
   $form['merchant_code'] = array(
-    '#type' => 'textfield', 
-    '#title' => t('Code'), 
+    '#type' => 'textfield',  
     '#size' => 10, 
     '#maxlength' => 100, 
-    '#required' => FALSE,
+    '#required' => FALSE,'#attributes' => array(
+      'class' => array('input-text'),
+      'placeholder' => t('Merchant Code')
+    ),
+    
   );
   
   $form['voucher_id'] = array(
@@ -97,7 +100,9 @@ function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   
   $form['submit'] = array(
     '#type' => 'submit', 
-    '#attributes'=> array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more', 'ajax-processed')),
+    '#attributes' => array(
+      'class' => array('btn', 'style1'),
+    ),
     '#value' => t('Redeem')
   );
   

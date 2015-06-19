@@ -9,7 +9,12 @@
     )
   );
 ?>
-
+<?php if ( empty($title) ): ?>
+    <?php $title = $view->get_title(); ?>
+  <?php endif; ?>
+  <?php if ($title): ?>
+    <h2 class="views-title"><?php print t($title)?></h2>
+  <?php endif; ?>
 <div class="view-coupon-box">
   <div class="blog-posts row">
     <?php foreach ($rows as $row_count => $row): ?>

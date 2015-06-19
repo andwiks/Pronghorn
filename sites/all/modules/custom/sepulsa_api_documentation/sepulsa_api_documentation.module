@@ -701,6 +701,7 @@ function services_views_retrieve_doc() {
       <li>Get views coupon:<br />GET ' . $base_url .'/api/views/coupon?display_id=coupon</li>
       <li>Get views front banner:<br />GET ' . $base_url .'/api/views/front_banner?display_id=banner</li>
       <li>Get views user owned coupon:<br />GET ' . $base_url .'/api/views/user_owned_coupon?display_id=user_owned_coupon</li>
+      <li>Get views user owned offline coupon:<br />GET ' . $base_url .'/api/views/user_offline_owned_coupon?display_id=user_offline_owned_coupon</li>
       <li>Get views user owned order:<br />GET ' . $base_url .'/api/views/commerce_user_orders?display_id=user_orders</li>
     </ul>
     ',

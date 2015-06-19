@@ -40,7 +40,7 @@
             <p><?php print ($row['field_description']); ?>.</p>
             <hr class="color-text">
             <p><strong><?php print t('Terms & Conditions'); ?></strong></p>  
-            <?php if (isset($row['field_coupon_tnc'])) print ($row['field_coupon_tnc']); else print "-"; ?>
+            <?php if (isset($row['field_detail_simple_coupon'])) print ($row['field_detail_simple_coupon']); else print "-"; ?>
             <?php $form = drupal_get_form('offline_coupon_redeem_form', $voucher_id); ?>
             <?php print drupal_render($form); ?>
           </div>

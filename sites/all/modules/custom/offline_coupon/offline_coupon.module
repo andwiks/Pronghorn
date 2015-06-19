@@ -24,7 +24,7 @@ function offline_coupon_services_resources() {
                 'data' => 'code',
                 'param' => 'code',
               ),
-              'optional' => FALSE,
+              'optional' => TRUE,
               'http_method' => 'POST',
             ),
             array(
@@ -87,7 +87,7 @@ function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
     '#title' => t('Code'), 
     '#size' => 10, 
     '#maxlength' => 100, 
-    '#required' => TRUE,
+    '#required' => FALSE,
   );
   
   $form['voucher_id'] = array(
@@ -97,6 +97,7 @@ function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   
   $form['submit'] = array(
     '#type' => 'submit', 
+    '#attributes'=> array('class' => array('btn', 'btn-sm', 'style3', 'post-read-more', 'ajax-processed')),
     '#value' => t('Redeem')
   );
   

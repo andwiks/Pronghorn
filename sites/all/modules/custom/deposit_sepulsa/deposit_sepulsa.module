@@ -216,9 +216,16 @@ function _deposit_sepulsa_get_deposit_product_doc() {
   global $base_url;
   $response = '
   {
-    "58": "Deposit Sepulsa 50.000",
-    "59": "Deposit Sepulsa 10.000",
-    "60": "Deposit Sepulsa 25.000"
+	"product_id": 58
+    "title": "Deposit Sepulsa 50.000"
+  },
+  {
+	"product_id": 59
+    "title": "Deposit Sepulsa 25.000"
+  },
+  {
+	"product_id": 60
+    "title": "Deposit Sepulsa 10.000"
   }
   ';
   $element = array(
@@ -233,6 +240,14 @@ function _deposit_sepulsa_get_deposit_product_doc() {
     // Resource prefix.
     // Errors.
     '#errors' => array(
+	  'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),

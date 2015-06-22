@@ -1,0 +1,5 @@
+name = "Mobile Banner Install Integration"
+description = "Show Banner Install for mobile browser"
+core = "7.x"
+
+dependencies[] = block

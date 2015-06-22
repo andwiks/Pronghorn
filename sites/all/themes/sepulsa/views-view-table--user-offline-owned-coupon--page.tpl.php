@@ -9,10 +9,16 @@
     )
   );
 ?>
-
+<?php if ( empty($title) ): ?>
+    <?php $title = $view->get_title(); ?>
+  <?php endif; ?>
+  <?php if ($title): ?>
+    <h2 class="views-title"><?php print t($title)?></h2>
+  <?php endif; ?>
 <div class="view-coupon-box">
   <div class="blog-posts row">
     <?php foreach ($rows as $row_count => $row): ?>
+      <?php $voucher_id = $row['nid']; ?>
       <?php $web_name = $row['field_website']; ?>
       <?php $web_link = $row['field_website_link']; ?> 
       <?php if (!isset($web_link)): ?>
@@ -39,7 +45,9 @@
             <p><?php print ($row['field_description']); ?>.</p>
             <hr class="color-text">
             <p><strong><?php print t('Terms & Conditions'); ?></strong></p>  
-            <?php if (isset($row['field_coupon_tnc'])) print ($row['field_coupon_tnc']); else print "-"; ?>
+            <?php if (isset($row['field_detail_simple_coupon'])) print ($row['field_detail_simple_coupon']); else print "-"; ?>
+            <?php $form = drupal_get_form('offline_coupon_redeem_form', $voucher_id); ?>
+            <?php print drupal_render($form); ?>
           </div>
         </article>
           

@@ -18,7 +18,7 @@ function userpoints_sepulsa_pane_checkout_form($form, &$form_state, $checkout_pa
 	foreach($order->commerce_line_items[LANGUAGE_NONE] as $id) {
 	  $litem = commerce_line_item_load($id['line_item_id']);
 	  if ($litem->type == 'deposit_sepulsa') {
-		//$deposit = 1;
+		$deposit = 1;
 		break;
 	  }
 	}

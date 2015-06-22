@@ -43,7 +43,7 @@
 	});
   });
 </script>
-<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #606060; z-index: 101; text-align: center;">
+<div id="mobile_banner" style="position: absolute; top: -1px; width: 100%; background-color: #393939; z-index: 101; text-align: center;">
   <table style="text-align: center; width: 100%">
 	<tr>
 	  <td width="20%"><img style="padding: 10px;" width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" /></td>

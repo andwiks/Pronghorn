@@ -17,7 +17,8 @@ function sepulsa_menu() {
   $items = array();
 
   $items['sepulsa'] = array(
-    'title' => 'Recharge Your Phone',
+    //'title' => 'Recharge Your Phone',
+    //no need to put title on front page
     'description' => 'Sepulsa Front Page',
     'page callback' => 'sepulsa_front_page',
     'access callback' => TRUE,

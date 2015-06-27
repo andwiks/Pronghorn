@@ -18,7 +18,6 @@ global $base_url;
   <title><?php print $head_title; ?></title>
 
   <meta charset="utf-8">
-  <meta name="description" content="PT. Sepulsa Teknologi Indonesia | Isi Ulang Pulsa Gratis">
   <meta name="author" content="PT. Sepulsa Teknologi Indonesia">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

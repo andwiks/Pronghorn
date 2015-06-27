@@ -17,8 +17,6 @@ global $base_url;
   <?php print $head; ?>
   <title><?php print $head_title; ?></title>
 
-  <link rel="shortcut icon" href="<?php print $base_url . '/' . path_to_theme(); ?>/images/favicon.png" />
-
   <meta charset="utf-8">
   <meta name="description" content="PT. Sepulsa Teknologi Indonesia | Isi Ulang Pulsa Gratis">
   <meta name="author" content="PT. Sepulsa Teknologi Indonesia">

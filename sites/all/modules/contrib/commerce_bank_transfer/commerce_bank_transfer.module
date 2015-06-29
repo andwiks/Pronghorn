@@ -164,7 +164,7 @@ function commerce_bank_transfer_submit_form($payment_method, $pane_values, $chec
 
   $form['bank_details'] = array(
   // TODO add message about details will be in email.. but email and token not yet done..
-    '#markup' => '<p><strong id="banktransfernotif">' . t('Additional Fee Rp XXX') . '</strong><br><br><strong>' . t('Please make payment to:') . '</strong><br />' . commerce_bank_transfer_bank_details($order->order_id, $payment_method) . '</p>',
+    '#markup' => '<p><strong>' . t('Please make payment to:') . '</strong><br />' . commerce_bank_transfer_bank_details($order->order_id, $payment_method) . '</p>',
   // TODO "Account owner" was/is the infamouse "To" in uc_bank_transfer depending on how the online and email invoice is looking we can move "Account owner" into commerce_bank_transfer_bank_details()
   // TODO in uc_bank_transfer we sent the details through a theming function - should we still do this?
   );

@@ -181,7 +181,7 @@ function sepulsa_form_alter(&$form, &$form_state, $form_id) {
       $settings = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings'];
 
       $form['commerce_payment']['payment_details']['bank_details'] = array();
-      $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong id="banktransfernotif">' . t('Additional Fee Rp XXX') . '</strong><br><br><strong>' . t('Please make payment to:') . '</strong>';
+      $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';
       $form['commerce_payment']['payment_details']['bank_details']['#suffix'] = '</p>';
       $form['commerce_payment']['payment_details']['bank_details']['account_bank'] = array(
         '#markup' => '<br>' . t('Banking institution') . ' : <strong>' . $settings['details']['account_bank'] . '</strong>',

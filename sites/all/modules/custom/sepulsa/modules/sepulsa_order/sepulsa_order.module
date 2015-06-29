@@ -6,16 +6,28 @@
 function sepulsa_order_commerce_order_presave($order) {
   if (function_exists('getallheaders')) {
     $headers = getallheaders();
-    if (!empty($headers['X-Imei'])) {
+    if (isset($headers['X-Imei'])) {
       $imei = $headers['X-Imei'];
     }
+    if (isset($headers['X-App'])) {
+      $app = $headers['X-App'];
+    }
   }
-  elseif (!empty($_SERVER['HTTP_X_IMEI'])) {
-    $imei = $_SERVER['HTTP_X_IMEI'];
+  else{
+    if (isset($_SERVER['HTTP_X_IMEI'])) {
+      $imei = $_SERVER['HTTP_X_IMEI'];
+    }
+    if (isset($_SERVER['HTTP_X_APP'])) {
+      $$app = $_SERVER['HTTP_X_APP'];
+    }
   }
 
-  if (!empty($imei) && $display_language = field_language('commerce_order', $order, 'field_imei')) {
+  if (isset($imei) && $display_language = field_language('commerce_order', $order, 'field_imei')) {
     $order->field_imei[$display_language][0]['value'] = $imei;
+  }
+
+  if (isset($app) && $display_language = field_language('commerce_order', $order, 'field_app')) {
+    $order->field_app[$display_language][0]['value'] = $app;
   }
 }
 

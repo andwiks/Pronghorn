@@ -137,12 +137,12 @@ function mobile_banner_install_view() {
 	setcookie("mobile_banner_install_cookie", "1", time() + $cookie_lifetime, '/');
 	$user_agent = $_SERVER['HTTP_USER_AGENT'];
 	drupal_set_message($user_agent);
-	if(stripos($user_agent, 'android') !== false) {
+	if(stripos($user_agent, 'android') != false) {
 	  $content['apps_desc'] = variable_get('mobile_banner_android_desc', '');
 	  $content['apps_path'] = variable_get('mobile_banner_android_path', '');
 	  $content['image_path'] = $image_path;
 	  $show = true;
-	} else if (stripos($user_agent, 'iphone') !== false) {
+	} else if (stripos($user_agent, 'iphone') != false) {
 	  $content['apps_desc'] = variable_get('mobile_banner_iphone_desc', '');
 	  $content['apps_path'] = variable_get('mobile_banner_iphone_path', '');
 	  $content['image_path'] = $image_path;

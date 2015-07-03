@@ -130,4 +130,5 @@ function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$f
       );
     }
   }
+  drupal_add_js(drupal_get_path('module', 'sepulsa_checkout') . '/sepulsa_checkout.form.js', 'file');
 }

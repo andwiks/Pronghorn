@@ -351,3 +351,34 @@ function token_reload_schema() {
 
   return $schema;
 }
+
+/**
+ * Add Nominal field to electricity_prepaid line item.
+ */
+function token_reload_update_7001(&$sandbox) {
+  $t = get_t();
+
+  if (!field_info_field('electricity_nominal')) {
+    $field = array(
+      'field_name' => 'electricity_nominal',
+      'type' => 'text',
+    );
+    field_create_field($field);
+  }
+
+  if (!field_info_instance('commerce_product', 'electricity_nominal', 'electricity')) {
+    $instance = array(
+      'field_name' => 'electricity_nominal',
+      'entity_type' => 'commerce_product',
+      'bundle' => 'electricity',
+      'label' => $t('Nominal'),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'hidden',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+}

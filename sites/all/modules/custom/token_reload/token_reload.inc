@@ -155,7 +155,8 @@ function token_reload_response_dummy($data, $method = 'inq') {
   $xml = new SimpleXMLElement('<methodResponse/>');
   $data = $xml->addChild('params')->addChild('param')->addChild('value')->addChild('array')->addChild('data');
 
-  $statuses = array('', '00', '15', '33', '99', 'XX');
+  // $statuses = array('', '00', '15', '33', '99', 'XX');
+  $statuses = array('', '00');
   $notes = array('SUCCESSFUL', 'KETERANGAN');
   if ($method == 'datatransaksi') {
     $status = $statuses[array_rand($statuses)];

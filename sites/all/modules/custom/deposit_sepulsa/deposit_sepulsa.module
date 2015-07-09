@@ -198,6 +198,8 @@ function topup_credit_deposit($item) {
 	'description' => 'Credit Deposit'
   );
   userpoints_userpointsapi($params); 
+  // update order to completed
+  commerce_order_status_update($item['order'], 'completed');
   watchdog('topup_credit_deposit', 'Topup Credit Deposit <br /><pre>'.print_r($item, true).'</pre>');
 }
 

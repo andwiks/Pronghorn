@@ -185,7 +185,14 @@ function sepulsa_order_process_order($order_id) {
       $sepulsa_order_wrapper->payment_instance->set($payment['instance']);
     }
 
-    return entity_save('sepulsa_order', $sepulsa_order);
+    try {
+      entity_save('sepulsa_order', $sepulsa_order);
+    }
+    catch (Exception $e) {
+      watchdog_exception('sepulsa_order', $e, NULL, array(), WATCHDOG_ERROR, l('view order', 'admin/commerce/orders/' . $order->order_id));
+    }
+
+    return $sepulsa_order;
   }
 }
 

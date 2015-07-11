@@ -9,13 +9,13 @@
                 <?php print l('Home', '<front>'); ?>
               </li>
               <li class="dropdown menu-item-has-children">
-                <?php print l('Tentang Kami', 'about'); ?>
+                <?php print l('Tentang Kami', 'node/73'); ?>
               </li>
               <li class="dropdown menu-item-has-children">
-                <?php print l('F.A.Q.', 'faq'); ?>
+                <?php print l('F.A.Q.', 'node/74'); ?>
               </li>
               <li class="dropdown menu-item-has-children">
-                <?php print l('Syarat Penggunaan', 'ga-terms-conditions'); ?>
+                <?php print l('Syarat Penggunaan', 'node/75'); ?>
               </li>
               <li class="dropdown menu-item-has-children">
                 <?php print l('Blog', 'blog'); ?>

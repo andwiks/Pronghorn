@@ -5,7 +5,7 @@
  */
 
 /* implement hook_permission(). */
-function bca_permission() {
+function auto_bank_transfer_permission() {
   return array(
     "bca_configuration" => array(
       'title' => t('BCA Configuration'),
@@ -15,7 +15,7 @@ function bca_permission() {
 }
 
 /* implement hook_menu(). */
-function bca_menu() {
+function auto_bank_transfer_menu() {
   $items = array();
 
   $items['admin/commerce/config/bca'] = array(
@@ -122,6 +122,7 @@ function bca_read_csv() {
   }
   $payments = variable_get('bca_payment_record', array());
   $all_payment = array_merge($payments, $payment);
+  $all_payment = array_unique($all_payment);
   variable_set('bca_payment_record', $all_payment);
 }
 

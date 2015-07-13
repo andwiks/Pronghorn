@@ -116,7 +116,7 @@ function bca_read_csv() {
       }
       fclose($handle);
       // delete bca csv file
-      unlink($filepath);
+      @drupal_unlink($filepath);
     }
     
   }

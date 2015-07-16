@@ -46,7 +46,7 @@ function deposit_sepulsa_rules_action_info() {
 function topup_credit_deposit_action($order, $user, $category) {
   $amount = $order->commerce_order_total[LANGUAGE_NONE][0]['amount'];
   $queue = DrupalQueue::get('topup_credit_deposit');
-  $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category);
+  $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order' => $order);
   $queue->createItem($queue_item);
 }
 

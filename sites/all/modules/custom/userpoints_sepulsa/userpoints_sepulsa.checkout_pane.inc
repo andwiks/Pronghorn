@@ -14,12 +14,13 @@ function userpoints_sepulsa_pane_checkout_form($form, &$form_state, $checkout_pa
     $line_item_id = commerce_userpoints_discount_order_has_userpoint_line_item($order->order_id);
     $point_amount = userpoints_get_current_points($order->uid, 'all');
     // If there is no existing userpoints line item, we create a new one.
-	
-	foreach($order->commerce_line_items[LANGUAGE_NONE] as $id) {
-	  $litem = commerce_line_item_load($id['line_item_id']);
-	  if ($litem->type == 'deposit_sepulsa') {
-		$deposit = 1;
-		break;
+	if (isset($order->commerce_line_items[LANGUAGE_NONE])) {
+	  foreach($order->commerce_line_items[LANGUAGE_NONE] as $id) {
+		$litem = commerce_line_item_load($id['line_item_id']);
+		if ($litem->type == 'deposit_sepulsa') {
+		  $deposit = 1;
+		  break;
+		}
 	  }
 	}
 	

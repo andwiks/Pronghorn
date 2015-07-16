@@ -1,0 +1,161 @@
+<?php
+/**
+ * @file
+ * bca.module
+ */
+
+/* implement hook_permission(). */
+function auto_bank_transfer_permission() {
+  return array(
+    "auto_bank_transfer_configuration" => array(
+      'title' => t('BCA Configuration'),
+      'description' => t('BCA Bank Tranfer Configuration'),
+    ),
+  );
+}
+
+/* implement hook_menu(). */
+function auto_bank_transfer_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/bca'] = array(
+    'title'            => t('BCA Configuration'),
+    'description'      => t('BCA Bank Tranfer Configuration'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('auto_bank_transfer_admin_form'),
+    'access arguments' => array('auto_bank_transfer_configuration'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+  
+  $items['admin/commerce/config/bca/list_file'] = array(
+    'title'            => t('List BCA File'),
+    'description'      => t('List of BCA Bank Tranfer CSV File'),
+    'page callback'    => 'auto_bank_transfer_list_file',
+    'access arguments' => array('auto_bank_transfer_configuration'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  $items['bca'] = array(
+    'title'            => t('BCA'),
+    'description'      => t('BCA Bank Tranfer'),
+    'page callback'    => 'auto_bank_transfer_confirm_payment',
+    'access arguments' => array('access content'),
+    'type'             => MENU_CALLBACK,
+  );
+
+  return $items;  
+}
+
+// admin page.
+function auto_bank_transfer_admin_form($form, &$form_state) {
+  $form['bca_csv_file_folder'] = array(
+    '#type' => 'textfield',
+    '#title' => t('BCA CSV file folder'),
+    '#required' => true,
+    '#default_value' => variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca')
+  );
+
+  return system_settings_form($form);
+}
+
+//function to get content of BCA CSV file
+function auto_bank_transfer_list_file() {
+  $dir = "sites/default/files/bank/bca/";
+  $files = scandir($dir);
+
+  foreach ($files as $file) {
+    $filepath = $dir . '/' . $file;
+    $file_parts = pathinfo($filepath);
+
+    $row = 1;
+    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
+      $output .= "<table>";
+      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $num = count($data);
+        if ($num == 5) {
+          $output .= "<tr>";
+          $row++;
+          for ($c=0; $c < $num; $c++) {
+            $output .= "<td>";
+            $output .= $data[$c];
+            $output .= "</td>";
+          }
+          $output .= "</tr>";
+        }
+
+      }
+      $output .= "</table>";
+      fclose($handle);
+    }
+  }
+  drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
+  return $output;
+}
+
+// function to read csv
+function auto_bank_transfer_read_csv() {
+  $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
+  $files = scandir($dir);
+  $payment = array();
+  foreach ($files as $file) {
+    $filepath = $dir . '/' . $file;
+    $file_parts = pathinfo($filepath);
+
+    $row = 1;
+    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $num = count($data);
+        if ($num == 5 && $data[3] != 'Jumlah') {
+          $amount = str_replace(array(',', '.00', ' CR'), '', $data[3]);
+          // only uniq amount processed
+          if ($amount % 1000 != 0) {
+            $payment[] = (float)$amount;
+          }
+        }
+      }
+      fclose($handle);
+      // delete bca csv file
+      @drupal_unlink($filepath);
+    }
+    
+  }
+  $payments = variable_get('bca_payment_record', array());
+  $all_payment = array_merge($payments, $payment);
+  $all_payment = array_unique($all_payment);
+  variable_set('bca_payment_record', $all_payment);
+}
+
+// function to confirm payment
+function auto_bank_transfer_confirm_payment() {
+  //read csv
+  auto_bank_transfer_read_csv();
+  $all_payment = variable_get('bca_payment_record', array());
+  $trans_log = array();
+  foreach ($all_payment as $key => $payment) {
+    // search payment
+    foreach (commerce_payment_transaction_load_multiple(array(), 
+        array(
+          'amount' => $payment, 
+          'payment_method' => 'bank_transfer',
+          'status' => 'pending')) 
+        as $transaction) {
+      // confirm payment
+      $transaction->status = 'success';
+      commerce_payment_transaction_save($transaction);
+      // delete payment
+      unset($all_payment[$key]);
+      $trans_log[] = 'order id: ' . $transaction->order_id;
+    }
+
+    variable_set('bca_payment_record', $all_payment);
+  }
+  // set log
+  watchdog('bca_confirm_payment', 'success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
+
+}
+
+/* implement hook_cron(). */
+function auto_bank_transfer_cron() {
+  auto_bank_transfer_confirm_payment();
+}

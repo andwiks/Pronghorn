@@ -1,3 +1,0 @@
-name = Auto Bank Transfer
-description = Read CSV file BCA and confirm payment
-core = 7.x

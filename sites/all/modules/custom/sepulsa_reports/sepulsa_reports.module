@@ -1,0 +1,57 @@
+<?php
+/**
+ * @file
+ * sepulsa_report.module
+ *
+ * @author ananto@sepulsa.com
+ */
+ 
+ /**
+ * Implements hook_menu().
+ */
+function sepulsa_reports_menu() {
+  $items = array();
+  
+  $items['admin/commerce/sepulsa_reports'] = array(
+    'title' => 'Sepulsa Reports',
+    'description' => 'View Sepulsa Reports.',
+    'access arguments' => array('access sepulsa reports'), // Inherited by children.
+    'page callback' => 'sepulsa_reports_dashboard',
+    'weight' => -30,
+  );
+  $items['admin/commerce/sepulsa_reports/dashboard'] = array(
+    'title' => 'Dashboard',
+    'description' => 'View Sepulsa Reports.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => 0,
+  );
+  $items['admin/commerce/sepulsa_reports/sales'] = array(
+    'title' => 'Sales',
+    'description' => 'View Sales Reports.',
+    'access arguments' => array('access sepulsa reports'),
+    'page callback' => 'system_admin_menu_block_page',
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 0,
+  );
+  
+  return $items;
+}
+
+function sepulsa_reports_dashboard() {
+  $render = "Test Report";
+  
+  return $render;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function sepulsa_reports_permission() {
+  return array(
+    'access sepulsa reports' => array(
+      'title' => t('Access sepulsa reports'),
+    )
+  );
+}

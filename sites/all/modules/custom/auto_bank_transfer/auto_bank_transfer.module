@@ -156,6 +156,6 @@ function bca_confirm_payment() {
 }
 
 /* implement hook_cron(). */
-function bca_cron() {
+function auto_bank_transfer_cron() {
   bca_confirm_payment();
 }

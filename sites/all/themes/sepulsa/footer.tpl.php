@@ -44,6 +44,11 @@
             <img src="<?php print url(path_to_theme() . '/images/footer/payment-mc.jpg'); ?>" style="min-height:25px; max-height:40px">
             <img src="<?php print url(path_to_theme() . '/images/footer/payment-visa.jpg'); ?>" style="min-height:25px; max-height:40px">
           </div>
+          
+          <br />
+          <div style="float: right;width: auto;text-align: right;margin-left: 20px; margin-top:20px;">
+            <a href="https://mixpanel.com/f/partner"><img src="//cdn.mxpnl.com/site_media/images/partner/badge_light.png" alt="Mobile Analytics"></a>
+          </div>
         </div>
         <div class="col-sm-12">
           <div class="copyright">

@@ -1,0 +1,51 @@
+name = Sepulsa
+description = Sepulsa Initial theme
+core = 7.x
+
+regions[page_top] = Page top
+regions[page_bottom] = Page bottom
+regions[content] = Content
+regions[sidebar_first] = Sidebar first
+regions[banner] = Front page banner
+regions[footer] = Footer
+
+regions[front_first] = Front First
+regions[front_second] = Front Second
+regions[front_third] = Front Third
+regions[front_fourth] = Front Fourth
+
+regions[right] = Right Bar
+regions[user_login] = User Login
+regions[user_signup] = User Signup
+
+version = "0.1"
+
+stylesheets[all][] = css/bootstrap.min.css
+stylesheets[all][] = css/font-awesome.min.css
+stylesheets[all][] = css/animate.min.css
+stylesheets[all][] = components/owl-carousel/owl.carousel.css
+stylesheets[all][] = components/owl-carousel/owl.transitions.css
+stylesheets[all][] = components/magnific-popup/magnific-popup.css
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/custom.css
+stylesheets[all][] = css/updates.css
+stylesheets[all][] = css/responsive.css
+stylesheets[all][] = css/additional.css
+
+;; Remove stylesheets
+;; ==================
+stylesheets[all][] = system.menus.css
+
+scripts[] = js/jquery.noconflict.js
+scripts[] = js/modernizr.2.8.3.min.js
+scripts[] = js/jquery-migrate-1.2.1.min.js
+scripts[] = js/bootstrap.min.js
+scripts[] = components/owl-carousel/owl.carousel.min.js
+scripts[] = components/carouFredSel-6.2.1/jquery.carouFredSel-6.2.1.js
+scripts[] = components/magnific-popup/jquery.magnific-popup.min.js
+scripts[] = js/jquery.stellar.min.js
+scripts[] = js/waypoints.min.js
+scripts[] = js/jquery.plugins.js
+scripts[] = js/jquery.popupoverlay.js
+scripts[] = js/script.js
+scripts[] = js/main.js

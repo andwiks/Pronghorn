@@ -8,7 +8,7 @@
  */
 global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
-$page = "home";
+$page_state = "home";
 ?>
 <!DOCTYPE html>
 <!--[if IE 8]>          <html class="ie ie8"> <![endif]-->
@@ -25,6 +25,9 @@ $page = "home";
   <?php print $scripts; ?>
 </head>
 <?php include('inc_header.php'); ?>
+  <?php print $page_top; ?>
+  <?php print $page; ?>
+  <?php print $page_bottom; ?>
 <!-- middle -->
 <section class="banner">
     <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="banner home" />

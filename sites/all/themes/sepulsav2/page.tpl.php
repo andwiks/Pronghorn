@@ -3,15 +3,14 @@
  * @file
  * page.tpl.php
  *
- * @author ananto@sepulsa.com
- * @since January 27th 2015.
+ * @author dwi@sepulsa.com
+ * @since July 23th 2015.
  */
 
 global $base_url;
 
 ?>
 <div id="page-wrapper">
-  <?php include "header.tpl.php"; ?>
 
   <section id="content">
     <div class="container">
@@ -58,6 +57,5 @@ global $base_url;
     </div>
   </section>
 
-  <?php include "footer.tpl.php"; ?>
 
 </div>

@@ -20,32 +20,16 @@ regions[user_signup] = User Signup
 
 version = "0.1"
 
-stylesheets[all][] = css/bootstrap.min.css
-stylesheets[all][] = css/font-awesome.min.css
-stylesheets[all][] = css/animate.min.css
-stylesheets[all][] = components/owl-carousel/owl.carousel.css
-stylesheets[all][] = components/owl-carousel/owl.transitions.css
-stylesheets[all][] = components/magnific-popup/magnific-popup.css
+stylesheets[all][] = css/jquery.bxslider.css
+stylesheets[all][] = css/reset.css
 stylesheets[all][] = css/style.css
-stylesheets[all][] = css/custom.css
-stylesheets[all][] = css/updates.css
-stylesheets[all][] = css/responsive.css
-stylesheets[all][] = css/additional.css
+stylesheets[all][] = css/theme.css
+stylesheets[screen and (min-width:0px) and (max-width:1170px)][] = css/stylemedia768.css
+stylesheets[screen and (min-width:480px) and (max-width:767px)][] = css/stylemedia480.css
+stylesheets[screen and (min-width:0px) and (max-width:479px)][] = css/stylemedia320.css
 
-;; Remove stylesheets
-;; ==================
-stylesheets[all][] = system.menus.css
-
-scripts[] = js/jquery.noconflict.js
-scripts[] = js/modernizr.2.8.3.min.js
-scripts[] = js/jquery-migrate-1.2.1.min.js
-scripts[] = js/bootstrap.min.js
-scripts[] = components/owl-carousel/owl.carousel.min.js
-scripts[] = components/carouFredSel-6.2.1/jquery.carouFredSel-6.2.1.js
-scripts[] = components/magnific-popup/jquery.magnific-popup.min.js
-scripts[] = js/jquery.stellar.min.js
-scripts[] = js/waypoints.min.js
-scripts[] = js/jquery.plugins.js
-scripts[] = js/jquery.popupoverlay.js
-scripts[] = js/script.js
-scripts[] = js/main.js
+scripts[] = js/jquery-1.11.2.min.js
+scripts[] = js/TweenMax.min.js
+scripts[] = js/jquery.bxslider.min.js
+scripts[] = js/js_lib.js
+scripts[] = js/js_run.js

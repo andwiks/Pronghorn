@@ -96,14 +96,21 @@ function topup_queue_request($order) {
 
   // Check whether pulsa container is available.
   if (!empty($topup)) {
+    $providers = topup_providers();
     // Get the queue.
     $queue = DrupalQueue::get('topup_process');
     // Looping for each pulsa container.
     foreach ($topup as $item) {
-      // Update topup status: in queue.
-      topup_update_status($item['line_item_id'], TOPUP_INQUEUE);
-      // Queue it.
-      $queue->createItem($item);
+      if (empty($providers[$item['field_topup_provider']]['no_queue'])) {
+        // Update topup status: in queue.
+        topup_update_status($item['line_item_id'], TOPUP_INQUEUE);
+        // Queue it.
+        $queue->createItem($item);
+      }
+      else {
+        topup_update_status($item['line_item_id'], TOPUP_PENDING);
+        topup_queue_process($item);
+      }
     }
   }
 }

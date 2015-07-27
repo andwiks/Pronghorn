@@ -754,6 +754,50 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
               'note' => (isset($container[9])) ? $container[9] : '-',
             );
             $output['topup_data'] = $topup['topup_data']['data'];
+
+            $output['topup_entity'] = array();
+            if (is_string($output['topup_data'][$output['request_id']])) {
+              if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {
+                if (!empty($matches[1])) {
+                  $output['topup_entity']['sn'] = $matches[1];
+                }
+                if (!empty($matches[2])) {
+                  $date = new DateObject($matches[2]);
+                  $output['topup_entity']['time'] = date_format_date($date, 'custom', 'U');
+                }
+                if (!empty($matches[3])) {
+                  $output['topup_entity']['price'] = str_replace('.', '', $matches[3]);
+                }
+              }
+            }
+            else {
+              if (!empty($output['topup_data'][$output['request_id']]['ref2'])) {
+                $output['topup_entity']['ref'] = $output['topup_data'][$output['request_id']]['ref2'];
+              }
+
+              if (!empty($output['topup_data'][$output['request_id']]['time'])) {
+                $output['topup_entity']['time'] = strtotime($output['topup_data'][$output['request_id']]['time']);
+              }
+
+              if (!empty($output['topup_data'][$output['request_id']]['note'])) {
+                if (preg_match('/sn#([\w\d]+)#([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+                  if (!empty($matches[1])) {
+                    $output['topup_entity']['price'] = $matches[1];
+                  }
+                  if (!empty($matches[2])) {
+                    $output['topup_entity']['sn'] = $matches[2];
+                  }
+                }
+                elseif (preg_match('/SN=([\w\d]+)\sHarga=([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+                  if (!empty($matches[1])) {
+                    $output['topup_entity']['sn'] = $matches[1];
+                  }
+                  if (!empty($matches[2])) {
+                    $output['topup_entity']['price'] = $matches[2];
+                  }
+                }
+              }
+            }
           }
           // Check the value: RESPONSECODE.
           if (isset($container[8])) {
@@ -787,6 +831,50 @@ function bimasakti_send($data, $settings, &$topup, &$output = NULL) {
             // Update note information.
             $topup['topup_data']['data'][$topup['request_id']]['note'] = (isset($container[9])) ? $container[9] : '-';
             $output['topup_data'] = $topup['topup_data']['data'];
+
+            $output['topup_entity'] = array();
+            if (is_string($output['topup_data'][$output['request_id']])) {
+              if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {
+                if (!empty($matches[1])) {
+                  $output['topup_entity']['sn'] = $matches[1];
+                }
+                if (!empty($matches[2])) {
+                  $date = new DateObject($matches[2]);
+                  $output['topup_entity']['time'] = date_format_date($date, 'custom', 'U');
+                }
+                if (!empty($matches[3])) {
+                  $output['topup_entity']['price'] = str_replace('.', '', $matches[3]);
+                }
+              }
+            }
+            else {
+              if (!empty($output['topup_data'][$output['request_id']]['ref2'])) {
+                $output['topup_entity']['ref'] = $output['topup_data'][$output['request_id']]['ref2'];
+              }
+
+              if (!empty($output['topup_data'][$output['request_id']]['time'])) {
+                $output['topup_entity']['time'] = strtotime($output['topup_data'][$output['request_id']]['time']);
+              }
+
+              if (!empty($output['topup_data'][$output['request_id']]['note'])) {
+                if (preg_match('/sn#([\w\d]+)#([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+                  if (!empty($matches[1])) {
+                    $output['topup_entity']['price'] = $matches[1];
+                  }
+                  if (!empty($matches[2])) {
+                    $output['topup_entity']['sn'] = $matches[2];
+                  }
+                }
+                elseif (preg_match('/SN=([\w\d]+)\sHarga=([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
+                  if (!empty($matches[1])) {
+                    $output['topup_entity']['sn'] = $matches[1];
+                  }
+                  if (!empty($matches[2])) {
+                    $output['topup_entity']['price'] = $matches[2];
+                  }
+                }
+              }
+            }
           }
           // 1. Check value: Phone number [3].
           // 2. Check value: RESPONSECODE [7].

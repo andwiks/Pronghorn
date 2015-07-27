@@ -1,0 +1,149 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_topup_provider_info().
+ */
+function kraken_topup_provider_info() {
+  $providers = array();
+
+  $providers['kraken'] = array(
+    'title' => t('Kraken'),
+    'description' => t('Kraken'),
+    'status' => TRUE,
+    'no_queue' => TRUE,
+  );
+
+  return $providers;
+}
+
+function kraken_settings_form($settings = array()) {
+  // API Endpoint.
+  $form['endpoint'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Endpoint'),
+    '#default_value' => isset($settings['endpoint']) ? $settings['endpoint'] : '',
+    '#size' => 60,
+    '#maxlength' => 60,
+    '#description' => t('Kraken endpoint. Please input using full url.'),
+    '#required' => TRUE,
+  );
+
+  // Partner username.
+  $form['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Partner username'),
+    '#default_value' => isset($settings['username']) ? $settings['username'] : '',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#required' => TRUE,
+  );
+
+  // Partner secret.
+  $form['secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Partner secret key'),
+    '#default_value' => isset($settings['secret']) ? $settings['secret'] : '',
+    '#required' => TRUE,
+  );
+
+  return $form;
+}
+
+function kraken_topup_process($topup, $settings, &$output = NULL) {
+  $uri = @parse_url($settings['endpoint']);
+  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $uri['host'] . $uri['path'] . '/transaction';
+
+  $data = array(
+    'customer_number' => $topup['field_topup_phone_number'],
+    'order_id' => $topup['order_id'],
+    'product_id' => $topup['field_topup_code'],
+  );
+
+  $options = array(
+    'headers' => array(
+      'Content-Type' => 'application/json',
+    ),
+    'method' => 'POST',
+    'data' => drupal_json_encode($data),
+  );
+
+  $result = drupal_http_request($url, $options);
+  if (!is_null($output) && !empty($result->data)) {
+    $transaction = drupal_json_decode($result->data);
+
+    $output['line_item_id'] = $topup['line_item_id'];
+    $output['request_id'] = $transaction['transaction_id'];
+    $output['field_topup_provider'] = 'kraken';
+    $output['topup_entity'] = array(
+      'ref' => $transaction['transaction_id'],
+      'time' => $transaction['created'],
+    );
+
+    switch ($transaction['status']) {
+      case 'success':
+        return TOPUP_SUCCESS;
+        break;
+
+      case 'failed':
+        return TOPUP_FAILED;
+        break;
+
+      case 'pending':
+      default:
+        return TOPUP_PENDING;
+        break;
+    }
+  }
+
+  return TOPUP_PENDING;
+}
+
+function kraken_topup_callback() {
+  global $user;
+
+  if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    drupal_add_http_header('status', '405 Method Not Allowed');
+  }
+
+  $headers = getallheaders();
+
+  // if ($headers['User-Agent'] != 'Kraken') {
+  //   drupal_add_http_header('status', '417 Expectation Failed');
+  // }
+
+  $body = file_get_contents('php://input');
+  watchdog('kraken', $body, array(), WATCHDOG_DEBUG);
+
+  if (!empty($body)) {
+    $payload = drupal_json_decode($body);
+    watchdog('kraken', '<pre>' . print_r($payload, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
+
+    $topup = entity_load('topup', FALSE, array('ref' => $payload['transaction_id']));
+    if (!empty($topup)) {
+      $topup = reset($topup);
+
+      switch ($payload['status']) {
+        case 'success':
+          $status = TOPUP_SUCCESS;
+          break;
+
+        case 'failed':
+          $status = TOPUP_FAILED;
+          break;
+      }
+
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup->line_item_id);
+      $user = user_load($line_item_wrapper->order->uid->value());
+      $topup->status = $status;
+      entity_save('topup', $topup);
+      topup_update_status($topup->line_item_id, $status);
+    }
+  }
+
+  drupal_json_output();
+  // return MENU_ACCESS_DENIED;
+}

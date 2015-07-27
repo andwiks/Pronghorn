@@ -1,0 +1,8 @@
+name = "Kraken"
+description = "Provide Kraken top up integration."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/commerce/config/topup/provider/kraken
+
+dependencies[] = topup

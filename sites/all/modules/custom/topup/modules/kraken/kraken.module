@@ -116,9 +116,11 @@ function kraken_topup_callback() {
   // }
 
   $body = file_get_contents('php://input');
+  watchdog('kraken', $body, array(), WATCHDOG_DEBUG);
 
   if (!empty($body)) {
     $payload = drupal_json_decode($body);
+    watchdog('kraken', '<pre>' . print_r($payload, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
 
     $topup = entity_load('topup', FALSE, array('ref' => $payload['transaction_id']));
     if (!empty($topup)) {

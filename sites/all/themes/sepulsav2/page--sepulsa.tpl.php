@@ -25,16 +25,18 @@ $page_state = "home";
   <div class="nav_tab after_clear"> 
     <a href="" class="active" target="target_1">
         <span class="ico pulsa"></span>
-        isi pulsa
+        isi pulsa & bolt
     </a>
     <a href="" target="target_2">
-        <span class="ico bolt"></span>
-        isi bolt
-    </a>
-    <a href="" target="target_3">
         <span class="ico listrik"></span>
         bayar listrik
     </a>
+    <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
+    <a href="" target="target_3">
+        <span class="ico bolt"></span>
+        deposit
+    </a>
+    <?php endif; ?>
   </div>
 
   <div class="content_tab">
@@ -47,13 +49,13 @@ $page_state = "home";
       <?php endif; ?>
       <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
     </div>
+    <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
     <div class="tab form style_1" id="target_3">
-      <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
       <div style="padding:5px 5px 20px;"> Deposit akan menambah jumlah Sepulsa Kredit yang tersedia di akun kamu. Sepulsa Kredit dapat digunakan untuk melakukan transaksi.</div>
       <?php print render($deposit_sepulsa_form); ?>
-      <?php endif; ?>
       <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
     </div>
+    <?php endif; ?>
   </div>
 
 </div>

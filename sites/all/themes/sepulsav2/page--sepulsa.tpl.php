@@ -60,71 +60,9 @@ $page_state = "home";
 
 </div>
 
-        <div class="voucher_vendor">
-            <h3><span class="ico"></span>voucher VENDOR :</h3>
-            <div class="slider">
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_1.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_2.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_3.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_4.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_5.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_6.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_1.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_2.png" alt="vendor 1" /></div>
-                <div class="slide"><img src="<?php print $theme_path; ?>/images/content/voucher_vendor_3.png" alt="vendor 1" /></div>
-            </div>
-        </div>
 
     </div>
 </section>
-
-<section class="promo_banner">
-    <div class="wrapper">
-        <div class="slider">
-            <div class="slide">
-                <img src="<?php print $theme_path; ?>/images/content/promo_banner.jpg " alt="promo card banner 1" />
-                <a href="" class="bt_std">CALL TO ACTION BUTTON</a>
-            </div>
-            <div class="slide">
-                <img src="<?php print $theme_path; ?>/images/content/promo_banner.jpg " alt="promo card banner 1" />
-                <a href="" class="bt_std">CALL TO ACTION BUTTON</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<section class="gratis_voucher after_clear">
-    <div class="wrapper after_clear">
-        <div class="desc right">
-            <h2>
-                Satu kali isi ulang pulsa,<br/>
-                gratis tiga voucher belanja.
-            </h2>
-            <h4>
-                Kini isi ulang pulsa lebih dari sekedar mudah, tapi menguntungkan!
-                <span class="border"></span>
-            </h4>
-            <p>
-                Cuma di Sepulsa, isi ulang pulsa lebih dari sekedar kemudahan dan kecepatan, tapi juga menguntungkan. Karena tiap kali kamu melakukan isi ulang pulsa, kamu langsung mendapatkan voucher diskon di berbagai macam online shop terkemuka di Indonesia. Tidak hanya satu, tapi kamu bebas memilih tiga voucher diskon sekaligus.
-                <br/><br/>
-                Terus isi ulang pulsa kamu di sini dan nantikan terus kejutan lain yang akan kami berikan untuk kamu. Di Sepulsa, kini isi ulang pulsa menjadi menyenangkan.
-            </p>
-            <p>
-                <b>Layanan Sepulsa bisa dinikmati via PC desktop, mobile web, android, dan iOS Anda.
-                    Unduh aplikasinya di Sini:</b>
-            </p>
-
-            <a href=""><img src="<?php print $theme_path; ?>/images/content/apple_store.png" alt="app store"/></a>
-            <a href=""><img src="<?php print $theme_path; ?>/images/content/google_store.png" alt="google play"/></a>
-        </div>
-    </div>
-</section>
-
-
-
-
-
-<!-- end of middle -->
 
   <section id="front_first" class="front_first">
     <?php print render($page['front_first']); ?>

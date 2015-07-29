@@ -24,14 +24,41 @@ $page_state = "home";
   <?php print $styles; ?>
   <?php print $scripts; ?>
 </head>
-<?php include('inc_header.php'); ?>
-  <?php print $page_top; ?>
-  <?php print $page; ?>
-  <?php print $page_bottom; ?>
-<!-- middle -->
+<body class="<?php print ($page_state == "home" || $page_state == "home_acc") ? 'home ' : ''; print $classes; ?>"<?php print $attributes; ?>>
+  <!--[if lt IE 7]>
+      <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+  <![endif]--> 
 
-<!-- end of middle -->
-<?php
-include('inc_footer.php');
-include('inc_popup.php');
+  <!-- header -->
+
+  <script>
+    function buynow() {
+      document.getElementById('nomor-hp').focus();
+    }
+  </script>
+<?php include('inc_header.php'); ?>
+<?php print $page_top; ?>
+<?php print $page; ?>
+<?php print $page_bottom; ?>
+  <!--Footer -->
+    <footer>
+        <div class="wrapper after_clear">
+            <div class="left">
+              <?php print render($footer_sub_left); ?>
+
+            </div>
+            <div class="right">
+              <?php print render($footer_sub_right); ?>
+                
+            </div>
+        </div>
+        <div class="bottom">
+          <?php print render($footer_second); ?>
+            
+        </div>
+    </footer>
+  <!--end of Footer -->
+  </body>
+</html>
+<?php include('inc_popup.php'); ?>
 ?>

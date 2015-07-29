@@ -14,6 +14,10 @@ regions[front_second] = Front Second
 regions[front_third] = Front Third
 regions[front_fourth] = Front Fourth
 
+regions[footer_sub_left] = Footer Sub Left
+regions[footer_sub_right] = Footer Sub Right
+regions[footer_second] = Footer Second
+
 regions[right] = Right Bar
 regions[user_login] = User Login
 regions[user_signup] = User Signup

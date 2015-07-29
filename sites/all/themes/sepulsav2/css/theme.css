@@ -212,3 +212,23 @@ body.home.red footer ,
 .home.red .form.style_1 .row.bt_wrap .right .bt_std,
 .home.red header .right_link .box .box_drop .box_credit ,
 .home.red .form.style_1 .row.saldo .left {background: #c72127;}
+
+home.blue section.h_middle_top html.js input.form-autocomplete {
+	background:url(../images/material/arr_ico2.png) no-repeat right 15px center;
+}
+
+home.blue section.h_middle_top input[type=submit], input[type=button] {
+	background: #105c8c;
+}
+
+home.green section.h_middle_top html.js input.form-autocomplete {
+	background:url(../images/material/arr_ico3.png) no-repeat right 15px center;
+}
+
+home.blue section.h_middle_top input[type=submit], input[type=button] {
+	background: #129d4a;
+}
+
+home.red section.h_middle_top html.js input.form-autocomplete {
+	background:url(../images/material/arr_ico4.png) no-repeat right 15px center;
+}

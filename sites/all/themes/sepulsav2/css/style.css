@@ -1745,3 +1745,28 @@ body.home footer .left nav a{color:#feb60a;}
 body.home footer .bottom a{color:#feb60a;}
 body.home footer .left .soc_link a.fb{background: url(../images/material/socmed_ico.png) no-repeat -35px top;}
 body.home footer .left .soc_link a.tw{background: url(../images/material/socmed_ico.png) no-repeat -35px bottom;}
+
+section.h_middle_top html.js input.form-autocomplete {
+background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+}
+section.h_middle_top html.js input.form-autocomplete
+{
+	background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+}
+
+section.h_middle_top input[type=submit], input[type=button] {
+	background: #feb60a;
+    border: none;
+    font-size: 24px;
+    padding: 9px 0px;
+    height: 60px;
+    width: 200px;
+    cursor: pointer;
+    color: #FFF;
+	border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+	margin:5px;
+}

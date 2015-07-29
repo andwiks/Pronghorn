@@ -20,56 +20,43 @@ $page_state = "home";
     </div>
 </section>
 <section class="h_middle_top">
-    <div class="wrapper">
+  <div class="wrapper">
+    <div class="home_tab">
+  <div class="nav_tab after_clear"> 
+    <a href="" class="active" target="target_1">
+        <span class="ico pulsa"></span>
+        isi pulsa
+    </a>
+    <a href="" target="target_2">
+        <span class="ico bolt"></span>
+        isi bolt
+    </a>
+    <a href="" target="target_3">
+        <span class="ico listrik"></span>
+        bayar listrik
+    </a>
+  </div>
 
-    <section id="content">
-    <div class="container">
-      <div id="main">
-        <?php print $messages; ?>
-
-        <div class="row">
-          <div class="col-sm-6 col-md-8">
-            <div class="tab-container full-width style1 box">
-              <ul class="tabs clearfix">
-                <li<?php if($active_tab == 'topup') print ' class="active"';?>><a href="#topup" data-toggle="tab">Isi Pulsa &amp; Bolt</a></li>
-                <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
-                  <li<?php if($active_tab == 'token_reload') print ' class="active"';?>><a href="#token-reload" data-toggle="tab">Listrik</a></li>
-                <?php endif; ?>
-				<?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?>  
-                  <li<?php if($active_tab == 'deposit_sepulsa') print ' class="active"';?>><a href="#deposit-sepulsa" data-toggle="tab">Deposit</a></li>
-				<?php endif; ?>
-              </ul>
-              <div id="topup" class="tab-content<?php if($active_tab == 'topup') print ' in active';?>">
-                <div class="tab-pane">
-                  <?php print render($page['content']); ?>
-                </div>
-                <div style="color:red; margin-top:10px;">* Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</div>
-              </div>
-              <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
-                <div id="token-reload" class="tab-content<?php if($active_tab == 'token_reload') print ' in active';?>">
-                  <div class="tab-pane">
-                    <?php print render($token_reload_form); ?>
-                  </div>
-                </div>
-              <?php endif; ?>
-			  <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
-                <div id="deposit-sepulsa" class="tab-content<?php if($active_tab == 'deposit_sepulsa') print ' in active';?>">
-                  <div class="tab-pane">
-                    <div style="padding:5px 5px 20px;"> Deposit akan menambah jumlah Sepulsa Kredit yang tersedia di akun kamu. Sepulsa Kredit dapat digunakan untuk melakukan transaksi.</div>
-                    <?php print render($deposit_sepulsa_form); ?>
-                  </div>
-                </div>
-              <?php endif; ?>
-            </div>
-          </div>
-
-          <div class="col-sm-6 col-md-4">
-            <?php print render($page['banner']); ?>
-          </div>
-        </div>
-      </div>
+  <div class="content_tab">
+    <div class="tab form style_1" id="target_1">
+      <?php print render($page['content']); ?>
     </div>
-  </section>
+    <div class="tab form style_1" id="target_2">
+      <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
+      <?php print render($token_reload_form); ?>
+      <?php endif; ?>
+      <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
+    </div>
+    <div class="tab form style_1" id="target_3">
+      <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
+      <div style="padding:5px 5px 20px;"> Deposit akan menambah jumlah Sepulsa Kredit yang tersedia di akun kamu. Sepulsa Kredit dapat digunakan untuk melakukan transaksi.</div>
+      <?php print render($deposit_sepulsa_form); ?>
+      <?php endif; ?>
+      <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
+    </div>
+  </div>
+
+</div>
 
         <div class="voucher_vendor">
             <h3><span class="ico"></span>voucher VENDOR :</h3>
@@ -93,11 +80,11 @@ $page_state = "home";
     <div class="wrapper">
         <div class="slider">
             <div class="slide">
-                <img src="images/content/promo_banner.jpg " alt="promo card banner 1" />
+                <img src="<?php print $theme_path; ?>/images/content/promo_banner.jpg " alt="promo card banner 1" />
                 <a href="" class="bt_std">CALL TO ACTION BUTTON</a>
             </div>
             <div class="slide">
-                <img src="images/content/promo_banner.jpg " alt="promo card banner 1" />
+                <img src="<?php print $theme_path; ?>/images/content/promo_banner.jpg " alt="promo card banner 1" />
                 <a href="" class="bt_std">CALL TO ACTION BUTTON</a>
             </div>
         </div>
@@ -131,71 +118,9 @@ $page_state = "home";
     </div>
 </section>
 
-<section class="easy_step">
-    <div class="wrapper after_clear">
-        <h2>semudah apa isi pulsa dengan sepulsa?</h2>
-        <h4>
-            Kemudahan Sepulsa membuat kamu bisa isi pulsa kapan saja dan di mana saja.
-            <span class="border"></span>
-        </h4>
-        <div class="box_step">
-            <div class="image"><img src="<?php print $theme_path; ?>/images/content/easy_step-1.png" alt="step1 " /></div>
-            <div class="label">1</div>
-            <p>Masukkan nomor HP dan nominal pulsa yang kamu inginkan.</p>
-        </div>
-        <div class="box_step">
-            <div class="image"><img src="<?php print $theme_path; ?>/images/content/easy_step-2.png" alt="step1 " /></div>
-            <div class="label">2</div>
-            <p>Kamu bebas memilih 3 voucher diskon belanja yang menarik sesukamu. Gratis!</p>
-        </div>
-        <div class="box_step">
-            <div class="image"><img src="<?php print $theme_path; ?>/images/content/easy_step-3.png" alt="step1 " /></div>
-            <div class="label">3</div>
-            <p>Pilih metode pembayaran mudah yang kamu inginkan.</p>
-        </div>
-        <div class="box_step">
-            <div class="image"><img src="<?php print $theme_path; ?>/images/content/easy_step-4.png" alt="step1 " /></div>
-            <div class="label">4</div>
-            <p>Pulsamu segera terisi 5-10 menit setelah pembayaran berhasil dan terverifikasi.Praktis!</p>
-        </div>
-        <div class="clear"></div>
-        <a href="" class="bt_std">Beli pulsa sekarang</a>
-    </div>
-</section>
-
-<section class="h_keuntungan">
-    <div class="wrapper_2 after_clear">
-        <h2>KEUNTUNGan bertansaksi di sepulsa</h2>
-        <h4>4 fakta yang membuat Sepulsa aman, nyaman digunakan, dan terpercaya.<span class="border"></span></h4>
 
 
-        <div class="box">
-            <div class="image" style="background: url(<?php print $theme_path; ?>/images/content/keuntungan_img_1.png) no-repeat ">
-            </div>
-            <h5>Mudah di Mana Saja</h5>
-            <p>Di manapun lokasi kamu berada, tak perlu mencari mesin ATM ataupun repot dengan mobile banking. Dengan Sepulsa, transaksi kamu jadi lebih mudah dan cepat.</p>
-        </div>
-        <div class="box">
-            <div class="image" style="background: url(<?php print $theme_path; ?>/images/content/keuntungan_img_2.png) no-repeat ">
-            </div>
-            <h5>Praktis Kapan saja</h5>
-            <p>Dengan Sepulsa, kamu bebas bertransaksi setiap saat kamu butuh. Pagi, siang, sore, hingga tengah malam, dalam segala situasi dan kondisi.</p>
-        </div>
-        <div class="box">
-            <div class="image" style="background: url(<?php print $theme_path; ?>/images/content/keuntungan_img_3.png) no-repeat ">
-            </div>
-            <h5>voucher diskon</h5>
-            <p>Kamu bisa memilih voucher diskon di berbagai macam e-commerce website di Indonesia. Bukan hanya satu, kamu bisa memilih sampai TIGA voucher diskon setiap transaksi.</p>
-        </div>
-        <div class="box">
-            <div class="image" style="background: url(<?php print $theme_path; ?>/images/content/keuntungan_img_4.png) no-repeat ">
-            </div>
-            <h5>transaksi aman</h5>
-            <p>Kami menggunakan 3D Secure untuk memastikan keamanan dari setiap transaksi dengan menambahkan autentikasi dari pemilik kartu ketika proses pembelian.</p>
-        </div>
 
-    </div>
-</section>
 
 <!-- end of middle -->
 

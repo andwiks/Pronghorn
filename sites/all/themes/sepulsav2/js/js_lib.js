@@ -13,7 +13,7 @@ $.fn.styledSelect = function (options) {
             top: 0,
             left: 0
         },
-        selectOpacity: 0
+        selectOpacity: 100
     }
     if (options)
         $.extend(prefs, options);

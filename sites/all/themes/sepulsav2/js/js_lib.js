@@ -21,7 +21,8 @@ $.fn.styledSelect = function (options) {
         if (isFF2)
             return false;
         var selElm = $(this);
-        if (!selElm.next('span.' + prefs.innerClass).length) {
+        
+        /*if (!selElm.next('span.' + prefs.innerClass).length) {
             selElm.wrap('<span><' + '/span>');
             selElm.after('<span><' + '/span>');
             var selReplace = selElm.next();
@@ -50,12 +51,12 @@ $.fn.styledSelect = function (options) {
                 'display': 'block',
                 'white-space': 'nowrap'
             });
-/*
+
             selElm.bind('change', function () {
                 $(this).next().text(this.options[this.selectedIndex].text);
             }).bind('resize', function () {
                 $(this).parent().width($(this).width() + 'px');
-            });*/
+            });
             selElm.trigger('change').trigger('resize');
         } else {
             var selElm = $(this);
@@ -84,7 +85,8 @@ $.fn.styledSelect = function (options) {
                 'white-space': 'nowrap'
             });
 
-        }
+        }*/
+        
     });
 };
 $.fn.placeHolder = function (e) {

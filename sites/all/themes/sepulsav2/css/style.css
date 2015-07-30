@@ -1782,11 +1782,11 @@ section.h_middle_top input[type=submit], input[type=button]
 {
     background: #feb60a;
     border: none;
-    font-size: 22px;
+    font-size: 16px;
     font-family: "robotoregular";
     padding: 9px 5px;
     height: 50px;
-    width: 185px;
+    width: 160px;
     cursor: pointer;
     color: #FFF;
     border-radius: 7px;
@@ -1905,7 +1905,7 @@ table.tab-isi-pulsa tr td:first-child a
 
 .topup-notes
 {
-    width:40%;
+    width:50%;
     float:left;
 }
 

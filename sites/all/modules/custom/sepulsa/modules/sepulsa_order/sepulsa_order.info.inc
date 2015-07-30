@@ -64,7 +64,7 @@ function sepulsa_order_entity_property_info() {
     'schema field' => 'phone',
   );
 
-  for ($i=1; $i < 4; $i++) {
+  for ($i=1; $i <= 5; $i++) {
     $properties ['coupon_' . $i] = array(
       'label' => t('Coupon !number', array('!number' => $i)),
       'type' => 'commerce_product',
@@ -74,6 +74,12 @@ function sepulsa_order_entity_property_info() {
     );
   }
 
+  $properties['coupon_number'] = array(
+    'label' => t('Coupon number'),
+    'type' => 'integer',
+    'setter callback' => 'entity_property_verbatim_set',
+    'schema field' => 'coupon_number',
+  );
   $properties['amount'] = array(
     'label' => t('Amount'),
     'type' => 'decimal',

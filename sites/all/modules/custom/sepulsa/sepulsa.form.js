@@ -8,7 +8,10 @@
       var operatorid = 0;
       function sepulsa_form_inactive() {
         $("#edit-operator").val(0);
-        $("#edit-card-type option").remove();        
+        $("#edit-card-type option").remove();
+        $(".topup-notes").hide();
+        $("#edit-add-cart").hide();
+        $("#edit-add-charge").hide();   
         $("#edit-operator").hide();
         $("#sepulsa-autocomplete-card-type").hide();
         $("#edit-packet option").remove();
@@ -70,6 +73,9 @@
               $("#sepulsa-autocomplete-card-type").toggle(Boolean(counter > 1));
               sepulsa_form_packet(operator, $("#edit-card-type").val(), $("#edit-packet").val());
               if ($("#edit-packet option").size() > 0) {
+                $(".topup-notes").show();
+                $("#edit-add-cart").show();
+                $("#edit-add-charge").show();
                 $("#edit-operator").show();
                 $("#sepulsa-autocomplete-packets").show();
                 $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
@@ -110,6 +116,7 @@
       
       $("#edit-existing-phone", context).on("change", function (event) {
         if ($("#edit-existing-phone").val() == "0") {
+            $("#edit-existing-phone").css("display", "none");
             $("#edit-phone").css("display", "inline");
             $("#phone-sepulsa").css("display", "inline");
             $("#edit-operator").css("display", "none");

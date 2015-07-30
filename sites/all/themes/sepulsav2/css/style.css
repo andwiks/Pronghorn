@@ -1782,10 +1782,11 @@ section.h_middle_top input[type=submit], input[type=button]
 {
     background: #feb60a;
     border: none;
-    font-size: 24px;
-    padding: 9px 0px;
-    height: 60px;
-    width: 200px;
+    font-size: 22px;
+    font-family: "robotoregular";
+    padding: 9px 5px;
+    height: 50px;
+    width: 185px;
     cursor: pointer;
     color: #FFF;
     border-radius: 7px;
@@ -1835,6 +1836,7 @@ section.h_middle_top #sepulsa-autocomplete-packets
     display: block;
     float: left;
     width: 60% !important;
+    margin-bottom: 10px;
 }
 
 section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone
@@ -1846,6 +1848,7 @@ section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top 
     border-color: #feb60a;
     padding: 0 30px;
     background: url(../images/material/drop_ico_1.png) no-repeat right 15px center;
+    cursor: pointer;
 
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1894,3 +1897,27 @@ table.tab-isi-pulsa tr td a
     min-width: 265px;
     border-left: 1px solid;
 }
+
+table.tab-isi-pulsa tr td:first-child a
+{
+    border-left: 0;
+}
+
+.topup-notes
+{
+    width:40%;
+    float:left;
+}
+
+    .topup-notes ul
+    {
+        margin: 0 0 0 20px;
+        padding: 0;
+    }
+
+    .topup-notes ul li
+    {
+        list-style: disc;
+        padding: 5px;
+        margin:0;
+    }

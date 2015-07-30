@@ -52,6 +52,12 @@ $page_state = "home";
   <div class="content_tab">
     <div class="tab form style_1" id="target_1">
       <?php print render($page['content']); ?>
+      <div class="topup-notes"> 
+          <ul>
+            <li>Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</li>
+            <li>Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</li>
+          </ul>
+      </div>
     </div>
     <div class="tab form style_1" id="target_2">
       <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>

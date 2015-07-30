@@ -213,22 +213,68 @@ body.home.red footer ,
 .home.red header .right_link .box .box_drop .box_credit ,
 .home.red .form.style_1 .row.saldo .left {background: #c72127;}
 
-home.blue section.h_middle_top html.js input.form-autocomplete {
-	background:url(../images/material/arr_ico2.png) no-repeat right 15px center;
+.home.blue section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico2.png) no-repeat right 15px center;
 }
 
-home.blue section.h_middle_top input[type=submit], input[type=button] {
-	background: #105c8c;
+	.home.blue section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #105c8c;
+	}
+
+	.home.blue section.h_middle_top .cover_combo, .home.blue section.h_middle_top #sepulsa-autocomplete-card-type, .home.blue section.h_middle_top #edit-operator
+	{
+	    background: #105c8c;
+    }
+
+	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone
+	{		
+	    color: #105c8c;
+	    border-color: #105c8c;
+    	background: url(../images/material/drop_ico_2.png) no-repeat right 15px center;
+	}
+
+.home.green section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico3.png) no-repeat right 15px center;
 }
 
-home.green section.h_middle_top html.js input.form-autocomplete {
-	background:url(../images/material/arr_ico3.png) no-repeat right 15px center;
+	.home.green section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #129d4a;
+	}
+
+	.home.green section.h_middle_top .cover_combo, .home.green section.h_middle_top #sepulsa-autocomplete-card-type, .home.green section.h_middle_top #edit-operator
+	{
+	    background: #129d4a;
+    }
+
+	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone
+	{		
+	    color: #129d4a;
+	    border-color: #129d4a;
+    	background: url(../images/material/drop_ico_3.png) no-repeat right 15px center;
+	}
+
+.home.red section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico4.png) no-repeat right 15px center;
 }
 
-home.blue section.h_middle_top input[type=submit], input[type=button] {
-	background: #129d4a;
-}
+	.home.red section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #c72127;
+	}
 
-home.red section.h_middle_top html.js input.form-autocomplete {
-	background:url(../images/material/arr_ico4.png) no-repeat right 15px center;
-}
+	.home.red section.h_middle_top .cover_combo, .home.red section.h_middle_top #sepulsa-autocomplete-card-type, .home.red section.h_middle_top #edit-operator
+	{
+	    background: #c72127;
+    }
+
+	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone
+	{		
+	    color: #c72127;
+	    border-color: #c72127;
+    	background: url(../images/material/drop_ico_4.png) no-repeat right 15px center;
+	}

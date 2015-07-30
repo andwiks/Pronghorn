@@ -8,7 +8,8 @@
       var operatorid = 0;
       function sepulsa_form_inactive() {
         $("#edit-operator").val(0);
-        $("#edit-card-type option").remove();
+        $("#edit-card-type option").remove();        
+        $("#edit-operator").hide();
         $("#sepulsa-autocomplete-card-type").hide();
         $("#edit-packet option").remove();
         $("#sepulsa-autocomplete-packets").hide();
@@ -69,6 +70,7 @@
               $("#sepulsa-autocomplete-card-type").toggle(Boolean(counter > 1));
               sepulsa_form_packet(operator, $("#edit-card-type").val(), $("#edit-packet").val());
               if ($("#edit-packet option").size() > 0) {
+                $("#edit-operator").show();
                 $("#sepulsa-autocomplete-packets").show();
                 $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
               }

@@ -1770,3 +1770,127 @@ section.h_middle_top input[type=submit], input[type=button] {
     -o-border-radius: 7px;
 	margin:5px;
 }
+
+/* repair css */
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+}
+
+section.h_middle_top input[type=submit], input[type=button]
+{
+    background: #feb60a;
+    border: none;
+    font-size: 24px;
+    padding: 9px 0px;
+    height: 60px;
+    width: 200px;
+    cursor: pointer;
+    color: #FFF;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+    margin:5px;
+}
+
+section.h_middle_top .cover_combo, section.h_middle_top #sepulsa-autocomplete-card-type, section.h_middle_top #edit-operator
+{
+    background: #feb60a;
+    height: 55px;
+    width: 40% !important;
+    padding: 0;
+    font-size: 24px;
+    font-family: "robotoregular";
+    color: #FFF;
+    line-height: 55px;
+    float:left;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+    padding-left:15px;
+    border:1px;
+}
+
+section.h_middle_top .cover_combo
+{
+    display: none;
+}
+
+section.h_middle_top #sepulsa-autocomplete-card-type .cover_combo
+{
+    display: block;
+}
+
+section.h_middle_top .cover_combo .inner_combo
+{
+    padding:0 15px;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets
+{
+    display: block;
+    float: left;
+    width: 60% !important;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone
+{
+    font-size: 24px;
+    font-family: "robotoregular";
+    line-height: 55px;
+    color: #feb60a;
+    border-color: #feb60a;
+    padding: 0 30px;
+    background: url(../images/material/drop_ico_1.png) no-repeat right 15px center;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}
+
+    section.h_middle_top .form-select
+    {
+        width: 100%;
+        padding: 15px;
+        height: 55px;
+    }
+
+    section.h_middle_top #edit-add-cart
+    {
+        content:"";
+        clear: both;
+        display: block
+    }
+
+.voucher_vendor
+{
+    clear: both;
+}
+
+.content_tab:after{
+    content:"";
+    clear: both;
+    display: block;
+}
+
+table.tab-isi-pulsa
+{
+    width:100%;
+}
+
+table.tab-isi-pulsa tr td
+{
+    width:50%;
+}
+
+table.tab-isi-pulsa tr td a
+{
+    width: 100% !important;
+    min-width: 265px;
+    border-left: 1px solid;
+}

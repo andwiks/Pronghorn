@@ -13,7 +13,7 @@ $.fn.styledSelect = function (options) {
             top: 0,
             left: 0
         },
-        selectOpacity: 0
+        selectOpacity: 100
     }
     if (options)
         $.extend(prefs, options);
@@ -50,12 +50,12 @@ $.fn.styledSelect = function (options) {
                 'display': 'block',
                 'white-space': 'nowrap'
             });
-
+/*
             selElm.bind('change', function () {
                 $(this).next().text(this.options[this.selectedIndex].text);
             }).bind('resize', function () {
                 $(this).parent().width($(this).width() + 'px');
-            });
+            });*/
             selElm.trigger('change').trigger('resize');
         } else {
             var selElm = $(this);

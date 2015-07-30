@@ -1,3 +1,6 @@
+/*=============================================================================================	
+        style css decorated by : Web Architect (webarq.com)
+==============================================================================================*/
 @import url("../fonts/roboto_light_macroman/stylesheet.css");
 @import url("../fonts/roboto_regular_macroman/stylesheet.css");
 @import url("../fonts/roboto_medium_macroman/stylesheet.css");
@@ -1743,17 +1746,16 @@ body.home footer .bottom a{color:#feb60a;}
 body.home footer .left .soc_link a.fb{background: url(../images/material/socmed_ico.png) no-repeat -35px top;}
 body.home footer .left .soc_link a.tw{background: url(../images/material/socmed_ico.png) no-repeat -35px bottom;}
 
-
-/* repair css */
-
-section.h_middle_top .home_tab .form input[type=text]
+section.h_middle_top html.js input.form-autocomplete {
+background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+}
+section.h_middle_top html.js input.form-autocomplete
 {
-    background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+	background:url(../images/material/arr_ico.png) no-repeat right 15px center;
 }
 
-section.h_middle_top input[type=submit], input[type=button]
-{
-    background: #feb60a;
+section.h_middle_top input[type=submit], input[type=button] {
+	background: #feb60a;
     border: none;
     font-size: 24px;
     padding: 9px 0px;
@@ -1761,55 +1763,10 @@ section.h_middle_top input[type=submit], input[type=button]
     width: 200px;
     cursor: pointer;
     color: #FFF;
-    border-radius: 7px;
+	border-radius: 7px;
     -webkit-border-radius: 7px;
     -moz-border-radius: 7px;
     -ms-border-radius: 7px;
     -o-border-radius: 7px;
-    margin:5px;
+	margin:5px;
 }
-
-section.h_middle_top .cover_combo, section.h_middle_top #sepulsa-autocomplete-card-type
-{
-    background: #feb60a;
-    height: 55px;
-    width: 40% !important;
-    padding: 0;
-    font-size: 24px;
-    font-family: "robotoregular";
-    color: #FFF;
-    line-height: 55px;
-    float:left;
-}
-
-section.h_middle_top .cover_combo
-{
-    /*display: none;*/
-}
-
-section.h_middle_top .cover_combo .inner_combo
-{
-    padding:0 15px;
-}
-
-section.h_middle_top #sepulsa-autocomplete-packets
-{
-    display: block;
-    float: left;
-    width: 60% !important;
-}
-
-
-    section.h_middle_top .form-select
-    {
-        width: 100%;
-        padding: 15px;
-        height: 55px;
-    }
-
-    section.h_middle_top #edit-add-cart
-    {
-        content:"";
-        clear: both;
-        display: block
-    }

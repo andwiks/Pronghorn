@@ -645,3 +645,9 @@ function sepulsav2_views_form_commerce_cart_block_default_ajax_submit($form, $fo
 
   return array('#type' => 'ajax', '#commands' => $commands);
 }
+
+function sepulsav2_preprocess_html(&$variables) {
+  $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
+  $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
+  $variables['footer_second'] = block_get_blocks_by_region('footer_second');
+}

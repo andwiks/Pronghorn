@@ -6,18 +6,8 @@
             <h6>Selamat datang! Masukan password anda untuk masuk ke akun.</h6>
             <span class="border"></span>
             <div class="left form">
-                <form action="sepulsa_credit.php">
-                    <div class="row">
-                        <input type="text" value-placeholder="Masukan alamat email" />
-                    </div>
-                    <div class="row">
-                        <input type="password" value-placeholder="Password" />
-                        <a href="" class="forgot" >Lupa dengan <span>password kamu ?</span></a>
-                    </div>
-                    <div class="row"> 
-                        <input type="submit" class="bt" value="Log In" />
-                    </div>
-                </form>
+                <?php $elements = drupal_get_form('user_login_block'); ?>
+                <?php print drupal_render($elements); ?>
             </div>
             <div class="left spar">
                 atau

@@ -1,10 +1,3 @@
-/*=============================================================================================	
-    Company    : PT Web Architect Technology - webarq.com
-    Document   : MediaQuery 320
-    Author     : Rizki Nida Chaerulsyah - akuiki.net
-==============================================================================================*/
-
-
 /* structure
 ----------------------------------------------------------------------------------------------*/
 .wrapper {width: 280px;}
@@ -412,4 +405,39 @@ footer .bottom img {
     position: relative;
     bottom: -3px;
     margin: 0 5px 0 0;
+}
+
+/* Retouch */
+table.tab-isi-pulsa tr td a
+{
+    min-width: 50px;
+}
+
+table.tab-isi-pulsa tr td {
+    width: 75%;
+}
+
+section.h_middle_top .cover_combo, section.h_middle_top #sepulsa-autocomplete-card-type, section.h_middle_top #edit-operator
+{
+    width: 100% !important;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets
+{
+    width: 100% !important;    
+}
+
+.topup-notes
+{
+    width:100%;
+}
+
+section.h_middle_top input[type=submit], input[type=button]
+{
+    width: 45%;
+    font-size: 12px;
+}
+section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, section.h_middle_top .home_tab .form input[type=text]
+{
+    font-size: 18px;
 }

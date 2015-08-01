@@ -56,6 +56,19 @@ function sepulsa_order_schema() {
         'type' => 'int',
         'unsigned' => TRUE,
       ),
+      'coupon_4' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),
+      'coupon_5' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),
+      'coupon_number' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
       'amount' => array(
         'type' => 'int',
         'not null' => TRUE,
@@ -99,6 +112,14 @@ function sepulsa_order_schema() {
         'table' => 'commerce_product',
         'columns' => array('coupon_3' => 'product_id'),
       ),
+      'coupon_4' => array(
+        'table' => 'commerce_product',
+        'columns' => array('coupon_4' => 'product_id'),
+      ),
+      'coupon_5' => array(
+        'table' => 'commerce_product',
+        'columns' => array('coupon_5' => 'product_id'),
+      ),
       'payment_instance' => array(
         'table' => 'rules_config',
         'columns' => array('payment_instance' => 'name'),
@@ -107,4 +128,21 @@ function sepulsa_order_schema() {
   );
 
   return $schema;
+}
+
+/**
+ * Add coupon_4, coupon_5, coupon_number field to {sepulsa_order}.
+ */
+function sepulsa_order_update_7001(&$sandbox) {
+  $schema = drupal_get_schema_unprocessed('sepulsa_order', 'sepulsa_order');
+
+  if (!db_field_exists('sepulsa_order', 'coupon_4')) {
+    db_add_field('sepulsa_order', 'coupon_4', $schema['fields']['coupon_4'], array('foreign keys' => array('coupon_4' => $schema['foreign keys']['coupon_4'])));
+  }
+  if (!db_field_exists('sepulsa_order', 'coupon_5')) {
+    db_add_field('sepulsa_order', 'coupon_5', $schema['fields']['coupon_5'], array('foreign keys' => array('coupon_5' => $schema['foreign keys']['coupon_5'])));
+  }
+  if (!db_field_exists('sepulsa_order', 'coupon_number')) {
+    db_add_field('sepulsa_order', 'coupon_number', $schema['fields']['coupon_number']);
+  }
 }

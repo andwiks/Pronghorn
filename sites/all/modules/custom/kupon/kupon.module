@@ -101,13 +101,22 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
         $expiry = time();
     }
     //drupal_set_message("<pre>".print_r($node_coupon, true)."</pre>");
-    if ($node_coupon != null && $node_coupon->type == 'coupon' && (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique')) {
+    if ($node_coupon != null 
+        && $node_coupon->type == 'coupon' 
+        && (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) 
+            && ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique'
+                || $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique'))) {
         while ($row = fgetcsv($handle, 1000, ',')) {
             $unique_code = $row[0];
             // start create owned unique coupon
             $node = new stdClass();
             $node->title = $node_coupon->title;
-            $node->type = "owned_unique_coupon";
+            // if voucher is offline unique
+            if ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique') {
+              $node->type = "offline_owned_unique";
+            } else {
+              $node->type = "owned_unique_coupon";
+            }
             $node->language = LANGUAGE_NONE;
 
             $node->field_simple_coupon[$node->language][] = array(

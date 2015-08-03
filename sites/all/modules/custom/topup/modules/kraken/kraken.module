@@ -72,30 +72,35 @@ function kraken_topup_process($topup, $settings, &$output = NULL) {
   );
 
   $result = drupal_http_request($url, $options);
-  if (!is_null($output) && !empty($result->data)) {
-    $transaction = drupal_json_decode($result->data);
+  if (!is_null($output)) {
+    if (in_array($result->code, array(200, 201))) {
+      $transaction = drupal_json_decode($result->data);
 
-    $output['line_item_id'] = $topup['line_item_id'];
-    $output['request_id'] = $transaction['transaction_id'];
-    $output['field_topup_provider'] = 'kraken';
-    $output['topup_entity'] = array(
-      'ref' => $transaction['transaction_id'],
-      'time' => $transaction['created'],
-    );
+      $output['line_item_id'] = $topup['line_item_id'];
+      $output['request_id'] = $transaction['transaction_id'];
+      $output['field_topup_provider'] = 'kraken';
+      $output['topup_entity'] = array(
+        'ref' => $transaction['transaction_id'],
+        'time' => $transaction['created'],
+      );
 
-    switch ($transaction['status']) {
-      case 'success':
-        return TOPUP_SUCCESS;
-        break;
+      switch ($transaction['status']) {
+        case 'success':
+          return TOPUP_SUCCESS;
+          break;
 
-      case 'failed':
-        return TOPUP_FAILED;
-        break;
+        case 'failed':
+          return TOPUP_FAILED;
+          break;
 
-      case 'pending':
-      default:
-        return TOPUP_PENDING;
-        break;
+        case 'pending':
+        default:
+          return TOPUP_PENDING;
+          break;
+      }
+    }
+    else {
+      return TOPUP_PENDING;
     }
   }
 

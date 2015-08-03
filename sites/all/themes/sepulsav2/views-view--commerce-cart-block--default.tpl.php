@@ -36,23 +36,46 @@ $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 $line_items = $order_wrapper->commerce_line_items;
 $total = commerce_line_items_total($line_items);
 ?>
-<div class="pricing-table style1">
-  <?php if ($rows): ?>
-    <div class="pricing-table-content" style="text-align:left; padding-left:20px">
-      <?php print $rows; ?>
-    </div>
-  <?php elseif ($empty): ?>
-    <div class="view-empty">
-      <?php print $empty; ?>
-    </div>
-  <?php endif; ?>
 
-  <div class="pricing-table-header">
-    <h4 class="pricing-type">TOTAL = IDR <?php print number_format($total['amount'], 0, ".", ","); ?></h4>
-  </div>
-  
-  <div class="pricing-table-footer">
-    <a href="<?php print $base_url."/checkout"; ?>" class="btn style4">Proses</a>
-  </div>
-  
+<div class="c_left">
+    <div class="grid_voucher_order">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th colspan="2">Harga</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="3">
+                      <?php if ($rows): ?>
+                        <div class="pricing-table-content" style="text-align:left;">
+                          <?php print $rows; ?>
+                        </div>
+                      <?php elseif ($empty): ?>
+                        <div class="view-empty">
+                          <?php print $empty; ?>
+                        </div>
+                      <?php endif; ?>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>TOTAL PAYMENT <span>(xx items)</span></th>
+                    <th colspan="2">
+                        IDR <?php print number_format($total['amount'], 0, ".", ","); ?>
+                        <a href="<?php print $base_url."/checkout"; ?>" class="add_bt">Proses</a>
+                    </th>                            
+                </tr>
+            </tfoot>
+        </table>
+        <p>
+            * Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
+            * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!
+        </p>
+    </div>
 </div>
+
+<div style="clear:both;"> &nbsp; </div>

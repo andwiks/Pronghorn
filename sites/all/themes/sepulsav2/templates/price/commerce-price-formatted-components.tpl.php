@@ -1,8 +1,7 @@
 <tfoot>
   <?php foreach ($components as $component): ?>
     <tr class="cart_item">
-      <td class="product-price" colspan="2">&nbsp;</td>
-      <td class="product-price">
+      <td class="product-price" colspan="3">
         <strong><?php print $component['title']; ?></strong>
       </td>
       <td class="product-subtotal">

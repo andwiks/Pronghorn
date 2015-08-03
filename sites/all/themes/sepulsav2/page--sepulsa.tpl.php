@@ -43,6 +43,7 @@ $page_state = "home";
 
   <div class="content_tab">
     <div class="tab form style_1" id="target_1">
+      <?php print render($messages); ?>
       <?php print render($page['content']); ?>
       <div class="topup-notes"> 
           <ul>

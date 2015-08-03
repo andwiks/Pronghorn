@@ -1,3 +1,15 @@
+<?php
+/**
+ * @file
+ * header.tpl.php
+ *
+ * @author dwi@sepulsa.com
+ * @since January 27th 2015.
+ */
+
+global $base_url, $user;
+
+?>
 <body class="<?php print ($page_state == "home" || $page_state == "home_acc") ? 'home ' : ''; print $classes; ?>"<?php print $attributes; ?>>
     <!--[if lt IE 7]>
         <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
@@ -25,7 +37,7 @@
             </div>
             <div class="right_link">
 
-                <?php if ($page == "home_acc" || $page == "member_area") { ?>
+                <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">
                         <a href="" >
                             <span class="ico"></span>
@@ -33,29 +45,29 @@
                         </a>
                         <div class="box_drop">
                             <div class="arr"></div>
-                            <div class="box_credit after_clear">
+                            <!--<div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
                                 <div class="right">IDR 2.000.000</div>
-                            </div>
-                            <a href="informasi_akun.php">AKUN</a>
-                            <a href="konfirmasi_pembayaran.php">KONFIRMASI PEMBAYARAN</a>
-                            <a href="">LOG OUT</a>
+                            </div>-->
+                            <a href="<?php print $base_url."/user/".$user->uid; ?>">AKUN</a>
+                            <a href="<?php print $base_url."/konfirmasi"; ?>">KONFIRMASI PEMBAYARAN</a>
+                            <a href="<?php print $base_url."/user/logout"; ?>">LOG OUT</a>
                         </div>
                     </div>
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
-                            <div class="box_credit after_clear">
+                            <!--<div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
                                 <div class="right">IDR 2.000.000</div>
-                            </div>
-                            <a href="informasi_akun.php" >Informasi Akun</a>
+                            </div>-->
+                            <a href="<?php print $base_url."/user/".$user->uid; ?>" >Informasi Akun</a>
                             <a href="order_transaksi.php">Order Transaksi</a>
                             <a href="info_kartu.php">Info Kartu</a>
                             <a href="dompet_saya.php">Dompet Saya</a>
                             <a href="akun_voucher.php">Voucher Diskon</a>
-                            <a href="konfirmasi_pembayaran.php">Konfirmasi Pembayaran</a>
-                            <a href="">LOG OUT</a>
+                            <a href="<?php print $base_url."/konfirmasi"; ?>">Konfirmasi Pembayaran</a>
+                            <a href="<?php print $base_url."/user/logout"; ?>">LOG OUT</a>
                             <div class="m_lang">
                                 <a href="">English</a>
                             </div>
@@ -65,10 +77,6 @@
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
-                            <div class="box_credit after_clear">
-                                <div class="left">SEPULSA CREDIT</div>
-                                <div class="right">IDR 2.000.000</div>
-                            </div>
                             <a href="" class="login">LOGIN</a>
                             <div class="m_lang">
                                 <a href="">English</a>

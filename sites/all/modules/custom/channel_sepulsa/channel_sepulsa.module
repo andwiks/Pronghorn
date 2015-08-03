@@ -23,18 +23,18 @@ function registration_channel_form($form, &$form_state) {
         $channel = db_query_range("SELECT channel FROM {registration_channel} WHERE id = :id", 0, 1, array('id' => $id))->fetchField();
     }
     $form['channel'] = array(
-        '#type' => 'textfield', 
+        '#type' => 'textfield',
         '#title' => 'Channel',
         '#required' => true,
         '#default_value' => $channel,
     );
     $form['submit'] = array(
-        '#type' => 'submit', 
+        '#type' => 'submit',
         '#title' => 'Submit',
         '#value' => 'Submit'
     );
 
-    return $form;    
+    return $form;
 }
 
 function registration_channel_form_submit($form, &$form_state) {
@@ -70,7 +70,7 @@ function registration_channel() {
                             <td>'.$row->channel.'</td>
                             <td>'.$base_url.'/user/register?channel='.$row->channel.'</td>
                             <td>
-                                <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/edit">Edit</a> | 
+                                <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/edit">Edit</a> |
                                 <a href="'.$base_url.'/admin/config/people/registration_channel/'.$row->id.'/delete">Delete</a>
                             </td>
                         </tr>';
@@ -83,12 +83,12 @@ function registration_channel() {
 function channel_sepulsa_form_alter(&$form, $form_state, $form_id) {
   global $user;
   $arg1 = arg(1);
-  if (arg(0) == 'user' && isset($arg1) && arg(2) == 'edit') {
+  if (arg(0) == 'user' && isset($arg1) && arg(2) == 'edit' && !user_access("administer users")) {
       //print "<pre>".print_r($user, true)."</pre>";
       $form['field_registration_channel']['#access'] = FALSE;
   }
   if ($form_id == 'user_register_form') {
-    if (isset($_GET['channel'])) {  
+    if (isset($_GET['channel'])) {
         $cookie = $_GET['channel'];
         $cookie_lifetime = 86400; // 1 day
         setcookie(REGISTRATION_CHANNEL_COOKIE, $cookie, time() + $cookie_lifetime, '/');

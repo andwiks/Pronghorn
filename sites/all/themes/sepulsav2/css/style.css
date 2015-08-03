@@ -1960,3 +1960,39 @@ section.h_middle_top .home_tab .nav_tab a.active
     padding-left: 20%;
     width: 80%;
 }
+
+section.transaction table.cart{width: 100%;border:1px solid #105c8c;font-size: 14px;margin:0 0 30px }
+section.transaction table.cart td,
+section.transaction table.cart th{
+    padding:  13px 15px;
+}
+section.transaction table.cart td{border-bottom: 1px dashed #b0b0b0;border-right: 1px dashed #b0b0b0; }
+section.transaction table.cart thead,
+section.transaction table.cart tfoot{
+    text-align: left
+}
+section.transaction table.cart th:last-child,
+section.transaction table.cart td:last-child{text-align: center;}
+
+section.transaction table.cart thead{background: #105c8c;color:#FFF;font-size: 16px}
+section.transaction table.cart thead th{padding:15px;border-right: 1px solid #FFF}
+section.transaction table.cart thead th:last-child{border:none;}
+
+section.transaction table.cart .sub_foot ,
+section.transaction table.cart tfoot{                                                     
+    font-family: "robotomedium";
+    font-size: 16px;
+    text-transform: uppercase;
+    color:#105c8c;
+}
+section.transaction table.cart tfoot th{padding: 30px 15px; }
+section.transaction table.cart .sub_foot {font-size: 14px;}
+section.transaction table.cart .sub_foot th{padding:20px 15px;text-align: left}
+section.transaction table.cart .sub_foot th:last-child{text-align: center;}
+section.transaction table.cart .sub_foot span{color:#fecc0a;font-style: italic;text-transform: none;font-size: 13px}
+section.transaction table.cart .sub_foot.style_1{background:#7b7b7b;color:#FFF; }
+
+section.transaction table.cart td.product-subtotal
+{
+    width:150px;
+}

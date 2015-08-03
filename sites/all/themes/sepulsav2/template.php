@@ -43,10 +43,13 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['packet']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Paket');
 
     $form['add']['#prefix'] = '<p></p>';
+
+    $form['add']['#prefix'] = '<div class="topup-action">';
     $form['add']['cart']['#value'] = t('Get Voucher');
     $form['add']['cart']['#attributes']['style'] = 'float:right';
     $form['add']['charge']['#value'] = t('Pay Now');
     $form['add']['charge']['#attributes']['style'] = 'float:right;';
+    $form['add']['#suffix'] = '</div>';
 
   } else if ($form_id == "user_login_block") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
@@ -297,10 +300,14 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
+
+        $form['add']['#prefix'] = '<div class="topup-action-2">';
         $form['submit']['#value'] = t('Process');
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
+        $form['add']['#suffix'] = '</div">';
+
         if ($form_state['submitted'] === FALSE) {
           $form['submit']['#attributes']['class'][] = 'inactive';
         }

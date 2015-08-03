@@ -37,14 +37,6 @@ $page_state = "home";
               bayar listrik
           </a>
         </td>
-        <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
-        <td>
-          <a href="" target="target_3">
-              <span class="ico bolt"></span>
-              deposit
-          </a>        
-        <td>
-        <?php endif; ?>
       </tr>
     </table>
   </div>
@@ -65,13 +57,6 @@ $page_state = "home";
       <?php endif; ?>
       <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
     </div>
-    <?php if (module_exists('deposit_sepulsa') && user_is_logged_in()): ?> 
-    <div class="tab form style_1" id="target_3">
-      <div style="padding:5px 5px 20px;"> Deposit akan menambah jumlah Sepulsa Kredit yang tersedia di akun kamu. Sepulsa Kredit dapat digunakan untuk melakukan transaksi.</div>
-      <?php print render($deposit_sepulsa_form); ?>
-      <span class="note">* Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</span>
-    </div>
-    <?php endif; ?>
   </div>
 
 </div>

@@ -10,33 +10,53 @@
 global $base_url;
 
 ?>
-<div id="page-wrapper">
-        
-  <section id="content">
-    <div class="container">
-      <div id="main">
-        
-        
-        <h3>Silahkan pilih (maksimal 3) kupon diskon menarik dibawah ini.</h3>
-        <div class="row">
-          <div class="col-sm-9">
-
-            <?php print render($title_suffix); ?>
-            <?php print $messages; ?>
-            <?php print render($page['content']); ?>
-            
-          </div>
-          
-            
-          <div class="col-sm-6 col-sm-3">
-            <?php print render($page['right']); ?>
-          </div>
-          
-        
+<section class="std_content">
+<?php print render($title_suffix); ?>
+<?php print $messages; ?>
+    <div class="wrapper_2 voucher ">
+       <?php print render($page['right']); ?>
+        <div class="c_left">
+            <div class="grid_voucher_order">
+                
+                <p>
+                    * Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
+                    * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!
+                </p>
+            </div>
         </div>
-      </div>
+        <div class="c_right">
+            <div class="grid_promo_bank">
+                
+                <a href="" class="bt_toogle">Check Bank Promo</a>
+            </div>
+            <div class="atau"><span>atau</span></div>
+            <a href="" class="bt_next" >LANJUT KE PEMBAYARAN</a>
+        </div>
+        <div class="clear"></div>
+
+        <div class="wrapper_2">
+            <h2>PILIH VOUCHER YANG KAMU SUKA</h2>
+            <h5>
+                Saat ini kamu memilih untuk melakukan pembayaran dengan kartu kredit BCA,<br/>
+                kamu bisa memilih tambahan 2 Voucher Diskon Special.
+                <span class="border"></span>
+            </h5>
+        </div> 
+        <div class="wrapper_3">
+            <div class="slider_voucher">
+                <div class="slider">
+                    
+                </div>
+            </div>
+            <div class="list_voucher after_clear">
+                <?php print render($page['content']); ?>
+            </div>
+            <a href="#" class="back_top">
+                <img src="images/material/go_top.png" alt="" />
+            </a>
+        </div>
+
     </div>
-  </section>
-        
-    
-</div>
+
+
+</section>

@@ -874,12 +874,13 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   $payment_transactions->propertyCondition('order_id', $order->order_id);
   $payment_transactions->count();
   $payment_transactions = $payment_transactions->execute();
+  $payment_transactions++;
 
   // Define transaction data to be sent.
   $transaction_data = array(
     'payment_type' => $payment_type,
     'transaction_details' => array(
-      'order_id' => $payment_method['settings']['prefix'] . $order->order_id . $payment_transactions + 1,
+      'order_id' => $payment_method['settings']['prefix'] . $order->order_id . '-' . $payment_transactions,
       'gross_amount'  => $order_wrapper->commerce_order_total->amount->value(),
     ),
     'item_details' => $items,

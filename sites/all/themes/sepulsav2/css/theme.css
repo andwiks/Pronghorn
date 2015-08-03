@@ -211,7 +211,7 @@ body.home.red footer ,
 
 .home.blue section.h_middle_top .home_tab .form input[type=text]
 {
-	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico2.png) no-repeat right 15px center;
+	background:url(../images/material/arr_ico2.png) no-repeat right 12px center;
 }
 
 	.home.blue section.h_middle_top input[type=submit], input[type=button]
@@ -224,7 +224,7 @@ body.home.red footer ,
 	    background: #105c8c;
     }
 
-	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone
+	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone, .home.blue section.h_middle_top #edit-product-id
 	{		
 	    color: #105c8c;
 	    border-color: #105c8c;
@@ -233,7 +233,7 @@ body.home.red footer ,
 
 .home.green section.h_middle_top .home_tab .form input[type=text]
 {
-	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico3.png) no-repeat right 15px center;
+	background:url(../images/material/arr_ico3.png) no-repeat right 12px center;
 }
 
 	.home.green section.h_middle_top input[type=submit], input[type=button]
@@ -246,7 +246,7 @@ body.home.red footer ,
 	    background: #129d4a;
     }
 
-	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone
+	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone, .home.green section.h_middle_top #edit-product-id
 	{		
 	    color: #129d4a;
 	    border-color: #129d4a;
@@ -255,7 +255,7 @@ body.home.red footer ,
 
 .home.red section.h_middle_top .home_tab .form input[type=text]
 {
-	background:url(/sites/all/themes/sepulsav2/images/material/arr_ico4.png) no-repeat right 15px center;
+	background:url(../images/material/arr_ico4.png) no-repeat right 12px center;
 }
 
 	.home.red section.h_middle_top input[type=submit], input[type=button]
@@ -268,7 +268,7 @@ body.home.red footer ,
 	    background: #c72127;
     }
 
-	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone
+	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone, .home.red section.h_middle_top #edit-product-id
 	{		
 	    color: #c72127;
 	    border-color: #c72127;

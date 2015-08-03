@@ -1,10 +1,3 @@
-/*=============================================================================================	
-    Company    : PT Web Architect Technology - webarq.com
-    Document   : MediaQuery 320
-    Author     : Rizki Nida Chaerulsyah - akuiki.net
-==============================================================================================*/
-
-
 /* structure
 ----------------------------------------------------------------------------------------------*/
 .wrapper {width: 440px;}
@@ -563,4 +556,38 @@ footer .bottom img {
     position: relative;
     bottom: -3px;
     margin: 0 5px 0 0;
+}
+
+/* retouch */
+
+table.tab-pulsa
+{
+    width: 100%;
+}
+
+table.tab-pulsa tr td
+{
+    width: auto;
+}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    width: 100%;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active
+{
+    padding-left: 20%;
+    width: 80%;
+}
+
+.topup-action 
+{
+    width:86%;
+    margin:0 auto;
+}
+
+.topup-notes
+{
+    width: 100%;
 }

@@ -591,3 +591,14 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     width: 100%;
 }
+
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+{
+    width: 158px
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-code, 
+.commerce_coupon #edit-commerce-coupon-coupon-code--2
+{
+    width: 250px;
+}

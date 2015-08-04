@@ -2010,7 +2010,98 @@ section.transaction #edit-continue
     text-transform: uppercase;
 }
 
-section.transaction label.option
+section.transaction .alert-block
+{
+    font-size: 16px;
+    padding: 5%;
+    margin: 0 0 15px;
+    width: 90%;
+    height: 35px;
+    color: #FFF;
+    background: red;
+}
+
+section.transaction .form-radios label.option
 {
     padding-right: 10px;
+    /*float: none;
+    padding-top: 0;*/
+}
+
+
+section.transaction .form-radios
+{
+    margin-bottom: 10px;
+}
+
+section.transaction .fieldset-wrapper .form-item label
+{
+    float: left;
+    width:27%;
+    padding-top:10px;
+}
+
+section.transaction .c_right input[type=text]
+{
+    float:left;
+    width:60%;
+    margin-bottom: 10px;
+}
+
+section.transaction .form-item, .form-actions
+{
+    clear:both;
+    margin:5px 0;
+}
+
+.commerce_coupon .description, .commerce_coupon .fieldset-legend
+{
+    display: none;
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+{
+    float: left;
+    width: 178px;
+    height: 50px;
+    background: #105c8c;
+    font-family: "robotomedium";
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #FFF;
+    border: none;
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-code, 
+.commerce_coupon #edit-commerce-coupon-coupon-code--2
+{
+    width: 400px;
+    padding: 0 15px;
+    height: 48px;
+    float: left;
+}
+
+.commerce_coupon label
+{
+    font-size: 16px;
+    text-transform: uppercase;
+    margin: 0 0 20px;
+}
+
+.commerce_coupon .alert-block
+{
+    height: 20px !important;
+    padding: 15px 5% !important;
+}
+
+.commerce_payment .alert-block
+{
+    height: 45px !important;
+    padding: 15px 5% !important;
+    background: #feb60a !important;
+}
+
+.small-only
+{
+    display: none;
 }

@@ -470,3 +470,87 @@ section.h_middle_top .home_tab .nav_tab a.active
     padding-left: 20%;
     width: 80%;
 }
+
+
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+{
+    width: 40%;
+    padding-left: 2%;
+    padding-right: 2%;
+    font-size: 14px;
+}
+
+
+.commerce_coupon #edit-commerce-coupon-coupon-code, 
+.commerce_coupon #edit-commerce-coupon-coupon-code--2
+{
+    width: 55%;
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+section.transaction .wrapper_2 .c_right
+{
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+section.transaction .form-radios label.option {
+    float: left;
+    padding-right: 0;
+    width: 95%;
+}
+
+section.transaction .form-radios
+{
+    margin:0;
+}
+
+section.transaction #edit-commerce-payment-payment-method input[type=checkbox], input[type=radio]
+{    
+    display: block;
+    clear: both;
+    width: 10%;
+    text-align: left;
+    float: left;
+    margin: 5px;
+    padding: 5px;
+}
+
+section.transaction .form-radios label.option {
+    float: left;
+    width: 85%;
+    display: block;
+    padding: 5px 0;
+}
+
+table.shop_table tbody td:nth-child(2), table.shop_table tbody td:nth-child(3)
+{
+    display: none;
+}
+
+
+table.shop_table thead th:nth-child(2), table.shop_table thead th:nth-child(3)
+{
+    display: none;
+}
+
+section.transaction .fieldset-wrapper .form-item label
+{
+    padding-bottom: 10px;
+}
+
+table.shop_table tfoot .cart_item
+{
+    display: none;
+}
+
+table.shop_table tfoot .small-only
+{
+    display: table-row;
+}
+
+section.transaction .alert-block
+{
+    height: 50px;
+}

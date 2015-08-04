@@ -19,6 +19,7 @@ regions[footer_sub_right] = Footer Sub Right
 regions[footer_second] = Footer Second
 
 regions[right] = Right Bar
+regions[promo] = Promo
 regions[user_login] = User Login
 regions[user_signup] = User Signup
 

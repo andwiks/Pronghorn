@@ -1,9 +1,3 @@
-/*=============================================================================================	
- Company    : PT Web Architect Technology - webarq.com
- Document   : Javascript Plugin Lib
- Author     : Rizki Nida Chaerulsyah - akuiki.net
- ==============================================================================================*/
-
 $.fn.styledSelect = function (options) {
     var isFF2 = false;
     var prefs = {

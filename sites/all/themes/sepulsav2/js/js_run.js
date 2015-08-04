@@ -1,8 +1,3 @@
-/*=============================================================================================	
- Company    : PT Web Architect Technology - webarq.com
- Document   : Javascript Plugin Exe
- Author     : Rizki Nida Chaerulsyah - akuiki.net
- ==============================================================================================*/
 $(document).ready(function () {
     $("input[type=text]").placeHolder();//placeholder custom
     $(".form input[type=password]").placeHolder();//placeholder custom

@@ -6,7 +6,7 @@
 
         <?php
         //if bank transfer
-        ?>
+        /*
         <div class="c_left">
             <h4>
                 <img src="<?php print url(path_to_theme()); ?>/images/material/bank_transfer_info.png" alt="img bank" />
@@ -40,6 +40,8 @@
         	</div>
     	*/
         ?>
+		
+		<?php print $message; ?>
 
     </div>
 </section>

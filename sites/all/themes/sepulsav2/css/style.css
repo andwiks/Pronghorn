@@ -2111,3 +2111,24 @@ section.transaction .thanks_page p {
     margin: 5px 0 10px 0;
     max-width: 100% !important;
 }
+
+#payment-details ul, .thanks_page ul
+{
+    list-style: decimal;
+    padding: 10px 10px 10px 15px;
+}
+
+#payment-details ul li
+{
+    margin-bottom:10px;
+}
+
+.thanks_page ul
+{
+    padding-left:20px;
+}
+
+.thanks_page ul li
+{
+    margin-bottom:15px;
+}

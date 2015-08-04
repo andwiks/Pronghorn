@@ -65,7 +65,7 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
         return services_error(t('Invalid merchant code'), 406);
       }
       $voucher->status->set(0);
-      $voucher->title->set($voucher->title . '-' . $code);
+      $voucher->title->set($voucher->title->value() . '-' . $code);
       $voucher->save();
       return $voucher
         ->field_simple_coupon

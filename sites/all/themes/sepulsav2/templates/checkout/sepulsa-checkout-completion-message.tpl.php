@@ -1,12 +1,33 @@
-<div class="checkout-completion-message">
-  <div class="container">
-    <div class="heading-box">
-      <h2 class="box-title">Terimakasih, Transaksi Anda Sukses</h2>
-      <br>
+<section class="transaction">
+    <div class="wrapper_3 thanks_page after_clear ">
+        <h2>Transaksi Anda Sukses</h2>
+        <h5>Terima kasih telah mempercayakan Sepulsa sebagai dealer pulsa kamu!</h5>
+        <span class="border"></span>
 
-      <div class="tqbox">
-        <?php print $message; ?>
-      </div>
+        <div class="c_left">
+            <h4>
+                <img src="<?php print $theme_path; ?>/images/material/bank_transfer_info.png" alt="img bank" />
+                BANK TRANSFER INFO
+            </h4>
+            <div class="checkout_complete">
+            	<?php print $message; ?>
+        	</div>
+        </div>
+        <div class="c_right">
+            <h4>
+                <img src="<?php print $theme_path; ?>/images/material/informasi_penting.png" alt="img info" />
+                INFORMASI PENTING
+            </h4>
+            <p>
+                Mohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun berikut dalam jangka waktu <span>kurang dari 24 jam</span>. Jika tidak pesanan kamu akan dibatalkan.
+                <br/><br/>
+                Untuk tahap akhir proses pembayaran, silakan lakukan konfirmasi pembayaran dengan melakukan konfirmasi pembayaran <a href="">disini</a> agar transaksi kamu dapat langsung kami proses.
+                <br/><br/>
+                Pulsa kamu akan terisi setelah pembayaran sukses dan dikonfirmasi.
+                <br/><br/>
+                Jika ini adalah transaksi pertama kamu, silahkan cek email kamu untuk mendapatkan instruksi login. Setelah login, kamu bisa melihat status pulsa kamu di halaman <a href="">akun saya</a>.
+            </p>
+        </div>
+
     </div>
-  </div>
-</div>
+</section>

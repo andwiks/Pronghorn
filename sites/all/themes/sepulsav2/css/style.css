@@ -2105,3 +2105,9 @@ section.transaction .form-item, .form-actions
 {
     display: none;
 }
+
+section.transaction .thanks_page p {
+    line-height: 1.75;
+    margin: 5px 0 10px 0;
+    max-width: 100% !important;
+}

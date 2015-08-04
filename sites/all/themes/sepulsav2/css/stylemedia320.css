@@ -554,3 +554,9 @@ section.transaction .alert-block
 {
     height: 50px;
 }
+
+#payment-details ul
+{
+    margin-left: 35px;
+    padding-left: 20px;
+}

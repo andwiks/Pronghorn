@@ -2100,3 +2100,8 @@ section.transaction .form-item, .form-actions
     padding: 15px 5% !important;
     background: #feb60a !important;
 }
+
+.small-only
+{
+    display: none;
+}

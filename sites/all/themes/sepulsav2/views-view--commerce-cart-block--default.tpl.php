@@ -46,26 +46,26 @@ $total = commerce_line_items_total($line_items);
                     <th colspan="2">Harga</th>
                 </tr>
             </thead>
+            <?php if ($rows): ?>
+            <tbody>
+            <?php print $rows; ?>
+            </tbody>
+            <?php elseif ($empty): ?>
             <tbody>
                 <tr>
                     <td colspan="3">
-                      <?php if ($rows): ?>
-                        <div class="pricing-table-content" style="text-align:left;">
-                          <?php print $rows; ?>
-                        </div>
-                      <?php elseif ($empty): ?>
                         <div class="view-empty">
                           <?php print $empty; ?>
                         </div>
-                      <?php endif; ?>
                     </td>
                 </tr>
             </tbody>
+            <?php endif; ?>
             <tfoot>
                 <tr>
-                    <th>TOTAL PAYMENT <span>(xx items)</span></th>
+                    <th>TOTAL PAYMENT</th>
                     <th colspan="2">
-                        IDR <?php print number_format($total['amount'], 0, ".", ","); ?>
+                        <?php print number_format($total['amount'], 0, ".", ","); ?> IDR
                         <a href="<?php print $base_url."/checkout"; ?>" class="add_bt">Proses</a>
                     </th>                            
                 </tr>

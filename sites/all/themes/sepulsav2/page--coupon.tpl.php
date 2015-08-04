@@ -14,20 +14,10 @@ global $base_url;
 <?php print render($title_suffix); ?>
 <?php print $messages; ?>
     <div class="wrapper_2 voucher ">
-       <?php print render($page['right']); ?>
-        <div class="c_left">
-            <div class="grid_voucher_order">
-                
-                <p>
-                    * Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
-                    * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!
-                </p>
-            </div>
-        </div>
+        <?php print render($page['right']); ?> 
         <div class="c_right">
             <div class="grid_promo_bank">
-                
-                <a href="" class="bt_toogle">Check Bank Promo</a>
+                <?php print render($page['promo']); ?>
             </div>
             <div class="atau"><span>atau</span></div>
             <a href="" class="bt_next" >LANJUT KE PEMBAYARAN</a>

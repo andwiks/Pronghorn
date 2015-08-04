@@ -549,3 +549,8 @@ table.shop_table tfoot .small-only
 {
     display: table-row;
 }
+
+section.transaction .alert-block
+{
+    height: 50px;
+}

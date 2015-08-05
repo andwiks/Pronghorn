@@ -602,3 +602,18 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     width: 250px;
 }
+
+section.std_content .box_voucher p
+{
+    width:100%;
+}
+
+section.std_content .list_voucher .box_voucher
+{
+    width: 210px;
+}
+
+.box_voucher .image img 
+{
+    height:140px;
+}

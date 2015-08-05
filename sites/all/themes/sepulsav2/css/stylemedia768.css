@@ -1,10 +1,3 @@
-/*=============================================================================================	
-    Company    : PT Web Architect Technology - webarq.com
-    Document   : MediaQuery 768
-    Author     : Rizki Nida Chaerulsyah - akuiki.net
-==============================================================================================*/
-
-
 /* structure
 ----------------------------------------------------------------------------------------------*/
 body{overflow-x: hidden;}
@@ -351,4 +344,9 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     padding-left: 20%;
     width: 80%;
+}
+
+.box_voucher .image img 
+{
+    height:130px;
 }

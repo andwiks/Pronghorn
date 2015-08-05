@@ -2248,3 +2248,8 @@ section.std_content .box_voucher
 {
     margin-bottom: 10px;
 }
+
+.box_voucher .image img 
+{
+    height:195px;
+}

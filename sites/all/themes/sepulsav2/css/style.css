@@ -2176,3 +2176,8 @@ section.std_content .voucher .c_left .grid_voucher_order td p {width: auto; marg
   border: 0;
   background-position-y: 10px;
 }
+
+.region-promo table tr td:first-child
+{
+    width:28px;
+}

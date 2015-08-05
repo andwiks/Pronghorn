@@ -2224,3 +2224,9 @@ section.std_content .box_voucher
 {
     display: initial;
 }
+
+.voucher-description
+{
+    height: 60px;
+    overflow: hidden;
+}

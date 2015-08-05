@@ -14,13 +14,15 @@ global $base_url;
 <?php print render($title_suffix); ?>
 <?php print $messages; ?>
     <div class="wrapper_2 voucher ">
+        <div class="c_left">
         <?php print render($page['right']); ?> 
+        </div>
         <div class="c_right">
             <div class="grid_promo_bank">
                 <?php print render($page['promo']); ?>
             </div>
             <div class="atau"><span>atau</span></div>
-            <a href="" class="bt_next" >LANJUT KE PEMBAYARAN</a>
+            <a href="<?php print $base_url."/checkout"; ?>" class="bt_next" >LANJUT KE PEMBAYARAN</a>
         </div>
         <div class="clear"></div>
 

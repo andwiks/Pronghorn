@@ -2166,3 +2166,13 @@ section.transaction #payment-details
 section.std_content .akun .form.akun label{font-weight: normal}
 section.std_content .akun  div.description{color:#666;font-size:12px;line-height:20px}
 section.std_content .akun  div.description span{color:#c72127}
+
+
+section.std_content .voucher .c_left .grid_voucher_order td p {width: auto; margin-bottom: 15px;}
+.delete-line-item {
+  background-repeat: no-repeat;
+  background-image: url(../images/material/trash_ico.png);
+  background-color: #ffffff;
+  border: 0;
+  background-position-y: 10px;
+}

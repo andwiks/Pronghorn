@@ -14,7 +14,11 @@ function sepulsav2_block_view_alter(&$data, $block) {
   if ($block->region == 'sidebar_first' && !empty($data['content']['#theme_wrappers'])) {
     foreach ($data['content']['#theme_wrappers'] as $key => $theme_wrapper) {
       if (strpos($theme_wrapper, 'menu_tree') === 0) {
-        $data['content']['#theme_wrappers'][] = 'menu_tree__sidebar';
+        $data['content']['#theme_wrappers'][$key] = 'menu_tree__sidebar';
+
+        foreach (element_children($data['content']) as $children) {
+          $data['content'][$children]['#theme'] = 'menu_link__sidebar';
+        }
         break;
       }
     }
@@ -232,21 +236,31 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     }
 
   } else if ($form_id == "user_profile_form") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
-    $form['contact']['#attributes']['style'] = "display:none;";
-    $form['mimemail']['#attributes']['style'] = "display:none;";
+    $form['#attributes']['class'][] = 'form';
+    $form['#attributes']['class'][] = 'akun';
+    $form['#suffix'] = '<hr>';
 
-    $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
+    foreach (element_children($form['account']) as $children) {
+      switch ($form['account'][$children]['#type']) {
+        case 'textfield':
+        case 'password':
+        case 'password_confirm':
+          $form['account'][$children]['#prefix'] = '<div class="row">';
+          $form['account'][$children]['#suffix'] = '</div>';
+          break;
+      }
+    }
 
-    $form['account']['mail']['#attributes']['class'] = array('input-text');
-    $form['account']['mail']['#suffix'] = '<p></p>';
+    foreach (element_children($form['actions']) as $children) {
+      $form['actions'][$children]['#attributes']['class'][] = 'bt_std';
+      $form['actions'][$children]['#prefix'] = '<div class="row">';
+      $form['actions'][$children]['#suffix'] = '</div>';
+    }
 
-    $form['account']['current_pass']['#attributes']['class'] = array('input-text');
-    $form['account']['current_pass']['#description'] = t('Enter your current password to change the E-mail address or Password.');
-    $form['account']['current_pass']['#suffix'] = '<p></p>';
-
-    $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
-
+    $form['contact']['#access'] = FALSE;
+    $form['mimemail']['#access'] = FALSE;
+    
+    // $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
@@ -363,6 +377,16 @@ function sepulsav2_form_process_password_confirm($element) {
   return $element;
 }
 
+function sepulsav2_menu_link__sidebar(array $variables) {
+  $element = $variables ['element'];
+  $sub_menu = '';
+
+  if ($element ['#below']) {
+    $sub_menu = drupal_render($element ['#below']);
+  }
+  return l($element ['#title'], $element ['#href'], $element ['#localized_options']);
+}
+
 function sepulsav2_menu_local_tasks(&$variables) {
   $output = '';
 
@@ -383,7 +407,7 @@ function sepulsav2_menu_local_tasks(&$variables) {
 }
 
 function sepulsav2_menu_tree__sidebar($variables) {
-  return '<ul class="arrow-circle hover-effect filter-options">' . $variables['tree'] . '</ul>';
+  return '<nav>' . $variables['tree'] . '</nav>';
 }
 
 function sepulsav2_preprocess_block(&$vars, $hook) {
@@ -596,6 +620,13 @@ function sepulsav2_theme($existing, $type, $theme, $path) {
       'path' => $path . '/templates/checkout',
       'template' => 'sepulsa-checkout-completion-message',
     ),
+    'sepulsav2_referral' => array(
+      'variables' => array(
+        'link' => NULL,
+      ),
+      'path' => $path . '/templates',
+      'template' => 'sepulsav2-referral',
+    ),
   );
 }
 
@@ -655,7 +686,11 @@ function sepulsav2_views_form_commerce_cart_block_default_ajax_submit($form, $fo
 
 function sepulsav2_preprocess_html(&$variables) {
   global $user;
-  
+
+  if (drupal_is_front_page()) {
+    $variables['classes_array'][] = 'home';
+  }
+
   $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
   $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
   $variables['footer_second'] = block_get_blocks_by_region('footer_second');
@@ -663,4 +698,38 @@ function sepulsav2_preprocess_html(&$variables) {
     module_load_include('module', 'userpoints', 'userpoints');
     $variables['userpoints'] = userpoints_get_current_points($user->uid);
   }
+}
+
+/**
+ * Implements hook_user_view_alter().
+ */
+function sepulsav2_user_view_alter(&$build) {
+  $build['Referrals']['#access'] = FALSE;
+  $build['summary']['#access'] = FALSE;
+
+  $build['referrals'] = array(
+    '#theme' => 'sepulsav2_referral',
+    '#link' => url($build['#account']->referral_link, array('absolute' => TRUE)),
+    '#suffix' => '<hr>',
+    '#attached' => array(
+      'js' => array(
+        path_to_theme() . '/js/zclip/jquery.zclip.js' => array(
+          'scope' => 'footer',
+        ),
+        array(
+          'type' => 'setting',
+          'data' => array(
+            'zclip' => array(
+              'path' => path_to_theme() . '/js/zclip/ZeroClipboard.swf',
+              'selector' => '#copy-link-wrap',
+              'target' => '#toclip',
+              'message' => 'Your Referral link has been copied',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  $build['form'] = drupal_get_form('user_profile_form', $build['#account']);
 }

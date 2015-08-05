@@ -24,10 +24,10 @@ $page_state = "home";
   <?php print $styles; ?>
   <?php print $scripts; ?>
 </head>
-<body class="<?php print ($page_state == "home" || $page_state == "home_acc") ? 'home ' : ''; print $classes; ?>"<?php print $attributes; ?>>
+<body class="<?php print $classes; ?>"<?php print $attributes; ?>>
   <!--[if lt IE 7]>
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-  <![endif]--> 
+  <![endif]-->
 
   <!-- header -->
 
@@ -49,12 +49,12 @@ $page_state = "home";
             </div>
             <div class="right">
               <?php print render($footer_sub_right); ?>
-                
+
             </div>
         </div>
         <div class="bottom">
           <?php print render($footer_second); ?>
-            
+
         </div>
     </footer>
   <!--end of Footer -->

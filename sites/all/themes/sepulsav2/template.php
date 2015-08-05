@@ -259,7 +259,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 
     $form['contact']['#access'] = FALSE;
     $form['mimemail']['#access'] = FALSE;
-    
+
     // $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
@@ -720,7 +720,7 @@ function sepulsav2_user_view_alter(&$build) {
           'type' => 'setting',
           'data' => array(
             'zclip' => array(
-              'path' => path_to_theme() . '/js/zclip/ZeroClipboard.swf',
+              'path' => url(path_to_theme() . '/js/zclip/ZeroClipboard.swf'),
               'selector' => '#copy-link-wrap',
               'target' => '#toclip',
               'message' => 'Your Referral link has been copied',

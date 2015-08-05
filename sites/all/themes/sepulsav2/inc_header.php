@@ -27,8 +27,8 @@ global $base_url, $user;
             <a href="javascript:;" onclick="buynow()" class="belipulsa">Beli Pulsa</a>
 
             <div class="soc_link">
-                <a href="" class="fb">facebook</a>
-                <a href="" class="tw">twitter</a>
+                <a href="https://www.facebook.com/sepulsa" class="fb">facebook</a>
+                <a href="https://twitter.com/sepulsa_id" class="tw">twitter</a>
             </div>
             <div class="logo">
                 <a href="index.php">

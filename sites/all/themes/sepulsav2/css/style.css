@@ -2181,3 +2181,32 @@ section.std_content .voucher .c_left .grid_voucher_order td p {width: auto; marg
 {
     width:28px;
 }
+
+.commerce-add-to-cart
+{
+    margin-top:20px;
+}
+
+.commerce-add-to-cart input[type=submit], input[type=button]
+{
+    display: block;
+    background: #c72127;
+    width: 75%;
+    margin: 5px auto;
+    padding: 23px 0;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #FFF;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+section.std_content .box_voucher
+{
+    width: 31%;
+    margin:5px 1%;
+}

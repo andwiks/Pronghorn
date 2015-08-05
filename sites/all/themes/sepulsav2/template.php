@@ -257,6 +257,12 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       $form['actions'][$children]['#suffix'] = '</div>';
     }
 
+    foreach (element_children($form) as $children) {
+      if (isset($form[$children]['#language'])) {
+        $form[$children]['#access'] = FALSE;
+      }
+    }
+
     $form['contact']['#access'] = FALSE;
     $form['mimemail']['#access'] = FALSE;
 
@@ -706,11 +712,13 @@ function sepulsav2_preprocess_html(&$variables) {
 function sepulsav2_user_view_alter(&$build) {
   $build['Referrals']['#access'] = FALSE;
   $build['summary']['#access'] = FALSE;
+  $build['simplenews']['#access'] = FALSE;
 
   $build['referrals'] = array(
     '#theme' => 'sepulsav2_referral',
     '#link' => url($build['#account']->referral_link, array('absolute' => TRUE)),
     '#suffix' => '<hr>',
+    '#weight' => 1,
     '#attached' => array(
       'js' => array(
         path_to_theme() . '/js/zclip/jquery.zclip.js' => array(
@@ -732,4 +740,5 @@ function sepulsav2_user_view_alter(&$build) {
   );
 
   $build['form'] = drupal_get_form('user_profile_form', $build['#account']);
+  $build['form']['#weight'] = 2;
 }

@@ -560,3 +560,16 @@ section.transaction .alert-block
     margin-left: 35px;
     padding-left: 20px;
 }
+
+#edit-commerce-payment-payment-details-veritrans-tokens
+{
+    float: left;
+    width: 100%;
+}
+
+#payment-details .description
+{
+    float: left;
+    width: 100%;
+    margin: 0;
+}

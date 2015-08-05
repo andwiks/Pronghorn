@@ -2230,3 +2230,21 @@ section.std_content .box_voucher
     height: 60px;
     overflow: hidden;
 }
+
+#edit-commerce-payment-payment-details-veritrans-tokens
+{
+    float: left;
+    width: 50%;
+}
+
+#payment-details .description
+{
+    float: left;
+    width: 40%;
+    margin: 0 10px 10px;
+}
+
+#payment-details h6
+{
+    margin-bottom: 10px;
+}

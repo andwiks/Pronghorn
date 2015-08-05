@@ -6,10 +6,8 @@
  * @author dwi@sepulsa.com
  * @since July 23th 2015.
  */
-
-global $base_url;
-
 ?>
+
 <section class="std_content">
   <div class="wrapper_2 akun after_clear">
     <?php if (!empty($page['sidebar_first'])): ?>

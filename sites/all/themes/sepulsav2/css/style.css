@@ -2112,6 +2112,54 @@ section.transaction .thanks_page p {
     max-width: 100% !important;
 }
 
+section.transaction #payment-details ul,section.transaction .thanks_page ul
+{
+    list-style: decimal;
+    padding: 10px 10px 10px 15px;
+}
+
+section.transaction #payment-details ul li
+{
+    margin-bottom:10px;
+}
+
+section.transaction .thanks_page ul
+{
+    padding-left:20px;
+}
+
+section.transaction .thanks_page ul li
+{
+    margin-bottom:15px;
+}
+
+section.transaction #payment-details
+{
+    clear:both;
+    padding-top: 10px;
+}
+
+#user-login-form a
+{
+    font-family: "robotomedium";
+    color: #dd4c3a;
+    font-size: 13px;
+    display: block;
+    text-align: right;
+    padding: 5px 0 0 0px;
+}
+
+#user-login-form .form-submit
+{
+    font-size: 18px;
+    width: 100%;
+    height: 50px;
+    background: #feb60a;
+    color: #FFF;
+    font-family: "robotoregular";
+    cursor: pointer;
+}
+
 /**
  * Account page
  */

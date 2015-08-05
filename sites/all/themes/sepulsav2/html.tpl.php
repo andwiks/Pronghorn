@@ -61,4 +61,3 @@ $page_state = "home";
   </body>
 </html>
 <?php include('inc_popup.php'); ?>
-?>

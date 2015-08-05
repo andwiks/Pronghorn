@@ -263,7 +263,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['mimemail']['#access'] = FALSE;
 
     // $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
-    dpm($form);
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));

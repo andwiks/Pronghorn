@@ -19,7 +19,7 @@ global $base_url, $user;
                 <a href="https://twitter.com/sepulsa_id" class="tw">twitter</a>
             </div>
             <div class="logo">
-                <a href="index.php">
+                <a href="<?php print url(); ?>">
                     <img src="<?php print $theme_path; ?>/images/material/logo.png" alt="sepulsa" />
                 </a>
             </div>

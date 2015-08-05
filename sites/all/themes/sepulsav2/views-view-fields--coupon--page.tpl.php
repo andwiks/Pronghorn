@@ -44,8 +44,7 @@ if (!isset($web_link)) {
             <h3><?php print $fields['title']->content; ?></h3>
             <h4><?php print $fields['field_description']->content; ?>.</h4>
             <h5><?php print t('Terms & Conditions'); ?></h5>
-            <p><?php if (isset($fields['field_coupon_tnc']->content)) print $fields['field_coupon_tnc']->content; else print "-"; ?>
-            </p>
+            <?php print isset($fields['field_coupon_tnc']->content) ? $fields['field_coupon_tnc']->content : "-"; ?>
         </div>
     </div>
 </div>

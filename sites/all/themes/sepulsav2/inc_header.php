@@ -10,18 +10,6 @@
 global $base_url, $user;
 
 ?>
-<body class="<?php print ($page_state == "home" || $page_state == "home_acc") ? 'home ' : ''; print $classes; ?>"<?php print $attributes; ?>>
-    <!--[if lt IE 7]>
-        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-    <![endif]--> 
-
-    <!-- header -->
-    
-    <script>
-      function buynow() {
-        document.getElementById('nomor-hp').focus();
-      }
-    </script>
     <header>
         <div class="wrapper">
             <a href="javascript:;" onclick="buynow()" class="belipulsa">Beli Pulsa</a>
@@ -73,7 +61,7 @@ global $base_url, $user;
                             </div>
                         </div>
                     </div>
-                <?php } else { ?>  
+                <?php } else { ?>
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
@@ -97,7 +85,7 @@ global $base_url, $user;
                     <a href="" >
                         <span class="ico"></span>
                         IN
-                    </a>  
+                    </a>
                     <div class="box_drop">
                         <div class="arr"></div>
                         <a href="">EN</a>

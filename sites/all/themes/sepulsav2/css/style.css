@@ -2159,3 +2159,10 @@ section.transaction #payment-details
     font-family: "robotoregular";
     cursor: pointer;
 }
+
+/**
+ * Account page
+ */
+section.std_content .akun .form.akun label{font-weight: normal}
+section.std_content .akun  div.description{color:#666;font-size:12px;line-height:20px}
+section.std_content .akun  div.description span{color:#c72127}

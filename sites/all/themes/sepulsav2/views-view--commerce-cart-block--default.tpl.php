@@ -37,7 +37,7 @@ $line_items = $order_wrapper->commerce_line_items;
 $total = commerce_line_items_total($line_items);
 ?>
 
-<div class="c_left">
+
     <div class="grid_voucher_order">
         <table>
             <thead>
@@ -76,6 +76,4 @@ $total = commerce_line_items_total($line_items);
             * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!
         </p>
     </div>
-</div>
 
-<div style="clear:both;"> &nbsp; </div>

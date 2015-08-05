@@ -238,20 +238,15 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
   } else if ($form_id == "user_profile_form") {
     $form['#attributes']['class'][] = 'form';
     $form['#attributes']['class'][] = 'akun';
-    $form['#suffix'] = '<hr>';
 
     foreach (element_children($form['account']) as $children) {
-      if (isset($form['account'][$children]['#type']) && in_array($form['account'][$children]['#type'], array('textfield', 'password_confirm'))) {
+      if (isset($form['account'][$children]['#type']) && $form['account'][$children]['#type'] == 'textfield') {
         $form['account'][$children]['#prefix'] = '<div class="row">';
         $form['account'][$children]['#suffix'] = '</div>';
       }
     }
 
-    foreach (element_children($form['actions']) as $children) {
-      $form['actions'][$children]['#attributes']['class'][] = 'bt_std';
-      $form['actions'][$children]['#prefix'] = '<div class="row">';
-      $form['actions'][$children]['#suffix'] = '</div>';
-    }
+    $form['account']['pass']['#process'] = array('form_process_password_confirm', 'user_form_process_password_confirm', 'sepulsav2_form_process_password_confirm');
 
     foreach (element_children($form) as $children) {
       if (isset($form[$children]['#language'])) {
@@ -262,7 +257,13 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['contact']['#access'] = FALSE;
     $form['mimemail']['#access'] = FALSE;
 
-    // $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
+    $form['actions']['#prefix'] = '<hr>';
+
+    foreach (element_children($form['actions']) as $children) {
+      $form['actions'][$children]['#attributes']['class'][] = 'bt_std';
+      $form['actions'][$children]['#prefix'] = '<div class="row">';
+      $form['actions'][$children]['#suffix'] = '</div>';
+    }
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
@@ -369,12 +370,11 @@ function sepulsav2_commerce_coupon_add_coupon_ajax_alter(&$commands, $form, &$fo
  * Implementation of expand_password_confirm.
  */
 function sepulsav2_form_process_password_confirm($element) {
-  //drupal_set_message("<pre>".print_r($element, true)."</pre>");
-  $element['pass1']['#attributes']['class'] = array('input-text');
-  $element['pass1']['#suffix'] = '<p></p>';
-
-  $element['pass2']['#attributes']['class'] = array('input-text');
-  //$element['pass2']['#suffix'] = '<p></p>';
+  $element['pass1']['#prefix'] = '<div class="row">';
+  $element['pass1']['#suffix'] = '</div>';
+  $element['pass2']['#prefix'] = '<div class="row">';
+  $element['pass2']['#suffix'] = '</div>';
+  unset($element['#attached']['js']);
 
   return $element;
 }

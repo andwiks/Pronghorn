@@ -35,7 +35,7 @@ if (!isset($web_link)) {
 <div class="box_voucher">
     <div class="image"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></div>
     <h4><?php print $fields['title']->content; ?></h4>
-    <p><?php print $fields['field_description']->content; ?>.</p>
+    <p class="voucher-description"><?php print $fields['field_description']->content; ?>.</p>
     <a href="" class="detail">Lihat detail voucher</a>
     <?php print $fields['field_product']->content; ?>
     <div class="data_popup">

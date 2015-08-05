@@ -34,6 +34,9 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <span class="border"></span>
             </h5>
         </div> 
+
+        <div class="coupon-separate" style="height:15px; clear:both; display:block;margin-top: 15px;border-top: 1px dashed #999;">&nbsp;</div>
+
         <div class="wrapper_3">
             <div class="list_voucher after_clear">
                 <?php print render($page['content']); ?>

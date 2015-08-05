@@ -2253,3 +2253,26 @@ section.std_content .box_voucher
 {
     height:195px;
 }
+
+.akun .form-actions .row
+{
+    float:left;
+    margin:0 10px 20px 0;
+}
+
+#block-userpoints-sepulsa-sepulsa-kredit table
+{
+    width: 100%;
+}
+
+#block-userpoints-sepulsa-sepulsa-kredit table tr th, #block-userpoints-sepulsa-sepulsa-kredit table tr td
+{
+    padding:10px;
+}
+
+#block-userpoints-sepulsa-sepulsa-kredit table tr th
+{
+    color:#fff;
+    font-weight: bold;
+    background: #105c8c;
+}

@@ -578,3 +578,11 @@ section.transaction .alert-block
 {
     height:185px;
 }
+
+
+.akun .form-actions .row
+{
+    float: none;
+    width: 100%;
+    text-align: center;
+}

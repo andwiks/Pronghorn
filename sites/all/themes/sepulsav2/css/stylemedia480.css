@@ -617,3 +617,9 @@ section.std_content .list_voucher .box_voucher
 {
     height:140px;
 }
+
+section.std_content .voucher .c_left
+{
+    width:100%;
+    padding:10px 0;
+}

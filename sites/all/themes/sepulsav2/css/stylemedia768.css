@@ -350,3 +350,8 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     height:130px;
 }
+
+section.std_content .voucher .c_left
+{
+    width:100%;
+}

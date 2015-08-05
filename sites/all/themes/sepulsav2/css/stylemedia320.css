@@ -586,3 +586,13 @@ section.transaction .alert-block
     width: 100%;
     text-align: center;
 }
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child
+{
+    padding-left: 0;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order td p
+{
+    margin:0;
+}

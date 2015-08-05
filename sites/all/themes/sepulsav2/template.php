@@ -241,13 +241,9 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['#suffix'] = '<hr>';
 
     foreach (element_children($form['account']) as $children) {
-      switch ($form['account'][$children]['#type']) {
-        case 'textfield':
-        case 'password':
-        case 'password_confirm':
-          $form['account'][$children]['#prefix'] = '<div class="row">';
-          $form['account'][$children]['#suffix'] = '</div>';
-          break;
+      if (isset($form['account'][$children]['#type']) && in_array($form['account'][$children]['#type'], array('textfield', 'password_confirm'))) {
+        $form['account'][$children]['#prefix'] = '<div class="row">';
+        $form['account'][$children]['#suffix'] = '</div>';
       }
     }
 

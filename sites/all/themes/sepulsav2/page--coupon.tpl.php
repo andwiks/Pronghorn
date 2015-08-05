@@ -8,7 +8,7 @@
  */
 
 global $base_url;
-
+$theme_path = $base_url . '/' . path_to_theme();
 ?>
 <section class="std_content">
 <?php print render($title_suffix); ?>
@@ -35,16 +35,11 @@ global $base_url;
             </h5>
         </div> 
         <div class="wrapper_3">
-            <div class="slider_voucher">
-                <div class="slider">
-                    
-                </div>
-            </div>
             <div class="list_voucher after_clear">
                 <?php print render($page['content']); ?>
             </div>
             <a href="#" class="back_top">
-                <img src="images/material/go_top.png" alt="" />
+                <img src="<?php print $theme_path; ?>/images/material/go_top.png" alt="" />
             </a>
         </div>
 

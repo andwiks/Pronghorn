@@ -267,7 +267,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['mimemail']['#access'] = FALSE;
 
     // $form['account']['pass']['#process'] = array('form_process_password_confirm', 'sepulsa_form_process_password_confirm', 'user_form_process_password_confirm');
-    dpm($form);
   } else if ($form_id == "commerce_veritrans_user_token_form") {
     //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['delete']['#attributes'] = array('class' => array('btn', 'style1'));
@@ -711,6 +710,8 @@ function sepulsav2_preprocess_html(&$variables) {
  * Implements hook_user_view_alter().
  */
 function sepulsav2_user_view_alter(&$build) {
+  module_load_include('inc', 'user', 'user.pages');
+
   $build['Referrals']['#access'] = FALSE;
   $build['summary']['#access'] = FALSE;
   $build['simplenews']['#access'] = FALSE;
@@ -742,6 +743,4 @@ function sepulsav2_user_view_alter(&$build) {
 
   $build['form'] = drupal_get_form('user_profile_form', $build['#account']);
   $build['form']['#weight'] = 2;
-
-  dpm($build);
 }

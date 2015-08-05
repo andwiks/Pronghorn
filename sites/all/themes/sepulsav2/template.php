@@ -742,4 +742,6 @@ function sepulsav2_user_view_alter(&$build) {
 
   $build['form'] = drupal_get_form('user_profile_form', $build['#account']);
   $build['form']['#weight'] = 2;
+
+  dpm($build);
 }

@@ -2210,3 +2210,17 @@ section.std_content .box_voucher
     width: 31%;
     margin:5px 1%;
 }
+
+.merchant-logo div
+{
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    height: 66px;
+    padding: 0 10px;
+}
+
+.bx-wrapper img
+{
+    display: initial;
+}

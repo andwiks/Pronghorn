@@ -2381,3 +2381,29 @@ section.std_content .box_voucher
     background: #105c8c;
     color: #FFF;
 }
+
+.alert-notification .alert-block
+{
+    text-align: center;
+    margin: 10px;
+    padding: 10px 30px;
+    background-color: yellow;
+}
+
+#payment-details .description
+{
+    float: left;
+    width:50%;
+    margin: 0 0 15px 0;
+    padding: 0;
+}
+
+#edit-commerce-payment-payment-details-veritrans-tokens
+{
+    float: right;
+}
+
+label[for='edit-commerce-payment-payment-details-veritrans-code2']
+{
+    width:50% !important;
+}

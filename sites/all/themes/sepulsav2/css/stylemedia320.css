@@ -596,3 +596,34 @@ section.std_content .voucher .c_left .grid_voucher_order td p
 {
     margin:0;
 }
+
+#payment-details .description
+{
+    margin:5px 0 15px 0;
+}
+
+
+
+label[for='edit-commerce-payment-payment-details-veritrans-code2']
+{
+    width:30% !important;
+}
+
+section.std_content .akun .grid_akun.order_transaksi tbody tr
+{
+    padding:0;
+}
+
+
+
+.dompet #edit-deposit
+{
+    width: 240px;
+    font-size: 14px;
+    padding: 0 15px 0 10px;
+}
+
+.dompet .form-submit
+{
+    width: 240px;
+}

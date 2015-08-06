@@ -13,10 +13,10 @@ $page_state = "home";
   <!-- middle -->
 <section class="banner">
     <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="banner home" />
-    <div class="caption">
+    <div class="caption" id="top_page">
         <h2>Praktis Isi Pulsa. Gratis Diskon Belanja.</h2>
         <p>Kini isi ulang pulsa lebih dari sekedar mudah, tapi menguntungkan!</p>
-        <a href="">Gimana Caranya?</a>
+        <a href="#easy_step">Gimana Caranya?</a>
     </div>
 </section>
 <section class="h_middle_top">

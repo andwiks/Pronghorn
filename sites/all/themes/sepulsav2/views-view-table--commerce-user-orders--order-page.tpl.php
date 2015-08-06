@@ -19,7 +19,7 @@
  * @ingroup views_templates
  */
 ?>
-<table class="table style1" <?php print $attributes; ?>>
+<table class="table style1 grid_akun order_transaksi" <?php print $attributes; ?>>
    <?php if (!empty($title) || !empty($caption)) : ?>
      <caption><?php print $caption . $title; ?></caption>
   <?php endif; ?>

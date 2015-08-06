@@ -608,3 +608,8 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 {
     width:30% !important;
 }
+
+section.std_content .akun .grid_akun.order_transaksi tbody tr
+{
+    padding:0;
+}

@@ -7,8 +7,8 @@
     IDR <?php print $credit ?>
 </div>
 <div class="nav_tab after_clear"> 
-    <a href="" target="target_1" >TOP UP Sepulsa Credit</a>
-    <a href="" target="target_2"  class="active">Transaksi Sebelumnya</a>
+    <a href="" target="target_1" class="active">TOP UP Sepulsa Credit</a>
+    <a href="" target="target_2" >Transaksi Sebelumnya</a>
 </div>
 <div class="content_tab">
 

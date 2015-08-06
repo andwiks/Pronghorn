@@ -2336,3 +2336,48 @@ section.std_content .box_voucher
     font-weight: normal;
     color: #c72127;
 }
+
+/* dompet top up */
+.dompet #edit-deposit
+{
+    font-size: 24px;
+    font-family: "robotoregular";
+    line-height: 55px;
+    /*color: #feb60a;
+    border-color: #feb60a;*/
+    border:1px solid #D8D8D8;
+    padding: 0 45px 0 30px;
+    background: url(../images/material/arr_drop.png) no-repeat right 15px center;
+    cursor: pointer;
+    margin-top: 10px;
+    width: 455px;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
+}
+
+.dompet .form-submit
+{
+    border: 1px solid #105c8c;
+    padding: 0;
+    height: 58px;
+    width: 200px;
+    background: #FFF;
+    color: #105c8c;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+.dompet .form-submit:hover
+{
+    background: #105c8c;
+    color: #FFF;
+}

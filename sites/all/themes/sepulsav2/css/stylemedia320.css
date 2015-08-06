@@ -613,3 +613,17 @@ section.std_content .akun .grid_akun.order_transaksi tbody tr
 {
     padding:0;
 }
+
+
+
+.dompet #edit-deposit
+{
+    width: 240px;
+    font-size: 14px;
+    padding: 0 15px 0 10px;
+}
+
+.dompet .form-submit
+{
+    width: 240px;
+}

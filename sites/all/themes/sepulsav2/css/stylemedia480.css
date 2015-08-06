@@ -623,3 +623,15 @@ section.std_content .voucher .c_left
     width:100%;
     padding:10px 0;
 }
+
+.dompet #edit-deposit
+{
+    width: 240px;
+    font-size: 14px;
+    padding: 0 15px 0 10px;
+}
+
+.dompet .form-submit
+{
+    width: 145px;
+}

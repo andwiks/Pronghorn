@@ -274,3 +274,29 @@ body.home.red footer ,
 	    border-color: #c72127;
     	background: url(../images/material/drop_ico_4.png) no-repeat right 15px center;
 	}
+	
+	
+.hybridauth-facebook {
+  width: 285px;
+  height: 37px;
+  background: url(../images/content/fb_login.jpg) no-repeat right 15px center;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0;
+  display: block;
+}
+
+.hybridauth-twitter {
+  width: 285px;
+  height: 37px;
+  background: url(../images/content/tw_login.jpg) no-repeat right 15px center;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0;
+  display: block;
+}
+
+ul.hybridauth-widget li {
+  height: 50px;
+  margin: 0 0 20px 0;
+}

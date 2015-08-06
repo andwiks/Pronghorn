@@ -7,18 +7,22 @@
             <span class="border"></span>
             <div class="left form">
                 <?php $elements = drupal_get_form('user_login_block'); ?>
+                <?php $hybridauth = $elements['hybridauth']; ?>
+                <?php unset($elements['hybridauth']); ?>
                 <?php print drupal_render($elements); ?>
             </div>
             <div class="left spar">
                 atau
             </div>
             <div class="right">
+              <?php print drupal_render($hybridauth); ?>
+              <!--
                 <a href=""><img src="<?php print $theme_path; ?>/images/content/fb_login.jpg" alt="facebook login" /></a>
                 <a href=""><img src="<?php print $theme_path; ?>/images/content/tw_login.jpg" alt="facebook login" /></a>
-
+                -->
                 <p>
                     Belum punya akun Sepulsa?
-                    <a href="">Click disini</a> untuk buat akun.
+                    <a href="<?php print url('user/register'); ?>">Click disini</a> untuk buat akun.
                 </p>
             </div>
         </div>

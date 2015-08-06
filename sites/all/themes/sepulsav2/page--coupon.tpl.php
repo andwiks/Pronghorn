@@ -10,6 +10,9 @@
 global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
 ?>
+
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+
 <section class="std_content">
 <?php print render($title_suffix); ?>
 <?php print $messages; ?>
@@ -50,3 +53,13 @@ $theme_path = $base_url . '/' . path_to_theme();
 
 
 </section>
+
+<script>
+/*$( document ).ready(function() {
+
+$( document ).click(function() {
+  $( ".grid_voucher_order" ).effect( "shake" );
+});
+ 
+});*/
+</script>

@@ -2412,3 +2412,8 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 {
     background:#fff;
 }
+
+.hidden 
+{
+    display: none;
+}

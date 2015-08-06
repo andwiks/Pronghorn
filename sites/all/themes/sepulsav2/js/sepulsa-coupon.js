@@ -4,8 +4,8 @@
  * Command to provide select_coupon animation.
  */
 Drupal.ajax.prototype.commands.select_coupon = function (ajax, response, status) {
-  var cart = $('.commerce-line-item-views-form ul');
-  var imgToDrag = $(response.selector + ' .post-image img');
+  var cart = $('.grid_voucher_order table');
+  var imgToDrag = $(response.selector + ' .box_voucher');
 
   if (imgToDrag) {
     var imgClone = imgToDrag.clone()
@@ -32,7 +32,7 @@ Drupal.ajax.prototype.commands.select_coupon = function (ajax, response, status)
       'duration': 1000,
       'easing': 'easeInOutExpo',
       'done': function() {
-        $('.cart-contents').effect('shake', {
+        $('.grid_voucher_order').effect('shake', {
           times: 2
         }, 200);
       }

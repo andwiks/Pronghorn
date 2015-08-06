@@ -28,7 +28,10 @@ global $base_url;
     <div class="container">
       <div id="main">
           <?php print render($tabs2); ?>
+          <div class="alert-notification">
           <?php print $messages; ?>
+          </div>
+
           <?php print render($page['help']); ?>
           <div class="clearfix">
             <?php print render($page['content']); ?>

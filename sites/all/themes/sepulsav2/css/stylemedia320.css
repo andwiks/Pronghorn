@@ -596,3 +596,15 @@ section.std_content .voucher .c_left .grid_voucher_order td p
 {
     margin:0;
 }
+
+#payment-details .description
+{
+    margin:5px 0 15px 0;
+}
+
+
+
+label[for='edit-commerce-payment-payment-details-veritrans-code2']
+{
+    width:30% !important;
+}

@@ -2407,3 +2407,8 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 {
     width:50% !important;
 }
+
+#payment-details input, textarea, select
+{
+    background:#fff;
+}

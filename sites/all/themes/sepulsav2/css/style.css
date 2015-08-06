@@ -2287,3 +2287,52 @@ section.std_content .box_voucher
 {
     margin-bottom: 10px;
 }
+
+.view-commerce-user-orders table {
+    width: 100%;
+    border: 1px solid #CCC;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #898989;
+}
+
+.view-commerce-user-orders table tr th, .view-commerce-user-orders table tr td {
+    padding: 20px 10px;
+    border-bottom: 1px solid #CCC;
+    background-color: white;
+    color: #898989;
+}
+
+.view-commerce-user-orders table tr th a, .view-commerce-user-orders table tr td a {
+    color: #898989;
+}
+
+
+.view-commerce-user-orders table tr th, .view-commerce-user-orders table tr td:first-child
+{
+    font-weight: bold;
+}
+
+.item-list ul li {
+    margin: 0;
+    padding: 0 5px;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-align: center;
+    font-weight: normal;
+}
+
+.item-list ul li a {
+    margin: 0;
+    padding: 0;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-align: center;
+    font-weight: normal;
+}
+
+.item-list ul li.pager-current
+{
+    font-weight: normal;
+    color: #c72127;
+}

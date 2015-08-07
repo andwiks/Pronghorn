@@ -14,6 +14,13 @@ function deposit_sepulsa_menu() {
     'description' => 'Deposit money and show the history of it.',
     'page callback' => 'deposit_sepulsa_page',
     'access arguments' => array('deposit credit'),
+    'type' => MENU_CALLBACK,
+    // 'title callback' => FALSE,
+    // 'title arguments' => array('!title', array('!title' => 'My Wallet')),
+    // 'title arguments' => array('My Wallet'),
+    // 'options' => array(
+    //   'html' => TRUE,
+    // ),
   );
 
   return $items;
@@ -35,6 +42,7 @@ function deposit_sepulsa_permission() {
  * Implements page for deposit credit
  */
 function deposit_sepulsa_page() {
+  drupal_set_title(t('My Wallet'));
   global $user;
 
   $deposit_form = deposit_sepulsa_view();

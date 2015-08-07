@@ -60,7 +60,7 @@ function bca_admin_form($form, &$form_state) {
 
 //function to get content of BCA CSV file
 function bca_list_file() {
-  $dir = "sites/default/files/bank/bca/";
+  $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
   $files = scandir($dir);
 
   foreach ($files as $file) {
@@ -106,7 +106,7 @@ function bca_read_csv() {
     if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $num = count($data);
-        if ($num == 5 && $data[3] != 'Jumlah') {
+        if ($num == 5 && $data[3] != 'Jumlah' && strpos($data[3], 'CR')) {
           $amount = str_replace(array(',', '.00', ' CR'), '', $data[3]);
           // only uniq amount processed
           if ($amount % 1000 != 0) {
@@ -116,6 +116,9 @@ function bca_read_csv() {
       }
       fclose($handle);
       // delete bca csv file
+      $newfile = 'sites/default/files/bank/bca-' . date('dmy') . '.csv';
+
+      @copy($filepath, $newfile);
       @drupal_unlink($filepath);
     }
     
@@ -140,22 +143,25 @@ function bca_confirm_payment() {
           'payment_method' => 'bank_transfer',
           'status' => 'pending')) 
         as $transaction) {
-      // confirm payment
-      $transaction->status = 'success';
-      commerce_payment_transaction_save($transaction);
-      // delete payment
-      unset($all_payment[$key]);
-      $trans_log[] = 'order id: ' . $transaction->order_id;
+      $order = commerce_order_load($transaction->order_id);
+      if ($order->status == 'pending') {
+        // confirm payment
+        $transaction->status = 'success';
+        commerce_payment_transaction_save($transaction);
+        // delete payment
+        
+        $trans_log[] = 'order id: ' . $transaction->order_id;
+      }
     }
-
-    variable_set('bca_payment_record', $all_payment);
   }
+  variable_set('bca_payment_record', array());
   // set log
-  watchdog('bca_confirm_payment', 'success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
+  watchdog('bca_confirm_payment', 'All payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
+  watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
 
 }
 
 /* implement hook_cron(). */
-function bca_cron() {
+function auto_bank_transfer_cron() {
   bca_confirm_payment();
 }

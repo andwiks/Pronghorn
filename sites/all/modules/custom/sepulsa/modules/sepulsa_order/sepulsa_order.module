@@ -150,6 +150,7 @@ function sepulsa_order_process_order($order_id) {
     $info = entity_get_property_info('sepulsa_order');
     $sepulsa_order_wrapper = entity_metadata_wrapper('sepulsa_order', $sepulsa_order);
 
+    $coupon_number = 0;
     foreach ($order_wrapper->commerce_line_items as $id => $line_item_wrapper) {
       switch ($line_item_wrapper->getBundle()) {
         case 'electricity_prepaid':
@@ -163,9 +164,13 @@ function sepulsa_order_process_order($order_id) {
           break;
 
         case 'coupon':
-          $property = 'coupon_' . $id;
+          $coupon_number++;
+          $property = 'coupon_' . $coupon_number;
           if (isset($info['properties'][$property])) {
             $sepulsa_order_wrapper->$property->set($line_item_wrapper->commerce_product->value());
+          }
+          else {
+            $coupon_number--;
           }
           break;
 
@@ -174,6 +179,7 @@ function sepulsa_order_process_order($order_id) {
       }
     }
 
+    $sepulsa_order_wrapper->coupon_number->set($coupon_number);
     $sepulsa_order_wrapper->amount->set($order_wrapper->commerce_order_total->amount->value());
     $sepulsa_order_wrapper->currency_code->set($order_wrapper->commerce_order_total->currency_code->value());
 
@@ -185,14 +191,16 @@ function sepulsa_order_process_order($order_id) {
       $sepulsa_order_wrapper->payment_instance->set($payment['instance']);
     }
 
-    try {
-      entity_save('sepulsa_order', $sepulsa_order);
-    }
-    catch (Exception $e) {
-      watchdog_exception('sepulsa_order', $e, NULL, array(), WATCHDOG_ERROR, l('view order', 'admin/commerce/orders/' . $order->order_id));
-    }
+    if (!empty($sepulsa_order->prepaid)) {
+      try {
+        entity_save('sepulsa_order', $sepulsa_order);
+      }
+      catch (Exception $e) {
+        watchdog_exception('sepulsa_order', $e, NULL, array(), WATCHDOG_ERROR, l('view order', 'admin/commerce/orders/' . $order->order_id));
+      }
 
-    return $sepulsa_order;
+      return $sepulsa_order;
+    }
   }
 }
 

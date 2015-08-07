@@ -84,6 +84,48 @@ function topup_cron_queue_info() {
   return $queues;
 }
 
+function topup_commerce_line_item_update($line_item) {
+  $topup_lineitem_type = variable_get('topup_lineitem_type', 'mobile_prepaid');
+  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+
+  if ($line_item->type == $topup_lineitem_type && $wrapper->field_topup_status->value() == TOPUP_SUCCESS) {
+    // Define all topup success variable.
+    $all_topup_success = FALSE;
+    // Define topup line item counter.
+    $topup_counter_success = $topup_counter = 0;
+    // Define order wrapper: to get total order amount.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $line_item->order_id);
+    // Looping for each line item.
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      // Only for line item: topup_lineitem_type.
+      if ($line_item_wrapper->type->value() == $line_item_wrapper) {
+        $topup_counter++;
+        // Check field topup status.
+        if ($line_item_wrapper->field_topup_status->value() == TOPUP_SUCCESS) {
+          $topup_counter_success++;
+        }
+      }
+    }
+    // Update variable all topup success.
+    $all_topup_success = ($topup_counter_success >= $topup_counter) ? TRUE : $all_topup_success;
+
+    // Invoke event when all topups success.
+    if ($all_topup_success) {
+      // Define order.
+      $order = $order_wrapper->value();
+
+      // Trigger the event now.
+      rules_invoke_all('all_topup_success', $order);
+
+      // Update the order's data array to indicate this just happened.
+      $order->data['all_topup_success_invoked'] = TRUE;
+
+      // Save the updated order.
+      commerce_order_save($order);
+    }
+  }
+}
+
 /**
  * Implements hook_entity_info().
  */
@@ -211,15 +253,16 @@ function topup_menu() {
       'file' => 'topup.admin.inc',
       'type' => MENU_CALLBACK,
     );
-
-    $items['topup/' . $provider_id . '/callback'] = array(
-      'title' => $provider_data['title'] . ' callback',
-      'description' => $provider_data['description'] . ' callback',
-      'page callback' => 'topup_callback',
-      'access callback' => TRUE,
-      'type' => MENU_CALLBACK,
-    );
   }
+
+  $items['topup/%/callback'] = array(
+    // 'title' => $provider_data['title'] . ' callback',
+    // 'description' => $provider_data['description'] . ' callback',
+    'page callback' => 'topup_callback',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 }
@@ -360,23 +403,20 @@ function topup_queue_query($topup = array()) {
 /**
  * Function topup_callback().
  */
-function topup_callback() {
-  // Get provider id.
-  $provider_id = arg(5);
+function topup_callback($provider) {
   // Get all providers.
   $providers = topup_providers();
   // Check whether provider id is available.
-  if (isset($providers[$provider_id])) {
+  if (isset($providers[$provider])) {
     // Get topup callback.
-    $callback = $providers[$provider_id]['base'] . '_topup_callback';
+    $callback = $providers[$provider]['base'] . '_topup_callback';
     // Check topup process callback.
     if (function_exists($callback) && is_callable($callback)) {
-      call_user_func($callback);
+      return call_user_func($callback);
     }
   }
-  else {
-    drupal_access_denied();
-  }
+
+  return MENU_ACCESS_DENIED;
 }
 
 /**
@@ -548,7 +588,7 @@ function topup_queue($op, $topup) {
           // Get topup try query.
           $topup['try_query'] = isset($topup['try_query']) ? intval($topup['try_query']) : 1;
           // Check whether topup try still allowed
-          if ($topup['try_query'] < variable_get('topup_try', 3)) {
+          if ($topup['try_query'] < variable_get('topup_try', 3) && empty($providers[$topup['field_topup_provider']]['no_queue'])) {
             $topup['try_query']++;
             // Update topup status: in queue.
             topup_update_status($topup['line_item_id'], TOPUP_INQUEUE);
@@ -586,41 +626,6 @@ function topup_queue($op, $topup) {
           // Update topup status if total success >= topup total.
           if ($success >= $topup['topup_total']) {
             topup_update_status($topup['line_item_id'], $result);
-          }
-
-          // Define all topup success variable.
-          $all_topup_success = FALSE;
-          // Define topup line item counter.
-          $topup_counter_success = $topup_counter = 0;
-          // Define order wrapper: to get total order amount.
-          $order_wrapper = entity_metadata_wrapper('commerce_order', $topup['order_id']);
-          // Looping for each line item.
-          foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-            // Only for line item: topup_lineitem_type.
-            if ($line_item_wrapper->type->value() == variable_get('topup_lineitem_type', 'mobile_prepaid')) {
-              $topup_counter++;
-              // Check field topup status.
-              if ($line_item_wrapper->field_topup_status->value() == $result) {
-                $topup_counter_success++;
-              }
-            }
-          }
-          // Update variable all topup success.
-          $all_topup_success = ($topup_counter_success >= $topup_counter) ? TRUE : $all_topup_success;
-
-          // Invoke event when all topups success.
-          if ($all_topup_success) {
-            // Define order.
-            $order = $order_wrapper->value();
-
-            // Trigger the event now.
-            rules_invoke_all('all_topup_success', $order);
-
-            // Update the order's data array to indicate this just happened.
-            $order->data['all_topup_success_invoked'] = TRUE;
-
-            // Save the updated order.
-            commerce_order_save($order);
           }
           break;
       }
@@ -660,6 +665,7 @@ function topup_providers() {
         $providers[$base]['base'] = $module;
         // Get providers settings.
         $providers[$base]['settings'] = variable_get('topup_providers_settings_' . $base, array());
+        $providers[$base] += $provider;
       }
     }
 
@@ -886,70 +892,23 @@ function topup_update_topup_data($topup, $result, $output) {
 function topup_update_topup_entity($topup, $result, $output) {
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup['line_item_id']);
 
-  if (is_string($output['topup_data'][$output['request_id']])) {
-    if (preg_match('/SN=([\w\d]+);([\d\/]+\s[\d:]+).+,HRG=([\d\.]+),/', $output['topup_data'][$output['request_id']], $matches)) {
-      if (!empty($matches[1])) {
-        $sn = $matches[1];
-      }
-      if (!empty($matches[2])) {
-        $date = new DateObject($matches[2]);
-        $time = date_format_date($date, 'custom', 'U');
-      }
-      if (!empty($matches[3])) {
-        $price = str_replace('.', '', $matches[3]);
-      }
-    }
-  }
-  else {
-    if (!empty($output['topup_data'][$output['request_id']]['ref2'])) {
-      $ref = $output['topup_data'][$output['request_id']]['ref2'];
-    }
-
-    if (!empty($output['topup_data'][$output['request_id']]['time'])) {
-      $time = strtotime($output['topup_data'][$output['request_id']]['time']);
-    }
-
-    if (!empty($output['topup_data'][$output['request_id']]['note'])) {
-      if (preg_match('/sn#([\w\d]+)#([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
-        if (!empty($matches[1])) {
-          $price = $matches[1];
-        }
-        if (!empty($matches[2])) {
-          $sn = $matches[2];
-        }
-      }
-      elseif (preg_match('/SN=([\w\d]+)\sHarga=([\w\d]+)$/', $output['topup_data'][$output['request_id']]['note'], $matches)) {
-        if (!empty($matches[1])) {
-          $sn = $matches[1];
-        }
-        if (!empty($matches[2])) {
-          $price = $matches[2];
-        }
-      }
-    }
-  }
-
   $conditions = array(
     'line_item_id' => $output['line_item_id'],
     'request_id' => $output['request_id'],
   );
   $topup_entities = entity_load('topup', FALSE, $conditions);
   if (empty($topup_entities)) {
-    $values = array(
-      'line_item_id' => $output['line_item_id'],
-      'request_id' => $output['request_id'],
-    );
-    $topup_entity = entity_create('topup', $values);
+    $topup_entity = entity_create('topup', $conditions);
   }
   else {
     $topup_entity = reset($topup_entities);
   }
 
   $topup_entity->status = $result;
-  $topup_entity->ref = empty($ref) ? $output['request_id'] : $ref;
-  $topup_entity->time = empty($time) ? $line_item_wrapper->changed->value() : $time;
-  $topup_entity->sn = empty($sn) ? '' : $sn;
-  $topup_entity->price = empty($price) ? '' : $price;
+  $topup_entity->ref = empty($output['topup_entity']['ref']) ? $output['request_id'] : $output['topup_entity']['ref'];
+  $topup_entity->time = empty($output['topup_entity']['time']) ? $line_item_wrapper->changed->value() : $output['topup_entity']['time'];
+  $topup_entity->sn = empty($output['topup_entity']['sn']) ? '' : $output['topup_entity']['sn'];
+  $topup_entity->price = empty($output['topup_entity']['price']) ? '' : $output['topup_entity']['price'];
   $topup_entity->vendor = $output['field_topup_provider'];
 
   entity_save('topup', $topup_entity);

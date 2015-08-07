@@ -3,7 +3,6 @@
 function mixpanel_sepulsa_page_build(&$page) {
   $item = menu_get_item();
   if (!path_is_admin($item['path'])) {
-    dpm($item, 'item');
     if ($item['path'] == 'sepulsa') {
       drupal_add_js('mixpanel.track("Halaman Depan");', 'inline');
       drupal_add_js('jQuery("#edit-add-charge").click(function() {mixpanel.track("Langsung Bayar");});jQuery("#edit-add-cart").click(function() {mixpanel.track("Pilih Kupon");});', 'inline');

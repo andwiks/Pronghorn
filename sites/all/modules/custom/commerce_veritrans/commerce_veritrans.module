@@ -119,6 +119,14 @@ function commerce_veritrans_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['user/token'] = array(
+    'title' => 'Saved Credit Card',
+    'page callback' => 'commerce_veritrans_user_token',
+    'access arguments' => array('access content'),
+    'file' => 'commerce_veritrans.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
   return $items;
 }
 

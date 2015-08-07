@@ -45,10 +45,10 @@ global $base_url, $user;
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
-                            <!--<div class="box_credit after_clear">
+                            <div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
-                                <div class="right">IDR 2.000.000</div>
-                            </div>-->
+                                <div class="right"><?php print userpoints_get_current_points($user->uid, 'all'); ?></div>
+                            </div>
                             <a href="<?php print $base_url."/user/".$user->uid; ?>" >Informasi Akun</a>
                             <a href="order_transaksi.php">Order Transaksi</a>
                             <a href="info_kartu.php">Info Kartu</a>

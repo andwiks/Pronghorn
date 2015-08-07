@@ -13,7 +13,7 @@ variable_set('cookie_lifetime', 3600); // 1 hour
 function campaign_tracker_boot() {
   $cookie_lifetime = variable_get('cookie_lifetime', 3600);
   //set cookie
-  
+
   if (isset($_GET['utm_source'])) {
     setcookie(UTM_SOURCE_COOKIE, check_plain($_GET['utm_source']), time() + $cookie_lifetime, '/');
   }
@@ -30,23 +30,23 @@ function campaign_tracker_boot() {
 /* implement hook_user_presave() */
 function campaign_tracker_user_presave(&$edit, $account, $category) {
   $cookie_lifetime = variable_get('cookie_lifetime', 3600);
-  
+
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
     $edit['field_reg_utm_source'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie
-    setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
+    //setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
   } else {
     $edit['field_reg_utm_source'][LANGUAGE_NONE][0]['value'] = 'direct';
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
     $edit['field_reg_utm_medium'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];
     // remove cookie
-    setcookie(UTM_MEDIUM_COOKIE, '', time() + $cookie_lifetime, '/');
+    //setcookie(UTM_MEDIUM_COOKIE, '', time() + $cookie_lifetime, '/');
   }
   if (isset($_COOKIE[UTM_CAMPAIGN_COOKIE])) {
     $edit['field_reg_utm_campaign'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_CAMPAIGN_COOKIE];
     // remove cookie
-    setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
+    //setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
   }
 }
 
@@ -57,20 +57,20 @@ function campaign_tracker_commerce_order_presave($order) {
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
     $order->field_utm_source[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
     // remove cookie
-    setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
+    //setcookie(UTM_SOURCE_COOKIE, '', time() + $cookie_lifetime, '/');
   } else {
     $edit->field_utm_source[LANGUAGE_NONE][0]['value'] = 'direct';
   }
   if (isset($_COOKIE[UTM_MEDIUM_COOKIE])) {
     $order->field_utm_medium[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_MEDIUM_COOKIE];
     // remove cookie
-    setcookie(UTM_MEDIUM_COOKIE, '', time() + $cookie_lifetime, '/');
+    //setcookie(UTM_MEDIUM_COOKIE, '', time() + $cookie_lifetime, '/');
   }
   if (isset($_COOKIE[UTM_CAMPAIGN_COOKIE])) {
     $order->field_utm_campaign[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_CAMPAIGN_COOKIE];
     // remove cookie
-    setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
-  }  
+    //setcookie(UTM_CAMPAIGN_COOKIE, '', time() + $cookie_lifetime, '/');
+  }
 }
 
 function campaign_tracker_form_alter(&$form, $form_state, $form_id) {

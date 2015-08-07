@@ -33,13 +33,13 @@ global $base_url, $user;
                         </a>
                         <div class="box_drop">
                             <div class="arr"></div>
-                            <!--<div class="box_credit after_clear">
+                            <div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
-                                <div class="right">IDR 2.000.000</div>
-                            </div>-->
-                            <a href="<?php print $base_url."/user/".$user->uid; ?>">AKUN</a>
-                            <a href="<?php print $base_url."/konfirmasi"; ?>">KONFIRMASI PEMBAYARAN</a>
-                            <a href="<?php print $base_url."/user/logout"; ?>">LOG OUT</a>
+                                <div class="right"><?php print commerce_currency_format(userpoints_get_current_points($user->uid, 'all'), 'IDR'); ?></div>
+                            </div>
+                            <a href="<?php print url('user/' . $user->uid); ?>">AKUN</a>
+                            <a href="<?php print url("konfirmasi"); ?>">KONFIRMASI PEMBAYARAN</a>
+                            <a href="<?php print url("user/logout"); ?>">LOG OUT</a>
                         </div>
                     </div>
                     <div class="nav_mobile">
@@ -47,17 +47,18 @@ global $base_url, $user;
                         <div class="box_drop">
                             <div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
-                                <div class="right"><?php print userpoints_get_current_points($user->uid, 'all'); ?></div>
+                                <div class="right"><?php print commerce_currency_format(userpoints_get_current_points($user->uid, 'all'), 'IDR'); ?></div>
                             </div>
-                            <a href="<?php print $base_url."/user/".$user->uid; ?>" >Informasi Akun</a>
-                            <a href="order_transaksi.php">Order Transaksi</a>
-                            <a href="info_kartu.php">Info Kartu</a>
-                            <a href="dompet_saya.php">Dompet Saya</a>
+                            <a href="<?php print url('user/' . $user->uid); ?>" >Informasi Akun</a>
+                            <a href="<?php print url('user/orders'); ?>">Order Transaksi</a>
+                            <a href="<?php print url('user/token'); ?>">Info Kartu</a>
+                            <a href="<?php print url('user/wallet'); ?>">Dompet Saya</a>
                             <a href="akun_voucher.php">Voucher Diskon</a>
-                            <a href="<?php print $base_url."/konfirmasi"; ?>">Konfirmasi Pembayaran</a>
-                            <a href="<?php print $base_url."/user/logout"; ?>">LOG OUT</a>
+                            <a href="<?php print url("konfirmasi"); ?>">Konfirmasi Pembayaran</a>
+                            <a href="<?php print url("user/logout"); ?>">LOG OUT</a>
                             <div class="m_lang">
                                 <a href="">English</a>
+                                <a href="">Indonesia</a>
                             </div>
                         </div>
                     </div>
@@ -65,14 +66,15 @@ global $base_url, $user;
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
-                            <a href="" class="login">LOGIN</a>
+                            <a href="<?php print url("user/login"); ?>" class="login">LOGIN</a>
                             <div class="m_lang">
                                 <a href="">English</a>
+                                <a href="">Indonesia</a>
                             </div>
                         </div>
                     </div>
                     <div class="box login">
-                        <a href="" >
+                        <a href="<?php print url("user/login"); ?>" >
                             <span class="ico"></span>
                             Log In
                         </a>
@@ -89,7 +91,6 @@ global $base_url, $user;
                     <div class="box_drop">
                         <div class="arr"></div>
                         <a href="">EN</a>
-                        <a href="">IN</a>
                     </div>
                 </div>
             </div>

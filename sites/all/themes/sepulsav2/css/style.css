@@ -2581,8 +2581,9 @@ tr.even, tr.odd {
     color:#c72127;
 }
 
-/*section.std_content .akun nav{margin: 0 0 30px 0;}
-section.std_content .akun nav a{
+
+section.std_content .akun nav.after_clear{margin: 0 0 30px 0;}
+section.std_content .akun nav.after_clear a{
     background: #bcbcbc;
     display: block;
     float: left;
@@ -2601,11 +2602,10 @@ section.std_content .akun nav a{
     -ms-border-radius:5px;
     -o-border-radius:5px;
 }
-section.std_content .akun nav a:hover,
-section.std_content .akun nav a.active{
+section.std_content .akun nav a.after_clear:hover,
+section.std_content .akun nav a.after_clear.active{
     background: #105c8c;
 }
-*/
 
 section.std_content .akun .list_voucher {border: none;padding: 0}
 section.std_content .akun .box_voucher{width: 225px;margin-right: 20px}

@@ -506,7 +506,7 @@ section.transaction .form-radios
     margin:0;
 }
 
-section.transaction #edit-commerce-payment-payment-method input[type=checkbox], input[type=radio]
+section.transaction #edit-commerce-payment-payment-method input[type=checkbox], section.transaction #edit-commerce-payment-payment-method input[type=radio]
 {    
     display: block;
     clear: both;
@@ -626,4 +626,26 @@ section.std_content .akun .grid_akun.order_transaksi tbody tr
 .dompet .form-submit
 {
     width: 240px;
+}
+
+section.std_content .akun .c_right nav a
+{
+    width:125px;
+    margin: 0 10px 0 0;
+}
+
+#webform-client-form-4907 .form-item .description
+{
+    margin-left: 0px !important;
+}
+
+#webform-client-form-4907 .form-item input, #webform-client-form-4907 .form-item textarea, #webform-client-form-4907 .form-item select, #webform-client-form-4907 .form-item .description, #webform-client-form-4907 .form-item .element-invisible
+{
+    width: 100% !important;
+}
+
+#webform-client-form-4907 .form-actions input[type=submit], #webform-client-form-4907 .form-actions input[type=button]
+{
+    margin: 0 auto;
+    display: block;
 }

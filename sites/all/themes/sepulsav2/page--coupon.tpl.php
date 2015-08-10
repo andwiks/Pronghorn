@@ -11,8 +11,7 @@ global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
 ?>
 
-<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-
+<?php drupal_add_js('http://code.jquery.com/ui/1.11.4/jquery-ui.js', 'external'); ?>
 <section class="std_content">
 <?php print render($title_suffix); ?>
 <?php print $messages; ?>
@@ -25,7 +24,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php print render($page['promo']); ?>
             </div>
             <div class="atau"><span>atau</span></div>
-            <a href="<?php print $base_url."/checkout"; ?>" class="bt_next" >LANJUT KE PEMBAYARAN</a>
+            <a href="<?php print url("checkout"); ?>" class="bt_next" >LANJUT KE PEMBAYARAN</a>
         </div>
         <div class="clear"></div>
 

@@ -66,7 +66,7 @@ $total = commerce_line_items_total($line_items);
                     <th>TOTAL PAYMENT</th>
                     <th colspan="2">
                         <?php print number_format($total['amount'], 0, ".", ","); ?> IDR
-                        <a href="<?php print $base_url."/checkout"; ?>" class="add_bt">Proses</a>
+                        <a href="<?php print url("checkout"); ?>" class="add_bt">Proses</a>
                     </th>                            
                 </tr>
             </tfoot>

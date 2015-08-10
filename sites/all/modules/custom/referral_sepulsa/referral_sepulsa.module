@@ -133,7 +133,7 @@ function referral_list(){
 	// referral share - end
 	
 	// get referral list - start
-	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.referral_uid = u.uid WHERE u.uid = :uid", array('uid' => $user->uid));
+	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.uid = u.uid WHERE r.referral_uid = :uid", array('uid' => $user->uid));
 	foreach ($referral as $data) {
 		// get the points
 		$userpoint = db_query_range("SELECT points FROM userpoints_txn WHERE uid = :uid AND status = 0 ORDER BY txn_id ASC", 0, 1, array('uid' => $data->uid));
@@ -147,7 +147,6 @@ function referral_list(){
 			$order_id = $row->order_id;
 			$date_txn = $row->created;
 		}
-		drupal_set_message("<pre>".print_r($order_id, true)."</pre>");
 		
 		if (isset($order_id)) {
 			$referral_list[] = array(

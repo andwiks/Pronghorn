@@ -113,7 +113,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
     // select table user_referral, get user referrer from current user
     $referrer_uid = db_query_range("SELECT referral_uid FROM {referral} WHERE uid = :uid", 0, 1, array('uid' => $user->uid))->fetchField();
     
-		drupal_set_message("<pre>referer uid: ".print_r($referrer_uid, true)."</pre>");
+		//drupal_set_message("<pre>referer uid: ".print_r($referrer_uid, true)."</pre>");
     if ($referrer_uid) {
         // assign point untuk yang merefer
         $order_total = $order->commerce_order_total["und"][0]["amount"];
@@ -131,10 +131,8 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 				
 				// assign point untuk yang di refer
 				if ($point_percentage_refer > 0) {
-					drupal_set_message("<pre>1: ".print_r($point_percentage_refer, true)."</pre>");
 					if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer); 
-					else $points_referrer = $point_percentage_refer;
-					drupal_set_message("<pre>2: ".print_r($points_refer, true)."</pre>");
+					else $points_refer = $point_percentage_refer;
 					$params_refer = array (
 						'uid' => $user->uid,
 						'points' => $points_refer,

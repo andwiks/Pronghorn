@@ -43,18 +43,19 @@ function referral_sepulsa_user_view_alter(&$build) {
     $referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
     $output = "<p><input id='referral_text' class='referral_text' size='50' readonly='true' type='text' value='".$referral_link."'></p>";
     $output .= '
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script type="text/javascript" src="'.$path_to_theme.'/js/zclip/jquery.zclip.js"></script>
         <script type="text/javascript">
-        jQuery(document).ready(function() {
-            jQuery("#copy-link-wrap").zclip({
-                path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
-                copy: jQuery("#toclip").val(),
-                afterCopy: function() {
-                    alert("Your Referral link has been copied");
-                }
-            });
-        });
+				(function($){
+					$(document).ready(function() {
+							$("#copy-link-wrap").zclip({
+									path: "'.$path_to_theme.'/js/zclip/ZeroClipboard.swf",
+									copy: $("#toclip").val(),
+									afterCopy: function() {
+											alert("Your Referral link has been copied");
+									}
+							});
+					});
+				})(jQuery)
         </script>
         <style>
         .referral_text { background-color: #eee; border: 1px solid #ccc; height: 40px; line-height: 40px; padding: 0 15px; box-shadow: inset 0px 0px 10px rgba(0,0,0,0.1); margin: 10px 0; }
@@ -103,30 +104,67 @@ function referral_sepulsa_theme($existing, $type, $theme, $path) {
 // Override Point Tab from Userpoints Module
 function referral_sepulsa_menu_alter(&$items) {
     unset($items['user/%user/points']);
-    $items['referral/view'] = array(
-        'page callback'    => 'referral_list',
-        'title'            => t('Your Referrals'),
-        'access arguments' => array(REFERRAL_PERM_USE),
-        'type'             => MENU_SUGGESTED_ITEM,
-      );
+    $items['user/%user/referral/view'] = array(
+			'page callback'    => 'referral_list',
+			'title'            => t('Your Referrals'),
+			'access arguments' => array(REFERRAL_PERM_USE),
+			'type' => MENU_LOCAL_TASK,
+		);
 }
 
 function referral_list(){
-    global $user;
-    $content['header'] = 'header';
-    $content['rows'] = 'rows';
-    $content['totalamount'] = 'total';
-    $query = db_select('referral', 'r');
-    $query->innerJoin('users', 'u', 'r.uid = u.uid');
-    $result = $query
-        ->fields('u', array('uid', 'name', 'mail'))
-	->fields('r', array('created', 'flag'))
-	->condition('referral_uid', $user->uid)
-	->condition('u.status', 1)
-	->orderBy('r.created', 'DESC')
-	->range(0, REFERRAL_PAGE_COUNT)
-	->extend('TableSort')
-	->execute();
-  
-    return theme('referral_list', array('result' => $result));
+	global $user, $base_url;
+	$content = array();
+	$referral_list = array();
+	$points = '';
+	$order_id = '';
+	$date_txn = '';
+	
+	// referral share - start
+	$logo = theme_get_setting('logo');
+	$inline_script = '<meta property="og:image" content="'.$logo.'" />';
+	$element = array(
+		'#type' => 'markup',
+		'#markup' => $inline_script,
+	);
+	drupal_add_html_head($element, 'facebook_metatag');
+	$path_to_theme = $base_url.'/'.drupal_get_path('theme', 'sepulsa');
+	$referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+	// referral share - end
+	
+	// get referral list - start
+	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.referral_uid = u.uid WHERE u.uid = :uid", array('uid' => $user->uid));
+	foreach ($referral as $data) {
+		// get the points
+		$userpoint = db_query_range("SELECT points FROM userpoints_txn WHERE uid = :uid AND status = 0 ORDER BY txn_id ASC", 0, 1, array('uid' => $data->uid));
+		foreach ($userpoint as $row) {
+			$points = number_format($row->points,0,",",".");
+		}
+		
+		// get first order
+		$order = db_query_range("SELECT order_id, created FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed' OR status = 'processing') AND uid = :uid ORDER by created ASC", 0, 1, array('uid' => $data->uid));
+    foreach ($order as $row) {
+			$order_id = $row->order_id;
+			$date_txn = $row->created;
+		}
+		drupal_set_message("<pre>".print_r($order_id, true)."</pre>");
+		
+		if (isset($order_id)) {
+			$referral_list[] = array(
+				'uid' => $data->uid,
+				'email' => $data->mail,
+				'date_registered' => format_date($data->created, 'custom', REFERRAL_DATE_FORMAT),
+				'points' => $points,
+				'order_id' => $order_id,
+				'date_txn' => format_date($date_txn, 'custom', REFERRAL_DATE_FORMAT)
+			);
+		}
+	}
+	// get referral list - end
+	
+	$content['referral_list'] = $referral_list;
+	$content['referral_link'] = $referral_link;
+	$content['path_to_theme'] = $path_to_theme;
+	
+  return theme('referral_list', array('content' => $content));
 }

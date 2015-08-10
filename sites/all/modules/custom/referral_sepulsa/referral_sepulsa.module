@@ -131,7 +131,7 @@ function referral_list(){
 	$date_txn = '';
 	
 	// referral share - start
-	$logo = theme_get_setting('logo');
+	/*$logo = theme_get_setting('logo');
 	$inline_script = '<meta property="og:image" content="'.$logo.'" />';
 	$element = array(
 		'#type' => 'markup',
@@ -140,6 +140,7 @@ function referral_list(){
 	drupal_add_html_head($element, 'facebook_metatag');
 	$path_to_theme = $base_url.'/'.drupal_get_path('theme', 'sepulsa');
 	$referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+	*/
 	// referral share - end
 	
 	// get referral list - start

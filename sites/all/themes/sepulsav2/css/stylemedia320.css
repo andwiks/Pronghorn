@@ -627,3 +627,25 @@ section.std_content .akun .grid_akun.order_transaksi tbody tr
 {
     width: 240px;
 }
+
+section.std_content .akun .c_right nav a
+{
+    width:125px;
+    margin: 0 10px 0 0;
+}
+
+.form-item .description
+{
+    margin-left: 0px !important;
+}
+
+.form-item input, .form-item textarea, .form-item select, .form-item .description, .form-item .element-invisible
+{
+    width: 100% !important;
+}
+
+.form-actions input[type=submit], .form-actions input[type=button]
+{
+    margin: 0 auto;
+    display: block;
+}

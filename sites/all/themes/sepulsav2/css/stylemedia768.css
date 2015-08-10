@@ -355,3 +355,20 @@ section.std_content .voucher .c_left
 {
     width:100%;
 }
+
+
+.form-item .description
+{
+    margin-left: 0px !important;
+}
+
+.form-item input, .form-item textarea, .form-item select, .form-item .description, .form-item .element-invisible
+{
+    width: 100% !important;
+}
+
+.form-actions input[type=submit], .form-actions input[type=button]
+{
+    margin: 0 auto;
+    display: block;
+}

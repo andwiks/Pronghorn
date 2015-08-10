@@ -1,18 +1,25 @@
 <?php
 
 function referral_sepulsa_menu() {
-    $items = array();
+	$items = array();
+
+	$items['admin/config/people/referral/custom_text'] = array(
+		'title'            => t('Referral Custom Text'),
+		'description'      => t('Referral Custom Page'),
+		'page callback'    => 'drupal_get_form',
+		'page arguments'   => array('referral_custom_text'),
+		'access arguments' => array('administer site configuration'),
+		'type'             => MENU_NORMAL_ITEM,
+	);
+		
+	$items['user/referral_list'] = array(
+		'title' => t('Your Referral'),
+		'page callback' => 'referral_list',
+		'access arguments' => array(REFERRAL_PERM_USE),
+		'type' =>  MENU_CALLBACK,
+	);
     
-    $items['admin/config/people/referral/custom_text'] = array(
-      'title'            => t('Referral Custom Text'),
-      'description'      => t('Referral Custom Page'),
-      'page callback'    => 'drupal_get_form',
-      'page arguments'   => array('referral_custom_text'),
-      'access arguments' => array('administer site configuration'),
-      'type'             => MENU_NORMAL_ITEM,
-    );
-    
-    return $items;
+  return $items;
 }
 
 function referral_custom_text() {
@@ -29,8 +36,8 @@ function referral_custom_text() {
 // Override Hook User View from Userpoints Module
 function referral_sepulsa_user_view_alter(&$build) {
     //drupal_set_message("<pre>".print_r($build, true)."</pre>");
-    global $user, $base_url;
-    
+		unset($build['Referrals']);
+    /*global $user, $base_url;  
     $logo = theme_get_setting('logo');
     $inline_script = '<meta property="og:image" content="'.$logo.'" />';
     $element = array(
@@ -74,7 +81,7 @@ function referral_sepulsa_user_view_alter(&$build) {
         </div>';
     
     $output .= variable_get('referral_custom_text');
-    $build['Referrals'][0]['#markup'] = $output;
+    $build['Referrals'][0]['#markup'] = $output;*/
 }
 
 function referral_sepulsa_form_alter(&$form, $form_state, $form_id) {
@@ -101,8 +108,11 @@ function referral_sepulsa_theme($existing, $type, $theme, $path) {
     );
 }
 
+
+/*
 // Override Point Tab from Userpoints Module
 function referral_sepulsa_menu_alter(&$items) {
+	
     unset($items['user/%user/points']);
     $items['user/%user/referral/view'] = array(
 			'page callback'    => 'referral_list',
@@ -111,6 +121,7 @@ function referral_sepulsa_menu_alter(&$items) {
 			'type' => MENU_LOCAL_TASK,
 		);
 }
+*/
 
 function referral_list(){
 	global $user, $base_url;

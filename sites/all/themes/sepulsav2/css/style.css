@@ -2417,3 +2417,104 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 {
     display: none;
 }
+
+.content_tab .alert-block
+{
+    background-color: red;
+    padding: 10px 15px;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.form-item {
+    display: block;
+    clear: both;
+    margin-bottom: 15px;
+}
+
+    .form-item:after {
+        clear: both;
+        margin-bottom: 15px;
+        content: "";
+        clear: both;
+        display: block;
+    }
+
+.form-item .element-invisible
+{
+    position: initial !important;
+    clip: auto;
+    overflow: visible;
+    height: auto;
+    width: 140px;
+    float: left;
+    font-family: "robotolight";
+    text-transform: uppercase;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+}
+
+.form-item input,  .form-item textarea, .form-item select {
+    float: left;
+    display: block !important;
+    padding: 0 15px;
+    font-size: 13px;
+    height: 50px;
+    width: 428px !important;
+    border-color: #d8d8d8;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+    
+        .form-item select {
+            width: 460px !important;
+        }
+
+        .form-item textarea {
+            height: 150px;
+            padding:10px;
+            width: 460px !important;
+        }
+
+.form-item .description {
+    font-size: 0.95em;
+    float: left;
+    margin: 5px 0 0 140px;
+    clear: both;
+    width: 458px;
+    color: #105c8c;
+}
+
+.webform-component-textarea .grippie
+{
+    display: none;
+}
+
+.form-actions input[type=submit], .form-actions input[type=button]
+{
+    clear:both;
+    margin: 5px 0 0 140px;
+    border: 1px solid #105c8c;
+    padding: 0;
+    height: 48px;
+    width: 198px;
+    background: #FFF;
+    color: #105c8c;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+.form-actions input[type=submit]:hover, .form-actions input[type=button]:hover {
+    background: #105c8c;
+    color: #FFF;
+}

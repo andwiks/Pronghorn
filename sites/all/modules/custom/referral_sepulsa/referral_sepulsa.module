@@ -116,7 +116,6 @@ function referral_list(){
 	global $user, $base_url;
 	$content = array();
 	$referral_list = array();
-	$points = '';
 	$order_id = '';
 	$date_txn = '';
 	
@@ -136,6 +135,7 @@ function referral_list(){
 	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.uid = u.uid WHERE r.referral_uid = :uid", array('uid' => $user->uid));
 	foreach ($referral as $data) {
 		// get the points
+		$points = '';
 		$userpoint = db_query_range("SELECT points FROM userpoints_txn WHERE uid = :uid AND status = 0 ORDER BY txn_id ASC", 0, 1, array('uid' => $data->uid));
 		foreach ($userpoint as $row) {
 			$points = number_format($row->points,0,",",".");

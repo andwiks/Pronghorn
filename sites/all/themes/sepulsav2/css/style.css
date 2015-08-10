@@ -2514,7 +2514,17 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     -o-border-radius: 7px;
 }
 
-.form-actions input[type=submit]:hover, .form-actions input[type=button]:hover {
+.form-actions input[type=submit]:hover, .form-actions input[type=button]:hover 
+{
     background: #105c8c;
     color: #FFF;
+}
+
+.std_content .alert-block 
+{
+    text-align: center;
+    padding: 15px;
+    margin: 5px;
+    background-color: yellow;
+    color: red;
 }

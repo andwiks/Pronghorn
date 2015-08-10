@@ -132,6 +132,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['commerce_payment']['#prefix'] .= '<h4><strong>'.t('Payment Options').'</strong></h4>';
     $form['commerce_payment']['#suffix'] = '</div>';
 
+    $form['commerce_payment']['payment_method']['#process'] = array('form_process_radios', 'sepulsav2_process_radios_payment_method');
 
     if (isset($form['commerce_payment']['payment_details']['veritrans'])) {
       $form['commerce_payment']['payment_details']['veritrans']['credit_card']['#prefix'] = '<div class="clearfix"></div>';
@@ -739,4 +740,13 @@ function sepulsav2_user_view_alter(&$build) {
 
   $build['form'] = drupal_get_form('user_profile_form', $build['#account']);
   $build['form']['#weight'] = 2;
+}
+
+function sepulsav2_process_radios_payment_method($element) {
+  foreach ($element['#options'] as $key => $choice) {
+    $element[$key]['#prefix'] = '<div class="payment">';
+    $element[$key]['#suffix'] = '</div>';
+  }
+
+  return $element;
 }

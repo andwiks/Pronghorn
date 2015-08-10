@@ -261,3 +261,14 @@ function commerce_veritrans_notification_callback() {
 
   return;
 }
+
+/**
+ * Function commerce_veritrans_user_token().
+ * @return array
+ *   Form array.
+ */
+function commerce_veritrans_user_token() {
+  global $user;
+  $form = drupal_get_form('commerce_veritrans_user_token_form', $user);
+  return $form;
+}

@@ -634,12 +634,12 @@ section.std_content .akun .c_right nav a
     margin: 0 10px 0 0;
 }
 
-.form-item .description
+#webform-client-form-4907 .form-item .description
 {
     margin-left: 0px !important;
 }
 
-.form-item input, .form-item textarea, .form-item select, .form-item .description, .form-item .element-invisible
+#webform-client-form-4907 .form-item input, #webform-client-form-4907 .form-item textarea, #webform-client-form-4907 .form-item select, #webform-client-form-4907 .form-item .description, #webform-client-form-4907 .form-item .element-invisible
 {
     width: 100% !important;
 }

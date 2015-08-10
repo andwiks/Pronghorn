@@ -1,6 +1,6 @@
 <nav class="after_clear">
-    <a href="<?php print url('user/voucher'); ?>" class="active">Online Store</a>
-    <a href="<?php print url('user/voucher/offline'); ?>">Offline Store</a>
+    <a href="<?php print url('user/voucher'); ?>">Online Store</a>
+    <a href="<?php print url('user/voucher/offline'); ?>" class="active">Offline Store</a>
 </nav>
 <div class="list_voucher after_clear">
 <?php foreach ($rows as $row_count => $row): ?>

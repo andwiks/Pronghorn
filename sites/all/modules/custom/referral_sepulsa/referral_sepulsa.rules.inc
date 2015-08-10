@@ -55,9 +55,28 @@ function referral_sepulsa_rules_action_info() {
           'type' => 'user',
           'label' => t('User who referred to sepulsa'),
         ),
-        'point_percentage' => array(
+				'point_type_referrer' => array(
+          'type' => 'text',
+          'label' => t('Point Percentage for Referrer'),
+          'description' => t('Choose one of point type below'),
+					'options list' => 'referral_sepulsa_point_type_options',
+          'restriction' => 'input',
+        ),
+        'point_percentage_referrer' => array(
           'type' => 'integer',
-          'label' => t('Point Percentage'),
+          'label' => t('Point Percentage for Referrer'),
+          'description' => t('Percentage of commerce order total convert into points (eg. 10)'),
+        ),
+				'point_type_refer' => array(
+          'type' => 'text',
+          'label' => t('Point Percentage for User Refer'),
+          'description' => t('Choose one of point type below'),
+					'options list' => 'referral_sepulsa_point_type_options',
+          'restriction' => 'input',
+        ),
+        'point_percentage_refer' => array(
+          'type' => 'integer',
+          'label' => t('Point Percentage for User Refer'),
           'description' => t('Percentage of commerce order total convert into points (eg. 10)'),
         ),
         'category' => array(
@@ -78,8 +97,10 @@ function referral_sepulsa_rules_action_info() {
  * The condition function for 'user_first_paid_in_full_order'.
  */
 function user_first_paid_in_full_order($order, $user) {
+	
     $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed' OR status = 'processing') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
     
+		drupal_set_message("<pre>order id prev: ".print_r($order_id_prev, true)."</pre>");
     // if order id prev exists, it means this is not user first order
     if ($order_id_prev) return FALSE;
     return TRUE;
@@ -88,21 +109,38 @@ function user_first_paid_in_full_order($order, $user) {
 /**
  * The action function for 'assign_point_to_referrer_user'.
  */
-function assign_point_to_referrer_user($order, $user, $point_percentage, $category) {
+function assign_point_to_referrer_user($order, $user, $point_type_referrer, $point_percentage_referrer, $point_type_refer, $point_percentage_refer, $category) {
     // select table user_referral, get user referrer from current user
     $referrer_uid = db_query_range("SELECT referral_uid FROM {referral} WHERE uid = :uid", 0, 1, array('uid' => $user->uid))->fetchField();
     
+		//drupal_set_message("<pre>referer uid: ".print_r($referrer_uid, true)."</pre>");
     if ($referrer_uid) {
-        // assign point to this referrer
+        // assign point untuk yang merefer
         $order_total = $order->commerce_order_total["und"][0]["amount"];
-        $points = ceil($order_total/100 * $point_percentage); 
-        $params = array (
-          'uid' => $referrer_uid,
-          'points' => $points,
-          'tid' => $category,
-          'description' => $user->mail.' made first purchase.'
-        );
-        userpoints_userpointsapi($params); 
+				if ($point_percentage_referrer > 0) {
+					if ($point_type_referrer == 'percentage') $points_referrer = ceil($order_total/100 * $point_percentage_referrer); 
+					else $points_referrer = $point_percentage_referrer;
+					$params_referrer = array (
+						'uid' => $referrer_uid,
+						'points' => $points_referrer,
+						'tid' => $category,
+						'description' => $user->mail.' made first purchase.'
+					);
+					userpoints_userpointsapi($params_referrer); 
+				}
+				
+				// assign point untuk yang di refer
+				if ($point_percentage_refer > 0) {
+					if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer); 
+					else $points_refer = $point_percentage_refer;
+					$params_refer = array (
+						'uid' => $user->uid,
+						'points' => $points_refer,
+						'tid' => $category,
+						'description' => $user->mail.' made first purchase.'
+					);
+					userpoints_userpointsapi($params_refer); 
+				}
     }
 }
 
@@ -116,4 +154,9 @@ function referral_sepulsa_userpoint_category_options() {
     //drupal_set_message("<pre>".print_r($list, true)."</pre>");
  
     return $list;
+}
+
+function referral_sepulsa_point_type_options() {
+	$list = array('cash' => t('Cash'), 'percentage' => t('Percentage'));
+	return $list;
 }

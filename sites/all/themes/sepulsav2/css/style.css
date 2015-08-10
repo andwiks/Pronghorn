@@ -2582,8 +2582,8 @@ tr.even, tr.odd {
 }
 
 
-section.std_content .akun nav.after_clear{margin: 0 0 30px 0;}
-section.std_content .akun nav.after_clear a{
+section.std_content .akun .c_right nav{margin: 0 0 30px 0;}
+section.std_content .akun .c_right nav a{
     background: #bcbcbc;
     display: block;
     float: left;
@@ -2602,16 +2602,16 @@ section.std_content .akun nav.after_clear a{
     -ms-border-radius:5px;
     -o-border-radius:5px;
 }
-section.std_content .akun nav a.after_clear:hover,
-section.std_content .akun nav a.after_clear.active{
+section.std_content .akun .c_right nav a:hover,
+section.std_content .akun .c_right nav a.active{
     background: #105c8c;
 }
 
-section.std_content .akun .list_voucher {border: none;padding: 0}
-section.std_content .akun .box_voucher{width: 225px;margin-right: 20px}
-section.std_content .akun .box_voucher:nth-child(3n+3){margin-right:0;}
-section.std_content .akun .box_voucher .image{border:none;margin:0}
-section.std_content .akun .box_voucher span.date{
+section.std_content .akun .c_right .list_voucher {border: none;padding: 0}
+section.std_content .akun .c_right .box_voucher{width: 225px;margin-right: 20px}
+section.std_content .akun .c_right .box_voucher:nth-child(3n+3){margin-right:0;}
+section.std_content .akun .c_right .box_voucher .image{border:none;margin:0}
+section.std_content .akun .c_right .box_voucher span.date{
     font-family: "robotoregular";
     background: url(../images/material/jam_ico.png) no-repeat left;
     display: block;
@@ -2624,3 +2624,13 @@ section.std_content .akun .box_voucher span.date{
     color:#9b9b9b;
 }
 section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotomedium";font-size: 14px;text-decoration: none;margin:8px 0 0; }
+
+.box_voucher .image img
+{
+    cursor: pointer;
+}
+
+.c_right .box_voucher .image img
+{
+    height: 150px;
+}

@@ -367,7 +367,7 @@ section.std_content .voucher .c_left
     width: 100% !important;
 }
 
-.form-actions input[type=submit], .form-actions input[type=button]
+#webform-client-form-4907 .form-actions input[type=submit], #webform-client-form-4907 .form-actions input[type=button]
 {
     margin: 0 auto;
     display: block;

@@ -2497,7 +2497,6 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 .form-actions input[type=submit], .form-actions input[type=button]
 {
     clear:both;
-    margin: 5px 0 0 140px;
     border: 1px solid #105c8c;
     padding: 0;
     height: 48px;
@@ -2512,6 +2511,11 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     -moz-border-radius: 7px;
     -ms-border-radius: 7px;
     -o-border-radius: 7px;
+}
+
+#webform-client-form-4907 .form-actions input[type=submit], #webform-client-form-4907 .form-actions input[type=button]
+{
+    margin: 5px 0 0 140px;
 }
 
 .form-actions input[type=submit]:hover, .form-actions input[type=button]:hover 

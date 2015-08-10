@@ -644,7 +644,7 @@ section.std_content .akun .c_right nav a
     width: 100% !important;
 }
 
-.form-actions input[type=submit], .form-actions input[type=button]
+#webform-client-form-4907 .form-actions input[type=submit], #webform-client-form-4907 .form-actions input[type=button]
 {
     margin: 0 auto;
     display: block;

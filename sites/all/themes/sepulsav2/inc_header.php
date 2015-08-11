@@ -35,7 +35,7 @@ global $base_url, $user;
                             <div class="arr"></div>
                             <div class="box_credit after_clear">
                                 <div class="left">SEPULSA CREDIT</div>
-                                <div class="right"><?php print commerce_currency_format(userpoints_get_current_points($user->uid, 'all'), 'IDR'); ?></div>
+                                <div class="right"><?php print number_format(userpoints_get_current_points($user->uid, 'all'), 0, ",", "."); ?> IDR</div>
                             </div>
                             <a href="<?php print url('user/' . $user->uid); ?>">AKUN</a>
                             <a href="<?php print url("konfirmasi"); ?>">KONFIRMASI PEMBAYARAN</a>

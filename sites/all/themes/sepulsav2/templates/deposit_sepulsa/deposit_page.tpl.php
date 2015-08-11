@@ -4,7 +4,7 @@
 </p>
 <div class="kredit">
     <span>Sisa kredit kamu</span>
-    IDR <?php print $credit ?>
+    <?php print number_format($credit, 0, ",", ".") ?> IDR
 </div>
 <div class="nav_tab after_clear"> 
     <a href="" target="target_1" class="active">TOP UP Sepulsa Credit</a>

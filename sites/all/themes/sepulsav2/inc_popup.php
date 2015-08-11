@@ -40,12 +40,8 @@
                     Tunjukan halaman ini, dan reedem voucher kamu.
                 </span>
                 <div class="form">
-                    <form>
-                        <div class="row"><input type="text" placeholder="Masukan 14 digit kode reedem"/></div>                        
-                        <div class="row">
-                            <input type="submit" value="REDEEM VOUCHER" class="bt bt_std" />
-                        </div>
-                    </form>
+                  <?php $form = drupal_get_form('offline_coupon_redeem_form', 0); ?>
+                  <?php print drupal_render($form); ?>
                 </div>
             </div>
 

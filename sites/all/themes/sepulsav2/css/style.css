@@ -2703,6 +2703,8 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
     font-size: 12px;
 }
 
+footer { margin-top: 15px;}
+
 footer .left{margin-top:5px;}
 footer .right{margin-top:5px;}
 
@@ -2785,4 +2787,9 @@ section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_a
     font-family: "robotomedium";
     color: #535353;
     font-size: 14px;
+}
+
+section.std_content .voucher .c_left, section.std_content .voucher .c_right
+{
+    margin-top:10px;
 }

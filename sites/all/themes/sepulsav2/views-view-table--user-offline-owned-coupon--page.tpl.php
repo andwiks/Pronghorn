@@ -4,7 +4,7 @@
 </nav>
 <div class="list_voucher after_clear">
 <?php foreach ($rows as $row_count => $row): ?>
-    <div class="box_voucher">
+    <div class="box_voucher offline" id="<?php print $row['nid']; ?>">
         <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
         <span class="date"><?php print $row['field_owned_coupon_expiry']; ?></span>
         <a href="" class="detail">lihat detail ></a>

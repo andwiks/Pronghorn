@@ -2702,3 +2702,6 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
     padding-right: 15px;
     font-size: 12px;
 }
+
+footer .left{margin-top:5px;}
+footer .right{margin-top:5px;}

@@ -2387,7 +2387,7 @@ section.std_content .box_voucher
     text-align: center;
     margin: 10px;
     padding: 10px 30px;
-    background-color: yellow;
+    background-color: red;
 }
 
 #payment-details .description

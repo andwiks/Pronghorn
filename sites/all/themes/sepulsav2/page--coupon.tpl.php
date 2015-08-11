@@ -11,7 +11,13 @@ global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
 ?>
 
-<?php drupal_add_js('http://code.jquery.com/ui/1.11.4/jquery-ui.js', 'external'); ?>
+<?php drupal_add_js('http://code.jquery.com/ui/1.11.4/jquery-ui.js', array(
+  'type' => 'external',
+  'scope' => 'footer',
+  'group' => JS_THEME,
+  'every_page' => FALSE,
+  'weight' => -1,
+)); ?>
 <section class="std_content">
 <?php print render($title_suffix); ?>
 <?php print $messages; ?>

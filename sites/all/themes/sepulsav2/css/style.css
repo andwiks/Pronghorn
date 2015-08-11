@@ -2529,8 +2529,8 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     text-align: center;
     padding: 15px;
     margin: 5px;
-    background-color: yellow;
-    color: red;
+    background-color: red;
+    color: #fff;
 }
 
 #commerce-veritrans-user-token-form div

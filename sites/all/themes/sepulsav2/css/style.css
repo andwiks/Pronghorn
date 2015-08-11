@@ -2705,3 +2705,75 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
 
 footer .left{margin-top:5px;}
 footer .right{margin-top:5px;}
+
+.views-field-order-id, .views-field-order-id a
+{
+    font-size: 16px;
+    font-family: "robotomedium";
+    color: #535353;
+    text-decoration: underline;
+}
+
+section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_akun thead th a
+{
+    font-size: 16px;
+    font-family: "robotomedium";
+    color: #535353;
+}
+
+.entity-commerce-order .field-name-commerce-line-items table {
+    width: 100%;
+    font-size: 14px;
+    color: #898989;
+    border: 1px solid #CCC;
+    margin-bottom: 10px;
+}
+
+.entity-commerce-order .field-name-commerce-line-items table tr td {
+    width: 100%;
+    font-size: 14px;
+    color: #898989;
+    border: 1px solid #CCC;
+    margin-bottom: 10px;
+}
+
+.entity-commerce-order .field-name-commerce-line-items table tr th
+{
+    background-color: #fff;
+    padding: 10px;
+    text-align: left;
+    color: #535353;
+}
+
+.entity-commerce-order .field-name-commerce-line-items table tr td {
+    background-color: #fff;
+    padding: 10px;
+    text-align: left;
+}
+
+.entity-commerce-order .field-name-commerce-order-total {
+    padding: 10px;
+    border: 1px solid #CCC;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #535353;
+    font-family: "robotomedium";
+}
+
+.entity-commerce-order .field-name-commerce-order-total .amount
+{
+    float: right;
+    padding-right: 30px;
+}
+
+.entity-commerce-order .field-name-commerce-customer-billing, .entity-commerce-order .field-name-field-commerce-billy-i-date, .entity-commerce-order .field-name-field-order-source
+{
+    margin-bottom: 10px;
+}
+
+.entity-commerce-order .field-name-commerce-customer-billing .field-label, .entity-commerce-order .field-name-field-commerce-billy-i-date .field-label, .entity-commerce-order .field-name-field-order-source .field-label
+{
+    font-family: "robotomedium";
+    color: #535353;
+    font-size: 14px;
+}

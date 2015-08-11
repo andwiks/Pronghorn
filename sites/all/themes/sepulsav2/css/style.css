@@ -2676,3 +2676,29 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
     color: #666666;
     padding: 0 0 10px 0;
 }
+
+#block-menu-menu-sidebar2 ul li a:hover {
+    text-decoration: underline;
+}
+#block-menu-menu-sidebar2 ul li a,  #block-menu-menu-sidebar2 ul li a.active,  #block-menu-menu-sidebar2 ul li a:hover {
+    color: #105c8c;
+}
+#block-menu-menu-sidebar2 ul li {
+    list-style-image: none;
+    list-style-type: none;
+    display: inline;
+    padding: 0;
+    font-size: 14px;
+    margin: 0 15px 0 0;
+    color: #105c8c;
+}
+
+#block-menu-menu-sidebar2 ul li.first:before {
+    content: "";
+    padding: 0;
+}
+#block-menu-menu-sidebar2 ul li:before {
+    content: "|";
+    padding-right: 15px;
+    font-size: 12px;
+}

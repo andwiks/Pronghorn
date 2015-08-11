@@ -2526,9 +2526,17 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
 
 .std_content .alert-block 
 {
+    /*
     text-align: center;
     padding: 15px;
     margin: 5px;
+    background-color: red;
+    color: #fff;
+    */
+
+    text-align: center;
+    padding: 15px 0;
+    margin: 5px auto;
     background-color: red;
     color: #fff;
 }

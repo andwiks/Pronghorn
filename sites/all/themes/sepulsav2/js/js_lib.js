@@ -233,6 +233,7 @@ function  voucherPop() {
         content_pop.children("h4").html(data_popup.find("h4").html());
         content_pop.children("h5").html(data_popup.find("h5").html());
         content_pop.children("p").html(data_popup.find("p").html());
+        content_pop.find("input[name=voucher_id]").val(data_popup.attr('id'));
 
     };
     $(".box_voucher .image,.box_voucher a.detail").click(function (e) {

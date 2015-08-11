@@ -20,8 +20,8 @@ $theme_path = $base_url . '/' . path_to_theme();
 )); ?>
 <section class="std_content">
 <?php print render($title_suffix); ?>
-<?php print $messages; ?>
     <div class="wrapper_2 voucher ">
+      <?php print $messages; ?>
         <div class="c_left">
         <?php print render($page['right']); ?> 
         </div>

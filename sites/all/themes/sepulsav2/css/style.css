@@ -2729,6 +2729,15 @@ section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_a
     margin-bottom: 10px;
 }
 
+.entity-commerce-order .field-name-commerce-line-items table tr th {
+    width: 100%;
+    font-size: 14px;
+    color: #898989;
+    border: 1px solid #CCC;
+    margin-bottom: 10px;
+    font-family: "robotomedium";
+}
+
 .entity-commerce-order .field-name-commerce-line-items table tr td {
     width: 100%;
     font-size: 14px;

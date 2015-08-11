@@ -2680,8 +2680,10 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
 #block-menu-menu-sidebar2 ul li a:hover {
     text-decoration: underline;
 }
-#block-menu-menu-sidebar2 ul li a,  #block-menu-menu-sidebar2 ul li a.active,  #block-menu-menu-sidebar2 ul li a:hover {
-    color: #105c8c;
+#block-menu-menu-sidebar2 ul li a,  
+#block-menu-menu-sidebar2 ul li a.active,  
+#block-menu-menu-sidebar2 ul li a:hover {
+    color: #feb60a;
 }
 #block-menu-menu-sidebar2 ul li {
     list-style-image: none;
@@ -2792,4 +2794,23 @@ section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_a
 section.std_content .voucher .c_left, section.std_content .voucher .c_right
 {
     margin-top:10px;
+}
+
+
+header .right_link .box .box_drop .arr{border-bottom:5px solid #105c8c; }
+header .right_link .box .box_drop .box_credit ,
+.form.style_1 .row.saldo .left {background: #105c8c;}
+
+header .right_link .box .box_drop a:hover
+{
+    color: #105c8c;
+}
+
+.home header .right_link .box .box_drop .arr{border-bottom:5px solid #fdb50a; }
+.home header .right_link .box .box_drop .box_credit ,
+.home .form.style_1 .row.saldo .left {background: #fdb50a;}
+
+.home header .right_link .box .box_drop a:hover
+{
+    color: #fdb50a;
 }

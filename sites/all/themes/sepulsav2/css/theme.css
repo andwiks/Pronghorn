@@ -300,3 +300,65 @@ ul.hybridauth-widget li {
   height: 50px;
   margin: 0 0 20px 0;
 }
+
+/* 2nd nav */
+
+.blue header .right_link .box .box_drop .arr{border-bottom:5px solid #105c8c; }
+.blue header .right_link .box .box_drop .box_credit ,
+.blue .form.style_1 .row.saldo .left {background: #105c8c;}
+
+.blue header .right_link .box .box_drop a:hover, body.home.blue header .right_link .box .box_drop a:hover
+{
+    color: #105c8c;
+}
+
+.orange header .right_link .box .box_drop .arr{border-bottom:5px solid #feb60a; }
+.orange header .right_link .box .box_drop .box_credit ,
+.orange .form.style_1 .row.saldo .left {background: #feb60a;}
+
+.orange header .right_link .box .box_drop a:hover, body.orange.blue header .right_link .box .box_drop a:hover
+{
+    color: #feb60a;
+}
+
+.red header .right_link .box .box_drop .arr{border-bottom:5px solid #c72127; }
+.red header .right_link .box .box_drop .box_credit ,
+.red .form.style_1 .row.saldo .left {background: #c72127;}
+
+.red header .right_link .box .box_drop a:hover, body.home.red header .right_link .box .box_drop a:hover
+{
+    color: #c72127;
+}
+
+.green header .right_link .box .box_drop .arr{border-bottom:5px solid #129d4a; }
+.green header .right_link .box .box_drop .box_credit ,
+.green .form.style_1 .row.saldo .left {background: #129d4a;}
+
+.green header .right_link .box .box_drop a:hover, body.home.green header .right_link .box .box_drop a:hover
+{
+    color: #129d4a;
+}
+
+/* footer nav */
+
+.blue #block-menu-menu-sidebar2 ul li a, 
+.blue #block-menu-menu-sidebar2 ul li a.active, 
+.blue #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #105c8c;
+}
+
+.green #block-menu-menu-sidebar2 ul li a, 
+.green #block-menu-menu-sidebar2 ul li a.active, 
+.green #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #129d4a;
+}
+
+
+.red #block-menu-menu-sidebar2 ul li a, 
+.red #block-menu-menu-sidebar2 ul li a.active, 
+.red #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #c72127;
+}

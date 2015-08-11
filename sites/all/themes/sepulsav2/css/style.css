@@ -2387,7 +2387,7 @@ section.std_content .box_voucher
     text-align: center;
     margin: 10px;
     padding: 10px 30px;
-    background-color: yellow;
+    background-color: red;
 }
 
 #payment-details .description
@@ -2639,8 +2639,6 @@ section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotom
     height: 150px;
 }
 
-
-
 .btn.disabled, .btn[disabled], fieldset[disabled]
 {
     cursor: not-allowed;
@@ -2649,5 +2647,20 @@ section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotom
     filter: alpha(opacity=65);
     -webkit-box-shadow: none;
     box-shadow: none;
-    background: #CCC;
+    background: #CCC !important;
+}
+
+section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
+    background-image: none;
+    padding-right: 0;
+}
+
+.payment {
+    float: left;
+    width: 50%;
+}
+
+#payment-details input, #payment-details textarea, #payment-details select
+{
+    border:1px solid #105c8c !important;
 }

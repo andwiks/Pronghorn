@@ -37,8 +37,7 @@ $theme_path = $base_url . '/' . path_to_theme();
         <div class="wrapper_2">
             <h2><?php print t('PILIH VOUCHER YANG KAMU SUKA'); ?></h2>
             <h5>
-                <?php print t('Saat ini kamu memilih untuk melakukan pembayaran dengan kartu kredit BCA,<br/>
-                kamu bisa memilih tambahan 2 Voucher Diskon Special.'); ?>
+                <?php print t('Kamu bisa memilih 3 Voucher yang kamu suka.'); ?>
                 <span class="border"></span>
             </h5>
         </div> 

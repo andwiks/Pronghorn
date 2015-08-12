@@ -2688,9 +2688,9 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
 #block-menu-menu-sidebar2 ul li a:hover {
     text-decoration: underline;
 }
-#block-menu-menu-sidebar2 ul li a,  
-#block-menu-menu-sidebar2 ul li a.active,  
-#block-menu-menu-sidebar2 ul li a:hover {
+.home #block-menu-menu-sidebar2 ul li a,  
+.home #block-menu-menu-sidebar2 ul li a.active,  
+.home #block-menu-menu-sidebar2 ul li a:hover {
     color: #feb60a;
 }
 #block-menu-menu-sidebar2 ul li {
@@ -2821,4 +2821,16 @@ header .right_link .box .box_drop a:hover
 .home header .right_link .box .box_drop a:hover
 {
     color: #fdb50a;
+}
+
+#payment-details select, #webform-client-form-4907 .form-item select
+{
+    padding: 10px 20px;
+    background: url(../images/material/arr_dropico.png) no-repeat right 10px center;
+    cursor: pointer;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    text-overflow: '';
 }

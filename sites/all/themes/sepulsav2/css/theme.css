@@ -341,6 +341,13 @@ ul.hybridauth-widget li {
 
 /* footer nav */
 
+.not-front #block-menu-menu-sidebar2 ul li a, 
+.not-front #block-menu-menu-sidebar2 ul li a.active, 
+.not-front #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #105c8c;
+}
+
 .blue #block-menu-menu-sidebar2 ul li a, 
 .blue #block-menu-menu-sidebar2 ul li a.active, 
 .blue #block-menu-menu-sidebar2 ul li a:hover

@@ -30,7 +30,6 @@ $web_link = $fields['field_website_link']->content;
 if (!isset($web_link)) {
   $web_link = 'http://'.$fields['field_website']->content; 
 }
-  
 ?>
 <div class="box_voucher">
     <div class="image"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></div>
@@ -44,7 +43,7 @@ if (!isset($web_link)) {
             <h3><?php print $fields['title']->content; ?></h3>
             <h4><?php print $fields['field_description']->content; ?>.</h4>
             <h5><?php print t('Terms & Conditions'); ?></h5>
-            <?php print isset($fields['field_coupon_tnc']->content) ? $fields['field_coupon_tnc']->content : "-"; ?>
+            <div class="tnc_desc"><?php print $fields['field_coupon_tnc']->content; ?></div>
         </div>
     </div>
 </div>

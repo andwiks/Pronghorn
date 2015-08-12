@@ -7,13 +7,10 @@
  * @since January 27th 2015.
  */
 
-global $base_url, $user;
-
+global $base_url, $user, $language;
 ?>
     <header>
         <div class="wrapper">
-            <a href="javascript:;" onclick="buynow()" class="belipulsa"><?php print t('Beli Pulsa'); ?></a>
-
             <div class="soc_link">
                 <a href="https://www.facebook.com/sepulsa" class="fb">facebook</a>
                 <a href="https://twitter.com/sepulsa_id" class="tw">twitter</a>
@@ -86,11 +83,19 @@ global $base_url, $user;
                 <div class="box lang">
                     <a href="" >
                         <span class="ico"></span>
-                        IN
+                     <?php if ($language->language == 'id') { ?>
+                        ID
+                      <?php } else { ?>
+                        EN
+                      <?php } ?>
                     </a>
                     <div class="box_drop">
                         <div class="arr"></div>
-                        <a href="">EN</a>
+                      <?php if ($language->language == 'id') : ?>
+                        <a href="?language=en">EN</a>
+                      <?php else: ?>
+                        <a href="?language=id">ID</a>
+                      <?php endif; ?>
                     </div>
                 </div>
             </div>

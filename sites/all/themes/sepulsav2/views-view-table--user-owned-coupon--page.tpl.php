@@ -20,53 +20,24 @@
  */
 ?>
 <nav class="after_clear">
-    <a href="<?php print url('user/voucher'); ?>" class="active">Online Store</a>
-    <a href="<?php print url('user/voucher/offline'); ?>">Offline Store</a>
+    <a href="<?php print url('user/voucher'); ?>" class="active"><?php print t('Online Store'); ?></a>
+    <a href="<?php print url('user/voucher/offline'); ?>"><?php print t('Offline Store'); ?></a>
 </nav>
 <div class="list_voucher after_clear">
 <?php foreach ($rows as $row_count => $row): ?>
     <div class="box_voucher">
         <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
         <span class="date"><?php print $row['field_owned_coupon_expiry']; ?></span>
-        <a href="" class="detail">lihat detail ></a>
+        <a href="" class="detail"><?php print t('lihat detail'); ?> ></a>
         <div class="data_popup">
             <div class="img"><?php print $row['field_coupon_product_image']; ?></div>
             <div class="desc">
                 <h3><?php print $row['title']; ?></h3>
                 <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
-                <h5>Terms & Conditions</h5>
+                <h5><?php print t('Syarat & Ketentuan'); ?></h5>
                 <?php print $row['field_coupon_tnc']; ?>
             </div>
         </div>
     </div>
 <?php endforeach; ?>
 </div>
-<!--
-<table class="table style1" <?php print $attributes; ?>>
-   <?php if (!empty($title) || !empty($caption)) : ?>
-     <caption><?php print $caption . $title; ?></caption>
-  <?php endif; ?>
-  <?php if (!empty($header)) : ?>
-    <thead>
-      <tr>
-        <?php foreach ($header as $field => $label): ?>
-          <th <?php if ($header_classes[$field]) { print 'class="'. $header_classes[$field] . '" '; } ?>>
-            <?php print $label; ?>
-          </th>
-        <?php endforeach; ?>
-      </tr>
-    </thead>
-  <?php endif; ?>
-  <tbody>
-    <?php foreach ($rows as $row_count => $row): ?>
-      <tr <?php if ($row_classes[$row_count]) { print 'class="' . implode(' ', $row_classes[$row_count]) .'"';  } ?>>
-        <?php foreach ($row as $field => $content): ?>
-          <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
-            <?php print $content; ?>
-          </td>
-        <?php endforeach; ?>
-      </tr>
-    <?php endforeach; ?>
-  </tbody>
-</table>
--->

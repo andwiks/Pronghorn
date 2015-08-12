@@ -3,9 +3,9 @@
     <table class="grid_akun dompet">
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Sepulsa Kredit</th>
-                <th>Deskripsi</th> 
+                <th><?php print t('Tanggal'); ?></th>
+                <th><?php print t('Sepulsa Kredit'); ?></th>
+                <th><?php print t('Deskripsi'); ?></th> 
             </tr>                    
         </thead>
         <tbody>

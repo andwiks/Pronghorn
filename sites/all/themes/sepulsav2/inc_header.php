@@ -29,7 +29,7 @@ global $base_url, $user;
                     <div class="box myacc">
                         <a href="" >
                             <span class="ico"></span>
-                            <?php print t('My Acc'); ?>
+                            <?php print t('Akunku'); ?>
                         </a>
                         <div class="box_drop">
                             <div class="arr"></div>

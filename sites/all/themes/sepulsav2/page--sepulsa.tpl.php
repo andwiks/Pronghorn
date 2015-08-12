@@ -12,11 +12,11 @@ $page_state = "home";
 ?>
   <!-- middle -->
 <section class="banner">
-    <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="Praktis Isi Pulsa. Gratis Diskon Belanja" />
+    <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="banner home" />
     <div class="caption" id="top_page">
-        <h1 style="font-family: 'robotoregular';font-size: 36px;margin: 0 0 15px 0;">Praktis Isi Pulsa. Gratis Diskon Belanja.</h1>
-        <p>Kini isi ulang pulsa lebih dari sekedar mudah, tapi menguntungkan!</p>
-        <a href="#easy_step">Gimana Caranya?</a>
+        <h2><?php print t('Praktis Isi Pulsa. Gratis Diskon Belanja.'); ?></h2>
+        <p><?php print t('Kini isi ulang pulsa lebih dari sekedar mudah, tapi menguntungkan!'); ?></p>
+        <a href="#easy_step"><?php print t('Gimana Caranya?'); ?></a>
     </div>
 </section>
 <section class="h_middle_top">
@@ -28,13 +28,13 @@ $page_state = "home";
             <td>
               <a href="" class="active" target="target_1">
                   <span class="ico pulsa"></span>
-                  isi pulsa & bolt
+                  <?php print t('isi pulsa & bolt'); ?>
               </a>
             </td>
             <td>
               <a href="" target="target_2">
                   <span class="ico listrik"></span>
-                  bayar listrik
+                  <?php print t('bayar listrik'); ?>
               </a>
             </td>
           </tr>
@@ -48,8 +48,8 @@ $page_state = "home";
 
           <div class="topup-notes"> 
               <ul>
-                <li>Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</li>
-                <li>Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</li>
+                <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
               </ul>
           </div>
         </div>
@@ -60,8 +60,8 @@ $page_state = "home";
           
           <div class="topup-notes topup-notes-2"> 
               <ul>
-                <li>Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.</li>
-                <li>Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.</li>
+                <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
               </ul>
           </div>
         </div>

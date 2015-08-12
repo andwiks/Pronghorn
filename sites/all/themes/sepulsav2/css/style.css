@@ -2849,6 +2849,49 @@ header .right_link .box .box_drop a:hover
     margin-bottom: 15px;
 }
 
+#frameBlog #right_column .block-block ul {margin: 0 0 22px 45px;}
+#frameBlog #right_column .block-block ul li {display:inline-block; margin: 0 15px 0 0;}
+#frameBlog #right_column .block-block ul li a {display:block; text-indent: -999999px; width: 40px; height: 40px;}
+#frameBlog #right_column .block-block ul li a.sr_fb {background:url('../images/material/sr_scfb.png') no-repeat 0 0;}
+#frameBlog #right_column .block-block ul li a.sr_tw {background:url('../images/material/sr_sctw.png') no-repeat 0 0;}
+#frameBlog #right_column .block-block ul li a.sr_gplus {background:url('../images/material/sr_scgplus.png') no-repeat 0 0;}
+#frameBlog #right_column .block-block ul li a.sr_link {background:url('../images/material/sr_sclink.png') no-repeat 0 0;}
+#frameBlog #right_column .block-block .blsubcribe {margin:0 0 0 45px;}
+#frameBlog #right_column .block-block .blsubcribe h5 {margin:0 0 12px 0;}
+#frameBlog #right_column .block-block .blsubcribe input[type="text"] {
+    float:left;
+    width: 225px;
+    border:1px solid #7b8793;
+    color:#969696;
+    font-style:italic;
+    border-right:none;
+    border-radius:4px 0 0 4px;
+    -moz-border-radius: 4px 0 0 4px;
+    -webkit-border-radius:4px 0 0 4px;
+}
+#frameBlog #right_column .block-block .blsubcribe input[type="submit"] {
+    float:left;
+    background:#129d4a;
+    border:none;
+    margin:0;
+    padding:0;
+    width:100px;
+    height:38px;
+    line-height: 38px;
+    text-align: center;
+    color:#fff;
+    font-size:14px;
+    border-radius:0 4px 4px 0;
+    -moz-border-radius: 0 4px 4px 0;
+    -webkit-border-radius:0 4px 4px 0;
+    transition:all .15s ease-in-out;
+    -moz-transition:all .15s ease-in-out;
+    -webkit-transition:all .15s ease-in-out;
+}
+#frameBlog #right_column .block-block .blsubcribe input[type="submit"]:hover {
+    background:#c72127;
+}
+
 #frameBlog #right_column h2 {
     height:50px;
     background:url('../images/material/sr_green_rec.png') no-repeat 0 0;

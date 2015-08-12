@@ -2834,3 +2834,56 @@ header .right_link .box .box_drop a:hover
     text-indent: 1px;
     text-overflow: '';
 }
+
+#frameBlog #right_column .content {
+    margin-left: 45px;
+}
+
+#frameBlog #right_column .block-block, #frameBlog #right_column .block-views  {
+    margin-bottom: 15px;
+}
+
+#frameBlog #right_column h2 {
+    height:50px;
+    background:url('../images/material/sr_green_rec.png') no-repeat 0 0;
+    margin:0 0 10px 0;
+    color:#fff;
+    font-size:18px;
+    font-weight:bold;
+    line-height: 40px;
+    padding-left: 45px;
+    display:block;
+}
+
+/*
+#frameBlog #right_column h2:before {
+    background: url('../images/material/sr_post.png') no-repeat 42px 50%;
+}    
+*/
+
+#frameBlog #right_column .views-row
+{
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #ccc;
+}
+
+#frameBlog #right_column .views-field-title
+{
+    margin-bottom:5px;
+}
+
+    #frameBlog #right_column .views-field-title, #frameBlog #right_column .views-field-title a
+    {
+        color: #535353;    
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    #frameBlog #right_column .views-field-created, #frameBlog #right_column .views-field-created a
+    {
+        font-size: 11px;
+        line-height: 15px;
+        color: #8e8e8e;
+        padding-top: 4px;
+    }

@@ -1,8 +1,112 @@
 <?php
-
 /**
  * @file
  */
+
+/**
+ * Implements hook_menu().
+ */
+function deposit_sepulsa_menu() {
+  $items = array();
+
+  $items['user/wallet'] = array(
+    'title' => t('My Wallet'),
+    'description' => 'Deposit money and show the history of it.',
+    'page callback' => 'deposit_sepulsa_page',
+    'access arguments' => array('deposit credit'),
+    'type' => MENU_CALLBACK,
+    // 'title callback' => FALSE,
+    // 'title arguments' => array('!title', array('!title' => 'My Wallet')),
+    // 'title arguments' => array('My Wallet'),
+    // 'options' => array(
+    //   'html' => TRUE,
+    // ),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function deposit_sepulsa_permission() {
+  return array(
+    'deposit credit' => array(
+      'title' => t('Deposit credit'),
+      'description' => t('Deposit to sepulsa credit.'),
+    ),
+  );
+}
+
+/**
+ * Implements page for deposit credit
+ */
+function deposit_sepulsa_page() {
+  drupal_set_title(t('My Wallet'));
+  global $user;
+
+  $deposit_form = deposit_sepulsa_view();
+  $history = deposit_sepulsa_list_transaction();
+  //drupal_set_message("<pre>".print_r($history, true)."</pre>");
+  $credit = userpoints_get_current_points($user->uid, 'all');
+
+  return theme('deposit_page', array('deposit_form' => $deposit_form, 'history' => $history, 'credit' => $credit));
+}
+
+function deposit_sepulsa_list_transaction(){
+    if (arg(0) == 'user'){
+        $rows = [];
+        global $user;
+        $user_uid = $user->uid;
+        if (!isset($user_uid)) $user_uid = $user->uid;
+        $totalamount = userpoints_get_current_points($user_uid, 'all');
+        $totalamount = number_format($totalamount,0,",",".");
+
+        $settings = array(
+          'show_user' => FALSE,
+        );
+        $header = userpoints_get_transaction_header($settings);
+        //$query = db_select('userpoints_txn', 'p')->extend('PagerDefault')->extend('TableSort')
+        $query = db_select('userpoints_txn', 'p')->extend('TableSort')
+            ->fields('p')
+            ->condition('p.uid', $user_uid)
+            ->condition('p.status', '0') // only show approved userpoints
+            ->orderByHeader($header)
+            ->orderBy('p.txn_id', 'DESC');
+            //->limit(variable_get(USERPOINTS_REPORT_LIMIT, 10));
+
+        if (module_exists('taxonomy')) {
+          $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+        }
+        foreach ($query->execute() as $transaction) {
+          $rows[] = userpoints_get_transaction_row($transaction, $settings);
+        }
+
+        $content['header'] = $header;
+        $content['rows'] = $rows;
+        $content['totalamount'] = $totalamount;
+
+        return theme('deposit_list_transaction', array('content' => $content));
+    }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function deposit_sepulsa_theme($existing, $type, $theme, $path) {
+    return array(
+      'deposit_page' => array(
+        'variables' => array('deposit_form' => NULL, 'history' => NULL, 'credit' => 0),
+        'template' => 'deposit_page', // place you file in 'theme' folder of you module folder
+        'path' => drupal_get_path('module', 'deposit_sepulsa')
+      ),
+      'deposit_list_transaction' => array(
+        'variables' => array('content' => NULL),
+        'template' => 'deposit_list_transaction', // place you file in 'theme' folder of you module folder
+        'path' => drupal_get_path('module', 'deposit_sepulsa')
+      )
+    );
+}
 
 /**
  * Implements hook_services_resources().
@@ -92,7 +196,7 @@ function deposit_sepulsa_block_info() {
   $blocks['deposit_sepulsa'] = array(
     'info' => t('Deposit Sepulsa'),
   );
-  
+
   return $blocks;
 }
 
@@ -101,13 +205,13 @@ function deposit_sepulsa_block_info() {
  */
 function deposit_sepulsa_block_view($delta='') {
   $block = array();
-  
+
   switch($delta) {
     case 'deposit_sepulsa' :
       $block['content'] = deposit_sepulsa_view();
       break;
   }
-  
+
   return $block;
 }
 
@@ -117,30 +221,30 @@ function deposit_sepulsa_form($form, &$form_state) {
 	$deposit[$value['product_id']] = $value['title'];
   }
   $form['deposit'] = array(
-	'#type' => 'select', 
+	'#type' => 'select',
 	'#title' => '',
 	//'#required' => true,
 	'#options' => $deposit,
 	'#attributes' => array(
       'class' => array(
-        'input-text full-width'  
+        'input-text full-width'
       ),
     ),
   );
   $form['submit'] = array(
-	'#type' => 'submit', 
+	'#type' => 'submit',
 	'#title' => t('Process'),
 	'#value' => t('Process'),
 	'#attributes' => array(
       'class' => array(
-        'btn style1'  
+        'btn style1'
       ),
     ),
 	'#prefix' => '<div style="padding-top:10px; float: right;">',
 	'#suffix' => '</div>'
   );
 
-  return $form;    
+  return $form;
 }
 
 function deposit_sepulsa_form_submit($form, &$form_state) {
@@ -149,19 +253,19 @@ function deposit_sepulsa_form_submit($form, &$form_state) {
   // Create the new order in checkout status.
   $order = commerce_order_new($user->uid, 'cart');
   commerce_order_save($order);
-  
+
   // line item
   $product = commerce_product_load($product_id);
   $line_item = commerce_product_line_item_new($product, 1, $order->order_id, array(), 'deposit_sepulsa');
   commerce_line_item_save($line_item);
-  
+
   // wrap the order
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
   $order_wrapper->commerce_line_items[] = $line_item;
-  
-  // save the order 
+
+  // save the order
   commerce_order_save($order);
-  
+
   drupal_goto($base_url.'/checkout/'.$order->order_id);
 }
 
@@ -174,7 +278,7 @@ function deposit_sepulsa_form_submit($form, &$form_state) {
 function deposit_sepulsa_view() {
   $my_form = drupal_get_form('deposit_sepulsa_form');
   $output = drupal_render($my_form);
-  
+
   return $output;
 }
 
@@ -197,7 +301,7 @@ function topup_credit_deposit($item) {
 	'tid' => $item['tid'],
 	'description' => 'Credit Deposit'
   );
-  userpoints_userpointsapi($params); 
+  userpoints_userpointsapi($params);
   // update order to completed
   commerce_order_status_update($item['order'], 'completed');
   watchdog('topup_credit_deposit', 'Topup Credit Deposit <br /><pre>'.print_r($item, true).'</pre>');
@@ -282,7 +386,7 @@ function get_deposit_product(){
 	$product = commerce_product_load($row->product_id);
 	$option[$i] = array('product_id'=>$product->product_id, 'title'=>$product->title);
 	$i = $i+1;
-  } 
-  
+  }
+
   return $option;
 }

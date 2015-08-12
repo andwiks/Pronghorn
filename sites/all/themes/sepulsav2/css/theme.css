@@ -1,0 +1,371 @@
+/* blue 
+----------------------------------------------------------------------------------------------*/
+
+.home.blue header .right_link .box a {color: #105c8c;}
+.home.blue header .right_link .box.lang a {background: #FFF url(../images/material/arr_dropico2.png) no-repeat 43px 50px;}
+.home.blue header .right_link .box span.ico {background-position: -17px 0px;}
+.home.blue header .right_link .box.lang span.ico {background-position: -24px 0px;}
+
+.home.blue section.h_middle_top .home_tab,
+.home.blue section.h_middle_top .home_tab .content_tab,
+.home.blue section.h_middle_top .home_tab .nav_tab a{border-color:#105c8c;color:#105c8c}
+.home.blue section.h_middle_top .home_tab .nav_tab a.active,
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover {background-color: #105c8c;border-color:#105c8c;color:#FFF}
+.home.blue section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -35px top}
+.home.blue section.h_middle_top .home_tab .nav_tab a.active span.ico, 
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -35px bottom}
+
+.home.blue .form.style_1 input.bt ,
+.home.blue .form.style_1 input[type=text] {color: #105c8c;border-color: #105c8c;}
+.home.blue .form.style_1 input.bt{background: url(../images/material/arr_ico2.png) no-repeat center}
+
+.home.blue section.h_middle_top .voucher_vendor h3 {  color: #105c8c}
+.home.blue section.h_middle_top .voucher_vendor h3 span.ico{background-position: -18px center;}
+.home.blue section.h_middle_top .voucher_vendor .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel_2.png) no-repeat;
+}
+.home.blue section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;}
+.home.blue section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next {background-position: top left;}
+.home.blue section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev:hover{background-position: bottom right;}
+.home.blue section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next:hover {background-position: top right;} 
+.home.blue section.newsletter .left h3,
+.home.blue section.newsletter .left h5,
+body.home.blue footer .left nav a ,
+.home.blue footer .right .box h6 ,
+.home.blue footer .left .soc_link div,
+.home.blue section.h_keuntungan h2,
+.home.blue section.h_keuntungan h4 ,
+.home.blue section.gratis_voucher .desc h2,
+.home.blue section.h_keuntungan .box h5 ,
+.home.blue section.gratis_voucher .desc h4{color:#105c8c}
+.home.blue section.gratis_voucher .desc span.border {border-color:#105c8c}
+
+.home.blue section.easy_step {background: #105c8c;}
+.home.blue .bt_std:hover{color:#105c8c}
+
+.home.blue section.h_keuntungan .box .image {background-position: -80px center !important;}
+.home.blue section.newsletter .left {
+    background: url(../images/content/newsletter_image_2.png) no-repeat left center;
+}
+
+body.home.blue footer .left .soc_link a.fb{background-position: -70px top;}
+body.home.blue footer .left .soc_link a.tw{background-position: -70px bottom;}
+
+.home.blue header .right_link .box .box_drop .arr{border-bottom:5px solid #105c8c }
+body.home.blue footer .bottom a,
+body.home.blue footer ,
+.home.blue header .right_link .box.lang .box_drop ,
+.home.blue .form.style_1 .drop_transaksi .box_drop,
+.home.blue .form.style_1 .row.saldo .right .cover_combo ,
+.home.blue .form.style_1 .drop_transaksi{border-color: #105c8c;  color: #105c8c;}
+.home.blue .form.style_1 .drop_transaksi .box_drop a ,
+.home.blue .form.style_1 .row.saldo .right .inner_combo {color: #105c8c;}
+.home.blue header .right_link .box.myacc span.ico{background-position: -22px 0px;}
+.home.blue section.banner .caption a.bt {background: rgba(16,92,140,.45);}
+.home.blue .form.style_1 .row.saldo .right .cover_combo .arr,
+.home.blue .form.style_1 .drop_transaksi span.ico {background-position: -40px 0}
+.home.blue .form.style_1 .row.bt_wrap .right .bt_std,
+.home.blue header .right_link .box .box_drop .box_credit ,
+.home.blue .form.style_1 .row.saldo .left {background: #105c8c;}
+
+/* green
+----------------------------------------------------------------------------------------------*/
+
+.home.green header .right_link .box a {color: #129d4a;}
+.home.green header .right_link .box.lang a {background: #FFF url(../images/material/arr_dropico3.png) no-repeat 43px 50px;}
+.home.green header .right_link .box span.ico {background-position: -34px 0px;}
+.home.green header .right_link .box.lang span.ico {background-position: -48px 0px;}
+
+.home.green section.h_middle_top .home_tab,
+.home.green section.h_middle_top .home_tab .content_tab,
+.home.green section.h_middle_top .home_tab .nav_tab a{border-color:#129d4a;color:#129d4a}
+.home.green section.h_middle_top .home_tab .nav_tab a.active,
+.home.green section.h_middle_top .home_tab .nav_tab a:hover {background-color: #129d4a;border-color:#129d4a;color:#FFF}
+.home.green section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -70px top}
+.home.green section.h_middle_top .home_tab .nav_tab a.active span.ico, 
+.home.green section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -70px bottom}
+
+.home.green .form.style_1 input.bt ,
+.home.green .form.style_1 input[type=text] {color: #129d4a;border-color: #129d4a;}
+.home.green .form.style_1 input.bt{background: url(../images/material/arr_ico3.png) no-repeat center}
+
+.home.green section.h_middle_top .voucher_vendor h3 {  color: #129d4a}
+.home.green section.h_middle_top .voucher_vendor h3 span.ico{background-position: -36px center;}
+.home.green section.h_middle_top .voucher_vendor .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel_3.png) no-repeat;
+}
+.home.green section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;}
+.home.green section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next {background-position: top left;}
+.home.green section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev:hover{background-position: bottom right;}
+.home.green section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next:hover {background-position: top right;} 
+.home.green section.newsletter .left h3,
+.home.green section.newsletter .left h5,
+body.home.green footer .left nav a ,
+.home.green footer .right .box h6 ,
+.home.green footer .left .soc_link div,
+.home.green section.h_keuntungan h2,
+.home.green section.h_keuntungan h4 ,
+.home.green section.gratis_voucher .desc h2,
+.home.green section.h_keuntungan .box h5 ,
+.home.green section.gratis_voucher .desc h4{color:#129d4a}
+.home.green section.gratis_voucher .desc span.border {border-color:#129d4a}
+
+.home.green section.easy_step {background: #129d4a;}
+.home.green .bt_std:hover{color:#129d4a}
+
+.home.green section.h_keuntungan .box .image {background-position: -160px center !important;}
+.home.green section.newsletter .left {
+    background: url(../images/content/newsletter_image_3.png) no-repeat left center;
+}
+
+body.home.green footer .left .soc_link a.fb{background-position: -105px top;}
+body.home.green footer .left .soc_link a.tw{background-position: -105px bottom;}
+
+.home.green header .right_link .box .box_drop .arr{border-bottom:5px solid #129d4a }
+body.home.green footer .bottom a,
+body.home.green footer ,
+.home.green header .right_link .box.lang .box_drop ,
+.home.green .form.style_1 .drop_transaksi .box_drop,
+.home.green .form.style_1 .row.saldo .right .cover_combo ,
+.home.green .form.style_1 .drop_transaksi{border-color: #129d4a;  color: #129d4a;}
+.home.green .form.style_1 .drop_transaksi .box_drop a ,
+.home.green .form.style_1 .row.saldo .right .inner_combo {color: #129d4a;}
+.home.green header .right_link .box.myacc span.ico{background-position: -44px 0px;}
+.home.green section.banner .caption a.bt {background: rgba(18,157,74,.45);}
+.home.green .form.style_1 .row.saldo .right .cover_combo .arr,
+.home.green .form.style_1 .drop_transaksi span.ico {background-position: -80px 0}
+.home.green .form.style_1 .row.bt_wrap .right .bt_std,
+.home.green header .right_link .box .box_drop .box_credit ,
+.home.green .form.style_1 .row.saldo .left {background: #129d4a;}
+
+
+/* red
+----------------------------------------------------------------------------------------------*/
+
+.home.red header .right_link .box a {color: #c72127;}
+.home.red header .right_link .box.lang a {background: #FFF url(../images/material/arr_dropico4.png) no-repeat 43px 50px;}
+.home.red header .right_link .box span.ico {background-position: -51px 0px;}
+.home.red header .right_link .box.lang span.ico {background-position: -72px 0px;}
+
+.home.red section.h_middle_top .home_tab,
+.home.red section.h_middle_top .home_tab .content_tab,
+.home.red section.h_middle_top .home_tab .nav_tab a{border-color:#c72127;color:#c72127}
+.home.red section.h_middle_top .home_tab .nav_tab a.active,
+.home.red section.h_middle_top .home_tab .nav_tab a:hover {background-color: #c72127;border-color:#c72127;color:#FFF}
+.home.red section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -105px top}
+.home.red section.h_middle_top .home_tab .nav_tab a.active span.ico, 
+.home.red section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -70px bottom}
+
+.home.red .form.style_1 input.bt ,
+.home.red .form.style_1 input[type=text] {color: #c72127;border-color: #c72127;}
+.home.red .form.style_1 input.bt{background: url(../images/material/arr_ico4.png) no-repeat center}
+
+.home.red section.h_middle_top .voucher_vendor h3 {  color: #c72127}
+.home.red section.h_middle_top .voucher_vendor h3 span.ico{background-position: -54px center;}
+.home.red section.h_middle_top .voucher_vendor .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel_4.png) no-repeat;
+}
+.home.red section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;}
+.home.red section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next {background-position: top left;}
+.home.red section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev:hover{background-position: bottom right;}
+.home.red section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next:hover {background-position: top right;} 
+.home.red section.newsletter .left h3,
+.home.red section.newsletter .left h5,
+body.home.red footer .left nav a ,
+.home.red footer .right .box h6 ,
+.home.red footer .left .soc_link div,
+.home.red section.h_keuntungan h2,
+.home.red section.h_keuntungan h4 ,
+.home.red section.gratis_voucher .desc h2,
+.home.red section.h_keuntungan .box h5 ,
+.home.red section.gratis_voucher .desc h4{color:#c72127}
+.home.red section.gratis_voucher .desc span.border {border-color:#c72127}
+
+.home.red section.easy_step {background: #c72127;}
+.home.red .bt_std:hover{color:#c72127}
+
+.home.red section.h_keuntungan .box .image {background-position: -240px center !important;}
+.home.red section.newsletter .left {
+    background: url(../images/content/newsletter_image_4.png) no-repeat left center;
+}
+
+body.home.red footer .left .soc_link a.fb{background-position: -140px top;}
+body.home.red footer .left .soc_link a.tw{background-position: -140px bottom;}
+
+.home.red header .right_link .box .box_drop .arr{border-bottom:5px solid #c72127 }
+body.home.red footer .bottom a,
+body.home.red footer ,
+.home.red header .right_link .box.lang .box_drop ,
+.home.red .form.style_1 .drop_transaksi .box_drop,
+.home.red .form.style_1 .row.saldo .right .cover_combo ,
+.home.red .form.style_1 .drop_transaksi{border-color: #c72127;  color: #c72127;}
+.home.red .form.style_1 .drop_transaksi .box_drop a ,
+.home.red .form.style_1 .row.saldo .right .inner_combo {color: #c72127;}
+.home.red header .right_link .box.myacc span.ico{background-position: -66px 0px;}
+.home.red section.banner .caption a.bt {background: rgba(199,33,39,.45);}
+.home.red .form.style_1 .row.saldo .right .cover_combo .arr,
+.home.red .form.style_1 .drop_transaksi span.ico {background-position: -120px 0}
+.home.red .form.style_1 .row.bt_wrap .right .bt_std,
+.home.red header .right_link .box .box_drop .box_credit ,
+.home.red .form.style_1 .row.saldo .left {background: #c72127;}
+
+.home.blue section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(../images/material/arr_ico2.png) no-repeat right 12px center;
+}
+
+	.home.blue section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #105c8c;
+	}
+
+	.home.blue section.h_middle_top .cover_combo, .home.blue section.h_middle_top #sepulsa-autocomplete-card-type, .home.blue section.h_middle_top #edit-operator
+	{
+	    background: #105c8c;
+    }
+
+	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone, .home.blue section.h_middle_top #edit-product-id
+	{		
+	    color: #105c8c;
+	    border-color: #105c8c;
+    	background: url(../images/material/drop_ico_2.png) no-repeat right 15px center;
+	}
+
+.home.green section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(../images/material/arr_ico3.png) no-repeat right 12px center;
+}
+
+	.home.green section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #129d4a;
+	}
+
+	.home.green section.h_middle_top .cover_combo, .home.green section.h_middle_top #sepulsa-autocomplete-card-type, .home.green section.h_middle_top #edit-operator
+	{
+	    background: #129d4a;
+    }
+
+	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone, .home.green section.h_middle_top #edit-product-id
+	{		
+	    color: #129d4a;
+	    border-color: #129d4a;
+    	background: url(../images/material/drop_ico_3.png) no-repeat right 15px center;
+	}
+
+.home.red section.h_middle_top .home_tab .form input[type=text]
+{
+	background:url(../images/material/arr_ico4.png) no-repeat right 12px center;
+}
+
+	.home.red section.h_middle_top input[type=submit], input[type=button]
+	{
+		background: #c72127;
+	}
+
+	.home.red section.h_middle_top .cover_combo, .home.red section.h_middle_top #sepulsa-autocomplete-card-type, .home.red section.h_middle_top #edit-operator
+	{
+	    background: #c72127;
+    }
+
+	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone, .home.red section.h_middle_top #edit-product-id
+	{		
+	    color: #c72127;
+	    border-color: #c72127;
+    	background: url(../images/material/drop_ico_4.png) no-repeat right 15px center;
+	}
+	
+	
+.hybridauth-facebook {
+  width: 285px;
+  height: 37px;
+  background: url(../images/content/fb_login.jpg) no-repeat right 15px center;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0;
+  display: block;
+}
+
+.hybridauth-twitter {
+  width: 285px;
+  height: 37px;
+  background: url(../images/content/tw_login.jpg) no-repeat right 15px center;
+  cursor: pointer;
+  padding: 10px;
+  margin: 0;
+  display: block;
+}
+
+ul.hybridauth-widget li {
+  height: 50px;
+  margin: 0 0 20px 0;
+}
+
+/* 2nd nav */
+
+.blue header .right_link .box .box_drop .arr{border-bottom:5px solid #105c8c; }
+.blue header .right_link .box .box_drop .box_credit ,
+.blue .form.style_1 .row.saldo .left {background: #105c8c;}
+
+.blue header .right_link .box .box_drop a:hover, body.home.blue header .right_link .box .box_drop a:hover
+{
+    color: #105c8c;
+}
+
+.orange header .right_link .box .box_drop .arr{border-bottom:5px solid #feb60a; }
+.orange header .right_link .box .box_drop .box_credit ,
+.orange .form.style_1 .row.saldo .left {background: #feb60a;}
+
+.orange header .right_link .box .box_drop a:hover, body.orange.blue header .right_link .box .box_drop a:hover
+{
+    color: #feb60a;
+}
+
+.red header .right_link .box .box_drop .arr{border-bottom:5px solid #c72127; }
+.red header .right_link .box .box_drop .box_credit ,
+.red .form.style_1 .row.saldo .left {background: #c72127;}
+
+.red header .right_link .box .box_drop a:hover, body.home.red header .right_link .box .box_drop a:hover
+{
+    color: #c72127;
+}
+
+.green header .right_link .box .box_drop .arr{border-bottom:5px solid #129d4a; }
+.green header .right_link .box .box_drop .box_credit ,
+.green .form.style_1 .row.saldo .left {background: #129d4a;}
+
+.green header .right_link .box .box_drop a:hover, body.home.green header .right_link .box .box_drop a:hover
+{
+    color: #129d4a;
+}
+
+/* footer nav */
+
+.not-front #block-menu-menu-sidebar2 ul li a, 
+.not-front #block-menu-menu-sidebar2 ul li a.active, 
+.not-front #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #105c8c;
+}
+
+.blue #block-menu-menu-sidebar2 ul li a, 
+.blue #block-menu-menu-sidebar2 ul li a.active, 
+.blue #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #105c8c;
+}
+
+.green #block-menu-menu-sidebar2 ul li a, 
+.green #block-menu-menu-sidebar2 ul li a.active, 
+.green #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #129d4a;
+}
+
+
+.red #block-menu-menu-sidebar2 ul li a, 
+.red #block-menu-menu-sidebar2 ul li a.active, 
+.red #block-menu-menu-sidebar2 ul li a:hover
+{
+	color: #c72127;
+}

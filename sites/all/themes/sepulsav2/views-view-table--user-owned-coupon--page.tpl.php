@@ -35,7 +35,7 @@
                 <h3><?php print $row['title']; ?></h3>
                 <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
                 <h5><?php print t('Syarat & Ketentuan'); ?></h5>
-                <?php print $row['field_coupon_tnc']; ?>
+                <div class="tnc_desc"><?php print $row['field_coupon_tnc']; ?></div>
             </div>
         </div>
     </div>

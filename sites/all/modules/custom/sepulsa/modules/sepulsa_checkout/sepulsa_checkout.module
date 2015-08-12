@@ -111,7 +111,7 @@ function sepulsa_checkout_completion_message_message($order, $format = NULL) {
 
 /**
  * Implements hook_form_FORM_ID_alter() for commerce_checkout_form_checkout().
- * 
+ *
  * Adding additional fee text.
  */
 function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$form_state, $form_id) {
@@ -119,15 +119,17 @@ function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$f
   if ($rules_config->active == True) {
     $order = $form_state['order'];
     $selected_payment_method = $form['commerce_payment']['payment_method']['#default_value'];
-  
+
     if ($selected_payment_method == 'bank_transfer|commerce_payment_bank_transfer') {
       $campaign = $order->payment_methods['bank_transfer|commerce_payment_bank_transfer']['settings']['sepulsa_campaign'];
       global $user;
       $additional_fee = substr(commerce_cart_order_id($user->uid), -3);
-      
+
+      /*
       $form['commerce_payment']['payment_details']['sepulsa_campaign'] = array(
         '#markup' => check_markup($campaign['value'], $campaign['format'])."<b style='color:red;'>".t("Additional Fee : Rp. ").$additional_fee."</b>",
       );
+      */
     }
   }
   drupal_add_js(drupal_get_path('module', 'sepulsa_checkout') . '/sepulsa_checkout.form.js', 'file');

@@ -2652,7 +2652,7 @@ section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotom
     height: 150px;
 }
 
-.btn.disabled, .btn[disabled], fieldset[disabled]
+.btn.disabled, .btn[disabled], fieldset[disabled], .form-button-disabled, input:disabled, button:disabled
 {
     cursor: not-allowed;
     pointer-events: none;

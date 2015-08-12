@@ -2059,7 +2059,9 @@ section.transaction .form-item, .form-actions
     display: none;
 }
 
-.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, 
+.commerce_coupon #edit-commerce-coupon-coupon-add, 
+.commerce_coupon #edit-commerce-coupon-coupon-add--4
 {
     float: left;
     width: 178px;
@@ -2073,7 +2075,8 @@ section.transaction .form-item, .form-actions
 }
 
 .commerce_coupon #edit-commerce-coupon-coupon-code, 
-.commerce_coupon #edit-commerce-coupon-coupon-code--2
+.commerce_coupon #edit-commerce-coupon-coupon-code--2, 
+.commerce_coupon #edit-commerce-coupon-coupon-code--4
 {
     width: 400px;
     padding: 0 15px;

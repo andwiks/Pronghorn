@@ -2,8 +2,8 @@
     <div class="box_popup login">
         <a href="" class="close"><img src="<?php print $theme_path; ?>/images/material/close_pop.png" alt="close" /></a>
         <div class="wrapper after_clear">
-            <h2>Log In dengan akun Sepulsa.</h2>
-            <h6>Selamat datang! Masukan password anda untuk masuk ke akun.</h6>
+            <h2><?php print t('Log In dengan akun Sepulsa.'); ?></h2>
+            <h6><?php print t('Selamat datang! Masukan password anda untuk masuk ke akun.'); ?></h6>
             <span class="border"></span>
             <div class="left form">
                 <?php $elements = drupal_get_form('user_login_block'); ?>
@@ -17,8 +17,8 @@
             <div class="right">
               <?php print drupal_render($hybridauth); ?>
               <p>
-                  Belum punya akun Sepulsa?
-                  <a href="<?php print url('user/register'); ?>">Click disini</a> untuk buat akun.
+                  <?php print t('Belum punya akun Sepulsa?'); ?>
+                  <a href="<?php print url('user/register'); ?>"><?php print t('Klik disini'); ?></a> <?php print t('untuk buat akun.'); ?>
               </p>
             </div>
         </div>
@@ -34,10 +34,9 @@
             <h4></h4>
 
             <div class="redeem">
-                <h6>REEDEM Voucher kamu</h6>
+                <h6><?php print t('REEDEM Voucher kamu'); ?></h6>
                 <span>
-                    Kode akan dicheck dan diisi oleh pihak merchant yang tertera di kupon.
-                    Tunjukan halaman ini, dan reedem voucher kamu.
+                    <?php print t('Kode akan dicheck dan diisi oleh pihak merchant yang tertera di kupon. Tunjukan halaman ini, dan reedem voucher kamu.'); ?>
                 </span>
                 <div class="form">
                   <?php $form = drupal_get_form('offline_coupon_redeem_form', 0); ?>

@@ -42,8 +42,8 @@ $total = commerce_line_items_total($line_items);
         <table>
             <thead>
                 <tr>
-                    <th>Order</th>
-                    <th colspan="2">Harga</th>
+                    <th><?php print t('Order'); ?></th>
+                    <th colspan="2"><?php print t('Harga'); ?></th>
                 </tr>
             </thead>
             <?php if ($rows): ?>
@@ -63,17 +63,17 @@ $total = commerce_line_items_total($line_items);
             <?php endif; ?>
             <tfoot>
                 <tr>
-                    <th>TOTAL PAYMENT</th>
+                    <th><?php print t('TOTAL PAYMENT'); ?></th>
                     <th colspan="2">
                         <?php print number_format($total['amount'], 0, ".", ","); ?> IDR
-                        <a href="<?php print url("checkout"); ?>" class="add_bt">Proses</a>
+                        <a href="<?php print url("checkout"); ?>" class="add_bt"><?php print t('Proses'); ?></a>
                     </th>                            
                 </tr>
             </tfoot>
         </table>
         <p>
-            * Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
-            * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!
+            <?php print t('* Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
+            * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!'); ?>
         </p>
     </div>
 

@@ -1,18 +1,6 @@
 <?php
 /**
  * @file
- * page--checkout.tpl.php
- *
- * @author ananto@sepulsa.com
- * @since February 8th 2015.
- */
-
-global $base_url;
-
-?>
-<?php
-/**
- * @file
  * page.tpl.php
  *
  * @author dwi@sepulsa.com

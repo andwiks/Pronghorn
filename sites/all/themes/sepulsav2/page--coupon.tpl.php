@@ -3,8 +3,8 @@
  * @file
  * page.tpl.php
  *
- * @author ananto@sepulsa.com
- * @since January 27th 2015.
+ * @author dwi@sepulsa.com
+ * @since July, 23th 2015.
  */
 
 global $base_url;
@@ -29,16 +29,16 @@ $theme_path = $base_url . '/' . path_to_theme();
             <div class="grid_promo_bank">
                 <?php print render($page['promo']); ?>
             </div>
-            <div class="atau"><span>atau</span></div>
-            <a href="<?php print url("checkout"); ?>" class="bt_next" >LANJUT KE PEMBAYARAN</a>
+            <div class="atau"><span><?php print t('atau'); ?></span></div>
+            <a href="<?php print url("checkout"); ?>" class="bt_next" ><?php print t('LANJUT KE PEMBAYARAN'); ?></a>
         </div>
         <div class="clear"></div>
 
         <div class="wrapper_2">
-            <h2>PILIH VOUCHER YANG KAMU SUKA</h2>
+            <h2><?php print t('PILIH VOUCHER YANG KAMU SUKA'); ?></h2>
             <h5>
-                Saat ini kamu memilih untuk melakukan pembayaran dengan kartu kredit BCA,<br/>
-                kamu bisa memilih tambahan 2 Voucher Diskon Special.
+                <?php print t('Saat ini kamu memilih untuk melakukan pembayaran dengan kartu kredit BCA,<br/>
+                kamu bisa memilih tambahan 2 Voucher Diskon Special.'); ?>
                 <span class="border"></span>
             </h5>
         </div> 
@@ -58,13 +58,3 @@ $theme_path = $base_url . '/' . path_to_theme();
 
 
 </section>
-
-<script>
-/*$( document ).ready(function() {
-
-$( document ).click(function() {
-  $( ".grid_voucher_order" ).effect( "shake" );
-});
- 
-});*/
-</script>

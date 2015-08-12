@@ -2,7 +2,7 @@
   <section class="h_middle_top">
     <div class="wrapper">
       <div class="voucher_vendor">
-         <h3><span class="ico"></span>voucher VENDOR :</h3>
+         <h3><span class="ico"></span><?php print t('voucher VENDOR') ?> :</h3>
          <div class="slider">
           <?php print $content ?>
          </div>

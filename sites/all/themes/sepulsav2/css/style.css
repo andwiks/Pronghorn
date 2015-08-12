@@ -2968,6 +2968,7 @@ header .right_link .box .box_drop a:hover
 #frameBlog .view-blog .views-row .views-field-body
 {
     clear: both;
+    padding-top:10px;
 }
 
 #frameBlog .view-blog .views-row .views-field-body p

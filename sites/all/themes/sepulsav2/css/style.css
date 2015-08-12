@@ -3037,3 +3037,62 @@ header .right_link .box .box_drop a:hover
 {
     background: #129d4a;
 }
+
+section.std_content .akun div.description
+{
+    margin-bottom: 10px;
+}
+
+section.std_content .akun .c_right .hybridauth-widget-wrapper
+{
+    margin-top: 40px;
+}
+
+section.std_content .akun .c_right .form-actions input[type=submit], 
+section.std_content .akun .c_right .form-actions input[type=button]
+{
+    display: block;
+    background: #c72127;
+    color: #FFF;
+    padding: 15px 0;
+    margin: 10px 0 0;
+    text-align: center;
+    font-size: 18px;
+    width: 30%;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+#commerce-checkout-coupon-ajax-wrapper table tr td, 
+#commerce-checkout-coupon-ajax-wrapper table tr th {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px dashed #b0b0b0;
+    font-size: 16px;
+    text-align: left;
+}
+
+#commerce-checkout-coupon-ajax-wrapper table tr th {
+    background-color: #105c8c;
+    color: #fff;
+}
+
+#commerce-checkout-coupon-ajax-wrapper table
+{
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #105c8c;
+    margin-top: 5px;
+}
+
+#commerce-checkout-coupon-ajax-wrapper table tr td .item-list ul li
+{
+    text-align: left;
+}
+
+#commerce-checkout-coupon-ajax-wrapper table tr td.views-field-remove-from-order
+{
+    text-align: center;
+}

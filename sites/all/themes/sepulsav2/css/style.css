@@ -2812,6 +2812,9 @@ header .right_link .box .box_drop .arr{border-bottom:5px solid #105c8c; }
 header .right_link .box .box_drop .box_credit ,
 .form.style_1 .row.saldo .left {background: #105c8c;}
 
+header .right_link .box.lang .box_drop
+{border-color: #105c8c;  color: #105c8c;}
+
 header .right_link .box .box_drop a:hover
 {
     color: #105c8c;
@@ -2820,6 +2823,9 @@ header .right_link .box .box_drop a:hover
 .home header .right_link .box .box_drop .arr{border-bottom:5px solid #fdb50a; }
 .home header .right_link .box .box_drop .box_credit ,
 .home .form.style_1 .row.saldo .left {background: #fdb50a;}
+
+.home header .right_link .box.lang .box_drop
+{border-color: #fdb50a;  color: #fdb50a;}
 
 .home header .right_link .box .box_drop a:hover
 {

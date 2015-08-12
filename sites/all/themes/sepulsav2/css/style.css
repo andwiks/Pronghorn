@@ -2688,9 +2688,9 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
 #block-menu-menu-sidebar2 ul li a:hover {
     text-decoration: underline;
 }
-#block-menu-menu-sidebar2 ul li a,  
-#block-menu-menu-sidebar2 ul li a.active,  
-#block-menu-menu-sidebar2 ul li a:hover {
+.home #block-menu-menu-sidebar2 ul li a,  
+.home #block-menu-menu-sidebar2 ul li a.active,  
+.home #block-menu-menu-sidebar2 ul li a:hover {
     color: #feb60a;
 }
 #block-menu-menu-sidebar2 ul li {

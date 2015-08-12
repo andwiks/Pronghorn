@@ -125,11 +125,11 @@ function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$f
       global $user;
       $additional_fee = substr(commerce_cart_order_id($user->uid), -3);
 
-      /*
+      //drupal_set_message("<pre>".print_r($form['commerce_payment']['payment_details'], true)."</pre>");
       $form['commerce_payment']['payment_details']['sepulsa_campaign'] = array(
         '#markup' => check_markup($campaign['value'], $campaign['format'])."<b style='color:red;'>".t("Additional Fee : Rp. ").$additional_fee."</b>",
       );
-      */
+      
     }
   }
   drupal_add_js(drupal_get_path('module', 'sepulsa_checkout') . '/sepulsa_checkout.form.js', 'file');

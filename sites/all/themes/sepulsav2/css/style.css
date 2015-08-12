@@ -2845,20 +2845,21 @@ header .right_link .box .box_drop a:hover
     margin-left: 45px;
 }
 
-#frameBlog #right_column .block-block, #frameBlog #right_column .block-views  {
+#frameBlog #right_column .block-block, #frameBlog #right_column .block-views  
+{
     margin-bottom: 15px;
 }
 
-#frameBlog #right_column .block-block ul {margin: 0 0 22px 45px;}
-#frameBlog #right_column .block-block ul li {display:inline-block; margin: 0 15px 0 0;}
-#frameBlog #right_column .block-block ul li a {display:block; text-indent: -999999px; width: 40px; height: 40px;}
-#frameBlog #right_column .block-block ul li a.sr_fb {background:url('../images/material/sr_scfb.png') no-repeat 0 0;}
-#frameBlog #right_column .block-block ul li a.sr_tw {background:url('../images/material/sr_sctw.png') no-repeat 0 0;}
-#frameBlog #right_column .block-block ul li a.sr_gplus {background:url('../images/material/sr_scgplus.png') no-repeat 0 0;}
-#frameBlog #right_column .block-block ul li a.sr_link {background:url('../images/material/sr_sclink.png') no-repeat 0 0;}
-#frameBlog #right_column .block-block .blsubcribe {margin:0 0 0 45px;}
-#frameBlog #right_column .block-block .blsubcribe h5 {margin:0 0 12px 0;}
-#frameBlog #right_column .block-block .blsubcribe input[type="text"] {
+#frameBlog #right_column #block-block-19 .content ul {margin: 0 0 22px 45px;}
+#frameBlog #right_column #block-block-19 .content ul li {display:inline-block; margin: 0 15px 0 0;}
+#frameBlog #right_column #block-block-19 .content ul li a {display:block; text-indent: -999999px; width: 40px; height: 40px;}
+#frameBlog #right_column #block-block-19 .content ul li a.sr_fb {background:url('../images/material/sr_scfb.png') no-repeat 0 0;}
+#frameBlog #right_column #block-block-19 .content ul li a.sr_tw {background:url('../images/material/sr_sctw.png') no-repeat 0 0;}
+#frameBlog #right_column #block-block-19 .content ul li a.sr_gplus {background:url('../images/material/sr_scgplus.png') no-repeat 0 0;}
+#frameBlog #right_column #block-block-19 .content ul li a.sr_link {background:url('../images/material/sr_sclink.png') no-repeat 0 0;}
+#frameBlog #right_column #block-block-19 .content .blsubcribe {margin:0 0 0 45px;}
+#frameBlog #right_column #block-block-19 .content .blsubcribe h5 {margin:0 0 12px 0;}
+#frameBlog #right_column #block-block-19 .content .blsubcribe input[type="text"] {
     float:left;
     width: 225px;
     border:1px solid #7b8793;
@@ -2869,7 +2870,8 @@ header .right_link .box .box_drop a:hover
     -moz-border-radius: 4px 0 0 4px;
     -webkit-border-radius:4px 0 0 4px;
 }
-#frameBlog #right_column .block-block .blsubcribe input[type="submit"] {
+
+#frameBlog #right_column #block-block-19 .content .blsubcribe input[type="submit"] {
     float:left;
     background:#129d4a;
     border:none;
@@ -2888,7 +2890,7 @@ header .right_link .box .box_drop a:hover
     -moz-transition:all .15s ease-in-out;
     -webkit-transition:all .15s ease-in-out;
 }
-#frameBlog #right_column .block-block .blsubcribe input[type="submit"]:hover {
+#frameBlog #right_column .block-block .content .blsubcribe input[type="submit"]:hover {
     background:#c72127;
 }
 
@@ -2986,7 +2988,7 @@ header .right_link .box .box_drop a:hover
     clear: both;
 }
 
-#frameBlog .view-blog .views-row .blog-readmore
+#frameBlog .view-blog .views-row .blog-readmore, #frameBlog .view-blog .views-row .blog-readmore a
 {
     /*float: right;*/
     display: block;
@@ -3004,4 +3006,34 @@ header .right_link .box .box_drop a:hover
     transition: all .15s ease-in-out;
     -moz-transition: all .15s ease-in-out;
     -webkit-transition: all .15s ease-in-out;
+}
+
+#frameBlog #right_column #block-block-18
+{
+    margin-top:50px;
+}
+
+#frameBlog #right_column #block-block-18 .content a.bt_beli
+{
+    display: block;
+    padding: 10px;
+    height: 40px;
+    line-height: 40px;
+    background: #c72127;
+    color: #fff;
+    font-size: 18px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    transition: all .25s ease-out;
+    -moz-transition: all .25s ease-out;
+    -webkit-transition: all .25s ease-out;
+}
+
+#frameBlog #right_column #block-block-18 .content a.bt_beli:hover
+{
+    background: #129d4a;
 }

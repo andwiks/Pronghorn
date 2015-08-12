@@ -2061,7 +2061,8 @@ section.transaction .form-item, .form-actions
 
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, 
 .commerce_coupon #edit-commerce-coupon-coupon-add, 
-.commerce_coupon #edit-commerce-coupon-coupon-add--4
+.commerce_coupon #edit-commerce-coupon-coupon-add--4, 
+.commerce_coupon input[name='coupon_add'] 
 {
     float: left;
     width: 178px;
@@ -2076,7 +2077,8 @@ section.transaction .form-item, .form-actions
 
 .commerce_coupon #edit-commerce-coupon-coupon-code, 
 .commerce_coupon #edit-commerce-coupon-coupon-code--2, 
-.commerce_coupon #edit-commerce-coupon-coupon-code--4
+.commerce_coupon #edit-commerce-coupon-coupon-code--4, 
+.commerce_coupon input[name='commerce_coupon[coupon_code]'] 
 {
     width: 400px;
     padding: 0 15px;
@@ -3101,4 +3103,13 @@ section.std_content .akun .c_right .form-actions input[type=button]
 #commerce-checkout-coupon-ajax-wrapper table tr td.views-field-remove-from-order
 {
     text-align: center;
+}
+
+ul.tnc {
+    list-style: decimal;
+    margin-left: 20px;
+}
+
+ul.tnc li {
+    margin-bottom: 10px;
 }

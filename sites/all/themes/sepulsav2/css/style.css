@@ -3102,3 +3102,12 @@ section.std_content .akun .c_right .form-actions input[type=button]
 {
     text-align: center;
 }
+
+ul.tnc {
+    list-style: decimal;
+    margin-left: 20px;
+}
+
+ul.tnc li {
+    margin-bottom: 10px;
+}

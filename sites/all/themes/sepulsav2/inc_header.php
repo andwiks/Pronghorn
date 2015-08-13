@@ -50,7 +50,7 @@ global $base_url, $user, $language;
                             <a href="<?php print url('user/orders'); ?>"><?php print t('Order Transaksi'); ?></a>
                             <a href="<?php print url('user/token'); ?>"><?php print t('Info Kartu'); ?></a>
                             <a href="<?php print url('user/wallet'); ?>"><?php print t('Dompet Saya'); ?></a>
-                            <a href="akun_voucher.php"><?php print t('Voucher Diskon'); ?></a>
+                            <a href="<?php print url('user/orders'); ?>"><?php print t('Voucher Diskon'); ?></a>
                             <a href="<?php print url("konfirmasi"); ?>"><?php print t('Konfirmasi Pembayaran'); ?></a>
                             <a href="<?php print url("user/logout"); ?>"><?php print t('KELUAR'); ?></a>
                             <div class="m_lang">

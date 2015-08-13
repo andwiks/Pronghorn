@@ -18,7 +18,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <h3><?php print $row['title']; ?></h3>
                 <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
                 <h5><?php print t('Syarat & Ketentuan'); ?></h5>
-                <div class="tnc_desc"><?php print $row['field_coupon_tnc']; ?></dev>
+                <div class="tnc_desc"><?php print $row['field_coupon_tnc']; ?></div>
             </div>
         </div>
     </div>
@@ -27,8 +27,7 @@ $theme_path = $base_url . '/' . path_to_theme();
             <a href="" class="close style_1" onclick="hidepopup('detail_voucher<?php print $row['nid']; ?>'); return false;"><img src="<?php print $theme_path; ?>/images/material/close_popup.png" alt="close" /></a>
             <div class="content_pop">
                 <h3><?php print $row['title']; ?></h3>
-                <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" />
-                </div>
+                <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
                 <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
 
                 <div class="redeem">
@@ -43,8 +42,6 @@ $theme_path = $base_url . '/' . path_to_theme();
                 </div>
 
                 <h5><?php print $row['field_coupon_tnc']; ?></h5>
-                <p>
-                </p>
             </div>
             <div class="nav_pop">
                 <a href="" class="prev"><</a> 

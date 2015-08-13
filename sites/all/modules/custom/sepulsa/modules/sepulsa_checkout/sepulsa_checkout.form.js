@@ -1,7 +1,11 @@
 (function($) {
   $(document).ready(function() {
     if($("body.not-logged-in").length){
-      $("form#commerce-checkout-form-checkout input[name=op]").attr("disabled", "disabled");
+      if ($("#edit-account-login-mail").val() > "0") {
+
+      } else {
+        $("form#commerce-checkout-form-checkout input[name=op]").attr("disabled", "disabled");
+      }
     }
 
     $("#edit-account-login-mail").on("input propertychange paste", function (event) {

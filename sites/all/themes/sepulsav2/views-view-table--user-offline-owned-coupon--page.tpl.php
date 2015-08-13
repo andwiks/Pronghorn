@@ -53,11 +53,11 @@ $theme_path = $base_url . '/' . path_to_theme();
 </div>
 <script type="text/javascript">
 function showpopup(id) {
-    document.getElementById(id).style.display = 'block';
+  $('#detail_voucher' + id).show();
 }
 
 function hidepopup(id) {
-    document.getElementById(id).style.display = 'none';
+  $('#detail_voucher' + id).hide();
 }
 </script>
 

@@ -5,14 +5,14 @@ function userpoints_sepulsa_menu() {
 	'title'            => t('Kredit'),
 	'description'      => t('Kredit'),
 	'page callback'    => 'userpoints_transaction_list',
-	'access arguments' => array('administer site configuration'),
+	'access arguments' => array('view userpoints'),
 	'type'             => MENU_NORMAL_ITEM,
   );
   $items['admin/people/kredit/%/detail'] = array(
 	'title'            => t('Kredit Detail'),
 	'description'      => t('Kredit Detail'),
 	'page callback'    => 'userpoints_transaction_detail',
-	'access arguments' => array('administer site configuration'),
+	'access arguments' => array('view userpoints'),
 	'type'             => MENU_NORMAL_ITEM,
   );
   return $items;
@@ -46,11 +46,11 @@ function userpoints_sepulsa_theme($existing, $type, $theme, $path) {
       )
     );
 }
-    
+
 // Override Point Tab from Userpoints Module
 function userpoints_sepulsa_menu_alter(&$items) {
     unset($items['user/%user/points']);
-    
+
     $items['user/%user/points'] = array(
         'title' => 'Sepulsa Kredit',
         'title arguments' => userpoints_translation(),
@@ -143,7 +143,7 @@ function userpoints_sepulsa_user_view_alter(&$build) {
 
 function userpoints_transaction_list() {
   $header = array("Email", "Points", "Detail");
-  
+
   $query = "SELECT a.uid, b.mail FROM userpoints a, users b WHERE a.uid=b.uid GROUP BY uid";
   $result = db_query($query);
   foreach ($result as $row) {
@@ -154,7 +154,7 @@ function userpoints_transaction_list() {
 	}
   }
   $return = theme('table', array("header" => $header, "rows" =>$rows));
-  
+
   return $return;
 }
 
@@ -175,11 +175,11 @@ function userpoints_transaction_detail() {
   foreach ($up as $row) {
 	$rows[] = array(number_format($row['data'][0]['data'],0,",","."), $row['data'][1]['data'], $row['data'][2]['data'], $row['data'][3]['data'], $row['data'][4]['data']);
   }
-  
+
   $totalamount = userpoints_get_current_points($user_uid, 'all');
   $totalamount = number_format($totalamount,0,",",".");
   $return = 'TOTAL POINT: <strong>'.$totalamount.'</strong>';
   $return .= theme('table', array("header" => $header, "rows" =>$rows));
-  
+
   return $return;
 }

@@ -11,7 +11,7 @@ $theme_path = $base_url . '/' . path_to_theme();
     <div class="box_voucher">
         <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
         <span class="date"><?php print $row['field_owned_coupon_expiry']; ?></span>
-        <a href="" class="detail" onclick="showpopup('detail_voucher<?php print $row['nid']; ?>'); return false;"><?php print t('lihat detail'); ?> ></a>
+        <a href="" class="detail"><?php print t('lihat detail'); ?> ></a>
         <div class="data_popup" id="<?php print $row['nid']; ?>">
             <div class="img"><?php print $row['field_coupon_product_image']; ?></div>
             <div class="desc">
@@ -24,7 +24,7 @@ $theme_path = $base_url . '/' . path_to_theme();
     </div>
     <div class="wrap_popup voucher" id="detail_voucher<?php print $row['nid']; ?>">
         <div class="box_popup">
-            <a href="" class="close style_1" onclick="hidepopup('detail_voucher<?php print $row['nid']; ?>'); return false;"><img src="<?php print $theme_path; ?>/images/material/close_popup.png" alt="close" /></a>
+            <a href="" class="close style_1"><img src="<?php print $theme_path; ?>/images/material/close_popup.png" alt="close" /></a>
             <div class="content_pop">
                 <h3><?php print $row['title']; ?></h3>
                 <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
@@ -52,12 +52,15 @@ $theme_path = $base_url . '/' . path_to_theme();
 <?php endforeach; ?>
 </div>
 <script type="text/javascript">
-function showpopup(id) {
-  $('#detail_voucher' + id).show();
-}
-
-function hidepopup(id) {
-  $('#detail_voucher' + id).hide();
-}
+(function () {
+  $('.box_voucher').click(function() {
+    $(this).next().show();
+  });
+  
+  $('.close').click(function() {
+    $('.wrap_popup voucher').hide();
+  });
+}());
+  
 </script>
 

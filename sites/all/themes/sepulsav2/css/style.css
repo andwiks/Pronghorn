@@ -1377,7 +1377,7 @@ section.transaction .thanks_page p a{color:#105c8c;text-decoration: underline;}
 .wrap_popup.voucher .nav_pop a.prev{float: left;background-position: left center;}
 .wrap_popup.voucher .nav_pop a.next{float: right;background-position:right center;}
 .wrap_popup.voucher .redeem{
-    display: none;
+    display: block;
     padding: 20px 0 ;
     border-top:1px dashed #CCC;
     border-bottom:1px dashed #CCC;

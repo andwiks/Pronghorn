@@ -3284,3 +3284,9 @@ section.transaction table.cart br
 {
     line-height: 1.5;
 }
+
+#edit-cancel {
+    background: none !important;
+    pointer-events: auto;
+    cursor: pointer;
+}

@@ -2951,7 +2951,8 @@ header .right_link .box .box_drop a:hover
         padding-top: 4px;
     }
 
-#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a
+#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a, 
+#frameBlog h2, #frameBlog h2 a
 {
     color: #535353;
     font-size: 28px;

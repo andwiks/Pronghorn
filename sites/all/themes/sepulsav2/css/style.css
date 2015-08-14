@@ -3193,3 +3193,52 @@ section.transaction .alert-warning
     background: yellow;
     color:#424143;
 }
+
+section.std
+{
+    z-index: 3;
+}
+
+.wrap_popup.voucher .redeem .form input[type=text]
+{
+    width: 90%;
+    height: 50px;
+    padding: 0 15px;
+    margin: 10px 0;
+    font-size: 13px;
+    border-color: #d8d8d8;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+.wrap_popup.voucher .redeem .form input[type=submit], 
+.wrap_popup.voucher .redeem .form input[type=button]
+{
+    padding: 15px 30px;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    background: #c72127;
+    border: none;
+    color: #FFF;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+.content_pop ul.tnc li
+{
+    text-align: left;
+    font-size: 12px;
+    font-family: "robotolight";
+}
+
+section.std_content .akun .box_popup .content_pop p {
+    margin: 10px 0 15px;
+    line-height: 1.5;
+}

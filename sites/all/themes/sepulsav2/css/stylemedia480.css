@@ -651,3 +651,14 @@ section.std_content .voucher .c_left
     margin: 0 auto;
     display: block;
 }
+
+
+.voucher
+{
+    width:100%;
+}
+
+.wrap_popup.voucher .box_popup
+{
+    width:95%;
+}

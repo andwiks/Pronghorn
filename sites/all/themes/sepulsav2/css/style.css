@@ -3180,15 +3180,15 @@ padding: 0;
 @media (max-width:991px) and (min-width:601px){.w3-hide-medium{display:none !important;}}
 @media (min-width:992px){.w3-hide-large{display:none !important;}}
 
-section.transaction .alert-success
+.alert-success
 {    
     background: green;
 }
-section.transaction .alert-error
+.alert-error
 {
     background: red;    
 }
-section.transaction .alert-warning
+.alert-warning
 {
     background: yellow;
     color:#424143;

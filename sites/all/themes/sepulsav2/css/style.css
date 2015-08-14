@@ -3242,3 +3242,40 @@ section.std_content .akun .box_popup .content_pop p {
     margin: 10px 0 15px;
     line-height: 1.5;
 }
+
+.hybridauth-widget-wrapper ul.hybridauth-widget li.first
+{
+    margin-bottom: 10px;
+}
+
+section.std_content .akun .c_right .user-form-login
+{
+    width: 50%;
+    float: left;
+}
+
+section.std_content .akun .c_right .user-form-connect
+{
+    border-left: 1px dashed #CCC;
+    width: 45%;
+    float: left;
+    padding-left: 4%;
+    color: #666;
+}
+
+section.std_content .akun .c_right .hybridauth-widget-wrapper
+{
+    margin-top: 0;
+}
+
+section.std_content .akun .c_right .user-form-login input, 
+section.std_content .akun .c_right .user-form-login textarea, 
+section.std_content .akun .c_right .user-form-login select
+{
+    width:90%;
+}
+
+section.std_content .akun .c_right .user-form-login .form-actions
+{
+    margin-top:15px;
+}

@@ -24,8 +24,13 @@
       <?php print $messages; ?>
       <?php $hybridauth = $page['content']['system_main']['hybridauth']; ?>
       <?php unset($page['content']['system_main']['hybridauth']); ?>
-      <?php print render($page['content']); ?>
-      <?php print render($hybridauth); ?>
+      <div class="user-form-login">
+        <?php print render($page['content']); ?>
+      </div>
+      <div class="user-form-connect">
+        <p>Atau gunakan:</p>
+        <?php print render($hybridauth); ?>
+      </div>
     </div>
   </div>
 </section>

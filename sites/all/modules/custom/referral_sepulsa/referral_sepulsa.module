@@ -90,13 +90,10 @@ function referral_sepulsa_form_alter(&$form, $form_state, $form_id) {
 			$arg0 = arg(0);
 			$arg1 = arg(1);
 			if ($arg0 == 'user' && $arg1 == 'register') {
-				//$_SESSION['messages'] = array();
 				$cookie = unserialize($_COOKIE[REFERRAL_COOKIE]);
 				$user = user_load($cookie['uid']);
 				$title = 'Anda diundang bergabung oleh '.$user->mail;
 				drupal_set_title($title);
-				//drupal_set_message($form_id);
-				//drupal_set_message($title, 'error');
 			}
     }
   }

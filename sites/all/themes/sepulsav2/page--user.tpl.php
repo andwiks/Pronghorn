@@ -18,7 +18,7 @@
 
     <div class="c_right">
       <?php if ($title): ?>
-        <h2><?php print $title ?></h2>
+        <h2><?php print decode_entities($title); ?></h2>
       <?php endif; ?>
 
       <?php print $messages; ?>

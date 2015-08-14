@@ -3317,3 +3317,8 @@ section.std_content .akun .form.akun #edit-language
 {
     margin-right: 15px;
 }
+
+section.std_content
+{
+    z-index:3;
+}

@@ -134,7 +134,7 @@ function referral_list(){
 	$order_id = '';
 	$date_txn = '';
 	$referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
-	drupal_set_message($referral_link);
+	//drupal_set_message($referral_link);
 	// referral share - start
 	/*$logo = theme_get_setting('logo');
 	$inline_script = '<meta property="og:image" content="'.$logo.'" />';

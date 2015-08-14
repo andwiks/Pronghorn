@@ -3182,16 +3182,16 @@ padding: 0;
 
 .alert-success
 {    
-    background: green;
+    background: green !important;
 }
 .alert-error
 {
-    background: red;    
+    background: red !important;    
 }
 .alert-warning
 {
-    background: yellow;
-    color:#424143;
+    background: yellow !important;
+    color:#424143 !important;
 }
 
 section.std

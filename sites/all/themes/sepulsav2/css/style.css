@@ -3290,3 +3290,30 @@ section.transaction table.cart br
     pointer-events: auto;
     cursor: pointer;
 }
+
+section.std_content .akun .form.akun input[type=password]
+{
+    width: 428px;
+}
+
+section.std_content .akun .form.akun #edit-locale
+{
+    border: 1px solid #d8d8d8;
+    padding: 15px;
+    width: 428px;
+}
+
+section.std_content .akun .form.akun label[for="edit-language"]
+{
+    display: none;
+}
+
+section.std_content .akun .form.akun label.option
+{
+    margin-right: 15px;
+}
+
+section.std_content .akun .form.akun #edit-language
+{
+    margin-right: 15px;
+}

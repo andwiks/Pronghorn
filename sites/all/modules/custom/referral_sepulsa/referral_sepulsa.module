@@ -87,10 +87,12 @@ function referral_sepulsa_user_view_alter(&$build) {
 function referral_sepulsa_form_alter(&$form, $form_state, $form_id) {
   if ($form_id == 'user_register_form') {
     if (isset($_COOKIE[REFERRAL_COOKIE])) {
-        $cookie = unserialize($_COOKIE[REFERRAL_COOKIE]);
-        $user = user_load($cookie['uid']);
-        $title = 'Anda diundang bergabung oleh '.$user->mail;
-        drupal_set_title($title);
+			$cookie = unserialize($_COOKIE[REFERRAL_COOKIE]);
+			$user = user_load($cookie['uid']);
+			$title = 'Anda diundang bergabung oleh '.$user->mail;
+			//drupal_set_title($title);
+			//drupal_set_message($form_id);
+			drupal_set_message($title);
     }
   }
 }
@@ -129,7 +131,8 @@ function referral_list(){
 	$referral_list = array();
 	$order_id = '';
 	$date_txn = '';
-	
+	$referral_link = url('referral/'. _referral_uid2ref($user->uid), array('query' => NULL, 'fragment' => NULL, 'absolute' => TRUE));
+	drupal_set_message($referral_link);
 	// referral share - start
 	/*$logo = theme_get_setting('logo');
 	$inline_script = '<meta property="og:image" content="'.$logo.'" />';
@@ -174,8 +177,8 @@ function referral_list(){
 	// get referral list - end
 	
 	$content['referral_list'] = $referral_list;
-	$content['referral_link'] = $referral_link;
-	$content['path_to_theme'] = $path_to_theme;
+	//$content['referral_link'] = $referral_link;
+	//$content['path_to_theme'] = $path_to_theme;
 	
   return theme('referral_list', array('content' => $content));
 }

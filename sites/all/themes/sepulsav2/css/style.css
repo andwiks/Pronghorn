@@ -3279,3 +3279,8 @@ section.std_content .akun .c_right .user-form-login .form-actions
 {
     margin-top:15px;
 }
+
+section.transaction table.cart br
+{
+    line-height: 1.5;
+}

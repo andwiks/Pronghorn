@@ -649,3 +649,13 @@ section.std_content .akun .c_right nav a
     margin: 0 auto;
     display: block;
 }
+
+.voucher
+{
+    width:100%;
+}
+
+.wrap_popup.voucher .box_popup
+{
+    width:95%;
+}

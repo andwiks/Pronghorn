@@ -2652,7 +2652,8 @@ section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotom
     height: 150px;
 }
 
-.btn.disabled, .btn[disabled], fieldset[disabled]
+.btn.disabled, .btn[disabled], fieldset[disabled], input[type=submit][disabled=disabled],
+button[disabled=disabled]
 {
     cursor: not-allowed;
     pointer-events: none;
@@ -3178,3 +3179,146 @@ padding: 0;
 @media (max-width:600px){.w3-hide-small{display:none !important;}}
 @media (max-width:991px) and (min-width:601px){.w3-hide-medium{display:none !important;}}
 @media (min-width:992px){.w3-hide-large{display:none !important;}}
+
+.alert-success
+{    
+    background: green !important;
+}
+.alert-error
+{
+    background: red !important;    
+}
+.alert-warning
+{
+    background: yellow !important;
+    color:#424143 !important;
+}
+
+section.std
+{
+    z-index: 3;
+}
+
+.wrap_popup.voucher .redeem .form input[type=text]
+{
+    width: 90%;
+    height: 50px;
+    padding: 0 15px;
+    margin: 10px 0;
+    font-size: 13px;
+    border-color: #d8d8d8;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+.wrap_popup.voucher .redeem .form input[type=submit], 
+.wrap_popup.voucher .redeem .form input[type=button]
+{
+    padding: 15px 30px;
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    background: #c72127;
+    border: none;
+    color: #FFF;
+    border-radius: 7px;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+}
+
+.content_pop ul.tnc li
+{
+    text-align: left;
+    font-size: 12px;
+    font-family: "robotolight";
+}
+
+section.std_content .akun .box_popup .content_pop p {
+    margin: 10px 0 15px;
+    line-height: 1.5;
+}
+
+.hybridauth-widget-wrapper ul.hybridauth-widget li.first
+{
+    margin-bottom: 10px;
+}
+
+section.std_content .akun .c_right .user-form-login
+{
+    width: 50%;
+    float: left;
+}
+
+section.std_content .akun .c_right .user-form-connect
+{
+    border-left: 1px dashed #CCC;
+    width: 45%;
+    float: left;
+    padding-left: 4%;
+    color: #666;
+}
+
+section.std_content .akun .c_right .hybridauth-widget-wrapper
+{
+    margin-top: 0;
+}
+
+section.std_content .akun .c_right .user-form-login input, 
+section.std_content .akun .c_right .user-form-login textarea, 
+section.std_content .akun .c_right .user-form-login select
+{
+    width:90%;
+}
+
+section.std_content .akun .c_right .user-form-login .form-actions
+{
+    margin-top:15px;
+}
+
+section.transaction table.cart br
+{
+    line-height: 1.5;
+}
+
+#edit-cancel {
+    background: none !important;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+section.std_content .akun .form.akun input[type=password]
+{
+    width: 428px;
+}
+
+section.std_content .akun .form.akun #edit-locale
+{
+    border: 1px solid #d8d8d8;
+    padding: 15px;
+    width: 428px;
+}
+
+section.std_content .akun .form.akun label[for="edit-language"]
+{
+    display: none;
+}
+
+section.std_content .akun .form.akun label.option
+{
+    margin-right: 15px;
+}
+
+section.std_content .akun .form.akun #edit-language
+{
+    margin-right: 15px;
+}
+
+section.std_content
+{
+    z-index:3;
+}

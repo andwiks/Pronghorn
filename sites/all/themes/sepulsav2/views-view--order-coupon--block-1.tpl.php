@@ -31,7 +31,7 @@
 
 <?php if ($rows): ?>
   <div class="heading-box">
-    <div class="row">
+    <div class="w3-row complete-coupon" style="width: 80%; margin: 0 auto;">
       <?php print $rows; ?>
     </div>
   </div>

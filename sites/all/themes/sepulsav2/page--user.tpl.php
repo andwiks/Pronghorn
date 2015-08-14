@@ -22,7 +22,10 @@
       <?php endif; ?>
 
       <?php print $messages; ?>
+      <?php $hybridauth = $page['content']['system_main']['hybridauth']; ?>
+      <?php unset($page['content']['system_main']['hybridauth']); ?>
       <?php print render($page['content']); ?>
+      <?php print render($hybridauth); ?>
     </div>
   </div>
 </section>

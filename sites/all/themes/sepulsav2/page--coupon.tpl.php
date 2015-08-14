@@ -11,7 +11,7 @@ global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
 ?>
 
-<?php drupal_add_js('http://code.jquery.com/ui/1.11.4/jquery-ui.js', array(
+<?php drupal_add_js('https://code.jquery.com/ui/1.11.4/jquery-ui.js', array(
   'type' => 'external',
   'scope' => 'footer',
   'group' => JS_THEME,
@@ -23,7 +23,7 @@ $theme_path = $base_url . '/' . path_to_theme();
     <div class="wrapper_2 voucher ">
       <?php print $messages; ?>
         <div class="c_left">
-        <?php print render($page['right']); ?> 
+        <?php print render($page['right']); ?>
         </div>
         <div class="c_right">
             <div class="grid_promo_bank">
@@ -40,7 +40,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php print t('Kamu bisa memilih 3 Voucher yang kamu suka.'); ?>
                 <span class="border"></span>
             </h5>
-        </div> 
+        </div>
 
         <div class="coupon-separate" style="height:15px; clear:both; display:block;margin-top: 15px;border-top: 1px dashed #999;">&nbsp;</div>
 

@@ -2652,7 +2652,8 @@ section.std_content .akun .box_voucher a.detail{float:right;font-family:"robotom
     height: 150px;
 }
 
-.btn.disabled, .btn[disabled], fieldset[disabled]
+.btn.disabled, .btn[disabled], fieldset[disabled], input[type=submit][disabled=disabled],
+button[disabled=disabled]
 {
     cursor: not-allowed;
     pointer-events: none;
@@ -3178,3 +3179,17 @@ padding: 0;
 @media (max-width:600px){.w3-hide-small{display:none !important;}}
 @media (max-width:991px) and (min-width:601px){.w3-hide-medium{display:none !important;}}
 @media (min-width:992px){.w3-hide-large{display:none !important;}}
+
+section.transaction .alert-success
+{    
+    background: green;
+}
+section.transaction .alert-error
+{
+    background: red;    
+}
+section.transaction .alert-warning
+{
+    background: yellow;
+    color:#424143;
+}

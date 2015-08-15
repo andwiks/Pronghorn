@@ -652,13 +652,12 @@ section.std_content .voucher .c_left
     display: block;
 }
 
-
-.voucher
+section.std_content .voucher, section.std_content .voucher .wrapper_2, section.std_content .voucher .wrapper_3
 {
-    width:100%;
+    width: 100%;
 }
 
 .wrap_popup.voucher .box_popup
 {
-    width:95%;
+    width:90%;
 }

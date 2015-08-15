@@ -655,7 +655,12 @@ section.std_content .akun .c_right nav a
     width:100%;
 }
 
+section.std_content .voucher, section.std_content .voucher .wrapper_2, section.std_content .voucher .wrapper_3
+{
+    width: 100%;
+}
+
 .wrap_popup.voucher .box_popup
 {
-    width:95%;
+    width:90%;
 }

@@ -2951,7 +2951,8 @@ header .right_link .box .box_drop a:hover
         padding-top: 4px;
     }
 
-#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a
+#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a, 
+#frameBlog h2, #frameBlog h2 a
 {
     color: #535353;
     font-size: 28px;
@@ -3180,21 +3181,31 @@ padding: 0;
 @media (max-width:991px) and (min-width:601px){.w3-hide-medium{display:none !important;}}
 @media (min-width:992px){.w3-hide-large{display:none !important;}}
 
-section.transaction .alert-success
-{    
-    background: green;
-}
-section.transaction .alert-error
+.alert-block
 {
-    background: red;    
-}
-section.transaction .alert-warning
-{
-    background: yellow;
-    color:#424143;
+    font-size: 16px;
+    padding: 3%;
+    margin: 0 0 15px;
+    width: 90%;
+    height: 35px;
+    color: #FFF;
 }
 
-section.std
+.alert-success
+{    
+    background: green !important;
+}
+.alert-error
+{
+    background: red !important;    
+}
+.alert-warning
+{
+    background: yellow !important;
+    color:#424143 !important;
+}
+
+.page-user-voucher section.std_content
 {
     z-index: 3;
 }
@@ -3241,4 +3252,79 @@ section.std
 section.std_content .akun .box_popup .content_pop p {
     margin: 10px 0 15px;
     line-height: 1.5;
+}
+
+.hybridauth-widget-wrapper ul.hybridauth-widget li.first
+{
+    margin-bottom: 10px;
+}
+
+section.std_content .akun .c_right .user-form-login
+{
+    width: 50%;
+    float: left;
+}
+
+section.std_content .akun .c_right .user-form-connect
+{
+    border-left: 1px dashed #CCC;
+    width: 45%;
+    float: left;
+    padding-left: 4%;
+    color: #666;
+}
+
+section.std_content .akun .c_right .hybridauth-widget-wrapper
+{
+    margin-top: 0;
+}
+
+section.std_content .akun .c_right .user-form-login input, 
+section.std_content .akun .c_right .user-form-login textarea, 
+section.std_content .akun .c_right .user-form-login select
+{
+    width:90%;
+}
+
+section.std_content .akun .c_right .user-form-login .form-actions
+{
+    margin-top:15px;
+}
+
+section.transaction table.cart br
+{
+    line-height: 1.5;
+}
+
+#edit-cancel {
+    background: none !important;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+section.std_content .akun .form.akun input[type=password]
+{
+    width: 428px;
+}
+
+section.std_content .akun .form.akun #edit-locale
+{
+    border: 1px solid #d8d8d8;
+    padding: 15px;
+    width: 428px;
+}
+
+section.std_content .akun .form.akun label[for="edit-language"]
+{
+    display: none;
+}
+
+section.std_content .akun .form.akun label.option
+{
+    margin-right: 15px;
+}
+
+section.std_content .akun .form.akun #edit-language
+{
+    margin-right: 15px;
 }

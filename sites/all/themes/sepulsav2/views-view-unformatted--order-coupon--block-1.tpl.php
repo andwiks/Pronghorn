@@ -8,8 +8,8 @@
  */
 ?>
 <?php foreach ($rows as $id => $row): ?>
-  <div class="col-sm-6 col-md-3">
-    <div class="shortcode-banner">
+  <div class="w3-col s12 m4">
+    <div class="shortcode-banner" style="margin: 10px 15px;">
       <?php print $row; ?>
     </div>
   </div>  

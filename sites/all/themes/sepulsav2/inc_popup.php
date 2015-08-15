@@ -24,3 +24,21 @@
         </div>
     </div>
 </div>
+<div class="wrap_popup voucher" id="detail_voucher">
+        <div class="box_popup">
+            <a href="" class="close style_1"><img src="<?php print $theme_path; ?>/images/material/close_popup.png" alt="close" /></a>
+            <div class="content_pop">
+                <h3></h3>
+                <div class="image"></div>
+                <h4></h4>
+
+                <h5></h5>
+                <p>
+            </p>
+            </div>
+            <div class="nav_pop">
+                <a href="" class="prev"><</a> 
+                <a href="" class="next">></a> 
+            </div>
+        </div>
+    </div>

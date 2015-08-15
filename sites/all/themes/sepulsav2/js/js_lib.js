@@ -250,10 +250,6 @@ function  voucherPop() {
             openPop("#detail_voucher");
             $("#detail_voucher").find('.redeem').css('display', 'none');
             act.setDataDetail(e_box, $("#detail_voucher"));
-        } else {
-            openPop("#detail_voucher");
-            $("#detail_voucher").find('.redeem').css('display', 'block');
-            act.setDataDetail(e_box, $("#detail_voucher"));
         }
     });
 

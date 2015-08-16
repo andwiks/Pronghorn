@@ -100,7 +100,7 @@ function user_first_paid_in_full_order($order, $user) {
 	
     $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed' OR status = 'processing') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
     
-		drupal_set_message("<pre>order id prev: ".print_r($order_id_prev, true)."</pre>");
+		//drupal_set_message("<pre>order id prev: ".print_r($order_id_prev, true)."</pre>");
     // if order id prev exists, it means this is not user first order
     if ($order_id_prev) return FALSE;
     return TRUE;
@@ -110,38 +110,67 @@ function user_first_paid_in_full_order($order, $user) {
  * The action function for 'assign_point_to_referrer_user'.
  */
 function assign_point_to_referrer_user($order, $user, $point_type_referrer, $point_percentage_referrer, $point_type_refer, $point_percentage_refer, $category) {
-    // select table user_referral, get user referrer from current user
-    $referrer_uid = db_query_range("SELECT referral_uid FROM {referral} WHERE uid = :uid", 0, 1, array('uid' => $user->uid))->fetchField();
-    
-		//drupal_set_message("<pre>referer uid: ".print_r($referrer_uid, true)."</pre>");
-    if ($referrer_uid) {
-        // assign point untuk yang merefer
-        $order_total = $order->commerce_order_total["und"][0]["amount"];
-				if ($point_percentage_referrer > 0) {
-					if ($point_type_referrer == 'percentage') $points_referrer = ceil($order_total/100 * $point_percentage_referrer); 
-					else $points_referrer = $point_percentage_referrer;
-					$params_referrer = array (
-						'uid' => $referrer_uid,
-						'points' => $points_referrer,
-						'tid' => $category,
-						'description' => $user->mail.' made first purchase.'
-					);
-					userpoints_userpointsapi($params_referrer); 
-				}
-				
-				// assign point untuk yang di refer
-				if ($point_percentage_refer > 0) {
-					if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer); 
-					else $points_refer = $point_percentage_refer;
-					$params_refer = array (
-						'uid' => $user->uid,
-						'points' => $points_refer,
-						'tid' => $category,
-						'description' => $user->mail.' made first purchase.'
-					);
-					userpoints_userpointsapi($params_refer); 
-				}
-    }
+	// select table user_referral, get user referrer from current user
+	//$referrer_uid = db_query_range("SELECT referral_uid FROM {referral} WHERE uid = :uid", 0, 1, array('uid' => $user->uid))->fetchField();
+	$query = 'SELECT referral_uid, a.mail FROM users a INNER JOIN referral b ON a.uid = b.referral_uid WHERE b.uid = '.$user->uid;
+	$referrer = db_query_range($query, 0, 1);
+	foreach ($referrer as $row) {
+		$referrer_uid = $row->referral_uid;
+		$referrer_mail = $row->mail;
+	}
+
+	//drupal_set_message("<pre>referer uid: ".print_r($referrer_uid, true)."</pre>");
+	if ($referrer_uid) {
+		// assign point untuk yang merefer
+		$order_total = $order->commerce_order_total["und"][0]["amount"];
+		if ($point_percentage_referrer > 0) {
+			if ($point_type_referrer == 'percentage') $points_referrer = ceil($order_total/100 * $point_percentage_referrer); 
+			else $points_referrer = $point_percentage_referrer;
+			$params_referrer = array (
+				'uid' => $referrer_uid,
+				'points' => $points_referrer,
+				'tid' => $category,
+				'description' => 'Refer '.$user->mail
+			);
+			userpoints_userpointsapi($params_referrer);
+			_send_referral_credit_notification($user->mail, $referrer_mail, $points_referrer, true);
+		}
+
+		// assign point untuk yang di refer
+		if ($point_percentage_refer > 0) {
+			if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer); 
+			else $points_refer = $point_percentage_refer;
+			$params_refer = array (
+				'uid' => $user->uid,
+				'points' => $points_refer,
+				'tid' => $category,
+				'description' => 'Referred by '.$referrer_mail
+			);
+			userpoints_userpointsapi($params_refer); 
+			_send_referral_credit_notification($user->mail, $referrer_mail, $points_refer);
+		}
+	}
+}
+
+function _send_referral_credit_notification($email, $email_referrer, $point, $referrer = false){
+	$point = number_format($point,0,",",".");
+  $from = "info@sepulsa.com";
+  $subject = "Anda Mendapatkan Kredit Sepulsa Sebesar Rp. ".$point;
+	if ($referrer == true) {
+		$to = $email_referrer;
+		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ".$point." karena user yang anda undang ".$email." melakukan order pertama.";
+	} else {
+		$to = $email;
+		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point." karena diundang ".$email_referrer." dan telah melakukan order pertama kali.";
+	}
+
+  //params is the array passed to hook_mail function 
+  $params = array(
+	  'subject' => $subject,
+	  'body' => $message,
+	  );
+
+  drupal_mail('referral_sepulsa', 'referral_credit_notification', $to, language_default(), $params, $from);
 }
 
 function referral_sepulsa_userpoint_category_options() {

@@ -158,10 +158,10 @@ function _send_referral_credit_notification($email, $email_referrer, $point, $re
   $subject = "Anda Mendapatkan Kredit Sepulsa Sebesar Rp. ".$point;
 	if ($referrer == true) {
 		$to = $email_referrer;
-		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point. " karena mereferensikan ".$email;
+		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ".$point." karena user yang anda undang ".$email." melakukan order pertama.";
 	} else {
 		$to = $email;
-		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point. " karena direferensikan oleh ".$email_referrer;
+		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point." karena diundang ".$email_referrer." dan telah melakukan order pertama kali.";
 	}
 
   //params is the array passed to hook_mail function 

@@ -246,7 +246,8 @@ function referral_transaction_list() {
 	$query = "SELECT order_id, a.created, a.mail, a.uid FROM commerce_order a
 						INNER JOIN userpoints_txn b ON a.uid = b.uid
 						INNER JOIN referral c ON b.uid = c.uid
-						WHERE b.points > 0 AND a.status IN('invoiced', 'completed', 'processing') 
+						WHERE b.points > 0 AND a.status IN('invoiced', 'completed', 'processing')
+						GROUP BY a.uid
 						ORDER BY order_id DESC";
 	$order = db_query_range($query, 0, 50);
 	foreach ($order as $row) {

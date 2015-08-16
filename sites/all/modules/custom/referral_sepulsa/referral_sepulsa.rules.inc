@@ -170,7 +170,7 @@ function _send_referral_credit_notification($email, $email_referrer, $point, $re
 	  'body' => $message,
 	  );
 
-  drupal_mail('referral_sepulsa_mail', 'referral_credit_notification', $to, language_default(), $params, $from);
+  drupal_mail('referral_sepulsa', 'referral_credit_notification', $to, language_default(), $params, $from);
 }
 
 function referral_sepulsa_userpoint_category_options() {

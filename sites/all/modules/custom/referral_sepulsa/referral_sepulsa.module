@@ -1,5 +1,18 @@
 <?php
 
+/**
+* Implementation of hook_permission().
+*/
+function referral_sepulsa_permission() {
+  return array(
+		"access referral admin" => array(
+	  	'title' => t('Kupon Upload CSV'),
+	  	'description' => t('Access Referral Admin'),
+		),
+  );
+}
+
+
 function referral_sepulsa_menu() {
 	$items = array();
 
@@ -8,21 +21,21 @@ function referral_sepulsa_menu() {
 		'description'      => t('Referral Custom Page'),
 		'page callback'    => 'drupal_get_form',
 		'page arguments'   => array('referral_custom_text'),
-		'access arguments' => array('administer site configuration'),
+		'access arguments' => array('access referral admin'),
 		'type'             => MENU_NORMAL_ITEM,
 	);
 
 	$items['admin/config/people/referral/referral_list'] = array(
 		'title'            => t('Referral List'),
 		'page callback'    => 'admin_referral_list',
-		'access arguments' => array('administer site configuration'),
+		'access arguments' => array('access referral admin'),
 		'type'             => MENU_NORMAL_ITEM,
 	);
 
 	$items['admin/config/people/referral/transaction_list'] = array(
 		'title'            => t('Referral Transaction List'),
 		'page callback'    => 'referral_transaction_list',
-		'access arguments' => array('administer site configuration'),
+		'access arguments' => array('access referral admin'),
 		'type'             => MENU_NORMAL_ITEM,
 	);
 

@@ -99,7 +99,7 @@ function token_reload_entity_info() {
  */
 function token_reload_entity_presave($entity, $type) {
   if ($type == 'commerce_line_item' && $entity->type == 'electricity_prepaid') {
-    $inquiry = &drupal_static('token_reload_inquiry_data');
+    $inquiry = &drupal_static('token_reload_inquiry_data_' . $entity->electricity_customer_number[LANGUAGE_NONE][0]['value']);
 
     if (empty($entity->electricity_customer_number) || empty($entity->electricity_phone_number)) {
       throw new Exception("Missing required fields.");
@@ -255,7 +255,7 @@ function token_reload_views_api() {
 
 function token_reload_add_to_cart_form_validate(&$form, &$form_state) {
   if ($form_state['submitted']) {
-    $inquiry = &drupal_static('token_reload_inquiry_data');
+    $inquiry = &drupal_static('token_reload_inquiry_data_' . $form_state['line_item']->electricity_customer_number[LANGUAGE_NONE][0]['value']);
 
     foreach (array_keys($form['submit']['#attributes']['class'], 'inactive') as $key) {
       unset($form['submit']['#attributes']['class'][$key]);

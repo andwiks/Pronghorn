@@ -6,7 +6,7 @@
 function referral_sepulsa_permission() {
   return array(
 		"access referral admin" => array(
-	  	'title' => t('Kupon Upload CSV'),
+	  	'title' => t('Access Referral Admin'),
 	  	'description' => t('Access Referral Admin'),
 		),
   );
@@ -169,8 +169,7 @@ function referral_list(){
 	global $user;
 	$content = array();
 	$referral_list = _get_referral_list($user->uid);
-	$content['referral_list'] = $referral_list;
-
+	$content = $referral_list;
   return theme('referral_list', array('content' => $content));
 }
 
@@ -180,6 +179,7 @@ function _get_referral_list($uid) {
 	$date_txn = '';
 
 	// get referral list - start
+	$referred_by = db_query("SELECT u.mail, u.created FROM referral r INNER JOIN users u ON r.referral_uid = u.uid WHERE r.uid = :uid", array('uid' => $uid))->fetchField();
 	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.uid = u.uid WHERE r.referral_uid = :uid", array('uid' => $uid));
 	foreach ($referral as $data) {
 		// get the points
@@ -194,22 +194,26 @@ function _get_referral_list($uid) {
     foreach ($order as $row) {
 			$order_id = $row->order_id;
 			$date_txn = $row->created;
+			$date_txn = format_date($date_txn, 'custom', REFERRAL_DATE_FORMAT);
 		}
-
-		if (isset($order_id)) {
+		
+		//if (isset($order_id)) {
 			$referral_list[] = array(
 				'uid' => $data->uid,
 				'email' => $data->mail,
 				'date_registered' => format_date($data->created, 'custom', REFERRAL_DATE_FORMAT),
 				'points' => $points,
 				'order_id' => $order_id,
-				'date_txn' => format_date($date_txn, 'custom', REFERRAL_DATE_FORMAT)
+				'date_txn' => $date_txn,
 			);
-		}
+		//}
 	}
 	// get referral list - end
-
-	return $referral_list;
+	$referral = array(
+		'referred_by' => $referred_by,
+		'referral_list' => $referral_list
+	);
+	return $referral;
 }
 
 function admin_referral_list() {
@@ -217,7 +221,7 @@ function admin_referral_list() {
 	//$output = drupal_render($form);
 	$content = array();
 	if (isset($_SESSION['referral_list'])) {
-		$content['referral_list'] = $_SESSION['referral_list'];
+		$content = $_SESSION['referral_list'];
 	}
 
   return theme('admin_referral_list', array('content' => $content));

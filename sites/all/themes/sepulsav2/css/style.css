@@ -3414,3 +3414,7 @@ hr.smallsize
     list-style-type: square;
     margin: 0 0 15px 0;
 }
+
+#frameBlog {
+    margin-top: 30px;
+}

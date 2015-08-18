@@ -6,7 +6,7 @@
 function referral_sepulsa_permission() {
   return array(
 		"access referral admin" => array(
-	  	'title' => t('Kupon Upload CSV'),
+	  	'title' => t('Access Referral Admin'),
 	  	'description' => t('Access Referral Admin'),
 		),
   );

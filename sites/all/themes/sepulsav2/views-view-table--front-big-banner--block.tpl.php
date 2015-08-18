@@ -4,9 +4,7 @@
         <?php foreach ($rows as $row_count => $row): ?>
             <div class="slide">
                 <?php print $row['field_image_banner']; ?>
-                <div class="slide_content">
-                    <?php print $row['field_link_title']; ?>
-                </div>
+                <?php print $row['field_link_title']; ?>
             </div>
         <?php endforeach; ?>
         </div>

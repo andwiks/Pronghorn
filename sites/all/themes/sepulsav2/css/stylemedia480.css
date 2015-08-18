@@ -661,3 +661,21 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 {
     width:90%;
 }
+
+.focus_right
+{
+    top:10px;
+    width: 410px;
+    right: 15px;
+}
+
+.slide_content a.bt_slider
+{
+    width: 165px;
+    padding: 10px 25px;
+}
+
+.large-only
+{
+    display: none;
+}

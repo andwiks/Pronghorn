@@ -1,9 +1,12 @@
 <?php 
 $form = drupal_get_form('admin_referral_list_form');
 print drupal_render($form);
-//print drupal_render(drupal_get_form('admin_referral_list'));
+//drupal_set_message("<pre>".print_r($content, true)."</pre>");
 ?>
 <?php $count = 1; ?>
+<p>
+Referred By: <?php print (empty($content['referred_by'])) ? " - " : $content['referred_by'] ?>
+</p>
 <table>
 	<thead>
 		<tr>

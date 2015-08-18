@@ -11,7 +11,7 @@
 	<tbody>
 			<?php if (isset($content['referral_list'])) { ?>
 				<?php foreach ($content['referral_list'] as $data) { ?>
-				<tr class="<?php print ($count%2 == 0) ? "even" : "odd" ?>">
+				<tr class="<?php print ($count%2 == 0) ? "" : "odd" ?>">
 					<td><?php print $data['email'] ?></td>
 					<td><?php print $data['date_registered'] ?></td>
 					<td><?php print $data['date_txn'] ?></td>

@@ -3369,9 +3369,9 @@ section.std_content .akun .form.akun #edit-language
     position: absolute;
     text-align:center;
     right: 20px;
-    top: 25px;
+    top: 15px;
     width: 450px;
-    height: 395px;
+    height: 425px;
     overflow: hidden;
     color:#fff;
 }

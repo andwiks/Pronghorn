@@ -664,3 +664,11 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 {
     width:90%;
 }
+
+/* popups login */
+.hybridauth-facebook, .hybridauth-twitter {
+    width: 255px;
+    background-position: left center;
+    background-size: 255px;
+    padding: 10px 0;
+}

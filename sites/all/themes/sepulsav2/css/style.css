@@ -3344,7 +3344,7 @@ section.std_content .akun .form.akun #edit-language
     display: block;
     width: 195px;
     text-align: center;
-    padding: 25px;
+    padding: 15px;
     border: 1px solid #FFF;
     font-family: "robotoregular";
     font-size: 16px;
@@ -3371,7 +3371,7 @@ section.std_content .akun .form.akun #edit-language
     right: 20px;
     top: 25px;
     width: 450px;
-    height: 385px;
+    height: 395px;
     overflow: hidden;
     color:#fff;
 }

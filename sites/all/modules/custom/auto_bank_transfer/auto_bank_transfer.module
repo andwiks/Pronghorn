@@ -315,6 +315,6 @@ function mandiri_confirm_payment() {
 function auto_bank_transfer_cron() {
 	$bca = variable_get('activate_bca_cron', 1);
 	$mandiri = variable_get('activate_mandiri_cron', 0);
-  if ($mandiri == 1) bca_confirm_payment();
+  if ($bca == 1) bca_confirm_payment();
   if ($mandiri == 1) mandiri_confirm_payment();
 }

@@ -266,7 +266,7 @@ function mandiri_read_csv() {
       fclose($handle);
 				
       // delete mandiri csv file
-      $newfile = 'sites/default/files/bank/mandiri-' . date('dmy') . '.csv';
+      $newfile = 'sites/default/files/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
 
       @copy($filepath, $newfile);
       @drupal_unlink($filepath);

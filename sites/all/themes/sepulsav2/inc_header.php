@@ -24,9 +24,9 @@ global $base_url, $user, $language;
 
                 <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">
-                        <a href="" >
+                        <a href="<?php print url('user/' . $user->uid); ?>" >
                             <span class="ico"></span>
-                            <?php print t('Akunku'); ?>
+                            <?php print t('AKUNKU'); ?>
                         </a>
                         <div class="box_drop">
                             <div class="arr"></div>
@@ -35,6 +35,10 @@ global $base_url, $user, $language;
                                 <div class="right"><?php print number_format(userpoints_get_current_points($user->uid, 'all'), 0, ",", "."); ?> IDR</div>
                             </div>
                             <a href="<?php print url('user/' . $user->uid); ?>"><?php print t('AKUN'); ?></a>
+                            <a href="<?php print url('user/orders'); ?>"><?php print t('ORDER TRANSAKSI'); ?></a>
+                            <a href="<?php print url('user/token'); ?>"><?php print t('INFO KARTU'); ?></a>
+                            <a href="<?php print url('user/wallet'); ?>"><?php print t('DOMPET SAYA'); ?></a>
+                            <a href="<?php print url("user/voucher"); ?>"><?php print t('VOUCHER DISKON'); ?></a>
                             <a href="<?php print url("konfirmasi"); ?>"><?php print t('KONFIRMASI PEMBAYARAN'); ?></a>
                             <a href="<?php print url("user/logout"); ?>"><?php print t('KELUAR'); ?></a>
                         </div>
@@ -50,13 +54,9 @@ global $base_url, $user, $language;
                             <a href="<?php print url('user/orders'); ?>"><?php print t('Order Transaksi'); ?></a>
                             <a href="<?php print url('user/token'); ?>"><?php print t('Info Kartu'); ?></a>
                             <a href="<?php print url('user/wallet'); ?>"><?php print t('Dompet Saya'); ?></a>
-<<<<<<< HEAD
-                            <a href="<?php print url('user/orders'); ?>"><?php print t('Voucher Diskon'); ?></a>
-=======
                             <a href="<?php print url("user/voucher"); ?>"><?php print t('Voucher Diskon'); ?></a>
->>>>>>> 16081325d48f6f3164ea8505fe39e30605a83ce9
                             <a href="<?php print url("konfirmasi"); ?>"><?php print t('Konfirmasi Pembayaran'); ?></a>
-                            <a href="<?php print url("user/logout"); ?>"><?php print t('KELUAR'); ?></a>
+                            <a href="<?php print url("user/logout"); ?>"><?php print t('Keluar'); ?></a>
                             <div class="m_lang">
                                 <a href="">English</a>
                                 <a href="">Indonesia</a>
@@ -69,8 +69,8 @@ global $base_url, $user, $language;
                         <div class="box_drop">
                             <a href="<?php print url("user/login"); ?>" class="login">LOGIN</a>
                             <div class="m_lang">
-                                <a href="">English</a>
-                                <a href="">Indonesia</a>
+                                <a href="?language=en">English</a>
+                                <a href="?language=id">Indonesia</a>
                             </div>
                         </div>
                     </div>

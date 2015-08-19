@@ -672,3 +672,29 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
     background-size: 255px;
     padding: 10px 0;
 }
+
+.slide_content a.bt_slider
+{
+    margin-top: 35px;
+    padding: 15px 15px;
+    margin: 5px auto;
+}
+
+.slide_teaser
+{
+    display: none;
+}
+
+.focus_right
+{
+    top:5px;
+    width: 250px;
+    right: 15px;
+    height: 245px;
+}
+
+.slide_content a.bt_slider
+{
+    width: 165px;
+    padding: 10px 25px;
+}

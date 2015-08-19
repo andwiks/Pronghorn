@@ -12,9 +12,9 @@ $page_state = "home";
 ?>
   <!-- middle -->
 <section class="banner">
-    <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="Praktis Isi Pulsa. Gratis Diskon Belanja" />
+    <img src="<?php print $theme_path; ?>/images/content/banner_home.jpg" alt="Praktis Isi Pulsa. Gratis Voucher Belanja" />
     <div class="caption" id="top_page">
-        <h1 style="font-family: 'robotoregular';font-size: 36px;margin: 0 0 15px 0;"><?php print t('Praktis Isi Pulsa. Gratis Diskon Belanja.'); ?></h1>
+        <h1 style="font-family: 'robotoregular';font-size: 36px;margin: 0 0 15px 0;"><?php print t('Praktis Isi Pulsa. Gratis Voucher Belanja.'); ?></h1>
         <p><?php print t('Kini isi ulang pulsa lebih dari sekedar mudah, tapi menguntungkan!'); ?></p>
         <a href="#easy_step"><?php print t('Gimana Caranya?'); ?></a>
     </div>

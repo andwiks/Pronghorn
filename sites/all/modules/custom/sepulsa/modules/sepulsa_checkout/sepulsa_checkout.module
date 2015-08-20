@@ -115,6 +115,11 @@ function sepulsa_checkout_completion_message_message($order, $format = NULL) {
  * Adding additional fee text.
  */
 function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$form_state, $form_id) {
+  $form['cart_contents']['cart_contents_view']['#prefix'] = '<div id="cart-contents-wrapper">';
+  $form['cart_contents']['cart_contents_view']['#suffix'] = '</div>';
+
+  $form['commerce_payment']['payment_method']['#ajax']['callback'] = 'sepulsa_checkout_pane_checkout_form_details_refresh';
+
   $rules_config = rules_config_load('rules_add_3_digit_from_order_id_to_order_total_if_bank_transfer');
   if ($rules_config->active == True) {
     $order = $form_state['order'];
@@ -129,8 +134,38 @@ function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$f
       $form['commerce_payment']['payment_details']['sepulsa_campaign'] = array(
         '#markup' => check_markup($campaign['value'], $campaign['format'])."<b style='color:red;'>".t("Additional Fee : Rp. ").$additional_fee."</b>",
       );
-      
+
     }
   }
   drupal_add_js(drupal_get_path('module', 'sepulsa_checkout') . '/sepulsa_checkout.form.js', 'file');
+}
+
+/**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_checkout_commerce_order_presave($order) {
+  if ($order->commerce_order_total[LANGUAGE_NONE][0]['amount'] > 0 && empty($order->data['payment_method'])) {
+    $order->payment_methods = array();
+    rules_invoke_all('commerce_payment_methods', $order);
+
+    // Sort the payment methods array by the enabling Rules' weight values.
+    uasort($order->payment_methods, 'drupal_sort_weight');
+
+    if (!empty($order->payment_methods)) {
+      $order->data['payment_method'] = key($order->payment_methods);
+    }
+  }
+}
+
+function sepulsa_checkout_pane_checkout_form_details_refresh($form, $form_state) {
+  $form_state['order']->data['payment_method'] = $form_state['values']['commerce_payment']['payment_method'];
+  commerce_order_save($form_state['order']);
+  commerce_cart_order_refresh($form_state['order']);
+
+  $commands = array();
+  $commands[] = ajax_command_replace('#' . $form['commerce_payment']['payment_method']['#ajax']['wrapper'], render($form['commerce_payment']['payment_details']));
+  $commands[] = ajax_command_html('#cart-contents-wrapper', commerce_embed_view('commerce_cart_summary', 'default', array($form_state['order']->order_id), 'cart'));
+  $commands[] = ajax_command_settings(array('vt_amount' => $form_state['order']->commerce_order_total[LANGUAGE_NONE][0]['amount']), TRUE);
+
+  return array('#type' => 'ajax', '#commands' => $commands);
 }

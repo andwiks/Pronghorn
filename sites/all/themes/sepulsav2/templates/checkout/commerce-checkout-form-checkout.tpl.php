@@ -5,6 +5,7 @@
 		  <?php print render($form['cart_contents']); ?>
 
 		  <?php print render($form['commerce_coupon']); ?>
+		  <div class="coupon-description"><?php print t('Enter your coupon code here.'); ?></div>
 		</div>
 
 		<div class="col-md-5 c_right">

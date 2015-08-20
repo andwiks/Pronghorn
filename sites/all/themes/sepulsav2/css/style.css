@@ -3418,3 +3418,8 @@ hr.smallsize
 #frameBlog {
     margin-top: 30px;
 }
+
+.focus_right .text_blue
+{
+    color: #105c8c!important;
+}

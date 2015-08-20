@@ -668,6 +668,7 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
     width: 410px;
     right: 15px;
     height: 245px;
+    margin-top: 10px;
 }
 
 .slide_content a.bt_slider
@@ -680,4 +681,15 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 .large-only
 {
     display: none;
+}
+
+.focus_right h2
+{
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.focus_right .highlight
+{
+    font-size: 32px;
 }

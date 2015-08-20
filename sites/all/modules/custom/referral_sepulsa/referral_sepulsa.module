@@ -175,13 +175,13 @@ function referral_list(){
 
 function _get_referral_list($uid) {
 	$referral_list = array();
-	$order_id = '';
-	$date_txn = '';
 
 	// get referral list - start
 	$referred_by = db_query("SELECT u.mail, u.created FROM referral r INNER JOIN users u ON r.referral_uid = u.uid WHERE r.uid = :uid", array('uid' => $uid))->fetchField();
 	$referral = db_query("SELECT r.uid, u.mail, u.created FROM referral r INNER JOIN users u ON r.uid = u.uid WHERE r.referral_uid = :uid", array('uid' => $uid));
 	foreach ($referral as $data) {
+		$order_id = '';
+		$date_txn = '';
 		// get the points
 		$points = '';
 		$userpoint = db_query_range("SELECT points FROM userpoints_txn WHERE uid = :uid AND status = 0 ORDER BY txn_id ASC", 0, 1, array('uid' => $data->uid));

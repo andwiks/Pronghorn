@@ -3405,6 +3405,9 @@ hr.smallsize
 {
     font-size: 18px;
     margin:0;
+    font-size: 26px;
+    font-family: 'robotoregular';
+    line-height: 2;
 }
 .slide_teaser ul {
     list-style: square inside none;
@@ -3419,7 +3422,7 @@ hr.smallsize
     margin-top: 30px;
 }
 
-.focus_right .text_blue
+.text_blue
 {
     color: #105c8c!important;
 }
@@ -3431,4 +3434,9 @@ hr.smallsize
 
 .slide_content .text_blue a.bt_slider:hover {
     background: #FFF;
+}
+
+.coupon-description
+{
+    margin-top: 10px;
 }

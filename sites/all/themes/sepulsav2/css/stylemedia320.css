@@ -710,3 +710,13 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 {
     font-size: 30px;
 }
+
+.payment
+{
+    width: 100%;
+}
+
+.promo-page-landing
+{
+    width:100% !important;
+}

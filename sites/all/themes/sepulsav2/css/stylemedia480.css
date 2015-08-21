@@ -693,3 +693,8 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 {
     font-size: 32px;
 }
+
+.promo-page-landing
+{
+    width:100% !important;
+}

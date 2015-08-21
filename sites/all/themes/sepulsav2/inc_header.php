@@ -35,6 +35,7 @@ global $base_url, $user, $language;
                                 <div class="right"><?php print number_format(userpoints_get_current_points($user->uid, 'all'), 0, ",", "."); ?> IDR</div>
                             </div>
                             <a href="<?php print url('user/' . $user->uid); ?>"><?php print t('AKUN'); ?></a>
+                            <a href="<?php print url('user/referral_list'); ?>"><?php print t('DAFTAR REFERRAL'); ?></a>
                             <a href="<?php print url('user/orders'); ?>"><?php print t('ORDER TRANSAKSI'); ?></a>
                             <a href="<?php print url('user/token'); ?>"><?php print t('INFO KARTU'); ?></a>
                             <a href="<?php print url('user/wallet'); ?>"><?php print t('DOMPET SAYA'); ?></a>
@@ -51,6 +52,7 @@ global $base_url, $user, $language;
                                 <div class="right"><?php print commerce_currency_format(userpoints_get_current_points($user->uid, 'all'), 'IDR'); ?></div>
                             </div>
                             <a href="<?php print url('user/' . $user->uid); ?>" ><?php print t('Informasi Akun'); ?></a>
+                            <a href="<?php print url('user/referral_list'); ?>"><?php print t('Daftar Referral'); ?></a>
                             <a href="<?php print url('user/orders'); ?>"><?php print t('Order Transaksi'); ?></a>
                             <a href="<?php print url('user/token'); ?>"><?php print t('Info Kartu'); ?></a>
                             <a href="<?php print url('user/wallet'); ?>"><?php print t('Dompet Saya'); ?></a>

@@ -22,10 +22,10 @@
       <?php endif; ?>
 
       <?php print $messages; ?>
-      <?php $hybridauth = isset($page['content']['system_main']['hybridauth']) ? $page['content']['system_main']['hybridauth'] : array(); ?>
-      <?php unset($page['content']['system_main']['hybridauth']); ?>
 
       <?php if (isset($page['content']['system_main']['hybridauth'])): ?>
+      <?php $hybridauth = isset($page['content']['system_main']['hybridauth']) ? $page['content']['system_main']['hybridauth'] : array(); ?>
+      <?php unset($page['content']['system_main']['hybridauth']); ?>
         <div class="user-form-login">
           <?php print render($page['content']); ?>
         </div>

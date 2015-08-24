@@ -698,3 +698,19 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 {
     width:100% !important;
 }
+
+section.std_content .akun .form.akun #edit-locale
+{
+    width:90%;
+}
+
+section.std_content .akun .c_right .share .right {
+    width: 300px;
+}
+
+section.std_content .akun .c_right .share input[type=text]
+{
+    width: 100%;
+    padding: 0;
+    margin: 0 0 5px 0;
+}

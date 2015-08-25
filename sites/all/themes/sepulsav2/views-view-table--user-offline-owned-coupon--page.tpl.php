@@ -36,7 +36,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                         <?php print t('Kode akan dicheck dan diisi oleh pihak merchant yang tertera di kupon. Tunjukan halaman ini, dan reedem voucher kamu.'); ?>
                     </span>
                     <div class="form">
-                      <?php $form = drupal_get_form('offline_coupon_redeem_form', $row['nid']); ?>
+                      <?php $form = drupal_get_form('offline_coupon_redeem_form_' . $row['nid'] , $row['nid']); ?>
                       <?php print drupal_render($form); ?>
                     </div>
                 </div>

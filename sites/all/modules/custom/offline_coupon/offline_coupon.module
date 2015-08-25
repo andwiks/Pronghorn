@@ -81,6 +81,24 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
   }
 }
 
+
+/**
+ * Implements hook_forms().
+ */
+function offline_coupon_forms($form_id, $args) {
+  $forms = array();
+
+  // Construct a valid cart form ID from the arguments.
+  if (strpos($form_id, 'offline_coupon_redeem_form_') === 0) {
+    $forms[$form_id] = array(
+      'callback' => 'offline_coupon_redeem_form',
+    );
+  }
+
+  return $forms;
+}
+
+
 /* implement hook_form */
 function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   $form = array();

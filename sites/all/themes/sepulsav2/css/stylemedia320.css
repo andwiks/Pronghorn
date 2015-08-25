@@ -440,6 +440,7 @@ section.h_middle_top input[type=submit], input[type=button]
 section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, section.h_middle_top .home_tab .form input[type=text]
 {
     font-size: 18px;
+    font-size: 14px;
 }
 
 section.h_middle_top .topup-action-2 input[type=submit], section.h_middle_top .topup-action-2 input[type=button]
@@ -719,4 +720,23 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 .promo-page-landing
 {
     width:100% !important;
+}
+
+section.std_content .akun .form.akun #edit-locale
+{
+    width:90%;
+}
+
+section.std_content .akun .c_right .share .right {
+    clear: both;
+    float: none;
+    display: block;
+    width: 100%;
+}
+
+section.std_content .akun .c_right .share input[type=text]
+{
+    width: 100%;
+    padding: 0;
+    margin: 0 0 10px 0;
 }

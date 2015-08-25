@@ -1915,6 +1915,7 @@ table.tab-isi-pulsa tr td:first-child a
 {
     width:50%;
     float:left;
+    display: block !important;
 }
 
 .topup-notes-2

@@ -138,10 +138,10 @@ function referral_list_doc() {
 		]
 	';
   $element = array(
-    '#name' => t('Referral Link Service'),
-    '#description' => t('Get Referral Link'),
+    '#name' => t('Referral List Service'),
+    '#description' => t('Get Referral List'),
     '#auth' => TRUE,
-    '#path' => 'referral/link',
+    '#path' => 'referral/list',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/referral/list.json<br />
     POST data application/json:

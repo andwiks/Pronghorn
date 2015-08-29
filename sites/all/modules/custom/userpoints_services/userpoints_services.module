@@ -24,6 +24,15 @@ function userpoints_services_services_resources() {
             // no parameter
           ),
         ),
+				'userpoints_total' => array(
+          'help' => 'Get Userpoints Total',
+          'callback' => '_userpoints_services_total',
+          'documentation callback' => 'userpoints_services_total_doc',
+          'access callback' => 'services_access_menu',
+          'args' => array(
+            // no parameter
+          ),
+        ),
       ),
     ),
   );
@@ -35,7 +44,7 @@ function userpoints_services_services_resources() {
  */
 
 /**
- * Resources callback for order detail.
+ * Resources callback for userpoints list.
  */
 function _userpoints_services_list(){
   global $user;
@@ -43,32 +52,54 @@ function _userpoints_services_list(){
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
   try {
-    $totalamount = userpoints_get_current_points($user->uid, 'all');
-    //$totalamount = number_format($totalamount,0,",",".");
+    //$totalamount = userpoints_get_current_points($user->uid, 'all');
     $stati = userpoints_txn_status();
     $query = db_select('userpoints_txn', 'p')
-        ->fields('p')
-        ->condition('p.uid', $user->uid)
-        ->condition('p.status', '0') // only show approved userpoints
-        ->orderBy('p.txn_id', 'DESC');
+			->fields('p')
+			->condition('p.uid', $user->uid)
+			->condition('p.status', '0') // only show approved userpoints
+			->orderBy('p.txn_id', 'DESC');
 
     if (module_exists('taxonomy')) {
       $query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
     }
     foreach ($query->execute() as $transaction) {
-        $userpoints_detail[] = array(
-            'txn_id' => $transaction->txn_id,
-            'uid' => $transaction->uid,
-            'points' => $transaction->points,
-            'description' => $transaction->description,
-            //'time_stamp' => format_date($transaction->time_stamp, 'small'),
-            'time_stamp' => $transaction->time_stamp,
-            'status' => $stati[$transaction->status]
-        );
+			$userpoints_detail[] = array(
+				'txn_id' => $transaction->txn_id,
+				'uid' => $transaction->uid,
+				'points' => $transaction->points,
+				'description' => $transaction->description,
+				//'time_stamp' => format_date($transaction->time_stamp, 'small'),
+				'time_stamp' => $transaction->time_stamp,
+				'status' => $stati[$transaction->status]
+			);
     }
-    $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
+    //$userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
     
-    return $userpoints;
+    return $userpoints_detail;
+  }
+  catch (Exception $exception) {
+    // Log this condition.
+    watchdog('userpoints_services', 'Error at @location. Trace:<pre>@trace</pre>', array(
+      '@location' => __FUNCTION__,
+      '@trace' => _drupal_render_exception_safe($exception),
+    ), WATCHDOG_ERROR, t('Userpoints Services'));
+  }
+  // Other condition return error;
+  return services_error(t('Invalid Line Item'), 406);
+}
+
+/**
+ * Resources callback for userpoint total.
+ */
+function _userpoints_services_total(){
+  global $user;
+  $userpoints_detail = [];
+  if ($user->uid == 0) return services_error(t('Invalid User'), 406);
+  // Wrap around using try and catch.
+  try {
+    $totalamount = userpoints_get_current_points($user->uid, 'all');   
+    return $totalamount;
   }
   catch (Exception $exception) {
     // Log this condition.
@@ -113,6 +144,45 @@ function userpoints_services_list_doc() {
     '#path' => 'userpoints/userpoints_list',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/userpoints/userpoints_list.json<br />
+    POST data application/json:
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => t('When drupal detect that the user already login from other site or header X-CSRF-Token is needed.'),
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+
+/**
+ * Documentation callback for order actions order total.
+ */
+function userpoints_services_total_doc() {
+  global $base_url;
+  $response = '[10000]';
+  $element = array(
+    '#name' => t('Userpoints Total Service'),
+    '#description' => t('Get Userpoints Total'),
+    '#auth' => TRUE,
+    '#path' => 'userpoints/userpoints_total',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/userpoints/userpoints_total.json<br />
     POST data application/json:
     ',
     // Example response. E.g., a JSON array.

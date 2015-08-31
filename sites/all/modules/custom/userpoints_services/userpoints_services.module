@@ -52,7 +52,7 @@ function _userpoints_services_list(){
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
   try {
-    //$totalamount = userpoints_get_current_points($user->uid, 'all');
+    $totalamount = userpoints_get_current_points($user->uid, 'all');
     $stati = userpoints_txn_status();
     $query = db_select('userpoints_txn', 'p')
 			->fields('p')
@@ -74,9 +74,8 @@ function _userpoints_services_list(){
 				'status' => $stati[$transaction->status]
 			);
     }
-    //$userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
-    
-    return $userpoints_detail;
+    $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
+    return $userpoints;
   }
   catch (Exception $exception) {
     // Log this condition.
@@ -118,24 +117,27 @@ function _userpoints_services_total(){
 function userpoints_services_list_doc() {
   global $base_url;
   $response = '
-  [
+  {
+		"userpoints_total": 10000,
+    "userpoints_detail": [
       {
-          "txn_id": "1",
-          "uid": "1",
-          "points": "10000",
-          "description": "User xxx has made first purchase",
-          "time_Stamp": 1426353153,
-          "status": 0
+				"txn_id": "1",
+				"uid": "1",
+				"points": "20000",
+				"description": "User xxx has made first purchase",
+				"time_Stamp": 1426353153,
+				"status": 0
       },
       {
-          "txn_id": "2",
-          "uid": "1",
-          "points": "-10000",
-          "description": "Using credit for purchase",
-          "time_Stamp": 1426353153,
-          "status": 0
+				"txn_id": "2",
+				"uid": "1",
+				"points": "-10000",
+				"description": "Using credit for purchase",
+				"time_Stamp": 1426353153,
+				"status": 0
       },
-  ]
+		]
+  }
   ';
   $element = array(
     '#name' => t('Userpoints List Service'),

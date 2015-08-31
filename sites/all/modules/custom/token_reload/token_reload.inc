@@ -97,7 +97,7 @@ function token_reload_request_call($data, $method = 'inquiry') {
     'data' => drupal_json_encode($data),
   );
 
-  if ($method != 'inq') {
+  if ($method != 'inquiry') {
     $options['timeout'] = $settings['timeout'];
   }
 

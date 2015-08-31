@@ -127,25 +127,51 @@ function kraken_topup_callback() {
     $payload = drupal_json_decode($body);
     watchdog('kraken', '<pre>' . print_r($payload, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
 
-    $topup = entity_load('topup', FALSE, array('ref' => $payload['transaction_id']));
-    if (!empty($topup)) {
-      $topup = reset($topup);
+    switch ($payload['type']) {
+      case 'electricity':
+        $token_reload = entity_load('token_reload', FALSE, array('no_ref_2' => $payload['transaction_id']));
+        if (!empty($token_reload)) {
+          $token_reload = reset($token_reload);
 
-      switch ($payload['status']) {
-        case 'success':
-          $status = TOPUP_SUCCESS;
-          break;
+          $info = entity_get_property_info('token_reload');
+          foreach ($payload as $key => $value) {
+            if (isset($info['properties'][$key])) {
+              $token_reload->$key = $value;
+            }
+          }
 
-        case 'failed':
-          $status = TOPUP_FAILED;
-          break;
-      }
+          $token_reload->data = $payload;
+          $token_reload->revision = TRUE;
+          entity_save('token_reload', $token_reload);
 
-      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup->line_item_id);
-      $user = user_load($line_item_wrapper->order->uid->value());
-      $topup->status = $status;
-      entity_save('topup', $topup);
-      topup_update_status($topup->line_item_id, $status);
+          if ($payload['status'] == 'success') {
+            commerce_order_status_update(entity_metadata_wrapper('commerce_line_item', $token_reload->line_item_id)->order->value(), 'completed');
+          }
+        }
+        break;
+
+      case 'mobile':
+        $topup = entity_load('topup', FALSE, array('ref' => $payload['transaction_id']));
+        if (!empty($topup)) {
+          $topup = reset($topup);
+
+          switch ($payload['status']) {
+            case 'success':
+              $status = TOPUP_SUCCESS;
+              break;
+
+            case 'failed':
+              $status = TOPUP_FAILED;
+              break;
+          }
+
+          $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup->line_item_id);
+          $user = user_load($line_item_wrapper->order->uid->value());
+          $topup->status = $status;
+          entity_save('topup', $topup);
+          topup_update_status($topup->line_item_id, $status);
+        }
+        break;
     }
   }
 

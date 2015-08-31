@@ -460,6 +460,8 @@ function order_services_list_doc() {
 function order_services_order($order) {
   // Wrap around using try and catch.
   try {
+    commerce_cart_order_refresh($order);
+
     // Get order wrapper.
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
     // Proccess order line item: remove language none (und).

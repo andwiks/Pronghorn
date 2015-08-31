@@ -219,21 +219,17 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $views = $form_state['build_info']['args'][0];
 
     foreach (element_children($form['edit_delete']) as $children) {
-      //drupal_set_message("<pre>".print_r($value, true)."</pre>");
-      //$value['#type'] = 'image_button';
-      //$value['#attributes']['src'] = $base_url.'/'.drupal_get_path('theme','sepulsa').'/images/ico-close.png';
-      //$value['#attributes']['width'] = '40px';
       $form['edit_delete'][$children]['#attributes']['class'][] = 'hapusButton';
       $form['edit_delete'][$children]['#value'] = '';
 
-      // $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $views->result[$children]->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_']['entity']);
-      // if ($line_item_wrapper->getBundle() == 'coupon') {
-      //   $form['edit_delete'][$children]['#product_id'] = $line_item_wrapper->commerce_product->getIdentifier();
-      //   $form['edit_delete'][$children]['#ajax'] = array(
-      //     'callback' => 'sepulsa_views_form_commerce_cart_block_default_ajax_submit',
-      //     'progress' => array('type' => 'none'),
-      //   );
-      // }
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $views->result[$children]->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_']['entity']);
+      if ($line_item_wrapper->getBundle() == 'coupon') {
+         $form['edit_delete'][$children]['#product_id'] = $line_item_wrapper->commerce_product->getIdentifier();
+         $form['edit_delete'][$children]['#ajax'] = array(
+           'callback' => 'sepulsa_views_form_commerce_cart_block_default_ajax_submit',
+           'progress' => array('type' => 'none'),
+         );
+      }
     }
 
   } else if ($form_id == "user_profile_form") {

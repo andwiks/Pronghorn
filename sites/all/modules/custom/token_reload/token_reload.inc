@@ -82,68 +82,42 @@ function token_reload_request_query_data($params = array()) {
   return $xml->asXML();
 }
 
-function token_reload_request_call($data, $method = 'inq') {
+function token_reload_request_call($data, $method = 'inquiry') {
   drupal_static_reset(__FUNCTION__);
   $params = &drupal_static(__FUNCTION__);
   $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
 
-  switch ($settings['environment']) {
-    case 'dev':
-      $response = token_reload_response_dummy($data, $method);
-      break;
+  $uri = @parse_url($settings['endpoint']);
+  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $uri['host'] . $uri['path'] . '/' . $method;
+  $options = array(
+    'headers' => array(
+      'Content-Type' => 'application/json',
+    ),
+    'method' => 'POST',
+    'data' => drupal_json_encode($data),
+  );
 
-    case 'prod':
-      $url = $settings['endpoint'];
-      $options = array(
-        'headers' => array(
-          'Content-Type' => 'application/xml',
-        ),
-        'method' => 'POST',
-        'data' => $data,
-      );
-
-      if ($method != 'inq') {
-        $options['timeout'] = $settings['timeout'];
-      }
-
-      $result = drupal_http_request($url, $options);
-
-      // Check the result:
-      // 1. Must have 200 http code.
-      // 2. Must have data.
-      if ($result->code == 200 && !empty($result->data)) {
-        $response = $result->data;
-        if (variable_get('token_reload_log_request', TRUE)) {
-          watchdog('token_reload', '<pre>!request</pre>', array('!request' => htmlentities($result->request)), WATCHDOG_DEBUG);
-        }
-        if (variable_get('token_reload_log_response', TRUE)) {
-          watchdog('token_reload', '<pre>!response</pre>', array('!response' => htmlentities($result->data)), WATCHDOG_DEBUG);
-        }
-      }
-      else {
-        return FALSE;
-      }
-      break;
+  if ($method != 'inquiry') {
+    $options['timeout'] = $settings['timeout'];
   }
 
-  foreach (simplexml_load_string($response)->params->param->value->array->data->value as $value) {
-    $params[] = (string) $value->string;
-  }
+  $result = drupal_http_request($url, $options);
 
-  if ($method == 'datatransaksi') {
-    if (count($params) >= 9) {
-      $params = explode('#', $params[9]);
-      $params = array_combine(token_reload_response_query_keys(), $params);
+  // Check the result:
+  // 1. Must have 201 http code.
+  // 2. Must have data.
+  if ($result->code == 201 && !empty($result->data)) {
+    if (variable_get('token_reload_log_request')) {
+      watchdog('token_reload', '<pre>!request</pre>', array('!request' => htmlentities($result->request)), WATCHDOG_DEBUG);
     }
-    else {
-      return FALSE;
+    if (variable_get('token_reload_log_response')) {
+      watchdog('token_reload', '<pre>!response</pre>', array('!response' => htmlentities($result->data)), WATCHDOG_DEBUG);
     }
+    return drupal_json_decode($result->data);
   }
   else {
-    $params = array_combine(token_reload_response_keys(), $params);
-    $params['power_consuming_category'] = (int) $params['power_consuming_category'];
+    return FALSE;
   }
-  return $params;
 }
 
 function token_reload_response_dummy($data, $method = 'inq') {

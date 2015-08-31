@@ -19,10 +19,11 @@ function token_reload_operation_form($form, &$form_state, $trid) {
     '#type' => 'select',
     '#options' => array(
       // 0 => '-Operation-',
+      // 'inquiry' => t('Inquiry'),
       'process' => t('Process'),
-      'query' => t('Query'),
-      'requeue_process' => t('Requeue: Process'),
-      'requeue_query' => t('Requeue: Query'),
+      // 'query' => t('Query'),
+      // 'requeue_process' => t('Requeue: Process'),
+      // 'requeue_query' => t('Requeue: Query'),
     ),
     '#required' => TRUE,
   );
@@ -43,30 +44,14 @@ function token_reload_operation_form_submit($form, &$form_state) {
 
   switch ($form_state['values']['operation']) {
     case 'process':
-      $params = &drupal_static('token_reload_request_call');
-      token_reload_queue_process(array('line_item_id' => $token_reload->line_item_id));
-      drupal_set_message('<pre>' . print_r($params, TRUE) . '</pre>');
+      $transaction = token_reload_queue_process($token_reload->line_item_id);
+      drupal_set_message(t('Processing transaction.'));
       break;
 
-    case 'query':
-      $params = &drupal_static('token_reload_request_call');
-      token_reload_queue_query(array('line_item_id' => $token_reload->line_item_id));
-      drupal_set_message('<pre>' . print_r($params, TRUE) . '</pre>');
-      break;
-
-    case 'requeue_process':
-      $queue = DrupalQueue::get('token_reload_process');
-      $queue->createItem(array('line_item_id' => $token_reload->line_item_id));
-
-      $token_reload->status = 'in_queue';
-      entity_save('token_reload', $token_reload);
-      drupal_set_message(t('Item added to queue'), 'status');
-      break;
-
-    case 'requeue_query':
-      $token_reload->status = 'in_queue';
-      entity_save('token_reload', $token_reload);
-      drupal_set_message(t('Item added to queue'), 'status');
-      break;
+    // case 'query':
+    //   $params = &drupal_static('token_reload_request_call');
+    //   token_reload_queue_query(array('line_item_id' => $token_reload->line_item_id));
+    //   drupal_set_message('<pre>' . print_r($params, TRUE) . '</pre>');
+    //   break;
   }
 }

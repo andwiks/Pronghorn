@@ -69,6 +69,25 @@ function commerce_checkout_services_services_resources() {
         ),
       ),
       'actions' => array(
+        'payment' => array(
+          'help' => 'Select payment method.',
+          'callback' => 'commerce_checkout_services_resource_payment',
+          'access callback' => 'services_access_menu',
+          // 'documentation callback' => 'commerce_checkout_services_resource_payment_doc',
+          'args' => array(
+            array(
+              'name' => 'payment_method',
+              'type' => 'string',
+              'description' => 'Selected payment method',
+              'source' => array(
+                'data' => 'payment_method',
+                'param' => 'payment_method',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
         'process' => array(
           'help' => 'Process checkout data.',
           'callback' => 'commerce_checkout_services_resource_process',
@@ -186,6 +205,32 @@ function commerce_checkout_services_resource_pane_retrieve($pane = NULL, $field 
 
   // Return all checkout form key without #.
   return array_keys($form);
+}
+
+/**
+ * Function commerce_checkout_services_resource_process().
+ *
+ * @param array $checkout
+ *   Checkout data.
+ *
+ * @return object
+ *   Order object.
+ */
+function commerce_checkout_services_resource_payment($payment_method) {
+  global $user;
+
+  // Get user's order.
+  $order = commerce_cart_order_load($user->uid);
+  // Check whether order can checkout.
+  if ($order !== FALSE && commerce_checkout_order_can_checkout($order)) {
+    $order->data['payment_method'] = $payment_method;
+    commerce_order_save($order);
+
+    return order_services_order($order);
+  }
+
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
 }
 
 /**

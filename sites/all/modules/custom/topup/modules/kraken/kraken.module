@@ -141,7 +141,7 @@ function kraken_topup_callback() {
           }
 
           if (isset($token_reload->token_reload)) {
-            $token_reload->token_pln = implode(' ', str_split($payment['token_pln'], 4));
+            $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
           }
 
           $token_reload->data = $payload;

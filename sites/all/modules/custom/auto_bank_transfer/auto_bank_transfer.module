@@ -158,7 +158,7 @@ function bca_read_csv() {
       }
       fclose($handle);
       // delete bca csv file
-      $newfile = 'sites/default/files/bank/bca-' . date('dmy') . '.csv';
+      $newfile = 'sites/default/files/bank/summary_bca/bca-' . date('dmy') . '.csv';
 
       @copy($filepath, $newfile);
       @drupal_unlink($filepath);

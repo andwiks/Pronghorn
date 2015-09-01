@@ -131,6 +131,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 					'uid' => $referrer_uid,
 					'points' => $points_referrer,
 					'tid' => $category,
+					'moderate' => TRUE,
 					'description' => 'Refer '.$user->mail
 				);
 				userpoints_userpointsapi($params_referrer);
@@ -145,6 +146,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 					'uid' => $user->uid,
 					'points' => $points_refer,
 					'tid' => $category,
+					'moderate' => TRUE,
 					'description' => 'Referred by '.$referrer_mail
 				);
 				userpoints_userpointsapi($params_refer); 

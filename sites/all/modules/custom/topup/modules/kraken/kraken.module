@@ -140,7 +140,7 @@ function kraken_topup_callback() {
             }
           }
 
-          if (isset($token_reload->token_reload)) {
+          if (isset($token_reload->token_pln)) {
             $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
           }
 

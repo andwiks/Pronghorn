@@ -97,12 +97,8 @@ function referral_sepulsa_rules_action_info() {
  * The condition function for 'user_first_paid_in_full_order'.
  */
 function user_first_paid_in_full_order($order, $user) {
-	
     $order_id_prev = db_query_range("SELECT order_id FROM {commerce_order} WHERE (status = 'invoiced' OR status = 'completed' OR status = 'processing') AND uid = :uid AND order_id != :order_id", 0, 1, array('uid' => $user->uid, 'order_id' => $order->order_number))->fetchField();
-    
-		drupal_set_message("<pre>order id prev: ".print_r($order_id_prev, true)."</pre>");
-		drupal_set_message("<pre>user: ".print_r($user, true)."</pre>");
-		drupal_set_message("<pre>order: ".print_r($order, true)."</pre>");
+		//drupal_set_message("<pre>order id prev: ".print_r($order_id_prev, true)."</pre>");
     // if order id prev exists, it means this is not user first order
     if ($order_id_prev) return FALSE;
     return TRUE;

@@ -134,10 +134,14 @@ function kraken_topup_callback() {
           $token_reload = reset($token_reload);
 
           $info = entity_get_property_info('token_reload');
-          foreach ($payload as $key => $value) {
+          foreach ($payload['pln'] as $key => $value) {
             if (isset($info['properties'][$key])) {
               $token_reload->$key = $value;
             }
+          }
+
+          if (isset($token_reload->token_reload)) {
+            $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
           }
 
           $token_reload->data = $payload;

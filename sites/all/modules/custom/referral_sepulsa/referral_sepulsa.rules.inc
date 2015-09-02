@@ -25,7 +25,7 @@ function referral_sepulsa_rules_condition_info() {
       ),
     ),
   );
-  
+
   return $conditions;
 }
 
@@ -44,7 +44,7 @@ function referral_sepulsa_rules_condition_info() {
 function referral_sepulsa_rules_action_info() {
   $actions = array(
     'assign_point_to_referrer_user' => array(
-      'label' => t('Assign Point to Referrer User'), 
+      'label' => t('Assign Point to Referrer User'),
       'group' => t('Sepulsa'),
       'parameter' => array(
         'order' => array(
@@ -89,7 +89,7 @@ function referral_sepulsa_rules_action_info() {
       ),
     ),
   );
-  
+
   return $actions;
 }
 
@@ -123,7 +123,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 			// assign point untuk yang merefer
 			$order_total = $order->commerce_order_total["und"][0]["amount"];
 			if ($point_percentage_referrer > 0) {
-				if ($point_type_referrer == 'percentage') $points_referrer = ceil($order_total/100 * $point_percentage_referrer); 
+				if ($point_type_referrer == 'percentage') $points_referrer = ceil($order_total/100 * $point_percentage_referrer);
 				else $points_referrer = $point_percentage_referrer;
 				$params_referrer = array (
 					'uid' => $referrer_uid,
@@ -138,7 +138,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 
 			// assign point untuk yang di refer
 			if ($point_percentage_refer > 0) {
-				if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer); 
+				if ($point_type_refer == 'percentage') $points_refer = ceil($order_total/100 * $point_percentage_refer);
 				else $points_refer = $point_percentage_refer;
 				$params_refer = array (
 					'uid' => $user->uid,
@@ -147,7 +147,7 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 					'moderate' => TRUE,
 					'description' => 'Referred by '.$referrer_mail
 				);
-				userpoints_userpointsapi($params_refer); 
+				userpoints_userpointsapi($params_refer);
 				_send_referral_credit_notification($user->mail, $referrer_mail, $points_refer);
 			}
 		}
@@ -157,16 +157,16 @@ function assign_point_to_referrer_user($order, $user, $point_type_referrer, $poi
 function _send_referral_credit_notification($email, $email_referrer, $point, $referrer = false){
 	$point = number_format($point,0,",",".");
   $from = "info@sepulsa.com";
-  $subject = "Anda Mendapatkan Kredit Sepulsa Sebesar Rp. ".$point;
+  $subject = "Anda Mendapatkan Sepulsa Kredit Sebesar Rp. ".$point;
 	if ($referrer == true) {
 		$to = $email_referrer;
-		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ".$point." karena user yang anda undang ".$email." melakukan order pertama.";
+		$message = "Anda mendapatkan Sepulsa Kredit sebesar Rp. ".$point." karena user yang anda undang ".$email." melakukan order pertama. Sepulsa Kredit akan masuk ke akun anda dalam waktu 1 x 24 jam. Syarat dan Ketentuan berlaku (https://www.sepulsa.com/promo-referral).";
 	} else {
 		$to = $email;
-		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point." karena diundang ".$email_referrer." dan telah melakukan order pertama kali.";
+		$message = "Anda mendapatkan Kredit Sepulsa sebesar Rp. ". $point." karena diundang ".$email_referrer." dan telah melakukan order pertama kali. Sepulsa Kredit akan masuk ke akun anda dalam waktu 1 x 24 jam. Syarat dan Ketentuan berlaku (https://www.sepulsa.com/promo-referral).";
 	}
 
-  //params is the array passed to hook_mail function 
+  //params is the array passed to hook_mail function
   $params = array(
 	  'subject' => $subject,
 	  'body' => $message,
@@ -183,7 +183,7 @@ function referral_sepulsa_userpoint_category_options() {
         $list[$category->tid] = $category->name;
     }
     //drupal_set_message("<pre>".print_r($list, true)."</pre>");
- 
+
     return $list;
 }
 

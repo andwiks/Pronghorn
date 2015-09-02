@@ -4,7 +4,9 @@ $(document).ready(function () {
     $(".voucher_vendor .slider").bxSlider({
         slideWidth: "175px",
         minSlides: 2,
-        maxSlides: 6
+        maxSlides: 6,
+        ticker: true,
+        speed: 20000
     });// carousel voucher vendor
 
     $(".slider_voucher .slider").bxSlider({
@@ -15,6 +17,8 @@ $(document).ready(function () {
     });// carousel voucher 
 
     $(".promo_banner .slider").bxSlider({
+        auto: true,
+        mode: 'fade'
     });// carousel voucher vendor
 
     randomTheme();// random theme at home

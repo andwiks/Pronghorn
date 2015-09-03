@@ -161,19 +161,27 @@ function userpoints_transaction_list() {
 function userpoints_transaction_detail() {
   $user_uid = arg(3);
   $settings = array('show_user' => FALSE);
-  $header = array("Point", "Category", "Date", "Reason", "Status");
+  $header = array("Point", "Category", "Date", "Reason", "Status", "Action");
   $query = db_select('userpoints_txn', 'p')->extend('TableSort')
             ->fields('p')
             ->condition('p.uid', $user_uid)
             ->orderBy('p.txn_id', 'DESC');
   if (module_exists('taxonomy')) {
-	$query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
+		$query->leftJoin('taxonomy_term_data', 't', 'p.tid = t.tid');
   }
-  foreach ($query->execute() as $transaction) {
-	$up[] = userpoints_get_transaction_row($transaction, $settings);
+  foreach ($query->execute() as $key=>$transaction) {
+		$up[$key] = userpoints_get_transaction_row($transaction, $settings);
+		$up[$key]['txn_id'] = $transaction->txn_id;
+	//drupal_set_message("<pre>".print_r($transaction, true)."</pre>");
   }
   foreach ($up as $row) {
-	$rows[] = array(number_format($row['data'][0]['data'],0,",","."), $row['data'][1]['data'], $row['data'][2]['data'], $row['data'][3]['data'], $row['data'][4]['data']);
+		$rows[] = array(
+			number_format($row['data'][0]['data'],0,",","."), 
+			$row['data'][1]['data'], 
+			$row['data'][2]['data'], 
+			$row['data'][3]['data'], 
+			$row['data'][4]['data'], 
+			l(t('Edit'), 'admin/config/people/userpoints/transaction/'.$row['txn_id'].'/edit'));
   }
 
   $totalamount = userpoints_get_current_points($user_uid, 'all');

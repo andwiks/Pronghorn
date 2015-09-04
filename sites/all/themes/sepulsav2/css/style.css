@@ -60,7 +60,7 @@ header {
     height: 80px;
     top:0;
     left: 0;
-    z-index: 1;
+    z-index: 2;
     border-bottom: 1px solid #CCC;
 }
 header .soc_link{float:left;}
@@ -3208,12 +3208,13 @@ padding: 0;
 
 .page-user-voucher section.std_content
 {
-    /*z-index: 3;*/
+    z-index: 1;
 }
 
 .page-user-voucher .wrap_popup.voucher
 {
-    margin-top:75px;
+    padding-top:75px;
+    padding-bottom: 15px;
 }
 
 .page-user-voucher section.std_content .alert-block

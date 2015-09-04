@@ -130,6 +130,11 @@ section.easy_step .box_step p {
   margin: 0 auto 40px auto;
 }
 
+section.h_keuntungan
+{
+    background: none;
+}
+
 
 section.h_keuntungan {
   padding: 10px 0 35px 0;

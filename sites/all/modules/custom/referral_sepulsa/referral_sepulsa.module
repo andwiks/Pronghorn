@@ -4,12 +4,17 @@
 * Implementation of hook_permission().
 */
 function referral_sepulsa_permission() {
-  return array(
+	$perm = array(
 		"access referral admin" => array(
 	  	'title' => t('Access Referral Admin'),
 	  	'description' => t('Access Referral Admin'),
 		),
+		"access daily referral order report" => array(
+	  	'title' => t('Access Daily Referral Report'),
+	  	'description' => t('Access Daily Referral Report'),
+		),
   );
+  return $perm;
 }
 
 /**
@@ -194,6 +199,13 @@ function referral_sepulsa_menu() {
 		'access arguments' => array('access referral admin'),
 		'type'             => MENU_NORMAL_ITEM,
 	);
+	
+	$items['admin/people/referral/daily_referral_report'] = array(
+		'title'            => t('Daily Referral Report'),
+		'page callback'    => 'admin_daily_referral_report',
+		'access arguments' => array('access daily referral order report'),
+		'type'             => MENU_NORMAL_ITEM,
+	);
 
 	$items['user/referral_list'] = array(
 		'title' => t('Your Referral'),
@@ -256,6 +268,11 @@ function referral_sepulsa_theme($existing, $type, $theme, $path) {
 			'referral_transaction_list' => array(
         'variables' => array('content' => NULL),
         'template' => 'referral_transaction_list',
+        'path' => drupal_get_path('module', 'referral_sepulsa')
+      ),
+			'daily_referral_report' => array(
+        'variables' => array('content' => NULL),
+        'template' => 'daily_referral_report',
         'path' => drupal_get_path('module', 'referral_sepulsa')
       )
     );
@@ -367,6 +384,73 @@ function admin_referral_list_form_submit($form, &$form_state){
 		$_SESSION['referral_list'] = $referral_list;
 		$_SESSION['email'] = $email;
 	}
+}
+
+function admin_daily_referral_report_form($form, &$form_state) {
+  $format_date = 'm/d/Y';
+  $form['start_date'] = array(
+    '#type' => 'date_popup',
+		'#date_format' => $format_date,
+		'#title' => t('Start Date'),
+		'#required' => TRUE,
+  );
+	$form['end_date'] = array(
+    '#type' => 'date_popup',
+		'#date_format' => $format_date,
+		'#title' => t('End Date'),
+		'#required' => TRUE
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+function admin_daily_referral_report_form_submit($form, &$form_state) {
+	$start_date = $form['start_date']['#value']['date'].' 00:00:00';
+	$end_date = $form['end_date']['#value']['date'].' 23:59:59';
+	$start_date_t = strtotime($start_date);
+	$end_date_t = strtotime($end_date);
+	drupal_goto('admin/people/referral/daily_referral_report', array("query" => array("sd" => $start_date_t, "ed" => $end_date_t)));
+}
+
+function admin_daily_referral_report() {
+	$content = array();
+	$page = 0;
+	$where = '';
+	$item_per_page = 50;
+	if (isset($_GET['page'])) $page = $_GET['page'];
+	$start = $page * $item_per_page;
+	
+	if (isset($_GET['sd']) && isset($_GET['ed'])) {
+		$where = " AND (co.created BETWEEN '".$_GET['sd']."' AND '".$_GET['ed']."')";
+		//$where = " AND (co.created >= '".$sd."' AND co.created <= '".$ed."')";
+	}
+	
+	$query = "SELECT COUNT(DISTINCT ( co.order_id)) as total_order, SUM(cpt.amount) as total_amount, from_unixtime(co.created, '%d %M %Y') AS 'order_date' 
+		FROM referral r JOIN commerce_order co ON r.uid = co.uid 
+		JOIN commerce_payment_transaction cpt ON co.order_id = cpt.order_id AND cpt.status = 'success' 
+		WHERE co.status IN ('completed', 'invoiced') ".$where." GROUP BY order_date ORDER BY co.created DESC";
+	
+	// get total row for paging
+	$orders_total = db_query($query);
+	$total = $orders_total->rowCount();
+	pager_default_initialize($total,$item_per_page);
+	
+	// listing
+	$orders = db_query_range($query, $start, $item_per_page);
+	foreach ($orders as $order) {
+		$average = (float)$order->total_amount / (int)$order->total_order;
+		$content[] = array(
+			'order_date' => $order->order_date,
+			'total_order' => $order->total_order,
+			'total_amount' => commerce_currency_format($order->total_amount, 'IDR'),
+			'order_amount_avg' => commerce_currency_format($average, 'IDR'),
+		);
+	}
+	//drupal_set_message("<pre>".print_r($content, true)."</pre>");
+	return theme('daily_referral_report', array('content' => $content));
 }
 
 function referral_transaction_list() {

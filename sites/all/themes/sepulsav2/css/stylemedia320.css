@@ -66,6 +66,11 @@ section.easy_step .box_step .label{margin: 10px auto 10px;}
 section.easy_step .box_step p {margin: 0 auto 30px;}
 section.easy_step .bt_std{display: inline-block;margin-top: 15px;}
 
+section.h_keuntungan
+{
+    background: none;
+}
+
 section.h_keuntungan .box {
     width: 280px;
     text-align: left;

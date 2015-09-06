@@ -60,7 +60,7 @@ header {
     height: 80px;
     top:0;
     left: 0;
-    z-index: 1;
+    z-index: 2;
     border-bottom: 1px solid #CCC;
 }
 header .soc_link{float:left;}
@@ -3208,7 +3208,33 @@ padding: 0;
 
 .page-user-voucher section.std_content
 {
-    z-index: 3;
+    z-index: 1;
+}
+
+.page-user-voucher .wrap_popup.voucher
+{
+    padding-top:75px;
+    padding-bottom: 15px;
+}
+
+.page-user-voucher section.std_content .alert-block
+{
+    height: auto;
+    padding: 15px 10px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.page-user-voucher section.std_content .akun .c_right .box_voucher
+{
+    width: 100%;
+    margin-right: 0;
+}
+
+.page-user-voucher section.std_content .akun .c_right .box_voucher .image img
+{
+    width: 100% !important;
+    height: auto;
 }
 
 .wrap_popup.voucher .redeem .form input[type=text]

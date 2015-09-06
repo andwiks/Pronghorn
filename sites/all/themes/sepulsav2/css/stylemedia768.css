@@ -132,6 +132,7 @@ header .nav_mobile .box_drop{
     left: -193px;
     font-size: 11px;
     font-family: "robotoregular";
+    border:1px solid #feb60a;
     border-top:5px solid #feb60a;
 }
 header .nav_mobile .box_drop a {

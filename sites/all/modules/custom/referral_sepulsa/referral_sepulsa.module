@@ -409,7 +409,7 @@ function admin_daily_referral_report_form($form, &$form_state) {
 
 function admin_daily_referral_report_form_submit($form, &$form_state) {
 	$start_date = $form['start_date']['#value']['date'].' 00:00:00';
-	$end_date = $form['end_date']['#value']['date'].' 00:00:00';
+	$end_date = $form['end_date']['#value']['date'].' 23:59:59';
 	$start_date_t = strtotime($start_date);
 	$end_date_t = strtotime($end_date);
 	drupal_goto('admin/people/referral/daily_referral_report', array("query" => array("sd" => $start_date_t, "ed" => $end_date_t)));

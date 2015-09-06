@@ -418,6 +418,7 @@ function admin_daily_referral_report_form_submit($form, &$form_state) {
 function admin_daily_referral_report() {
 	$content = array();
 	$page = 0;
+	$where = '';
 	$item_per_page = 50;
 	if (isset($_GET['page'])) $page = $_GET['page'];
 	$start = $page * $item_per_page;

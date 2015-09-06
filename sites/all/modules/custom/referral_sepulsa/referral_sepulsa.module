@@ -423,7 +423,7 @@ function admin_daily_referral_report() {
 	$start = $page * $item_per_page;
 	
 	if (isset($_GET['sd']) && isset($_GET['ed'])) {
-		$where = " AND (co.created BETWEEN '".$_GET['sd']."' AND '".$_GET['sd']."')";
+		$where = " AND (co.created BETWEEN '".$_GET['sd']."' AND '".$_GET['ed']."')";
 		//$where = " AND (co.created >= '".$sd."' AND co.created <= '".$ed."')";
 	}
 	

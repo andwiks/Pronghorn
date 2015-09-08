@@ -413,7 +413,7 @@ section.std_content .voucher .c_left {
 }
 section.std_content .voucher .c_left .grid_voucher_order table {
     width: 440px;
-    width: 96%%;
+    width: 96%;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order table td:first-child

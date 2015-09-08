@@ -408,8 +408,19 @@ section.std_content .voucher .c_left {
     display: block;
     width: auto;
     padding: 10px;
+    width: 100%;
+    padding: 0;
 }
-section.std_content .voucher .c_left .grid_voucher_order table {width: 440px;}
+section.std_content .voucher .c_left .grid_voucher_order table {
+    width: 440px;
+    width: 96%%;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child
+{
+    padding-left: 15px;
+}
+
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child{
     min-width: 0;
 }
@@ -420,7 +431,8 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position
 section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position: absolute;top: 60px;}
 section.std_content .voucher .c_left .grid_voucher_order p {
     width: 250px;
-    margin: 90px auto 20px ;
+    margin: 90px auto 20px;
+    margin: 0;
 }
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(2) {font-size: 14px;}
 section.std_content .voucher .c_left .grid_voucher_order tfoot th{font-size: 12px;}

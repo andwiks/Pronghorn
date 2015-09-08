@@ -305,8 +305,13 @@ section.std_content .voucher .c_left {
     display: block;
     width: auto;
     padding: 10px;
+    width: 100%;
+    padding: 0;
 }
-section.std_content .voucher .c_left .grid_voucher_order table {width: 280px;}
+section.std_content .voucher .c_left .grid_voucher_order table {
+    width: 280px;
+    width: 96%;
+}
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child{
     min-width: 0;
 }
@@ -596,6 +601,15 @@ section.transaction .alert-block
 section.std_content .voucher .c_left .grid_voucher_order table td:first-child
 {
     padding-left: 0;
+    padding-left: 10px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child img
+{
+    position: inherit !important;
+    display: block;
+    float: left;
+    margin-right: 10px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order td p

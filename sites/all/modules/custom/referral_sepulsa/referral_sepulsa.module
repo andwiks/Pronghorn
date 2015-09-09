@@ -206,6 +206,13 @@ function referral_sepulsa_menu() {
 		'access arguments' => array('access daily referral order report'),
 		'type'             => MENU_NORMAL_ITEM,
 	);
+	
+	$items['admin/people/referral/daily_referral_report/csv'] = array(
+		'title'            => t('Daily Referral Report CSV'),
+		'page callback'    => 'admin_daily_referral_report_csv',
+		'access arguments' => array('access daily referral order report'),
+		'type'             => MENU_CALLBACK,
+	);
 
 	$items['user/referral_list'] = array(
 		'title' => t('Your Referral'),
@@ -451,6 +458,45 @@ function admin_daily_referral_report() {
 	}
 	//drupal_set_message("<pre>".print_r($content, true)."</pre>");
 	return theme('daily_referral_report', array('content' => $content));
+}
+
+function admin_daily_referral_report_csv() {
+	$where = '';
+	if (isset($_GET['sd']) && isset($_GET['ed'])) {
+		$where = " AND (co.created BETWEEN '".$_GET['sd']."' AND '".$_GET['ed']."')";
+	}
+	$query = "SELECT COUNT(DISTINCT ( co.order_id)) as total_order, SUM(cpt.amount) as total_amount, from_unixtime(co.created, '%d %M %Y') AS 'order_date' 
+		FROM referral r JOIN commerce_order co ON r.uid = co.uid 
+		JOIN commerce_payment_transaction cpt ON co.order_id = cpt.order_id AND cpt.status = 'success' 
+		WHERE co.status IN ('completed', 'invoiced') ".$where." GROUP BY order_date ORDER BY co.created DESC";
+	
+	$filename = 'daily_referral_report_'.date('Ymj').'_'.date('His').'.csv';
+	header("Pragma: ");
+	header("Cache-Control: ");
+	header("Content-type: text/csv");
+	header("Content-Disposition: attachment; filename=\"{$filename}\";");
+
+	// Write header
+	$headerL = array(
+			"Date",
+			"Total Referral Order",
+			"Total Revenue",
+			"Average",
+	);
+	echo implode(",", $headerL) . "\n";
+	
+	$orders = db_query($query);
+	foreach ($orders as $order) {
+		$average = (float)$order->total_amount / (int)$order->total_order;
+		$rowValueL = array(
+			$order->order_date,
+			$order->total_order,
+			commerce_currency_format($order->total_amount, 'IDR'),
+			commerce_currency_format($average, 'IDR'),
+		);
+		echo '"' . implode('","', $rowValueL) . "\"\n";
+	}
+	exit;
 }
 
 function referral_transaction_list() {

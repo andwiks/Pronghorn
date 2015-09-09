@@ -305,12 +305,19 @@ section.std_content .voucher .c_left {
     display: block;
     width: auto;
     padding: 10px;
+    width: 100%;
+    padding: 0;
 }
-section.std_content .voucher .c_left .grid_voucher_order table {width: 280px;}
+section.std_content .voucher .c_left .grid_voucher_order table {
+    width: 280px;
+    width: 96%;
+}
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child{
     min-width: 0;
 }
-section.std_content .voucher .c_left .grid_voucher_order table {width: 260px}
+section.std_content .voucher .c_left .grid_voucher_order table {width: 260px;
+    width: 96%;
+}
 section.std_content .voucher .c_left .grid_voucher_order table tr td:last-child {width: 30px;}
 section.std_content .voucher .c_left .grid_voucher_order table tr td{  padding: 8px 7px;font-size: 13px;line-height: 16px}
 section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position: absolute;bottom: -60px}
@@ -596,6 +603,15 @@ section.transaction .alert-block
 section.std_content .voucher .c_left .grid_voucher_order table td:first-child
 {
     padding-left: 0;
+    padding-left: 10px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child img
+{
+    position: inherit !important;
+    display: block;
+    float: left;
+    margin-right: 10px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order td p

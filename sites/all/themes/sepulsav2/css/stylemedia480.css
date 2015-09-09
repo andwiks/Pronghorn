@@ -740,3 +740,9 @@ section.std_content .akun .c_right .share input[type=text]
     padding: 0;
     margin: 0 0 5px 0;
 }
+
+.page-user-voucher section.std_content .akun .c_right .box_voucher
+{
+    width: 100%;
+    padding-right:0;
+}

@@ -3229,6 +3229,8 @@ padding: 0;
 {
     width: 100%;
     margin-right: 0;
+    width: 47%;
+    padding-right: 2%;
 }
 
 .page-user-voucher section.std_content .akun .c_right .box_voucher .image img

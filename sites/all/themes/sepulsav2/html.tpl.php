@@ -35,6 +35,13 @@ $page_state = "home";
     function buynow() {
       document.getElementById('nomor-hp').focus();
     }
+
+
+    $(document).ready(function(){  
+      $('#edit-add-charge').click(function(){   
+        return confirm('Apakah Anda yakin ingin melanjutkan pembayaran tanpa memilih Voucher?') 
+      });      
+    });
   </script>
 <?php include('inc_header.php'); ?>
 <?php print $page_top; ?>

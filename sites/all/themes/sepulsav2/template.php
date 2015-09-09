@@ -214,24 +214,23 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
   } else if ($form_id == "views_form_commerce_cart_block_default") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
-    global $base_url;
+    unset($form['#prefix']);
+    unset($form['#suffix']);
+
     $views = $form_state['build_info']['args'][0];
 
     foreach (element_children($form['edit_delete']) as $children) {
-      $form['edit_delete'][$children]['#attributes']['class'][] = 'hapusButton';
       $form['edit_delete'][$children]['#value'] = '';
 
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $views->result[$children]->_field_data['commerce_line_item_field_data_commerce_line_items_line_item_']['entity']);
       if ($line_item_wrapper->getBundle() == 'coupon') {
          $form['edit_delete'][$children]['#product_id'] = $line_item_wrapper->commerce_product->getIdentifier();
          $form['edit_delete'][$children]['#ajax'] = array(
-           'callback' => 'sepulsa_views_form_commerce_cart_block_default_ajax_submit',
+           'callback' => 'sepulsav2_views_form_commerce_cart_block_default_ajax_submit',
            'progress' => array('type' => 'none'),
          );
       }
     }
-
   } else if ($form_id == "user_profile_form") {
     $form['#attributes']['class'][] = 'form';
     $form['#attributes']['class'][] = 'akun';
@@ -279,17 +278,10 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
   if (!empty($form_state['line_item'])) {
     switch ($form_state['line_item']->type) {
       case 'coupon':
-        // $form['#attached']['library'][] = array('system', 'effects.shake');
-        // $form['#attached']['js'][path_to_theme() . '/js/sepulsav2-coupon.js'] = array(
-        //   'group' => JS_THEME,
-        // );
-
-        // $form['submit']['#attributes'] = array('class' => array('post-read-more'));
-        // $form['submit']['#ajax'] = array(
-        //   'callback' => 'sepulsav2_commerce_add_to_cart_form_ajax_submit',
-        //   'progress' => array('type' => 'none'),
-        // );
-        // dpm($form);
+        $form['submit']['#ajax'] = array(
+          'callback' => 'sepulsav2_commerce_add_to_cart_form_ajax_submit',
+          'progress' => array('type' => 'none'),
+        );
         break;
 
       case 'electricity_prepaid':
@@ -484,6 +476,30 @@ function sepulsav2_preprocess_views_view_list(&$variables) {
       foreach ($view->result as $id => $result) {
         $variables['classes_array'][$id] = 'line-item-' . $result->commerce_line_item_field_data_commerce_line_items_line_item_;
       }
+      break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_table().
+ */
+function sepulsav2_preprocess_views_view_table(&$variables) {
+  $view = $variables['view'];
+
+  switch ($view->name) {
+    case 'commerce_cart_block':
+      if (!empty($view->args)) {
+        $order = commerce_order_load(reset($view->args));
+      }
+      else {
+        global $user;
+
+        $order = commerce_cart_order_load($user->uid);
+      }
+
+      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+      $line_items = $order_wrapper->commerce_line_items;
+      $variables['order_total'] = commerce_line_items_total($line_items);
       break;
   }
 }

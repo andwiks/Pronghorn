@@ -3479,3 +3479,9 @@ hr.smallsize
 {
     margin-top: 10px;
 }
+
+/* hide lang for a moment */
+header .right_link .box.lang
+{
+    display: none !important;
+}

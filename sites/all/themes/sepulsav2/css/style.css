@@ -3485,3 +3485,8 @@ header .right_link .box.lang
 {
     display: none !important;
 }
+
+.m_lang
+{
+    display: none !important;
+}

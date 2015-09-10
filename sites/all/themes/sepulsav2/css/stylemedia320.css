@@ -656,6 +656,12 @@ section.std_content .akun .c_right nav a
     margin: 0 10px 0 0;
 }
 
+.page-user-voucher section.std_content .akun .c_right .box_voucher
+{
+    width: 100%;
+    padding-right:0;
+}
+
 #webform-client-form-4907 .form-item .description
 {
     margin-left: 0px !important;

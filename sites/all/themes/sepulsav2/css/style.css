@@ -2665,6 +2665,16 @@ button[disabled=disabled]
     background: #CCC !important;
 }
 
+.grid_voucher_order .btn.disabled, 
+.grid_voucher_order .btn[disabled], 
+.grid_voucher_order fieldset[disabled], 
+.grid_voucher_order input[type=submit][disabled=disabled], 
+.grid_voucher_order button[disabled=disabled]
+{
+    background: none !important;
+    background-image: url(../images/material/trash_ico.png) !important;
+}
+
 section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
     background-image: none;
     padding-right: 0;
@@ -3229,6 +3239,8 @@ padding: 0;
 {
     width: 100%;
     margin-right: 0;
+    width: 47%;
+    padding-right: 2%;
 }
 
 .page-user-voucher section.std_content .akun .c_right .box_voucher .image img
@@ -3466,4 +3478,10 @@ hr.smallsize
 .coupon-description
 {
     margin-top: 10px;
+}
+
+/* hide lang for a moment */
+header .right_link .box.lang
+{
+    display: none !important;
 }

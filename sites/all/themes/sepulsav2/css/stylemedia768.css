@@ -221,17 +221,26 @@ section.transaction .wrapper_2 .c_right {
     border: none;
     border-top: 1px dashed #d8d8d8;   
 }
-section.transaction .wrapper_3.thanks_page{
+/*section.transaction .wrapper_3.thanks_page{
     width: 708px;
+
+}*/
+section.transaction .wrapper_3.thanks_page{
+    width: 960px;
 
 }
 section.transaction .thanks_page .c_right, 
 section.transaction .thanks_page .c_left{width: 335px;}
 section.transaction .c_right {padding: 0 0 0 38px;}
 
+/*section.std_content .voucher,
+section.std_content .voucher .wrapper_2,
+section.std_content .voucher .wrapper_3 {width: 708px;}*/
+
 section.std_content .voucher,
 section.std_content .voucher .wrapper_2,
-section.std_content .voucher .wrapper_3 {width: 708px;}
+section.std_content .voucher .wrapper_3 {width: 960px;}
+
 section.std_content .c_right {width: 100%;}
 section.std_content .voucher .c_left{
     display: block;width: 100%;
@@ -255,7 +264,14 @@ section.std_content .filter .row label {margin: 12px 5px 0 0;}
 
 section.std_content .voucher .slider_voucher{width: 625px;margin: auto;}
 section.std_content .box_voucher a.bt {width: 180px;padding: 12px 0;}
-section.std_content .list_voucher {width: 637px;margin: auto;}
+
+/*section.std_content .list_voucher {width: 637px;margin: auto;}*/
+
+section.std_content .list_voucher {
+    width: 98%;
+    margin: auto;
+}
+
 section.std_content .slider_voucher .bx-wrapper .bx-controls-direction a {
     background-size: auto  200%;
     width: 21px;

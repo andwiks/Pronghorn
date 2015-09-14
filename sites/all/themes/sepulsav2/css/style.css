@@ -3490,3 +3490,16 @@ header .right_link .box.lang
 {
     display: none !important;
 }
+
+.std_content .alert-block .voucher-code
+{
+    background-color: #86fb38;
+    padding: 10px;
+    margin-bottom: 5px;
+    color: #000;
+    border: 1px dashed;
+    font-size: 20px;
+    font-weight: bold;
+    padding-left: 40px;
+    background: #86fb38 url(../images/material/check_ico.png) no-repeat left 20px center;
+}

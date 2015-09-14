@@ -547,7 +547,6 @@ function commerce_fees_commerce_cart_order_refresh($order_wrapper) {
     if ($line_item_wrapper->getBundle() == 'fee') {
       // Delete the line item, and remove it from the order.
       $line_item_ids[] = $line_item_wrapper->line_item_id->value();
-      $order_wrapper->commerce_line_items->offsetUnset($delta);
     }
   }
 
@@ -557,7 +556,14 @@ function commerce_fees_commerce_cart_order_refresh($order_wrapper) {
     commerce_line_item_delete_multiple($line_item_ids);
   }
 
-  rules_invoke_event('commerce_fees_order', $order_wrapper);
+  // After deleting line items - recalculate order total.
+  // This will remove empty references to freshly deleted line items
+  // and make sure percentage fees get calculated based on order total
+  // without the fee already applied
+
+  commerce_order_calculate_total($order_wrapper->value());
+
+  rules_invoke_event('commerce_fees_order', $order_wrapper->value());
 }
 
 /**

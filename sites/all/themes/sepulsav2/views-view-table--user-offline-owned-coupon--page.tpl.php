@@ -31,9 +31,9 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
 
                 <div class="redeem">
-                    <h6><?php print t('REDEEM Voucher kamu'); ?></h6>
+                    <h6><?php print t('Kode Voucher'); ?></h6>
                     <span>
-                        <?php print t('Kode akan dicheck dan diisi oleh pihak merchant yang tertera di kupon. Tunjukan halaman ini, dan redeem voucher kamu.'); ?>
+                        <h4><?php print $row['field_unique_coupon_code']; ?></h4>
                     </span>
                     <div class="form">
                       <?php $form = drupal_get_form('offline_coupon_redeem_form_' . $row['nid'] , $row['nid']); ?>

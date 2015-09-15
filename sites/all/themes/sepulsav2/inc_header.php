@@ -59,10 +59,10 @@ global $base_url, $user, $language;
                             <a href="<?php print url("user/voucher"); ?>"><?php print t('Voucher Diskon'); ?></a>
                             <a href="<?php print url("konfirmasi"); ?>"><?php print t('Konfirmasi Pembayaran'); ?></a>
                             <a href="<?php print url("user/logout"); ?>"><?php print t('Keluar'); ?></a>
-                            <div class="m_lang">
+                            <!--<div class="m_lang">
                                 <a href="">English</a>
                                 <a href="">Indonesia</a>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                 <?php } else { ?>
@@ -70,10 +70,10 @@ global $base_url, $user, $language;
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
                             <a href="<?php print url("user/login"); ?>" class="login">LOGIN</a>
-                            <div class="m_lang">
+                            <!--<div class="m_lang">
                                 <a href="?language=en">English</a>
                                 <a href="?language=id">Indonesia</a>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                     <div class="box login">
@@ -86,7 +86,7 @@ global $base_url, $user, $language;
                     <?php
                 }
                 ?>
-                <div class="box lang">
+                <!--<div class="box lang">
                     <a href="" >
                         <span class="ico"></span>
                      <?php if ($language->language == 'id') { ?>
@@ -102,7 +102,7 @@ global $base_url, $user, $language;
                       <?php else: ?>
                         <a href="?language=id">ID</a>
                       <?php endif; ?>
-                    </div>
+                    </div>-->
                 </div>
             </div>
 

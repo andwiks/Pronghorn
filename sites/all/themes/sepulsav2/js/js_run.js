@@ -6,7 +6,8 @@ $(document).ready(function () {
         minSlides: 2,
         maxSlides: 6,
         ticker: true,
-        speed: 20000
+        tickerHover: true,
+        speed: 40000
     });// carousel voucher vendor
 
     $(".slider_voucher .slider").bxSlider({
@@ -57,6 +58,8 @@ $(document).ready(function () {
         }, 1000);
     });
 
+
+    onclick="return confirm('Apakah Anda yakin ingin melanjutkan pembayaran tanpa memilih Voucher?')"
 
 
     /* blog

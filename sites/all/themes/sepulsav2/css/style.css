@@ -465,7 +465,11 @@ section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../ima
 section.h_middle_top .home_tab .nav_tab a:last-child{border-right: none;}
 
 section.h_middle_top .home_tab .nav_tab a.active,
-section.h_middle_top .home_tab .nav_tab a:hover{background:#feb60a;color:#FFF;border-color: #FFF }
+section.h_middle_top .home_tab .nav_tab a:hover{
+    background:#feb60a;color:#FFF;border-color: #FFF 
+}
+
+
 section.h_middle_top .home_tab .nav_tab a.active span.ico,
 section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position:left bottom;}
 
@@ -3502,4 +3506,12 @@ header .right_link .box.lang
     font-weight: bold;
     padding-left: 40px;
     background: #86fb38 url(../images/material/check_ico.png) no-repeat left 20px center;
+}
+
+section.h_middle_top .home_tab .nav_tab a:hover {
+    filter: contrast(150%) !important;
+    -webkit-filter: contrast(150%) !important;
+    -moz-filter: contrast(150%) !important;
+    -ms-filter: contrast(150%) !important;
+    -o-filter: contrast(150%) !important;
 }

@@ -56,3 +56,7 @@
     </tr>
   </tfoot>
 </table>
+<p>
+  <?php print t('* Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.<br/>
+  * Check Bank Promo untuk mendapatkan lebih banyak voucher diskon!'); ?>
+</p>

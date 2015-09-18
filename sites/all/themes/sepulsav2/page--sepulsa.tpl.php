@@ -29,7 +29,7 @@ $page_state = "home";
             <td>
               <a href="" target="target_2">
                   <span class="ico listrik"></span>
-                  <?php print t('bayar listrik'); ?>
+                  <?php print t('token listrik'); ?>
               </a>
             </td>
           </tr>

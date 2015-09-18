@@ -1,7 +1,12 @@
 <?php
 
-/*
- * Checkout pane callback: coupon settings
+/**
+ * @file
+ * Commerce Checkout pane implementations.
+ */
+
+/**
+ * Checkout pane callback: coupon settings.
  */
 function commerce_coupon_pane_settings_form($checkout_pane) {
   $form = array();
@@ -22,7 +27,7 @@ function commerce_coupon_pane_settings_form($checkout_pane) {
   $form['commerce_coupon_checkout_pane_view'] = array(
     '#type' => 'select',
     '#title' => t('Coupons Checkout Pane View'),
-    '#description' => t('Specify the View to use in the checkout pane under the coupon form. Select \'none\' to not display anything.'),
+    '#description' => t('Specify the View to use in the checkout pane under the coupon form. Select "none" to not display anything.'),
     '#options' => array('none' => t('None')) + $options,
     '#default_value' => variable_get('commerce_coupon_checkout_pane_view', 'order_coupon_list|checkout'),
   );
@@ -38,8 +43,8 @@ function commerce_coupon_pane_settings_form($checkout_pane) {
   return $form;
 }
 
-/*
- * Checkout pane callback: coupon checkout form
+/**
+ * Checkout pane callback: coupon checkout form.
  */
 function commerce_coupon_pane_checkout_form($form, &$form_state, $checkout_pane, $order) {
   // Allow to replace pane content with ajax calls.
@@ -119,7 +124,8 @@ function commerce_coupon_pane_checkout_form($form, &$form_state, $checkout_pane,
   }
 
   // Display any new status messages added by this pane within the pane's area.
-  if (drupal_get_messages(NULL, FALSE)) {
+  if (isset($form_state['triggering_element']) && $form_state['triggering_element']['#name'] == 'coupon_add'
+    && drupal_get_messages(NULL, FALSE)) {
     $pane_form['status_messages'] = array(
       '#type' => 'markup',
       '#markup' => theme('status_messages'),
@@ -130,33 +136,38 @@ function commerce_coupon_pane_checkout_form($form, &$form_state, $checkout_pane,
   return $pane_form;
 }
 
-/*
+/**
  * Ajax callback: coupon add button.
  */
 function commerce_coupon_add_coupon_callback($form, &$form_state) {
   // Re-render the cart summary.
   list($view_id, $display_id) = explode('|', variable_get('commerce_cart_contents_pane_view', 'commerce_cart_summary|default'));
   $cart_summary = commerce_embed_view($view_id, $display_id, array($form_state['order']->order_id));
-  $commands[] = ajax_command_replace('.view-commerce-cart-summary', $cart_summary);
+  $commands[] = ajax_command_replace('.cart_contents .view', $cart_summary);
 
-  // Re-render coupon pane
+  // Re-render coupon pane.
   $coupon_pane = $form['commerce_coupon'];
   $commands[] = ajax_command_replace('#commerce-checkout-coupon-ajax-wrapper', drupal_render($coupon_pane));
 
-  // Allow other modules to alter the commands
+  // Allow other modules to alter the commands.
   drupal_alter('commerce_coupon_add_coupon_ajax', $commands, $form, $form_state);
 
   return array('#type' => 'ajax', '#commands' => $commands);
 }
 
-/*
- * Checkout pane callback: coupon checkout review
+/**
+ * Checkout pane callback: coupon checkout review.
  */
 function commerce_coupon_pane_review($form, $form_state, $checkout_pane, $order) {
   if (!empty($order->commerce_coupons)) {
     // Extract the View and display keys from the cart contents pane setting.
     list($view_id, $display_id) = explode('|', variable_get('commerce_coupon_review_pane_view', 'order_coupon_list|checkout'));
 
-    return commerce_embed_view($view_id, $display_id, array($order->order_id));
+    $view = views_get_view($view_id);
+    // Check for view.
+    if ($view) {
+      // If view exisits then proceed.
+      return commerce_embed_view($view_id, $display_id, array($order->order_id));
+    }
   }
 }

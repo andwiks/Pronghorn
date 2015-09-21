@@ -15,13 +15,20 @@ function commerce_discount_default_rules_configuration() {
   $rules = array();
 
   // Create a rule for each commerce discount entity.
+  entity_get_controller('commerce_discount')->resetCache();
+
   foreach (entity_load('commerce_discount') as $discount) {
     $wrapper = entity_metadata_wrapper('commerce_discount', $discount);
     $wrapper_properties = $wrapper->getPropertyInfo();
     // Only for Commerce Discount wrappers with Commerce Discount Offer defined.
-    if (in_array('commerce_discount_offer', array_keys($wrapper_properties))) {
+    if (isset($wrapper->commerce_discount_offer)) {
+      $offer_bundle = $wrapper->commerce_discount_offer->getBundle();
+      if (!isset($offer_types[$offer_bundle])) {
+        continue;
+      }
+
       $type = $types[$discount->type];
-      $offer_type = $offer_types[$wrapper->commerce_discount_offer->getBundle()];
+      $offer_type = $offer_types[$offer_bundle];
 
       $rule = rules_reaction_rule();
 

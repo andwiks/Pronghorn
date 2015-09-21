@@ -55,7 +55,7 @@ function userpoints_sepulsa_commerce_cart_order_refresh($order_wrapper) {
   // So first remove from order and then delete the line items.
   $line_items_to_delete = array();
   foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
-    if ($line_item_wrapper->type->value() == 'userpoints') {
+    if ($line_item_wrapper->getBundle() == 'userpoints') {
       $line_items_to_delete[] = $line_item_wrapper->line_item_id->value();
     }
   }

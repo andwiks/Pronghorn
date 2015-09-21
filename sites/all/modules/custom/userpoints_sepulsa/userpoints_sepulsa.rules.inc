@@ -79,6 +79,7 @@ function userpoints_sepulsa_rules_event_info() {
 }
 
 function userpoints_sepulsa_apply(EntityDrupalWrapper $order_wrapper, $user = NULL) {
+  commerce_order_calculate_total($order_wrapper->value());
   $point_amount = userpoints_get_current_points($user->uid, 'all');
   $order_total = $order_wrapper->commerce_order_total->amount->value();
   $amount = $order_total > $point_amount ? $point_amount : $order_total;
@@ -100,9 +101,7 @@ function userpoints_sepulsa_apply(EntityDrupalWrapper $order_wrapper, $user = NU
 
     $line_item = commerce_userpoints_discount_line_item_populate($line_item, $order_wrapper->getIdentifier(), $userpoints_params, commerce_default_currency(), t('User credit'));
     commerce_line_item_save($line_item);
-    $order = $order_wrapper->value();
-    $delta = $order_wrapper->commerce_line_items->count();
-    $order->commerce_line_items[LANGUAGE_NONE][]['line_item_id'] = $line_item->line_item_id;
+    $order_wrapper->commerce_line_items[] = $line_item;
   }
 }
 

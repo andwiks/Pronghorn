@@ -158,6 +158,7 @@ function sepulsa_checkout_commerce_order_presave($order) {
 }
 
 function sepulsa_checkout_pane_checkout_form_details_refresh($form, $form_state) {
+  commerce_cart_order_refresh($form_state['order']);
   $form_state['order']->data['payment_method'] = $form_state['values']['commerce_payment']['payment_method'];
   commerce_cart_order_refresh($form_state['order']);
 

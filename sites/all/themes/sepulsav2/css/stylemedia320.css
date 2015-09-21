@@ -767,3 +767,13 @@ section.std_content .akun .c_right .share input[type=text]
     padding: 0;
     margin: 0 0 10px 0;
 }
+
+table.shop_table tfoot .cart_item
+{
+    display: block;
+}
+
+section.transaction table.cart td.product-subtotal
+{
+    width: 110px;
+}

@@ -1,6 +1,11 @@
 <?php
 
-/*
+/**
+ * @file
+ * Default views for Commerce Coupon.
+ */
+
+/**
  * Implements hook_views_default_views().
  */
 function commerce_coupon_views_default_views() {
@@ -130,7 +135,7 @@ function commerce_coupon_views_default_views() {
   $handler = $view->new_display('block', 'Checkout', 'checkout');
   $handler->display->display_options['block_description'] = 'Order coupon list: checkout';
 
-  $views['order_coupons_list'] = $view;
+  $views['order_coupon_list'] = $view;
 
   return $views;
 

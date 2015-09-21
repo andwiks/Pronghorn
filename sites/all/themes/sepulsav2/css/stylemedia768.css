@@ -388,3 +388,8 @@ section.std_content .voucher .c_left
     margin: 0 auto;
     display: block;
 }
+
+section.std_content .box_voucher h4
+{
+    min-height: 40px;
+}

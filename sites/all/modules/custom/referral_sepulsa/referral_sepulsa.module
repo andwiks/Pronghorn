@@ -541,3 +541,172 @@ function referral_sepulsa_mail($key, &$message, $params) {
     break;
     }
 }
+
+
+
+/**
+ *  @file
+ *  This defines views hooks for the Referral Sepulsa module. It will be loaded automatically as needed by the Views module.
+ */
+
+/**
+ * Implements hook_views_data().
+ */
+function referral_sepulsa_views_data() {
+	//print 'test'; exit;
+  // ----------------------------------------------------------------
+  // referral table
+  // Describe the referral table.
+  // Define the base group of this table. Fields that don't
+  // have a group defined will go into this field by default.
+  $data['referral']['table']['group'] = t('Referral');
+
+  $data['referral']['table']['base'] = array(
+		'field' => 'uid',
+		'title' => t('Referral'),
+  );
+
+  $data['referral']['table']['join'] = array(
+		'commerce_order' => array(
+				'left_field' => 'uid',
+				'field' => 'uid',
+		),
+  );
+	
+	 $data ['referral']['uid'] = array(
+    'title' => t('Referral UID'),
+    'help' => t('Referral UID'),
+    // Define a relationship to the {node} table, so example_table views can
+    // add a relationship to nodes. If you want to define a relationship the
+    // other direction, use hook_views_data_alter(), or use the 'implicit' join
+    // method described above.
+    'relationship' => array(
+      'base' => 'commerce_order', // The name of the table to join with.
+      'base field' => 'uid', // The name of the field on the joined table.
+      // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Commerce Order Relationship'),
+      'title' => t('Commerce Order Relationship'),
+      'help' => t('Relationship to commerce order table'),
+    ),
+  );
+
+  // Describe the referral uid column of the referral table.
+  $data['referral']['referral_uid'] = array(
+      'title' => t('Referral UID'),
+			'help' => t('User UID who referred another user'),
+      'field' => array(
+				'handler' => 'views_handler_field_numeric',
+				'click sortable' => TRUE,
+      ),
+      'argument' => array(
+				'handler' => 'views_handler_argument_numeric',
+				'numeric' => TRUE,
+				'name field' => 'referral_uid', // display this field in the summary
+      ),
+      'filter' => array(
+        'handler' => 'views_handler_filter_numeric',
+      ),
+      'sort' => array(
+        'handler' => 'views_handler_sort',
+      ),
+  );
+
+  // Describe the created column of the referral table.
+  $data['referral']['created'] = array(
+      'title' => t('Created Date'),
+      'help' => t('Referral user created date'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'created', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+
+	// Describe the flag column of the referral table.
+  $data['referral']['flag'] = array(
+      'title' => t('Flag'),
+      'help' => t('Referral Flag'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+          'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'flag', // display this field in the summary
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort',
+      ),
+  );
+
+  // Describe the flag timestamp column of the referral table.
+  $data['referral']['flag_timestamp'] = array(
+      'title' => t('Flag timestamp'),
+      'help' => t('Referral Flag timestamp'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'flag_timestamp', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+	
+	$data['referral']['host'] = array(
+      'title' => t('Host'),
+      'help' => t('Referrer Host'),
+      'field' => array(
+          'handler' => 'views_handler_field',
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_string',
+          'name field' => 'host', // display this field in the summary
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_string',
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort',
+      ),
+  );
+	
+	$data['referral']['http_referrer'] = array(
+      'title' => t('Http Referrer'),
+      'help' => t('Referral Http Referrer'),
+      'field' => array(
+          'handler' => 'views_handler_field',
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_string',
+          'name field' => 'http_referrer', // display this field in the summary
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_string',
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort',
+      ),
+  );
+	
+  return $data;
+}

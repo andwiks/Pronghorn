@@ -617,6 +617,7 @@ section.std_content .voucher .c_left .grid_voucher_order table td:first-child im
 section.std_content .voucher .c_left .grid_voucher_order td p
 {
     margin:0;
+    min-width: 90px;
 }
 
 #payment-details .description

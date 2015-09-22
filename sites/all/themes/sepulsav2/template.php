@@ -345,6 +345,7 @@ function sepulsav2_form_webform_client_form_alter(&$form, &$form_state, $form_id
  * Implements hook_commerce_coupon_add_coupon_ajax_alter().
  */
 function sepulsav2_commerce_coupon_add_coupon_ajax_alter(&$commands, $form, &$form_state) {
+  commerce_cart_order_refresh($form_state['order']);
   $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
   $commerce_payment = $rebuild['commerce_payment'];
 

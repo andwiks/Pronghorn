@@ -777,3 +777,8 @@ section.transaction table.cart td.product-subtotal
 {
     width: 110px;
 }
+
+section.transaction table.cart td.product-price
+{
+    width: 110px;
+}

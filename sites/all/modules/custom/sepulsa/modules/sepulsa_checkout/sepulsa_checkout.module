@@ -162,6 +162,8 @@ function sepulsa_checkout_pane_checkout_form_details_refresh($form, $form_state)
   $form_state['order']->data['payment_method'] = $form_state['values']['commerce_payment']['payment_method'];
   commerce_cart_order_refresh($form_state['order']);
 
+  $rebuild = drupal_rebuild_form($form_state['build_info']['form_id'], $form_state, $form);
+
   $commands = array();
   $commands[] = ajax_command_replace('#' . $form['commerce_payment']['payment_method']['#ajax']['wrapper'], render($form['commerce_payment']['payment_details']));
   $commands[] = ajax_command_html('#cart-contents-wrapper', commerce_embed_view('commerce_cart_summary', 'default', array($form_state['order']->order_id), 'cart'));

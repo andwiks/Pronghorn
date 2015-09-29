@@ -571,11 +571,15 @@ function referral_sepulsa_views_data() {
 				'left_field' => 'uid',
 				'field' => 'uid',
 		),
+		'users' => array(
+				'left_field' => 'uid',
+				'field' => 'referral_uid',
+		),
   );
 	
 	 $data ['referral']['uid'] = array(
-    'title' => t('Referral UID'),
-    'help' => t('Referral UID'),
+    'title' => t('UID'),
+    'help' => t('UID'),
     // Define a relationship to the {node} table, so example_table views can
     // add a relationship to nodes. If you want to define a relationship the
     // other direction, use hook_views_data_alter(), or use the 'implicit' join
@@ -590,7 +594,21 @@ function referral_sepulsa_views_data() {
       'help' => t('Relationship to commerce order table'),
     ),
   );
+	 
+	 $data ['referral']['referral_uid'] = array(
+    'title' => t('Referral UID'),
+    'help' => t('User UID who referred another user'),
+    'relationship' => array(
+      'base' => 'users', // The name of the table to join with.
+      'base field' => 'uid', // The name of the field on the joined table.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Users Relationship'),
+      'title' => t('Users Relationship'),
+      'help' => t('Relationship to users table'),
+    ),
+  );
 
+/*
   // Describe the referral uid column of the referral table.
   $data['referral']['referral_uid'] = array(
       'title' => t('Referral UID'),
@@ -611,7 +629,8 @@ function referral_sepulsa_views_data() {
         'handler' => 'views_handler_sort',
       ),
   );
-
+*/
+	 
   // Describe the created column of the referral table.
   $data['referral']['created'] = array(
       'title' => t('Created Date'),

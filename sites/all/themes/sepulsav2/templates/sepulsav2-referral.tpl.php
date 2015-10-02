@@ -1,3 +1,5 @@
+<?php
+/*
 <p>
   <?php print t('Ayo "SHARE" kemudahan isi pulsa di Sepulsa kepada teman atau kerabat kamu sekarang juga, dan dapatkan cashback dan benefit lainnya!'); ?>
   <br/><br/>
@@ -24,3 +26,5 @@
       '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;" class="gp">gp</a>
   </div>
 </div>
+*/
+?>

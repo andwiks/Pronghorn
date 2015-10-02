@@ -61,7 +61,7 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
     if ($voucher->author->getIdentifier() == $user->uid &&
         $voucher->status->value() == 1) {
       $v_code = array_map('trim',explode(",", $voucher_code));
-      if (!in_array($code, $v_code)) {
+      if (!in_array(strtoupper($code), $v_code)) {
         return services_error(t('Invalid merchant code'), 406);
       }
       $kode = $voucher->field_unique_coupon_code->value();
@@ -143,7 +143,7 @@ function offline_coupon_redeem_form_submit($form, &$form_state) {
     if ($voucher->author->getIdentifier() == $user->uid &&
         $voucher->status->value() == 1) {
       $v_code = array_map('trim',explode(",", $voucher_code));
-      if (!in_array($form_state['values']['merchant_code'], $v_code)) {
+      if (!in_array(strtoupper($form_state['values']['merchant_code']), $v_code)) {
         drupal_set_message(t('Invalid merchant code.'), 'error');
       } else {
         $kode = $voucher->field_unique_coupon_code->value();

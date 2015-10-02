@@ -25,6 +25,15 @@ function sepulsa_menu() {
     'file' => 'sepulsa.pages.inc',
   );
 
+  $items['sepulsa/data'] = array(
+    //'title' => 'Recharge Your Phone',
+    //no need to put title on front page
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_phone_form', TRUE),
+    'access callback' => TRUE,
+    'file' => 'sepulsa.pages.inc',
+  );
+
   $items['sepulsa/autocomplete/%'] = array(
     'title' => 'Sepulsa Autocomplete',
     'description' => 'Sepulsa Autocomplete',

@@ -122,7 +122,7 @@ function sepulsa_get_packet($nid, $data_packet = FALSE) {
     $products = $node_wrapper->field_product->value();
     // Looping for each product.
     foreach ($products as $product) {
-      $field_data_packet = empty($product->field_data_packet) ? FALSE : $product->field_data_packet;
+      $field_data_packet = empty($product->field_data_packet) ? FALSE : $product->field_data_packet[LANGUAGE_NONE][0]['value'];
       // Check product status.
       if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.

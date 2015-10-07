@@ -15,14 +15,14 @@
 /**
  * Function sepulsa_autocomplete().
  */
-function sepulsa_autocomplete() {
-  // Get autocomplete parameter.
-  $type = arg(2);
-  $string = arg(3);
+function sepulsa_autocomplete($type, $string = '') {
   // Get autocomplete callback by type.
   switch ($type) {
     case 'phone':
       return sepulsa_autocomplete_phone_number($string);
+
+    case 'data':
+      return sepulsa_autocomplete_phone_number($string, TRUE);
 
     default:
       drupal_access_denied();
@@ -58,11 +58,13 @@ function sepulsa_front_page() {
  * @return array
  *   Form array.
  */
-function sepulsa_phone_form($form, &$form_state) {
+function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
   global $user;
+  $form_state['data_packet'] = $data_packet;
+
   $existing_phone_options = array();
   // Get sepulsa operator data.
-  $operator_data = sepulsa_get_all_operator_data();
+  $operator_data = sepulsa_get_all_operator_data(FALSE, $data_packet);
 
   // Add sepulsa autocomplete form js.
   $form['#attached']['js'][] = array(
@@ -92,36 +94,38 @@ function sepulsa_phone_form($form, &$form_state) {
   // Autocorrect phone prefix.
   $phone = sepulsa_autocorrect_mobile_prefix($phone);
 
-  $query = "SELECT distinct(field_phone_number_value) 
-			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c	
-			WHERE
-			a.order_id = b.order_id 
-			AND b.line_item_id = c.entity_id
-			AND (a.status = 'completed' OR a.status = 'invoiced')
-			AND a.uid = :uid
-			ORDER BY a.created DESC";
-  $result = db_query($query, array(':uid' => $user->uid));
-  foreach ($result as $row) {
-	$existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
+  if (!$data_packet) {
+    $query = "SELECT distinct(field_phone_number_value)
+        FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c
+        WHERE
+        a.order_id = b.order_id
+        AND b.line_item_id = c.entity_id
+        AND (a.status = 'completed' OR a.status = 'invoiced')
+        AND a.uid = :uid
+        ORDER BY a.created DESC";
+    $result = db_query($query, array(':uid' => $user->uid));
+    foreach ($result as $row) {
+    $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
+    }
+    $existing_phone = sepulsa_get_existing_number();
+    foreach ($existing_phone as $value) {
+    $existing_phone_options[$value] = $value;
+    }
+    if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
+    $existing_phone_options['0'] = t('Topup another number');
+    $form['existing_phone'] = array(
+      '#type' => 'select',
+      '#title' => '',
+      '#options' => $existing_phone_options,
+      //'#suffix' => '<div>&nbsp;</div>',
+      '#validated' => TRUE,
+      '#attributes' => array(
+      'class' => array('full-width'),
+      ),
+    );
+    }
   }
-  $existing_phone = sepulsa_get_existing_number();
-  foreach ($existing_phone as $value) {
-	$existing_phone_options[$value] = $value;
-  }
-  if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
-  $existing_phone_options['0'] = t('Topup another number');
-	$form['existing_phone'] = array(
-	  '#type' => 'select',
-	  '#title' => '',
-	  '#options' => $existing_phone_options,
-	  //'#suffix' => '<div>&nbsp;</div>',
-	  '#validated' => TRUE,
-	  '#attributes' => array(
-		'class' => array('full-width'),
-	  ),
-	);
-  }
-  
+
   // Show input phone number.
   $form['phone'] = array(
     '#type' => 'textfield',
@@ -131,11 +135,14 @@ function sepulsa_phone_form($form, &$form_state) {
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
     '#attributes' => array(
       'pattern' => '[0-9]*',
-	  'style'=>'margin-top: 15px;'
+    'style'=>'margin-top: 15px;'
     ),
-	//'#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
-    //'#suffix' => 'test</div>',
+    // '#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
+    // '#suffix' => 'test</div>',
   );
+  if ($data_packet) {
+    $form['phone']['#autocomplete_path'] = 'sepulsa/autocomplete/data';
+  }
 
   // Add operator options with operator data from phone prefix.
   foreach ($operator_data as $data) {
@@ -180,8 +187,8 @@ function sepulsa_phone_form($form, &$form_state) {
     '#default_value' => (isset($operator)) ? $operator : 0,
     '#options' => $operator_options,
     '#disabled' => TRUE,
-//	'#prefix' => '<div id="operator-sepulsa" style="display: none;">',
-//    '#suffix' => '</div>',
+    // '#prefix' => '<div id="operator-sepulsa" style="display: none;">',
+    // '#suffix' => '</div>',
   );
 
   // Check whether operator input already available.
@@ -254,7 +261,7 @@ function sepulsa_phone_form_validate($form, &$form_state) {
     // Define phone variable.
     $phone = sepulsa_autocorrect_mobile_prefix($form_state['values']['phone']);
     // Get operator data.
-    $operator_data = sepulsa_get_all_operator_data();
+    $operator_data = sepulsa_get_all_operator_data(FALSE, $form_state['data_packet']);
     // Define default packets.
     $packets = array();
     // Looping for each operator data.
@@ -395,11 +402,11 @@ function sepulsa_autocorrect_mobile_prefix($phone) {
  * @return array
  *   Autocomplete array.
  */
-function sepulsa_autocomplete_prefix($string, $count = 4) {
+function sepulsa_autocomplete_prefix($string, $count = 4, $data_packet = FALSE) {
   // Define default count.
   $count = intval($count);
   // Get List of operator and prefix code.
-  $operators = sepulsa_get_all_operator_data();
+  $operators = sepulsa_get_all_operator_data(FALSE, $data_packet);
   // Define default matches.
   $matches = array();
   // Only for non empty operators.
@@ -407,7 +414,8 @@ function sepulsa_autocomplete_prefix($string, $count = 4) {
     // Looping for each operator.
     foreach ($operators as $operator) {
       // Check whether prefix is available.
-      if (isset($operator['prefix']) && !empty($operator['prefix'])) {
+      $packet = reset($operator['packet']);
+      if (isset($operator['prefix']) && !empty($operator['prefix']) && !empty($packet)) {
         // Looping for each prefix.
         foreach ($operator['prefix'] as $prefix) {
           // Autocomplete based on count parameter: create sub prefix.
@@ -435,7 +443,7 @@ function sepulsa_autocomplete_prefix($string, $count = 4) {
  * @return string
  *   JSON output.
  */
-function sepulsa_autocomplete_phone_number($string = '') {
+function sepulsa_autocomplete_phone_number($string = '', $data_packet = FALSE) {
   $matches = array();
   // Check whether strin gis not empty or has input 0.
   if (!empty($string) || $string == '0') {
@@ -446,11 +454,11 @@ function sepulsa_autocomplete_phone_number($string = '') {
     elseif (strlen($string) < 5 && preg_match('#^\d+$#', $string)) {
       // Check for 2 digits string.
       if (strlen($string) == 2) {
-        $matches = sepulsa_autocomplete_prefix($string, 3);
+        $matches = sepulsa_autocomplete_prefix($string, 3, $data_packet);
       }
       // Check for 3 digits string.
       if (strlen($string) == 3) {
-        $matches = sepulsa_autocomplete_prefix($string, 4);
+        $matches = sepulsa_autocomplete_prefix($string, 4, $data_packet);
       }
     }
     elseif (preg_match('#^\+62(\d+)#', $string, $match)) {
@@ -464,5 +472,3 @@ function sepulsa_autocomplete_phone_number($string = '') {
 
   drupal_json_output($matches);
 }
-
-

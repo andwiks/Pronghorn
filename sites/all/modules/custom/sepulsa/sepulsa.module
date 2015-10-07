@@ -25,10 +25,20 @@ function sepulsa_menu() {
     'file' => 'sepulsa.pages.inc',
   );
 
+  $items['sepulsa/data'] = array(
+    //'title' => 'Recharge Your Phone',
+    //no need to put title on front page
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_phone_form', TRUE),
+    'access callback' => TRUE,
+    'file' => 'sepulsa.pages.inc',
+  );
+
   $items['sepulsa/autocomplete/%'] = array(
     'title' => 'Sepulsa Autocomplete',
     'description' => 'Sepulsa Autocomplete',
     'page callback' => 'sepulsa_autocomplete',
+    'page arguments' => array(2),
     'access callback' => TRUE,
     'file' => 'sepulsa.pages.inc',
   );
@@ -98,7 +108,7 @@ function sepulsa_get_card_type($operator) {
  * @return array
  *   Packet options array.
  */
-function sepulsa_get_packet($nid) {
+function sepulsa_get_packet($nid, $data_packet = FALSE) {
   // Define default packet options.
   $options = array();
 
@@ -112,8 +122,9 @@ function sepulsa_get_packet($nid) {
     $products = $node_wrapper->field_product->value();
     // Looping for each product.
     foreach ($products as $product) {
+      $field_data_packet = empty($product->field_data_packet) ? FALSE : $product->field_data_packet;
       // Check product status.
-      if (!empty($product->status)) {
+      if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.
         $price = field_get_items('commerce_product', $product, 'commerce_price');
         // Add it inside options array.
@@ -140,16 +151,22 @@ function sepulsa_get_packet($nid) {
  *   Array of operators (key).
  *   Value: prefix codes and card types.
  */
-function sepulsa_get_all_operator_data($reset = FALSE) {
+function sepulsa_get_all_operator_data($reset = FALSE, $data_packet = FALSE) {
   // Declare static operators variable.
-  $operators  = &drupal_static(__FUNCTION__, NULL);
+  if ($data_packet) {
+    $operators = &drupal_static(__FUNCTION__ . '_packet', NULL);
+  }
+  else {
+    $operators = &drupal_static(__FUNCTION__, NULL);
+  }
   // If already defined, and not empty, then return it.
   if (isset($operators) && !empty($operators) && !$reset) {
     return $operators;
   }
 
   // Get databases data from cache.
-  $cache = cache_get('sepulsa_all_operator_data', 'cache');
+  $cid = $data_packet ? 'sepulsa_all_operator_data:packet_data' : 'sepulsa_all_operator_data';
+  $cache = cache_get($cid, 'cache');
   // Check whether cache is available.
   if (empty($cache) || $reset) {
     // Define default operators array.
@@ -173,7 +190,7 @@ function sepulsa_get_all_operator_data($reset = FALSE) {
         // Get operator packets.
         $packets = array();
         foreach ($card_types as $node_id => $node_title) {
-          $packets[$node_id] = sepulsa_get_packet($node_id);
+          $packets[$node_id] = sepulsa_get_packet($node_id, $data_packet);
         }
         // Add it in the operator array.
         $operators[$tid] = array(
@@ -185,7 +202,7 @@ function sepulsa_get_all_operator_data($reset = FALSE) {
       }
     }
     // Store it inside cache.
-    cache_set('sepulsa_all_operator_data', $operators, 'cache', CACHE_PERMANENT);
+    cache_set($cid, $operators, 'cache', CACHE_PERMANENT);
   }
   else {
     $operators = $cache->data;
@@ -195,15 +212,13 @@ function sepulsa_get_all_operator_data($reset = FALSE) {
   return $operators;
 }
 
-
-
-function sepulsa_get_existing_number () {
+function sepulsa_get_existing_number() {
   global $user;
   $existing_number = [];
-  $query = "SELECT distinct(field_phone_number_value) 
-			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c	
+  $query = "SELECT distinct(field_phone_number_value)
+			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c
 			WHERE
-			a.order_id = b.order_id 
+			a.order_id = b.order_id
 			AND b.line_item_id = c.entity_id
 			AND (a.status = 'completed' OR a.status = 'invoiced')
 			AND a.uid = :uid
@@ -212,6 +227,6 @@ function sepulsa_get_existing_number () {
   foreach ($result as $row) {
 	$existing_number[] = $row->field_phone_number_value;
   }
-  
+
   return $existing_number;
 }

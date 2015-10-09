@@ -783,3 +783,16 @@ section.transaction table.cart td.product-price
 {
     width: 110px;
 }
+
+/* paket data */
+.info-paket-data
+{
+    width:95%;
+    margin:75px auto 0;
+}
+
+.detail-paket-data
+{
+    margin:10px 0 50px 0;
+    width:100%;
+}

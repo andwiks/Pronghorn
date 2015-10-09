@@ -393,3 +393,16 @@ section.std_content .box_voucher h4
 {
     min-height: 40px;
 }
+
+/* paket data */
+.info-paket-data
+{
+    width: 659px;
+    margin:75px auto 0;
+}
+
+.detail-paket-data
+{
+    margin:10px 0 50px 0;
+    width:100%;
+}

@@ -746,3 +746,16 @@ section.std_content .akun .c_right .share input[type=text]
     width: 100%;
     padding-right:0;
 }
+
+/* paket data */
+.info-paket-data
+{
+    width: 440px;
+    margin:75px auto 0;
+}
+
+.detail-paket-data
+{
+    margin:10px 0 50px 0;
+    width:100%;
+}

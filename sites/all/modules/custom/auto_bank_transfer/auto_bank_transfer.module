@@ -188,9 +188,7 @@ function bca_confirm_payment() {
     $result = $query->execute();
     if (isset($result['commerce_order'])) {
       $order_ids = array_keys($result['commerce_order']);
-      dpm($order_ids);
       $order = commerce_order_load($order_ids[0]);
-      dpm($order);
 
       foreach ($order_ids as $order_id) {
         // load commerce payment transaction by order_id and bank transfer method

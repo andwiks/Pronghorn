@@ -72,16 +72,6 @@ function auto_bank_transfer_menu() {
 // admin page.
 function bca_admin_form($form, &$form_state) {
   // load order by total order
-  
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'commerce_order');
-  $query->propertyCondition('status', 'pending');
-  $query->fieldCondition('commerce_order_total', 'amount', 50000);
-  $result = $query->execute();
-  $order_ids = array_keys($result['commerce_order']);
-  dpm($order_ids);
-  $order = commerce_order_load($order_ids[0]);
-  dpm($order);
 
   $form['bca_csv_file_folder'] = array(
     '#type' => 'textfield',

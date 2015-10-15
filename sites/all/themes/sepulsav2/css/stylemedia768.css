@@ -413,3 +413,8 @@ section.std_content .box_voucher h4
 {
     width: 100%;
 }
+
+.voucher_vendor {
+    width: 708px;
+    margin: auto;
+}

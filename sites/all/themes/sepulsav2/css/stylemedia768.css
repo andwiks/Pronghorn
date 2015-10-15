@@ -394,13 +394,27 @@ section.std_content .box_voucher h4
     min-height: 40px;
 }
 
+/* paket-data */
+.detail-paket-data {
+    width: 659px;
+}
+
+.detail-paket-data {
+    margin: 10px 0 50px 0;
+}
+
 /* Voucher Homepage */
-section.h_middle_top .voucher_vendor .slider .slide
+.voucher_vendor .slider .slide
 {
     width: 236px !important;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide .image img
+.voucher_vendor .slider .slide .image img
 {
     width: 100%;
+}
+
+.voucher_vendor {
+    width: 708px;
+    margin: auto;
 }

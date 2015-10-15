@@ -396,11 +396,11 @@ section.std_content .box_voucher h4
 
 /* paket-data */
 .detail-paket-data {
-    width: 659px;
+    width: 659px !important;
 }
 
 .detail-paket-data {
-    margin: 10px 0 50px 0;
+    margin: 10px 0 50px 0 !important;
 }
 
 /* Voucher Homepage */

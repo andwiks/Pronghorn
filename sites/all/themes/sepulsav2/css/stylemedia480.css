@@ -749,11 +749,13 @@ section.std_content .akun .c_right .share input[type=text]
 
 
 /* paket-data */
-.detail-paket-data {
+.info-paket-data {
     width: 440px !important;
+    margin:45px auto 15px auto !important
 }
 
 .detail-paket-data {
+    width: 100% !important;
     margin: 10px 0 30px 0 !important;
 }
 

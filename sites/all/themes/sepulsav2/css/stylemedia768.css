@@ -395,11 +395,13 @@ section.std_content .box_voucher h4
 }
 
 /* paket-data */
-.detail-paket-data {
+.info-paket-data {
     width: 659px !important;
+    margin:45px auto 15px auto !important
 }
 
 .detail-paket-data {
+    width: 100% !important;
     margin: 10px 0 50px 0 !important;
 }
 

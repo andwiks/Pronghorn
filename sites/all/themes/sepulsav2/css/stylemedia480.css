@@ -746,3 +746,14 @@ section.std_content .akun .c_right .share input[type=text]
     width: 100%;
     padding-right:0;
 }
+
+/* Voucher Homepage */
+section.h_middle_top .voucher_vendor .slider .slide
+{
+    width: 205px !important;
+}
+
+section.h_middle_top .voucher_vendor .slider .slide .image img
+{
+    width: 100%;
+}

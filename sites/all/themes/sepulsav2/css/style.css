@@ -3515,3 +3515,48 @@ section.h_middle_top .home_tab .nav_tab a:hover {
     -ms-filter: contrast(150%) !important;
     -o-filter: contrast(150%) !important;
 }
+
+/* voucher homepage*/
+.voucher_vendor .slider .slide .image
+{
+    padding: .7em;
+}
+
+.voucher_vendor h3
+{
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #feb60a;
+    margin: 0px 0 30px;
+    text-align: center;
+    width: 85%;
+    margin:0 auto;
+}
+
+.voucher_vendor .slider .slide h4
+{
+    padding: 0 .7em;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.6em;
+}
+
+.voucher_vendor .slider .slide h4 span
+{
+    font-size: .8em;
+    font-weight: normal;
+}
+
+
+.voucher_vendor .bx-pager{display:none;}
+.voucher_vendor .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel.png) no-repeat;
+    width: 18px;
+    height: 30px;
+    margin-top: -16px;
+}
+.voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
+.voucher_vendor .bx-wrapper a.bx-next {background-position: top left;right: -40px}
+.voucher_vendor .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
+.voucher_vendor .bx-wrapper a.bx-next:hover {background-position:top right;}

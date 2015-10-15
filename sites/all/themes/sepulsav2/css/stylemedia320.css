@@ -803,3 +803,5 @@ section.transaction table.cart td.product-price
 {
     width: 100%;
 }
+
+.voucher_vendor {width: 260px;margin: auto}

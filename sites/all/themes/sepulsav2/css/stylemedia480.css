@@ -767,3 +767,9 @@ section.std_content .akun .c_right .share input[type=text]
 {
     width: 100%;
 }
+
+.voucher_vendor {
+    /*width: 260px;*/
+    width: 410px;
+    margin: auto;
+}

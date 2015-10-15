@@ -3531,7 +3531,16 @@ section.h_middle_top .home_tab .nav_tab a:hover {
     margin: 0px 0 30px;
     text-align: center;
     width: 85%;
-    margin:0 auto;
+    margin:0 auto !important;
+}
+
+.voucher_vendor h3 span.ico{
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: url(../images/material/ico_voucher.png) left ;
+    position: relative;
+    margin:0 10px -3px 0;
 }
 
 .voucher_vendor .slider .slide h4

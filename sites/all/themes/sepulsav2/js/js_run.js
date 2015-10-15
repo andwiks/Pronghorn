@@ -2,12 +2,12 @@ $(document).ready(function () {
     $("input[type=text]").placeHolder();//placeholder custom
     $(".form input[type=password]").placeHolder();//placeholder custom
     $(".voucher_vendor .slider").bxSlider({
-        slideWidth: "175px",
-        minSlides: 2,
-        maxSlides: 6,
-        ticker: true,
+        slideWidth: "265px",
+        minSlides: 1,
+        maxSlides: 4
+        /*ticker: true,
         tickerHover: true,
-        speed: 40000
+        speed: 40000*/
     });// carousel voucher vendor
 
     $(".slider_voucher .slider").bxSlider({

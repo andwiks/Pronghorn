@@ -750,11 +750,11 @@ section.std_content .akun .c_right .share input[type=text]
 
 /* paket-data */
 .detail-paket-data {
-    width: 440px;
+    width: 440px !important;
 }
 
 .detail-paket-data {
-    margin: 10px 0 30px 0;
+    margin: 10px 0 30px 0 !important;
 }
 
 /* Voucher Homepage */

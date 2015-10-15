@@ -786,11 +786,11 @@ section.transaction table.cart td.product-price
 
 /* paket-data */
 .detail-paket-data {
-    width: 280px;
+    width: 280px !important;
 }
 
 .detail-paket-data {
-    margin: 10px 0 30px 0;
+    margin: 10px 0 30px 0 !important;
 }
 
 /* Voucher Homepage */

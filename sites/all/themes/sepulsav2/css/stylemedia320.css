@@ -784,6 +784,15 @@ section.transaction table.cart td.product-price
     width: 110px;
 }
 
+/* paket-data */
+.detail-paket-data {
+    width: 280px;
+}
+
+.detail-paket-data {
+    margin: 10px 0 30px 0;
+}
+
 /* Voucher Homepage */
 section.h_middle_top .voucher_vendor .slider .slide
 {

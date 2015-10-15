@@ -794,12 +794,12 @@ section.transaction table.cart td.product-price
 }
 
 /* Voucher Homepage */
-section.h_middle_top .voucher_vendor .slider .slide
+.voucher_vendor .slider .slide
 {
     width: 260px !important;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide .image img
+.voucher_vendor .slider .slide .image img
 {
     width: 100%;
 }

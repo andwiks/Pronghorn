@@ -3517,12 +3517,12 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 }
 
 /* voucher homepage*/
-section.h_middle_top .voucher_vendor .slider .slide .image
+.voucher_vendor .slider .slide .image
 {
     padding: .7em;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide h4
+.voucher_vendor .slider .slide h4
 {
     padding: 0 .7em;
     text-align: center;
@@ -3530,7 +3530,7 @@ section.h_middle_top .voucher_vendor .slider .slide h4
     font-size: 1.6em;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide h4 span
+.voucher_vendor .slider .slide h4 span
 {
     font-size: .8em;
     font-weight: normal;

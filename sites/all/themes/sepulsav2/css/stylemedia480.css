@@ -758,12 +758,18 @@ section.std_content .akun .c_right .share input[type=text]
 }
 
 /* Voucher Homepage */
-section.h_middle_top .voucher_vendor .slider .slide
+.voucher_vendor .slider .slide
 {
     width: 205px !important;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide .image img
+.voucher_vendor .slider .slide .image img
 {
     width: 100%;
+}
+
+.voucher_vendor {
+    /*width: 260px;*/
+    width: 410px;
+    margin: auto;
 }

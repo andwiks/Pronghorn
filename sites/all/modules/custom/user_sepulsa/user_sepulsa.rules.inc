@@ -41,7 +41,7 @@ function add_payment_order_to_user($order_id, $user_id) {
 	$query = new EntityFieldQuery();
 	$query->entityCondition('entity_type', 'commerce_payment_transaction')
 		->propertyCondition('order_id', $order_id)
-		->propertyCondition('uid', $user_id)
+		//->propertyCondition('uid', $user_id)
 		->propertyCondition('status', 'success');
 
 	$results = $query->execute();

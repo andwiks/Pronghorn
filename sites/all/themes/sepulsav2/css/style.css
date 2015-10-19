@@ -3517,12 +3517,33 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 }
 
 /* voucher homepage*/
-section.h_middle_top .voucher_vendor .slider .slide .image
+.voucher_vendor .slider .slide .image
 {
     padding: .7em;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide h4
+.voucher_vendor h3
+{
+    font-family: "robotoregular";
+    font-size: 16px;
+    text-transform: uppercase;
+    color: #feb60a;
+    margin: 0px 0 30px;
+    text-align: center;
+    width: 85%;
+    margin:0 auto !important;
+}
+
+.voucher_vendor h3 span.ico{
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background: url(../images/material/ico_voucher.png) left ;
+    position: relative;
+    margin:0 10px -3px 0;
+}
+
+.voucher_vendor .slider .slide h4
 {
     padding: 0 .7em;
     text-align: center;
@@ -3530,8 +3551,21 @@ section.h_middle_top .voucher_vendor .slider .slide h4
     font-size: 1.6em;
 }
 
-section.h_middle_top .voucher_vendor .slider .slide h4 span
+.voucher_vendor .slider .slide h4 span
 {
     font-size: .8em;
     font-weight: normal;
 }
+
+
+.voucher_vendor .bx-pager{display:none;}
+.voucher_vendor .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel.png) no-repeat;
+    width: 18px;
+    height: 30px;
+    margin-top: -16px;
+}
+.voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
+.voucher_vendor .bx-wrapper a.bx-next {background-position: top left;right: -40px}
+.voucher_vendor .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
+.voucher_vendor .bx-wrapper a.bx-next:hover {background-position:top right;}

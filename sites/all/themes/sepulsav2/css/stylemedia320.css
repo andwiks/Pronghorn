@@ -785,12 +785,14 @@ section.transaction table.cart td.product-price
 }
 
 /* paket-data */
-.detail-paket-data {
-    width: 280px;
+.info-paket-data {
+    width: 280px !important;
+    margin:45px auto 15px auto !important
 }
 
 .detail-paket-data {
-    margin: 10px 0 30px 0;
+    width: 100% !important;
+    margin: 10px 0 30px 0 !important;
 }
 
 /* Voucher Homepage */

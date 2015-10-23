@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function hybridauth_facebook_twitter_login_services_services_resources() {
+    return array(
+        'hybridauth_facebook_twitter_login' => array(
+            'actions' => array(
+                'login' => array(
+                    'help' => 'Get Token by login using Facebook, Twitter from apps',
+                    'callback' => 'hybridauth_facebook_twitter_login_services_process',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'hybridauth_facebook_twitter_login_services',
+                        'name' => 'hybridauth_facebook_twitter_login_services',
+                    ),
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                        array(
+                            'name' => 'data',
+                            'optional' => TRUE,
+                            'source' => 'data',
+                            'description' => t('data.'),
+                            'type' => 'array',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}

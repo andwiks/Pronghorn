@@ -810,10 +810,6 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
 
     // Get item name: by default is line item label (SKU).
     $item_name = $line_item->line_item_label;
-    // Check whether line item has product: possible other value: shipping, tax.
-    if (isset($line_item->commerce_product)) {
-      $item_name .= ' ' . $line_item_wrapper->commerce_product->value()->title;
-    }
     // Define item.
     $item = array(
       'id' => $line_item->line_item_id,
@@ -896,9 +892,12 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
       'first_name' => (isset($billing['first_name'])) ? $billing['first_name'] : $order->mail,
       'last_name' => (isset($billing['last_name'])) ? $billing['last_name'] : '',
       'email' => $order->mail,
-      'phone' => $customer_phone,
     ),
   );
+
+  if (!empty($customer_phone)) {
+    $transaction_data['customer_details']['phone'] = $customer_phone;
+  }
 
   $args = func_get_args();
   $args[] = &$transaction_data;

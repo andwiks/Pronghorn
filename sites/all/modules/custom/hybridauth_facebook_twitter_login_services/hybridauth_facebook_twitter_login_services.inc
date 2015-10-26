@@ -105,12 +105,13 @@ function hybridauth_facebook_twitter_login_services_process($data){
         // Add identity to existing account, only if emailVerified.
         if (variable_get('hybridauth_duplicate_emails', 1) == 2 && $data['email'] == $data['emailVerified']) {
             _hybridauth_identity_save($user_profile, $account->uid);
-            $return["return"] = 1;
-            $return["message"] = t("Identitas diri anda telah di update");
             _hybridauth_invoke_hooks('hybridauth_identity_added', $account, $user_profile);
             $form_state['uid'] = $account->uid;
             user_login_submit(array(), $form_state);
             _hybridauth_invoke_hooks('hybridauth_user_login', $user, $user_profile);
+            $return["return"] = 1;
+            $return["message"] = t("Identitas diri anda telah di update");
+            $return["token"] = drupal_get_token('services');
             return $return;
         }
         // Block registration - if (variable_get('hybridauth_duplicate_emails', 1) == 1) or
@@ -233,6 +234,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
           user_login_submit(array(), $form_state);
           _hybridauth_invoke_hooks('hybridauth_user_login', $user, $user_profile);
           $return["return"] = 1;
+          $return["token"] = drupal_get_token('services');
           return $return;
         }
       }
@@ -251,7 +253,8 @@ function hybridauth_facebook_twitter_login_services_process($data){
     }
     
     if($user->uid > 0){
-       $return["return"] = 1; 
+       $return["return"] = 1;
+       $return["token"] = drupal_get_token('services');
     }
     return $return;
 }

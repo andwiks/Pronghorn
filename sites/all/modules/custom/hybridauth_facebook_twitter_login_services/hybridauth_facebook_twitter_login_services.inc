@@ -5,7 +5,12 @@ function hybridauth_facebook_twitter_login_services_process($data){
     
     $return = array();
     //$data['access_token']
+    //$data['access_secret']
     //$data['provider'] Facebook, Twitter
+    //$data['source']
+    //$data['email']
+    
+    $return["email_request"] = 0;
     
     //access token validation
     if(!isset($data['access_token']) || empty($data['access_token'])){
@@ -27,43 +32,103 @@ function hybridauth_facebook_twitter_login_services_process($data){
         return $return;
     }
     
-    $user_details = "https://graph.facebook.com/me?access_token=" .$data['access_token'];
+    if($data['provider'] == "Twitter"){
+        //access token validation
+        if(!isset($data['access_secret']) || empty($data['access_secret'])){
+            $return["return"] = 0;
+            $return["message"] = t("Secret token anda tidak valid");
+            return $return;
+        }
+        
+        module_load_include("php", "hybridauth_facebook_twitter_login_services", "TwitterAPIExchange");
 
-    $response = file_get_contents($user_details);
-    $response = json_decode($response,true);
-    
-    $return["return"] = 0;
-    
-    //convert data response facebook to hybridauth profile format
-    //define the container
-    $hybriauth_user_profile = new stdClass();
-    $hybriauth_user_profile->user = new stdClass();
-    $hybriauth_user_profile->user->profile = new stdClass();
-    
-    # store the user profile.
-    $hybriauth_user_profile->user->profile->identifier = (array_key_exists('id', $response)) ? $response['id'] : "";
-    $hybriauth_user_profile->user->profile->username = (array_key_exists('username', $response)) ? $response['username'] : "";
-    $hybriauth_user_profile->user->profile->displayName = (array_key_exists('name', $response)) ? $response['name'] : "";
-    $hybriauth_user_profile->user->profile->firstName = (array_key_exists('first_name', $response)) ? $response['first_name'] : "";
-    $hybriauth_user_profile->user->profile->lastName = (array_key_exists('last_name', $response)) ? $response['last_name'] : "";
-    $hybriauth_user_profile->user->profile->photoURL = "https://graph.facebook.com/" . $hybriauth_user_profile->user->profile->identifier . "/picture?width=150&height=150";
-    $hybriauth_user_profile->user->profile->coverInfoURL = "https://graph.facebook.com/" . $hybriauth_user_profile->user->profile->identifier . "?fields=cover&access_token=" . $data['access_token'];
-    $hybriauth_user_profile->user->profile->profileURL = (array_key_exists('link', $response)) ? $response['link'] : "";
-    $hybriauth_user_profile->user->profile->webSiteURL = (array_key_exists('website', $response)) ? $response['website'] : "";
-    $hybriauth_user_profile->user->profile->gender = (array_key_exists('gender', $response)) ? $response['gender'] : "";
-    $hybriauth_user_profile->user->profile->language = (array_key_exists('locale', $response)) ? $response['locale'] : "";
-    $hybriauth_user_profile->user->profile->description = (array_key_exists('about', $response)) ? $response['about'] : "";
-    $hybriauth_user_profile->user->profile->email = (array_key_exists('email', $response)) ? $response['email'] : "";
-    $hybriauth_user_profile->user->profile->emailVerified = (array_key_exists('email', $response)) ? $response['email'] : "";
-    $hybriauth_user_profile->user->profile->region = (array_key_exists("location", $response) && array_key_exists("name", $response['location'])) ? $response['location']["name"] : "";
-    
-    $user_profile = (array)$hybriauth_user_profile->user->profile;
-    $user_profile["provider"] = $data['provider'];
+        /** Set access tokens here - see: https://dev.twitter.com/apps/ **/
+        $settings = array(
+            'oauth_access_token' => $data['access_token'],
+            'oauth_access_token_secret' => $data['access_secret'],
+            'consumer_key' => "M9PYSMp0jcgCJnWxA81IyDO23",
+            'consumer_secret' => "O4Dz1il5cGFFf3DEctJgwc6g7ZoKSiAZG8TGSQ1KTJ7ukdfcKh"
+        );
+        
+        $url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
+        $requestMethod = 'GET';
+        $twitter = new TwitterAPIExchange($settings);
+        $response = json_decode($twitter->setGetfield($getfield)->buildOauth($url, $requestMethod)->performRequest());     
+        
+        //define the container
+        $hybriauth_user_profile = new stdClass();
+        $hybriauth_user_profile->user = new stdClass();
+        $hybriauth_user_profile->user->profile = new stdClass();
+        
+        # store the user profile.  
+        $hybriauth_user_profile->user->profile->identifier = (property_exists($response, 'id')) ? $response->id : "";
+        $hybriauth_user_profile->user->profile->displayName = (property_exists($response, 'screen_name')) ? $response->screen_name : "";
+        $hybriauth_user_profile->user->profile->description = (property_exists($response, 'description')) ? $response->description : "";
+        $hybriauth_user_profile->user->profile->firstName = (property_exists($response, 'name')) ? $response->name : "";
+        $hybriauth_user_profile->user->profile->photoURL = (property_exists($response, 'profile_image_url')) ? (str_replace('_normal', '', $response->profile_image_url)) : "";
+        $hybriauth_user_profile->user->profile->profileURL = (property_exists($response, 'screen_name')) ? ("http://twitter.com/" . $response->screen_name) : "";
+        $hybriauth_user_profile->user->profile->webSiteURL = (property_exists($response, 'url')) ? $response->url : "";
+        $hybriauth_user_profile->user->profile->region = (property_exists($response, 'location')) ? $response->location : "";
+        if(isset($data['email']) && !empty($data['email'])){
+            $hybriauth_user_profile->user->profile->email = $data['email'];
+        }
+        else{
+            $hybriauth_user_profile->user->profile->email = "";
+        }
+        
+        $user_profile = (array)$hybriauth_user_profile->user->profile;
+        $user_profile["provider"] = $data['provider'];
+        
+        $identity = _hybridauth_identity_load($user_profile);
+        
+        if (!$identity && (!isset($data['email']) || empty($data['email']))) {
+            $return["return"] = 0;
+            $return["email_request"] = 1;
+            $return["message"] = t("Tolong masukan email");
+            return $return;
+        }
+    }
+    elseif($data['provider'] == "Facebook"){
+        $user_details = "https://graph.facebook.com/me?access_token=" .$data['access_token'];
+
+        $response = file_get_contents($user_details);
+        $response = json_decode($response,true);
+
+        $return["return"] = 0;
+
+        //convert data response facebook to hybridauth profile format
+        //define the container
+        $hybriauth_user_profile = new stdClass();
+        $hybriauth_user_profile->user = new stdClass();
+        $hybriauth_user_profile->user->profile = new stdClass();
+
+        # store the user profile.
+        $hybriauth_user_profile->user->profile->identifier = (array_key_exists('id', $response)) ? $response['id'] : "";
+        $hybriauth_user_profile->user->profile->username = (array_key_exists('username', $response)) ? $response['username'] : "";
+        $hybriauth_user_profile->user->profile->displayName = (array_key_exists('name', $response)) ? $response['name'] : "";
+        $hybriauth_user_profile->user->profile->firstName = (array_key_exists('first_name', $response)) ? $response['first_name'] : "";
+        $hybriauth_user_profile->user->profile->lastName = (array_key_exists('last_name', $response)) ? $response['last_name'] : "";
+        $hybriauth_user_profile->user->profile->photoURL = "https://graph.facebook.com/" . $hybriauth_user_profile->user->profile->identifier . "/picture?width=150&height=150";
+        $hybriauth_user_profile->user->profile->coverInfoURL = "https://graph.facebook.com/" . $hybriauth_user_profile->user->profile->identifier . "?fields=cover&access_token=" . $data['access_token'];
+        $hybriauth_user_profile->user->profile->profileURL = (array_key_exists('link', $response)) ? $response['link'] : "";
+        $hybriauth_user_profile->user->profile->webSiteURL = (array_key_exists('website', $response)) ? $response['website'] : "";
+        $hybriauth_user_profile->user->profile->gender = (array_key_exists('gender', $response)) ? $response['gender'] : "";
+        $hybriauth_user_profile->user->profile->language = (array_key_exists('locale', $response)) ? $response['locale'] : "";
+        $hybriauth_user_profile->user->profile->description = (array_key_exists('about', $response)) ? $response['about'] : "";
+        $hybriauth_user_profile->user->profile->email = (array_key_exists('email', $response)) ? $response['email'] : "";
+        $hybriauth_user_profile->user->profile->emailVerified = (array_key_exists('email', $response)) ? $response['email'] : "";
+        $hybriauth_user_profile->user->profile->region = (array_key_exists("location", $response) && array_key_exists("name", $response['location'])) ? $response['location']["name"] : "";
+
+        $user_profile = (array)$hybriauth_user_profile->user->profile;
+        $user_profile["provider"] = $data['provider'];
+        
+        $identity = _hybridauth_identity_load($user_profile);
+    }
     
     // User is already logged in, tries to add new identity.
     if (user_is_logged_in()) {
         // Identity is already registered.
-        if ($identity = _hybridauth_identity_load($user_profile)) {
+        if ($identity) {
           // Registered to this user.
           if ($user->uid == $identity['uid']) {
             $return["message"] = t("Sudah terdaftar");
@@ -81,7 +146,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
         }
     }
 
-    if ($identity = _hybridauth_identity_load($user_profile)) {
+    if ($identity) {
         // Check if user is blocked.
         if ($account = _hybridauth_user_is_blocked_by_uid($identity['uid'])) {
             $return["return"] = 0;

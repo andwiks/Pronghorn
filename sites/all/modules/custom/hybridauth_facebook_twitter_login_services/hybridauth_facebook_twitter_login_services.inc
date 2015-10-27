@@ -256,8 +256,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
         
         $account_check = user_load_by_mail($userinfo["mail"]);
         if(!$account_check){
-            return $userinfo;
-            //$account = user_save(drupal_anonymous_user(), $userinfo);
+            $account = user_save(drupal_anonymous_user(), $userinfo);
         }
         else{
             $account = $account_check;

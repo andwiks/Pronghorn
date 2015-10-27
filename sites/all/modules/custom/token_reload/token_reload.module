@@ -303,7 +303,7 @@ function token_reload_queue_process($line_item_id) {
 
   if ($transaction = token_reload_request_call($data, 'transaction')) {
     if ($transaction['status'] == 'success') {
-      commerce_order_status_update($line_item_wrapper->order->value(), 'completed');
+      $line_item_wrapper->field_line_item_status->set('success');
     }
 
     $token_reload->status = $transaction['status'];

@@ -228,14 +228,6 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
       'class' => array('btn', 'style1', 'inactive'),
     ),
   );
-  // Submit button: fast charge.
-  $form['add']['charge'] = array(
-    '#type' => 'submit',
-    '#value' => t('Fast Charge'),
-    '#attributes' => array(
-      'class' => array('btn', 'style1', 'inactive'),
-    ),
-  );
 
   // Return form array.
   return $form;

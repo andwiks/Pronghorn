@@ -46,8 +46,8 @@ function hybridauth_facebook_twitter_login_services_process($data){
         $settings = array(
             'oauth_access_token' => $data['access_token'],
             'oauth_access_token_secret' => $data['access_secret'],
-            'consumer_key' => "M9PYSMp0jcgCJnWxA81IyDO23",
-            'consumer_secret' => "O4Dz1il5cGFFf3DEctJgwc6g7ZoKSiAZG8TGSQ1KTJ7ukdfcKh"
+            'consumer_key' => variable_get("hybridauth_provider_Twitter_keys_key","tm3JggaFEi93Kq3ufC5pPclBO"),
+            'consumer_secret' => variable_get("hybridauth_provider_Twitter_keys_secret","Xv3poUULrnJkf4R25Bk2RfMY90gKIzUtoZv2DsdODJC32kguDa")
         );
         
         $url = 'https://api.twitter.com/1.1/account/verify_credentials.json';
@@ -81,11 +81,21 @@ function hybridauth_facebook_twitter_login_services_process($data){
         
         $identity = _hybridauth_identity_load($user_profile);
         
-        if (!$identity && (!isset($data['email']) || empty($data['email']))) {
-            $return["return"] = 0;
-            $return["email_request"] = 1;
-            $return["message"] = t("Tolong masukan email");
-            return $return;
+        if (!$identity) {
+            if(isset($user_profile['email']) && !empty($user_profile['email'])) {
+                $check_email_exist = user_load_by_mail($user_profile['email']);
+                if($check_email_exist){
+                    $return["return"] = 0;
+                    $return["message"] = t("Email yg anda input telah digunakan oleh account lain");
+                    return $return;
+                }
+            }
+            else{
+                $return["return"] = 0;
+                $return["email_request"] = 1;
+                $return["message"] = t("Tolong masukan email");
+                return $return;
+            }
         }
     }
     elseif($data['provider'] == "Facebook"){
@@ -139,7 +149,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
           }
         }
         // Identity is not registered - add it to the logged in user.
-        else {
+        elseif($user_profile["provider"] != "Twitter") {
           _hybridauth_identity_save($user_profile);
           $return["return"] = 0;
           $return["message"] = t("Data anda telah ditambahkan");
@@ -169,7 +179,9 @@ function hybridauth_facebook_twitter_login_services_process($data){
     elseif (variable_get('hybridauth_duplicate_emails', 1) && !empty($data['email']) && $account = user_load_by_mail($data['email'])) {
         // Add identity to existing account, only if emailVerified.
         if (variable_get('hybridauth_duplicate_emails', 1) == 2 && $data['email'] == $data['emailVerified']) {
-            _hybridauth_identity_save($user_profile, $account->uid);
+            if (!$identity) {
+                _hybridauth_identity_save($user_profile, $account->uid);
+            }
             _hybridauth_invoke_hooks('hybridauth_identity_added', $account, $user_profile);
             $form_state['uid'] = $account->uid;
             user_login_submit(array(), $form_state);
@@ -243,8 +255,9 @@ function hybridauth_facebook_twitter_login_services_process($data){
         }
         
         $account_check = user_load_by_mail($userinfo["mail"]);
-        if($account_check->uid < 1){
-            $account = user_save(drupal_anonymous_user(), $userinfo); 
+        if(!$account_check){
+            return $userinfo;
+            //$account = user_save(drupal_anonymous_user(), $userinfo);
         }
         else{
             $account = $account_check;
@@ -257,7 +270,9 @@ function hybridauth_facebook_twitter_login_services_process($data){
             return $return;
         }
         _hybridauth_invoke_hooks('hybridauth_user_insert', $account, $user_profile);
-        _hybridauth_identity_save($user_profile, $account->uid);
+        if (!$identity) {
+            _hybridauth_identity_save($user_profile, $account->uid);
+        }
         _hybridauth_invoke_hooks('hybridauth_identity_added', $account, $user_profile);
         
         $user_save_trigger = FALSE;

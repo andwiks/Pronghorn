@@ -83,6 +83,12 @@ function hybridauth_facebook_twitter_login_services_process($data){
         
         if (!$identity) {
             if(isset($user_profile['email']) && !empty($user_profile['email'])) {
+                if(!valid_email_address($user_profile['email'])){
+                    $return["return"] = 0;
+                    $return["message"] = t("Format Email anda tidak dikenali di sistem kami, mohon untuk menggunakan Email lain");
+                    return $return;
+                }
+                
                 $check_email_exist = user_load_by_mail($user_profile['email']);
                 if($check_email_exist){
                     $return["return"] = 0;
@@ -147,12 +153,6 @@ function hybridauth_facebook_twitter_login_services_process($data){
           else {
             $return["message"] = t("Credential anda sudah dipakai di account lain");
           }
-        }
-        // Identity is not registered - add it to the logged in user.
-        elseif($user_profile["provider"] != "Twitter") {
-          _hybridauth_identity_save($user_profile);
-          $return["return"] = 0;
-          $return["message"] = t("Data anda telah ditambahkan");
         }
     }
 

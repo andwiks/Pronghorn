@@ -35,7 +35,8 @@ function facebook_twitter_share_set_return($order_id = ""){
     $url = str_replace("<order_id>",$order_id,$url);
     
     if(variable_get('enable_facebook_share', 1) && !empty($url)){
-        $return["facebook"] = $url;
+        $return["facebook"] = variable_get('facebook_share_endpoint', 'https://www.facebook.com/sharer/sharer.php?u=') . $url;
+        $return["facebook_content"] = $url;
     }
     
     if(variable_get('enable_twitter_share', 1)){
@@ -43,7 +44,8 @@ function facebook_twitter_share_set_return($order_id = ""){
         $text_after = variable_get('twitter_predefined_text_after_url', '');
         $twitter_content = $text_before . $url . $text_after;
         if(isset($twitter_content) && !empty($twitter_content)){
-            $return["twitter"] = $twitter_content;
+            $return["twitter"] = variable_get('twitter_share_endpoint', 'https://twitter.com/intent/tweet?text=') . $twitter_content;
+            $return["twitter_content"] = $twitter_content;
         }
     }
     

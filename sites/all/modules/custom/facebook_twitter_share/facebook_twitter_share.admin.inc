@@ -14,7 +14,7 @@ function facebook_twitter_share_setting_form($node, $form_state) {
         '#type' => 'fieldset',
         '#title' => t('Twitter Predefined Text'),
         '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
+        '#collapsed' => FALSE,
     );
     
     $form['twitter_predefined_text']['twitter_predefined_text_before_url'] = array(
@@ -37,7 +37,7 @@ function facebook_twitter_share_setting_form($node, $form_state) {
         '#type' => 'fieldset',
         '#title' => t('Enable/Disable Facebook Twitter share'),
         '#collapsible' => TRUE,
-        '#collapsed' => TRUE,
+        '#collapsed' => FALSE,
     );
     
     $form['enable_disable']['enable_facebook_share'] = array(
@@ -50,6 +50,29 @@ function facebook_twitter_share_setting_form($node, $form_state) {
         '#type' => 'checkbox',
         '#title' => t('Enable/Disable Twitter share'),
         '#default_value' => variable_get('enable_twitter_share', 1),
+    );
+    
+    $form['facebook_twitter_share_endpoint'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Facebook and Twitter share endpoint'),
+        '#collapsible' => TRUE,
+        '#collapsed' => TRUE,
+    );
+    
+    $form['facebook_twitter_share_endpoint']['facebook_share_endpoint'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Facebook share endpoint'),
+        '#default_value' => variable_get('facebook_share_endpoint', 'https://www.facebook.com/sharer/sharer.php?u='),
+        '#description' => t('The endpoint for facebook share'),  
+        '#required' => TRUE,
+    );
+    
+    $form['facebook_twitter_share_endpoint']['twitter_share_endpoint'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Twitter share endpoint'),
+        '#default_value' => variable_get('twitter_share_endpoint', 'https://twitter.com/intent/tweet?text='),
+        '#description' => t('The endpoint for twitter share'),  
+        '#required' => TRUE,
     );
     
     // Return form array.

@@ -138,6 +138,12 @@ function hybridauth_facebook_twitter_login_services_process($data){
         $user_profile = (array)$hybriauth_user_profile->user->profile;
         $user_profile["provider"] = $data['provider'];
         
+        if(!isset($user_profile['email']) || empty($user_profile['email'])) {
+            $return["return"] = 0;
+            $return["message"] = t("Tolong masukan email");
+            return $return;
+        }
+        
         $identity = _hybridauth_identity_load($user_profile);
     }
     

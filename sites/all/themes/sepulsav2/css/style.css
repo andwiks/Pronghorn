@@ -1267,6 +1267,21 @@ section.transaction .thanks_page p span{font-family:"robotolight";}
 section.transaction .thanks_page p.note{color:#c72127;font-size: 12px;}
 section.transaction .thanks_page p a{color:#105c8c;text-decoration: underline;}
 
+section.transaction .thanks_page div.facebook_twitter_share_container{
+    margin: 0 0 25px;
+}
+
+section.transaction .thanks_page div.facebook_twitter_share_description{
+    text-align: center;
+    font-family: "robotoregular";
+    color: #424143;
+    font-size: 14px;
+    margin: 0px 0 10px;
+}
+
+section.transaction .thanks_page div.facebook_twitter_share_icon{
+    text-align: center;
+}
 
 /* popup
 ----------------------------------------------------------------------------------------------*/

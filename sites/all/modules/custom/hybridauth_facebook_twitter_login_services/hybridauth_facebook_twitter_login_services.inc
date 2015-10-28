@@ -160,13 +160,15 @@ function hybridauth_facebook_twitter_login_services_process($data){
         // Check if user is blocked.
         if ($account = _hybridauth_user_is_blocked_by_uid($identity['uid'])) {
             $return["return"] = 0;
-            $return["message"] = t('Username %name belum belum diaktivasi atau sedang diblock.', array('%name' => $account->name));
+            $return["message"] = t('Username %name belum belum diaktivasi atau sedang diblock.');
+            $return["message"] = str_replace("%name",$data['email'],$return["message"]);
         }
         // Check for email verification timestamp.
         elseif (!_hybridauth_user_login_access_by_uid($identity['uid'])) {
             $return["return"] = 0;
             $data = unserialize($identity['data']);
-            $return["message"] = t('You need to verify your e-mail address - !email. A welcome message with further instructions has been sent to your e-mail address.', array('!email' => $data['email']));
+            $return["message"] = t('You need to verify your e-mail address - !email. A welcome message with further instructions has been sent to your e-mail address.');
+            $return["message"] = str_replace("!email",$data['email'],$return["message"]);
             _hybridauth_mail_notify('hybridauth_email_verification', user_load($identity['uid']));
         }
         else {
@@ -197,13 +199,12 @@ function hybridauth_facebook_twitter_login_services_process($data){
             if (!empty($account->data['hybridauth'])) {
                 $providers = hybridauth_providers_list();
                 $return["return"] = 0;
-                $return["message"] = t("Kamu mencoba login dengan email yang sudah terdaftar, mohon login menggunakan %provider.",
-                array('%provider' => $providers[$account->data['hybridauth']['provider']]));
+                $return["message"] = t("Kamu mencoba login dengan email yang sudah terdaftar, mohon login menggunakan %provider.");
+                $return["message"] = str_replace("%provider",$providers[$account->data['hybridauth']['provider']],$return["message"]);
             }
             else {
                 $return["return"] = 0;
-                $return["message"] = t('Kamu mencoba login dengan email yang sudah terdaftar, apakah kamu mau reset password? - <a href="@password">request new password</a>.',
-                array('@password' => url('user/password')));
+                $return["message"] = t('Kamu mencoba login dengan email yang sudah terdaftar, mohon reset password anda telah lupa dengan account anda');
             }
         }
     }

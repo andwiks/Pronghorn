@@ -160,8 +160,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
         // Check if user is blocked.
         if ($account = _hybridauth_user_is_blocked_by_uid($identity['uid'])) {
             $return["return"] = 0;
-            $return["message"] = t('Username %name belum diaktivasi atau sedang diblock.');
-            $return["message"] = str_replace("%name",$user_profile["email"],$return["message"]);
+            $return["message"] = t('Username facebook anda belum diaktivasi');
         }
         // Check for email verification timestamp.
         elseif (!_hybridauth_user_login_access_by_uid($identity['uid'])) {

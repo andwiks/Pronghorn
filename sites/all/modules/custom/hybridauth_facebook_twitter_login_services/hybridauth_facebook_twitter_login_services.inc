@@ -160,15 +160,15 @@ function hybridauth_facebook_twitter_login_services_process($data){
         // Check if user is blocked.
         if ($account = _hybridauth_user_is_blocked_by_uid($identity['uid'])) {
             $return["return"] = 0;
-            $return["message"] = t('Username %name belum belum diaktivasi atau sedang diblock.');
-            $return["message"] = str_replace("%name",$data['email'],$return["message"]);
+            $return["message"] = t('Username %name belum diaktivasi atau sedang diblock.');
+            $return["message"] = str_replace("%name",$user_profile["email"],$return["message"]);
         }
         // Check for email verification timestamp.
         elseif (!_hybridauth_user_login_access_by_uid($identity['uid'])) {
             $return["return"] = 0;
             $data = unserialize($identity['data']);
             $return["message"] = t('You need to verify your e-mail address - !email. A welcome message with further instructions has been sent to your e-mail address.');
-            $return["message"] = str_replace("!email",$data['email'],$return["message"]);
+            $return["message"] = str_replace("!email",$user_profile["email"],$return["message"]);
             _hybridauth_mail_notify('hybridauth_email_verification', user_load($identity['uid']));
         }
         else {
@@ -178,9 +178,9 @@ function hybridauth_facebook_twitter_login_services_process($data){
         }
     }
     // Handle duplicate email addresses.
-    elseif (variable_get('hybridauth_duplicate_emails', 1) && !empty($data['email']) && $account = user_load_by_mail($data['email'])) {
+    elseif (variable_get('hybridauth_duplicate_emails', 1) && !empty($user_profile["email"]) && $account = user_load_by_mail($user_profile["email"])) {
         // Add identity to existing account, only if emailVerified.
-        if (variable_get('hybridauth_duplicate_emails', 1) == 2 && $data['email'] == $data['emailVerified']) {
+        if (variable_get('hybridauth_duplicate_emails', 1) == 2 && $user_profile["email"] == $user_profile["emailVerified"]) {
             if (!$identity) {
                 _hybridauth_identity_save($user_profile, $account->uid);
             }
@@ -200,7 +200,7 @@ function hybridauth_facebook_twitter_login_services_process($data){
                 $providers = hybridauth_providers_list();
                 $return["return"] = 0;
                 $return["message"] = t("Kamu mencoba login dengan email yang sudah terdaftar, mohon login menggunakan %provider.");
-                $return["message"] = str_replace("%provider",$providers[$account->data['hybridauth']['provider']],$return["message"]);
+                $return["message"] = str_replace("%provider",$user_profile["provider"],$return["message"]);
             }
             else {
                 $return["return"] = 0;

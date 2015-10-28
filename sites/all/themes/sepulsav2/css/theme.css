@@ -8,12 +8,57 @@
 
 .home.blue section.h_middle_top .home_tab,
 .home.blue section.h_middle_top .home_tab .content_tab,
-.home.blue section.h_middle_top .home_tab .nav_tab a{border-color:#105c8c;color:#105c8c}
+.home.blue section.h_middle_top .home_tab .nav_tab a{
+	border-color:#105c8c;
+	color:#105c8c;
+    border-top-color: #fff;
+    color: #fff; 
+}
+
+.home.blue section.h_middle_top .home_tab .nav_tab a{
+	border-color:#105c8c;
+	color:#105c8c;
+    border-top-color: #fff;
+    color: #fff;    
+    border-bottom: 1px solid #105c8c;
+}
+
+.home.blue section.h_middle_top .home_tab
+{
+    border-top-color: #105c8c;
+}
+
 .home.blue section.h_middle_top .home_tab .nav_tab a.active,
-.home.blue section.h_middle_top .home_tab .nav_tab a:hover {background-color: #105c8c;border-color:#105c8c;color:#FFF}
-.home.blue section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -35px top}
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #FFF;
+	border-color:#FFF;
+	color:#105c8c;
+    border-right: 1px solid #105c8c;
+}
+
+.home.blue section.h_middle_top .home_tab .nav_tab table tr td:last-child{
+    border-left: 1px solid #105c8c;
+}
+
+.home.blue section.h_middle_top .home_tab .nav_tab a span.ico{
+	background-position: -35px top;
+	background-position: -35px bottom;
+}
 .home.blue section.h_middle_top .home_tab .nav_tab a.active span.ico, 
-.home.blue section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -35px bottom}
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -35px bottom;
+	background-position: -35px top;
+}
+
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #105c8c;
+	border-color:#105c8c;
+	color:#FFF;
+}
+
+.home.blue section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -35px bottom;
+}
 
 .home.blue .form.style_1 input.bt ,
 .home.blue .form.style_1 input[type=text] {color: #105c8c;border-color: #105c8c;}
@@ -78,12 +123,59 @@ body.home.blue footer ,
 
 .home.green section.h_middle_top .home_tab,
 .home.green section.h_middle_top .home_tab .content_tab,
-.home.green section.h_middle_top .home_tab .nav_tab a{border-color:#129d4a;color:#129d4a}
+.home.green section.h_middle_top .home_tab .nav_tab a{
+	border-color:#129d4a;
+	color:#129d4a;
+    border-top-color: #fff;
+    color: #fff;    
+
+}
+
+.home.green section.h_middle_top .home_tab .nav_tab a{
+	border-color:#129d4a;
+	color:#129d4a;
+    border-top-color: #fff;
+    color: #fff;    
+    border-bottom: 1px solid #129d4a;
+
+}
+
+.home.green section.h_middle_top .home_tab
+{
+    border-top-color: #129d4a;
+}
+
 .home.green section.h_middle_top .home_tab .nav_tab a.active,
-.home.green section.h_middle_top .home_tab .nav_tab a:hover {background-color: #129d4a;border-color:#129d4a;color:#FFF}
-.home.green section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -70px top}
+.home.green section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #FFF;
+	border-color:#FFF;
+	color:#129d4a;
+    border-right: 1px solid #129d4a;
+}
+
+.home.green section.h_middle_top .home_tab .nav_tab table tr td:last-child{
+    border-left: 1px solid #129d4a;
+}
+
+.home.green section.h_middle_top .home_tab .nav_tab a span.ico{
+	background-position: -70px top;
+	background-position: -70px bottom;
+}
 .home.green section.h_middle_top .home_tab .nav_tab a.active span.ico, 
-.home.green section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -70px bottom}
+.home.green section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -70px bottom;
+	background-position: -70px top;
+}
+
+.home.green section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #129d4a;
+	border-color:#129d4a;
+	color:#FFF;
+}
+
+.home.green section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -70px bottom;
+}
 
 .home.green .form.style_1 input.bt ,
 .home.green .form.style_1 input[type=text] {color: #129d4a;border-color: #129d4a;}
@@ -149,12 +241,62 @@ body.home.green footer ,
 
 .home.red section.h_middle_top .home_tab,
 .home.red section.h_middle_top .home_tab .content_tab,
-.home.red section.h_middle_top .home_tab .nav_tab a{border-color:#c72127;color:#c72127}
+.home.red section.h_middle_top .home_tab .nav_tab a{
+	border-color:#c72127;
+	color:#c72127;
+    border-top-color: #fff;
+    color: #fff;    
+}
+
+.home.red section.h_middle_top .home_tab .nav_tab a{
+	border-color:#c72127;
+	color:#c72127;
+    border-top-color: #fff;
+    color: #fff;    
+    border-bottom: 1px solid #c72127;
+}
+
 .home.red section.h_middle_top .home_tab .nav_tab a.active,
-.home.red section.h_middle_top .home_tab .nav_tab a:hover {background-color: #c72127;border-color:#c72127;color:#FFF}
-.home.red section.h_middle_top .home_tab .nav_tab a span.ico{background-position: -105px top}
+.home.red section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #c72127;
+	border-color:#c72127;
+	color:#FFF;
+    background-color: #FFF;
+	border-color:#FFF;
+	color:#c72127;
+	border-right: 1px solid #c72127;
+}
+
+.home.red section.h_middle_top .home_tab .nav_tab table tr td:last-child{
+	border-left: 1px solid #c72127;
+}
+
+.home.red section.h_middle_top .home_tab
+{
+    border-top-color: #c72127;
+}
+
+
+.home.red section.h_middle_top .home_tab .nav_tab a span.ico{
+	background-position: -105px top;
+	background-position: -70px bottom;
+}
+
 .home.red section.h_middle_top .home_tab .nav_tab a.active span.ico, 
-.home.red section.h_middle_top .home_tab .nav_tab a:hover span.ico{background-position: -70px bottom}
+.home.red section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -70px bottom;
+	background-position: -105px top;
+}
+
+.home.red section.h_middle_top .home_tab .nav_tab a:hover span.ico{
+	background-position: -70px bottom;
+}
+
+.home.red section.h_middle_top .home_tab .nav_tab a:hover {
+	background-color: #c72127;
+	border-color:#c72127;
+	color:#FFF;
+}
 
 .home.red .form.style_1 input.bt ,
 .home.red .form.style_1 input[type=text] {color: #c72127;border-color: #c72127;}

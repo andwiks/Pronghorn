@@ -196,6 +196,11 @@ function hybridauth_facebook_twitter_login_services_process($data){
             $return["return"] = 1;
             $return["message"] = t("Identitas diri anda telah di update");
             $return["token"] = drupal_get_token('services');
+            $return["sessid"] = session_id();
+            $return["session_name"] = session_name();
+            services_remove_user_data($user);
+            $return["user"] = $user;
+
             return $return;
         }
         // Block registration - if (variable_get('hybridauth_duplicate_emails', 1) == 1) or
@@ -320,6 +325,10 @@ function hybridauth_facebook_twitter_login_services_process($data){
           _hybridauth_invoke_hooks('hybridauth_user_login', $user, $user_profile);
           $return["return"] = 1;
           $return["token"] = drupal_get_token('services');
+          $return["sessid"] = session_id();
+          $return["session_name"] = session_name();
+          services_remove_user_data($user);
+          $return["user"] = $user;
           return $return;
         }
       }
@@ -340,6 +349,10 @@ function hybridauth_facebook_twitter_login_services_process($data){
     if($user->uid > 0){
        $return["return"] = 1;
        $return["token"] = drupal_get_token('services');
+       $return["sessid"] = session_id();
+       $return["session_name"] = session_name();
+       services_remove_user_data($user);
+       $return["user"] = $user;
     }
     return $return;
 }

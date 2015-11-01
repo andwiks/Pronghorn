@@ -127,11 +127,17 @@ function sepulsa_get_packet($nid, $data_packet = FALSE) {
       if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.
         $price = field_get_items('commerce_product', $product, 'commerce_price');
+        // Get product description
+        $desc = "";
+        if (isset($product->field_deskripsi[LANGUAGE_NONE][0]['value'])) {
+          $desc = $product->field_deskripsi[LANGUAGE_NONE][0]['value'];
+        }
         // Add it inside options array.
         $options[] = array(
           'id' => $product->product_id,
           'title' => $product->title,
           'price' => (isset($price[0]['amount'])) ? $price[0]['amount'] : 0,
+          'desc' => $desc,
         );
       }
     }

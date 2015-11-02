@@ -64,7 +64,7 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
       if (!in_array(strtoupper($code), $v_code)) {
         return services_error(t('Invalid merchant code'), 406);
       }
-      $kode = $voucher->field_unique_coupon_code->value();
+      $kode = (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : "";
       $msg = "REDEEM BERHASIL!!!<br>";
       $msg .= t("Kode diskon: ") . $kode;
       $msg .= "<br>" . $voucher->title->value();

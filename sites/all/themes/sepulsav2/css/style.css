@@ -1273,10 +1273,13 @@ section.transaction .thanks_page div.facebook_twitter_share_container{
 
 section.transaction .thanks_page div.facebook_twitter_share_description{
     text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;    
     font-family: "robotoregular";
     color: #424143;
     font-size: 14px;
-    margin: 0px 0 10px;
+    max-width: 450px;
 }
 
 section.transaction .thanks_page div.facebook_twitter_share_icon{

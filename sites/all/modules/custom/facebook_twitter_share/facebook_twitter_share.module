@@ -34,6 +34,8 @@ function facebook_twitter_share_set_return($order_id = ""){
     $url = variable_get('facebook_twitter_share_url', 'http://www.sepulsa.com?o=<order_id>');
     $url = str_replace("<order_id>",$order_id,$url);
     
+    $return["info"] = variable_get('facebook_twitter_share_info', 'Share transaksimu ke akun Media Sosial dan dapatkan kesempatan memenangkan tambahan sepulsa kredit');
+    
     if(variable_get('enable_facebook_share', 1) && !empty($url)){
         $return["facebook"] = variable_get('facebook_share_endpoint', 'https://www.facebook.com/sharer/sharer.php?u=') . $url;
         $return["facebook_content"] = $url;

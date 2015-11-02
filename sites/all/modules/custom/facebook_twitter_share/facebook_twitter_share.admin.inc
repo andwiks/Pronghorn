@@ -10,6 +10,14 @@ function facebook_twitter_share_setting_form($node, $form_state) {
         '#required' => FALSE,
     );
     
+    $form['facebook_twitter_share_info'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Facebook Twitter info title to define to user their benefits of sharing'),
+        '#default_value' => variable_get('facebook_twitter_share_info', 'Share transaksimu ke akun Media Sosial dan dapatkan kesempatan memenangkan tambahan sepulsa kredit'),
+        '#description' => t('Description at the top of the sharing button, to explain the user their benefits if sharing'),  
+        '#required' => TRUE,
+    );
+    
     $form['twitter_predefined_text'] = array(
         '#type' => 'fieldset',
         '#title' => t('Twitter Predefined Text'),

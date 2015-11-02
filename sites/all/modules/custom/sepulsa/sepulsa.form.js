@@ -39,6 +39,7 @@
       }
       
       function sepulsa_check_number_prefix() {
+        $(".hidden_div").hide();
         phone = new RegExp("\\d{4}");
         if ($("#edit-phone").val() == null || $("#edit-phone").val() == "") {
             number = $("#edit-existing-phone").val();
@@ -79,6 +80,8 @@
                 $("#edit-operator").show();
                 $("#sepulsa-autocomplete-packets").show();
                 $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
+                packetinfoid = $("#edit-packet").val();
+                $("#packet-description" + packetinfoid).show();
               }
               return;
             }
@@ -130,6 +133,7 @@
             sepulsa_check_number_prefix();
         }
       });
+      $(".hidden_div").hide();
     }
   }
 })(jQuery);

@@ -12,9 +12,7 @@ if (module_exists('facebook_twitter_share')) {
         <?php if (module_exists('facebook_twitter_share') && count($returned_facebook_twitter_share) > 0) { ?>
         <div class="facebook_twitter_share_container">
             <div class="facebook_twitter_share_description">
-                Share Transaksimu ke akun Media Sosial
-                <br />
-                dan dapatkan kesempatan memenangkan tambahan sepulsa kredit
+                <?php echo $returned_facebook_twitter_share["info"]; ?>
             </div>
             <div class="facebook_twitter_share_icon">
                 <?php if(isset($returned_facebook_twitter_share["facebook"]) && !empty($returned_facebook_twitter_share["facebook"])){ ?>

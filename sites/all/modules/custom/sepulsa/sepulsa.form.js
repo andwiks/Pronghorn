@@ -11,7 +11,7 @@
         $("#edit-card-type option").remove();
         $(".topup-notes").hide();
         $("#edit-add-cart").hide();
-        $("#edit-add-charge").hide();   
+        $("#edit-add-charge").hide();
         $("#edit-operator").hide();
         $("#sepulsa-autocomplete-card-type").hide();
         $("#edit-packet option").remove();
@@ -19,7 +19,7 @@
         $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", true).attr("disabled", "disabled");
         $("#operator-sepulsa").css("display", "none");
       }
-      
+
       function sepulsa_form_packet(oid, pid, ps) {
         $("#edit-packet option").remove();
         price = 0;
@@ -37,8 +37,9 @@
         }
         $("#edit-packet").val(select ? ps : sid);
       }
-      
+
       function sepulsa_check_number_prefix() {
+        $(".hidden_div").hide();
         phone = new RegExp("\\d{4}");
         if ($("#edit-phone").val() == null || $("#edit-phone").val() == "") {
             number = $("#edit-existing-phone").val();
@@ -47,7 +48,7 @@
             number = $("#edit-phone").val();
         }
         prefix = phone.exec(number);
-          
+
         if (prefix != null) {
           for (operator in settings.sepulsa) {
             if (settings.sepulsa[operator].prefix.indexOf(prefix[0]) != -1) {
@@ -79,14 +80,16 @@
                 $("#edit-operator").show();
                 $("#sepulsa-autocomplete-packets").show();
                 $("form#sepulsa-phone-form input[name=op]").toggleClass("inactive", false).removeAttr("disabled");
+                packetinfoid = $("#edit-packet").val();
+                $("#packet-description" + packetinfoid).show();
               }
               return;
             }
           }
         }
-        sepulsa_form_inactive(); 
+        sepulsa_form_inactive();
       }
-      
+
       $(document).ready(function() {
         $("form#sepulsa-phone-form input[name=op]").attr("disabled", "disabled");
         $("#edit-phone").trigger("blur").focus().val($("#edit-phone").val());
@@ -99,12 +102,12 @@
             sepulsa_check_number_prefix();
         }
       });
-      
+
       $("#edit-phone", context).on("keyup blur", function(event) {
         //phone = new RegExp("^0\\d{3}");
         sepulsa_check_number_prefix();
       });
-       
+
       $("#edit-card-type", context).on("change", function (event) {
         if (operatorid > 0) {
           sepulsa_form_packet(operatorid, $(this).val(), $("#edit-packet").val());
@@ -113,7 +116,7 @@
           sepulsa_form_inactive();
         }
       });
-      
+
       $("#edit-existing-phone", context).on("change", function (event) {
         if ($("#edit-existing-phone").val() == "0") {
             $("#edit-existing-phone").css("display", "none");
@@ -129,6 +132,12 @@
             $("#edit-phone").val(existing_number);
             sepulsa_check_number_prefix();
         }
+      });
+      $(".hidden_div").hide();
+      $("#edit-packet").change(function() {
+        $(".hidden_div").hide();
+        packetinfoid = $("#edit-packet").val();
+        $("#packet-description" + packetinfoid).show();
       });
     }
   }

@@ -23,45 +23,6 @@ $theme_path = $base_url . '/' . path_to_theme();
             </div>
         </div>
     </div>
-    <div class="wrap_popup voucher" id="detail_voucher<?php print $row['nid']; ?>">
-        <div class="box_popup">
-            <a href="" class="close style_1"><img src="<?php print $theme_path; ?>/images/material/close_popup.png" alt="close" /></a>
-            <div class="content_pop">
-                <h3><?php print $row['title']; ?></h3>
-                <div class="image"><img src="<?php print $row['field_coupon_product_image']; ?>" alt="voucher" /></div>
-                <h4><?php print $row['field_detail_simple_coupon']; ?></h4>
-
-                <div class="redeem">
-                    <h6><?php print t('Kode Voucher'); ?></h6>
-                    <span>
-                        <h4><?php print $row['field_unique_coupon_code']; ?></h4>
-                    </span>
-                    <div class="form">
-                      <?php $form = drupal_get_form('offline_coupon_redeem_form_' . $row['nid'] , $row['nid']); ?>
-                      <?php print drupal_render($form); ?>
-                    </div>
-                </div>
-
-                <h5><?php print $row['field_coupon_tnc']; ?></h5>
-            </div>
-            <div class="nav_pop">
-                <a href="" class="prev"><</a>
-                <a href="" class="next">></a>
-            </div>
-        </div>
-    </div>
 <?php endforeach; ?>
 </div>
-<script type="text/javascript">
-(function () {
-  $('.box_voucher').click(function() {
-    $(this).next().show();
-  });
-
-  $('.close').click(function() {
-    $('.wrap_popup voucher').hide();
-  });
-}());
-
-</script>
 

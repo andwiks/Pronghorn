@@ -27,10 +27,10 @@
         sid = 0;
         for (p in settings.sepulsa[oid].packet[pid]) {
           $("#edit-packet").append($("<option>", {"value":settings.sepulsa[oid].packet[pid][p].id}).text(settings.sepulsa[oid].packet[pid][p].title));
-          if (parseInt(settings.sepulsa[oid].packet[pid][p].price) > price) {
-            price = parseInt(settings.sepulsa[oid].packet[pid][p].price);
-            sid = settings.sepulsa[oid].packet[pid][p].id;
-          }
+          
+          price = parseInt(settings.sepulsa[oid].packet[pid][p].price);
+          sid = settings.sepulsa[oid].packet[pid][p].id;
+          
           if (ps != null && ps == settings.sepulsa[oid].packet[pid][p].id) {
             select = true;
           }

@@ -181,7 +181,7 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     }
     foreach ($data['packet'] as $packets) {
       foreach ($packets as $packet) {
-        $descs[$packet['id']] = $packet['desc'];
+        $descs[$packet['id']] = (isset($packet['desc']) ? $packet['desc'] : "");
       }
     }
   }

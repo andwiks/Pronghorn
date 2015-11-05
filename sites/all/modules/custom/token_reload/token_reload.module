@@ -443,7 +443,9 @@ function token_reload_products($nominal = NULL) {
     $settings = variable_get('token_reload_settings', array()) + token_reload_default_settings();
 
     $uri = @parse_url($settings['endpoint']);
-    $url = url($uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $uri['host'] . $uri['path'] . '/product', array('external' => TRUE, 'query' => array('operator' => 'pln')));
+    $hostaddr = $uri['host'];
+    if(!empty($uri['port'])) $hostaddr .= ':' . $uri['port'];
+    $url = url($uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $hostaddr . $uri['path'] . '/product', array('external' => TRUE, 'query' => array('operator' => 'pln')));
     $options = array(
       'headers' => array(
         'Accept' => 'application/json',

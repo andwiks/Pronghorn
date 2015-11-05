@@ -89,6 +89,8 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     0 => t('Select Packet'),
   );
 
+  // Define default packet description
+  $desc = "";
   // Check previous form state.
   $phone = (isset($form_state['input']['phone']) && !empty($form_state['input']['phone'])) ? $form_state['input']['phone'] : '';
   // Autocorrect phone prefix.
@@ -177,6 +179,11 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
         }
       }
     }
+    foreach ($data['packet'] as $packets) {
+      foreach ($packets as $packet) {
+        $descs[$packet['id']] = (isset($packet['desc']) ? $packet['desc'] : "");
+      }
+    }
   }
 
   // Define operator dropdown select.
@@ -215,6 +222,16 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     '#validated' => TRUE,
   );
 
+  // Data package information
+  $data_info = "";
+  foreach ($descs as $key => $desc) {
+    if ($desc != '') {
+      $data_info .= '<div id="packet-description' . $key . '" class="hidden_div" style="border: 1px solid; padding: 1em; margin: 15px 0; font-size:1.2em; clear:both;">' . $desc . '</div>';
+    }
+  }
+  $form['data_info'] = array(
+    '#markup' => $data_info
+  );
   // Define add to cart: currently as markup.
   // Check autocomplete for cart.
   $form['add'] = array(

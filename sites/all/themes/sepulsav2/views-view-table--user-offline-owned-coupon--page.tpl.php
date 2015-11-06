@@ -5,6 +5,7 @@ $theme_path = $base_url . '/' . path_to_theme();
 <nav class="after_clear">
     <a href="<?php print url('user/voucher'); ?>"><?php print t('Online Store'); ?></a>
     <a href="<?php print url('user/voucher/offline'); ?>" class="active"><?php print t('Offline Store'); ?></a>
+    <a href="<?php print url('user/voucher/redeemed'); ?>"><?php print t('Redeemed Today'); ?></a>
 </nav>
 <div class="list_voucher after_clear">
 <?php foreach ($rows as $row_count => $row): ?>
@@ -44,8 +45,8 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <h5><?php print $row['field_coupon_tnc']; ?></h5>
             </div>
             <div class="nav_pop">
-                <a href="" class="prev"><</a> 
-                <a href="" class="next">></a> 
+                <a href="" class="prev"><</a>
+                <a href="" class="next">></a>
             </div>
         </div>
     </div>
@@ -56,11 +57,11 @@ $theme_path = $base_url . '/' . path_to_theme();
   $('.box_voucher').click(function() {
     $(this).next().show();
   });
-  
+
   $('.close').click(function() {
     $('.wrap_popup voucher').hide();
   });
 }());
-  
+
 </script>
 

@@ -1,7 +1,29 @@
+<?php
+$theme_url = url(path_to_theme());
+if (module_exists('facebook_twitter_share')) {
+    $order_id = arg(1);
+    $returned_facebook_twitter_share = facebook_twitter_share_set_return($order_id);
+}
+?>
 <section class="transaction">
     <div class="wrapper_3 thanks_page after_clear ">
         <h2>Transaksi Anda Sukses</h2>
         <h5>Terima kasih telah mempercayakan Sepulsa sebagai dealer pulsa kamu!</h5>
+        <?php if (module_exists('facebook_twitter_share') && count($returned_facebook_twitter_share) > 0) { ?>
+        <div class="facebook_twitter_share_container">
+            <div class="facebook_twitter_share_description">
+                <?php echo $returned_facebook_twitter_share["info"]; ?>
+            </div>
+            <div class="facebook_twitter_share_icon">
+                <?php if(isset($returned_facebook_twitter_share["facebook"]) && !empty($returned_facebook_twitter_share["facebook"])){ ?>
+                <a href="<?php echo $returned_facebook_twitter_share["facebook"]; ?>" target="_blank"><image src="<?php echo $theme_url; ?>/images/material/sr_scfb.png" alt="facebook share" /></a>
+                <?php } ?>
+                <?php if(isset($returned_facebook_twitter_share["twitter"]) && !empty($returned_facebook_twitter_share["twitter"])){ ?>
+                <a href="<?php echo $returned_facebook_twitter_share["twitter"]; ?>" target="_blank"><image src="<?php echo $theme_url; ?>/images/material/sr_sctw.png" alt="twitter share" /></a>
+                <?php } ?>
+            </div>
+        </div>
+        <?php } ?>
         <span class="border"></span>
 
         <?php

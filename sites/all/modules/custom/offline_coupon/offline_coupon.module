@@ -64,7 +64,7 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
       if (!in_array(strtoupper($code), $v_code)) {
         return services_error(t('Invalid merchant code'), 406);
       }
-      $kode = $voucher->field_unique_coupon_code->value();
+      $kode = (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : "";
       $msg = "REDEEM BERHASIL!!!<br>";
       $msg .= t("Kode diskon: ") . $kode;
       $msg .= "<br>" . $voucher->title->value();
@@ -102,29 +102,29 @@ function offline_coupon_forms($form_id, $args) {
 function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   $form = array();
   $form['merchant_code'] = array(
-    '#type' => 'textfield',  
-    '#size' => 10, 
-    '#maxlength' => 100, 
+    '#type' => 'textfield',
+    '#size' => 10,
+    '#maxlength' => 100,
     '#required' => FALSE,'#attributes' => array(
       'class' => array('input-text'),
       'placeholder' => t('Merchant Code')
     ),
-    
+
   );
-  
+
   $form['voucher_id'] = array(
-    '#type' => 'hidden', 
-    '#value' => $voucher_id, 
+    '#type' => 'hidden',
+    '#value' => $voucher_id,
   );
-  
+
   $form['submit'] = array(
-    '#type' => 'submit', 
+    '#type' => 'submit',
     '#attributes' => array(
       'class' => array('btn', 'style1'),
     ),
     '#value' => t('Redeem')
   );
-  
+
   return $form;
 }
 
@@ -146,7 +146,7 @@ function offline_coupon_redeem_form_submit($form, &$form_state) {
       if (!in_array(strtoupper($form_state['values']['merchant_code']), $v_code)) {
         drupal_set_message(t('Invalid merchant code.'), 'error');
       } else {
-        $kode = $voucher->field_unique_coupon_code->value();
+        $kode = (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : "";
         $msg = "REDEEM BERHASIL!!!";
         $msg .= "<div class='voucher-code'>" . t("Kode diskon: ") . $kode . "</div>";
         $msg .= $voucher->title->value();
@@ -161,5 +161,5 @@ function offline_coupon_redeem_form_submit($form, &$form_state) {
   } else {
     drupal_set_message(t('Invalid voucher.'), 'error');
   }
-   
+
 }

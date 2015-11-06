@@ -55,7 +55,9 @@ function kraken_settings_form($settings = array()) {
 
 function kraken_topup_process($topup, $settings, &$output = NULL) {
   $uri = @parse_url($settings['endpoint']);
-  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $uri['host'] . $uri['path'] . '/transaction';
+  $hostaddr = $uri['host'];
+  if(!empty($uri['port'])) $hostaddr .= ':' . $uri['port'];
+  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $hostaddr . $uri['path'] . '/transaction';
 
   $data = array(
     'customer_number' => $topup['field_topup_phone_number'],
@@ -72,6 +74,7 @@ function kraken_topup_process($topup, $settings, &$output = NULL) {
   );
 
   $result = drupal_http_request($url, $options);
+
   if (!is_null($output)) {
     if (in_array($result->code, array(200, 201))) {
       $transaction = drupal_json_decode($result->data);

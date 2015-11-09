@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function bbm_checkout_services_services_resources() {
+    return array(
+        'bbm_checkout' => array(
+            'actions' => array(
+                'order' => array(
+                    'help' => 'Create and complete order for BBM Checkout',
+                    'callback' => 'bbm_checkout_order_services',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'bbm_checkout_services',
+                        'name' => 'bbm_checkout_services',
+                    ),
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                        array(
+                            'name' => 'data',
+                            'optional' => TRUE,
+                            'source' => 'data',
+                            'description' => t('data.'),
+                            'type' => 'array',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+function bbm_checkout_services_menu() {
+    $items['admin/config/administration/bbm_checkout_services'] = array(
+        'title'             => 'BBM Checkout Services Configuration',
+        'description'       => 'Configure page for BBM Checkout Services',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('bbm_checkout_services_setting_form'),
+        'access arguments'  => array('access_bbm_checkout_services_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'bbm_checkout_services.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function bbm_checkout_services_permission() {
+    return array(
+        'access_bbm_checkout_services_config' => array(
+            'title'         => t('Accessing BBM Checkout Configuration'),
+            'description'   => t('Accessing BBM Checkout Configuration.')
+        ),
+    );
+}

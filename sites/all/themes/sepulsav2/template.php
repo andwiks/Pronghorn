@@ -403,21 +403,34 @@ function sepulsav2_menu_tree__sidebar($variables) {
   return '<nav>' . $variables['tree'] . '</nav>';
 }
 
-function sepulsav2_preprocess_block(&$vars, $hook) {
-  //drupal_set_message("<pre>".print_r($vars, true)."</pre>");
-  foreach ($vars['classes_array'] as $key => $value) {
-    if ($value == 'block') {
-      $vars['classes_array'][$key] = NULL;
-    }
-  }
-}
-
 /**
- * Implements hook_preprocess_menu_link ().
+ * Implements hook_preprocess_menu_link().
  */
 function sepulsav2_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
+  }
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function sepulsav2_preprocess_html(&$variables) {
+  if (drupal_is_front_page()) {
+    $variables['classes_array'][] = 'home';
+  }
+
+  if (isset($variables['page']['shopping_cart'])) {
+    $variables['shopping_cart'] = $variables['page']['shopping_cart'];
+    unset($variables['page']['shopping_cart']);
+  }
+
+  $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
+  $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
+  $variables['footer_second'] = block_get_blocks_by_region('footer_second');
+  if ($variables['user']->uid > 0) {
+    module_load_include('module', 'userpoints', 'userpoints');
+    $variables['userpoints'] = userpoints_get_current_points($variables['user']->uid);
   }
 }
 
@@ -431,6 +444,17 @@ function sepulsav2_preprocess_page(&$variables) {
     }
     else {
       $variables['active_tab'] = 'topup';
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function sepulsav2_preprocess_block(&$variables) {
+  foreach ($variables['classes_array'] as $key => $value) {
+    if ($value == 'block') {
+      $variables['classes_array'][$key] = NULL;
     }
   }
 }
@@ -502,6 +526,16 @@ function sepulsav2_preprocess_views_view_table(&$variables) {
       $line_items = $order_wrapper->commerce_line_items;
       $variables['order_total'] = commerce_line_items_total($line_items);
       break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_sepulsa_checkout_completion_message().
+ */
+function sepulsav2_preprocess_sepulsa_checkout_completion_message(&$variables) {
+  $variables['user'] = $GLOBALS['user'];
+  if ($variables['user']->uid) {
+    $variables['authenticated'] = TRUE;
   }
 }
 
@@ -647,16 +681,6 @@ function sepulsav2_theme($existing, $type, $theme, $path) {
   );
 }
 
-/**
- * Implements hook_preprocess_sepulsa_checkout_completion_message().
- */
-function sepulsav2_preprocess_sepulsa_checkout_completion_message(&$variables) {
-  $variables['user'] = $GLOBALS['user'];
-  if ($variables['user']->uid) {
-    $variables['authenticated'] = TRUE;
-  }
-}
-
 function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
   if (!function_exists('commerce_order_rules_contains_product')) {
     module_load_include('rules.inc', 'commerce_order');
@@ -699,20 +723,6 @@ function sepulsav2_views_form_commerce_cart_block_default_ajax_submit($form, $fo
   drupal_get_messages('status');
 
   return array('#type' => 'ajax', '#commands' => $commands);
-}
-
-function sepulsav2_preprocess_html(&$variables) {
-  if (drupal_is_front_page()) {
-    $variables['classes_array'][] = 'home';
-  }
-
-  $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
-  $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
-  $variables['footer_second'] = block_get_blocks_by_region('footer_second');
-  if ($variables['user']->uid > 0) {
-    module_load_include('module', 'userpoints', 'userpoints');
-    $variables['userpoints'] = userpoints_get_current_points($variables['user']->uid);
-  }
 }
 
 /**

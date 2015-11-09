@@ -154,102 +154,157 @@ function bca_read_csv() {
           $amount = str_replace(array(',', '.00', ' CR'), '', $data[3]);
           // only uniq amount processed
           if ($amount % 1000 != 0) {
-            $payment[] = (float)$amount;
+            $payment[] = array(
+              $data[1],
+              (int)$amount
+            );
           }
         }
       }
       fclose($handle);
       // delete bca csv file
       $newfile = 'sites/default/files/bank/summary_bca/bca-' . date('dmy') . '.csv';
+      $rawfile = 'sites/default/files/bank/raw_bca/'.$file.'.csv';
 
+      $mydir = file_default_scheme() . '://bank/summary_bca';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
-      @drupal_unlink($filepath);
+
+      //save raw csv for future use
+      $mydir = file_default_scheme() . '://bank/raw_bca';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
+      @copy($filepath, $rawfile);
+
+      //disabled for local dev purpose
+      //@drupal_unlink($filepath);
     }
-    
   }
+  
+  $result = db_query("SELECT * FROM {auto_bank_transfer}")->fetchAll();
+  // If table not empty, run match check with note and amount field pair.
+  if(!empty($result)){
+    $flag = true;
+    if(count($result) > 2){
+      if($payment[count($result)-1][0] != $result[count($result)-1]->note || $payment[count($result)-1][1] != $result[count($result)-1]->amount) $flag = false;
+      if($payment[count($result)-2][0] != $result[count($result)-2]->note || $payment[count($result)-2][1] != $result[count($result)-2]->amount) $flag = false;
+      if($payment[count($result)-3][0] != $result[count($result)-3]->note || $payment[count($result)-3][1] != $result[count($result)-3]->amount) $flag = false;
+      //if any out of 3 not match, flag will return false.
+      if($flag == true) {
+        //data match, splice it, ignore pointer and above
+        $payment = array_slice($payment,count($result));
+      }else{
+        //data not match, reset table, insert new data
+        watchdog('bca_read_csv', 'Table data missmatch, filling with new data.');
+        db_truncate('auto_bank_transfer')->execute();
+      }      
+    }
+  }
+  //Insert new data to table.
+  $temp = array();
+  foreach($payment as $value){
+    db_insert('auto_bank_transfer')
+    ->fields(array(
+      'note' => $value[0],
+      'amount' => $value[1],
+    ))
+    ->execute();
+    $temp[] = $value[1];
+  }
+  //Set variable with new record only
+  variable_set('bca_payment_record2',$temp);
+  
+  /* old style, this is SPARTA! Eh, Roy style!
   $payments = variable_get('bca_payment_record', array());
   $all_payment = array_merge($payments, $payment);
   $all_payment = array_unique($all_payment);
   variable_set('bca_payment_record', $all_payment);
+  */
 }
 
 // function to confirm payment
 function bca_confirm_payment() {
   //read csv
   bca_read_csv();
+  /* old style
   $all_payment = variable_get('bca_payment_record', array());
-  $trans_log = array();
-  foreach ($all_payment as $key => $payment) {
-    // load order by total order
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'commerce_order');
-    $query->propertyCondition('status', 'pending');
-    $query->fieldCondition('commerce_order_total', 'amount', $payment);
-    $result = $query->execute();
-    if (isset($result['commerce_order'])) {
-      $order_ids = array_keys($result['commerce_order']);
-      $order = commerce_order_load($order_ids[0]);
+  */
+  $all_payment = variable_get('bca_payment_record2',array());
+  //if no new transaction, stop function
+  if(empty($all_payment)){
+    watchdog('bca_confirm_payment', 'No new transaction. Stopping.');    
+  }else{
+    watchdog('bca_confirm_payment', 'Comparing payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
+    $trans_log = array();
+    foreach ($all_payment as $key => $payment) {
+      // load order by total order
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_order');
+      $query->propertyCondition('status', 'pending');
+      $query->fieldCondition('commerce_order_total', 'amount', $payment);
+      $result = $query->execute();
+      if (isset($result['commerce_order'])) {
+        $order_ids = array_keys($result['commerce_order']);
+        $order = commerce_order_load($order_ids[0]);
 
-      foreach ($order_ids as $order_id) {
-        // load commerce payment transaction by order_id and bank transfer method
-        $payment_confirm = 0;
-        foreach (commerce_payment_transaction_load_multiple(array(), 
-            array(
-              'order_id' => $order_id,
-              'payment_method' => 'bank_transfer',
-              'status' => 'pending')) 
-            as $transaction) {
-          
-          $order = commerce_order_load($order_id);
-          // compare total amount
-          if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
-            // if same = confirm payment
+        foreach ($order_ids as $order_id) {
+          // load commerce payment transaction by order_id and bank transfer method
+          $payment_confirm = 0;
+          foreach (commerce_payment_transaction_load_multiple(array(), 
+              array(
+                'order_id' => $order_id,
+                'payment_method' => 'bank_transfer',
+                'status' => 'pending')) 
+              as $transaction) {
+            
+            $order = commerce_order_load($order_id);
+            // compare total amount
+            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
+              // if same = confirm payment
+              $transaction->status = 'success';
+              commerce_payment_transaction_save($transaction);
+              
+              $trans_log[] = 'order id: ' . $transaction->order_id;
+              $payment_confirm = 1;
+
+            } else {
+              // if not same = delete payment
+              commerce_payment_transaction_delete($transaction->transaction_id);
+            }
+          }
+          if ($payment_confirm == 0) {
+            $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
+            $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
+            $transaction->amount = $payment;
+            $transaction->currency_code = 'IDR';
             $transaction->status = 'success';
             commerce_payment_transaction_save($transaction);
-            
             $trans_log[] = 'order id: ' . $transaction->order_id;
-            $payment_confirm = 1;
-
-          } else {
-            // if not same = delete payment
-            commerce_payment_transaction_delete($transaction->transaction_id);
           }
         }
-        if ($payment_confirm == 0) {
-          $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
-          $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
-          $transaction->amount = $payment;
-          $transaction->currency_code = 'IDR';
+      }
+
+      // search payment --old approach
+      /*foreach (commerce_payment_transaction_load_multiple(array(), 
+          array(
+            'amount' => $payment, 
+            'payment_method' => 'bank_transfer',
+            'status' => 'pending')) 
+          as $transaction) {
+        $order = commerce_order_load($transaction->order_id);
+        if ($order->status == 'pending') {
+          // confirm payment
           $transaction->status = 'success';
           commerce_payment_transaction_save($transaction);
+          // delete payment
+          
           $trans_log[] = 'order id: ' . $transaction->order_id;
         }
-      }
+      }*/
     }
-
-    // search payment --old approach
-    /*foreach (commerce_payment_transaction_load_multiple(array(), 
-        array(
-          'amount' => $payment, 
-          'payment_method' => 'bank_transfer',
-          'status' => 'pending')) 
-        as $transaction) {
-      $order = commerce_order_load($transaction->order_id);
-      if ($order->status == 'pending') {
-        // confirm payment
-        $transaction->status = 'success';
-        commerce_payment_transaction_save($transaction);
-        // delete payment
-        
-        $trans_log[] = 'order id: ' . $transaction->order_id;
-      }
-    }*/
+    variable_set('bca_payment_record', array());
+    // set log success payment, if any.
+    watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
   }
-  variable_set('bca_payment_record', array());
-  // set log
-  watchdog('bca_confirm_payment', 'All payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
-  watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
-
 }
 
 

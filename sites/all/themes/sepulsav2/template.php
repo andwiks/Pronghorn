@@ -449,6 +449,19 @@ function sepulsav2_preprocess_page(&$variables) {
 }
 
 /**
+ * Implements hook_preprocess_region().
+ */
+function sepulsav2_preprocess_region(&$variables) {
+  switch ($variables['region']) {
+    case 'shopping_cart':
+      $variables['classes_array'][] = 'box';
+      $variables['classes_array'][] = 'lang';
+      $variables['classes_array'][] = 'cart';
+      break;
+  }
+}
+
+/**
  * Implements hook_preprocess_block().
  */
 function sepulsav2_preprocess_block(&$variables) {

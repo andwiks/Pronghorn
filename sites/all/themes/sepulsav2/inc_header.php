@@ -6,8 +6,6 @@
  * @author dwi@sepulsa.com
  * @since January 27th 2015.
  */
-
-global $base_url, $user, $language;
 ?>
     <header>
         <div class="wrapper">
@@ -22,80 +20,7 @@ global $base_url, $user, $language;
             </div>
             <div class="right_link">
 
-                <div class="box lang cart">
-                    <a href="" >
-                        <span class="ico"></span>
-                        CART
-                    </a>  
-                    <div class="box_drop" id="shopping-cart">
-                        <div class="arr"></div>
-                            <form action="#" id="cart_form" name="cart_form">
-        
-                                <div class="cart-info">
-                                    <div class="shopp" id="each-1">
-                                        <div class="label">Indosat 25.000
-                                            <br><span style="font-weight:bold;">085722122787</span>
-                                        </div>
-                                        <!-- <span class="shopp-quantity">1</span>
-                                        <div class="shopp-price"> Rp 150.000</div> -->
-                                        <div style="float:right;  padding: 3px;">
-                                            <a href="#"><img src="<?php print $theme_path; ?>/images/material/remove.png" class="remove"></a>
-                                        </div>
-                                        <br class="all">
-                                    </div>
-                                    <div class="shopp" id="each-2">
-                                        <div class="label">Indosat 100.000
-                                            <br><span style="font-weight:bold;">085722122787</span>
-                                        </div>
-                                        <!-- <span class="shopp-quantity">1</span>
-                                        <div class="shopp-price"> Rp 500.000</div> -->
-                                        <div style="float:right;  padding: 3px;">
-                                            <a href="#"><img src="<?php print $theme_path; ?>/images/material/remove.png" class="remove"></a>
-                                        </div>
-                                        <br class="all">
-                                    </div>
-                                    <!-- <div class="shopp" id="each-3">
-                                        <div class="label">Telkomsel 50k 
-                                            <br>085722122787
-                                        </div>
-                                        <span class="shopp-quantity">3</span>
-                                        <div class="shopp-price"> Rp 300.000</div>
-                                        <img src="images/material/remove.png" class="remove"><br class="all">
-                                    </div> -->
-                                    <div class="shopp" id="each-4">
-                                        <div class="label">Axis 50.000
-                                            <br><span style="font-weight:bold;">085722122787</span>
-                                        </div>
-                                        <!-- <span class="shopp-quantity">1</span>
-                                        <div class="shopp-price"> Rp 100.000</div> -->
-                                        <div style="float:right;  padding: 3px;">
-                                            <a href="#"><img src="<?php print $theme_path; ?>/images/material/remove.png" class="remove"></a>
-                                        </div>
-                                        <br class="all">
-                                    </div>
-
-                                    <!-- <div class="cart-total">                                        
-                                        <div class="label">
-                                            <b>TOTAL:</b> 
-                                        </div>
-                                        <div class="shopp-price"> Rp 1.050.000</div>
-                                        
-                                        <div style="clear:both; height:0;">&nbsp;</div>
-                                        <input type="hidden" name="total-hidden-charges" id="total-hidden-charges" value="Rp 1.050.000">
-                                    </div> -->
-
-                                    <div class="opsi-voucher">
-                                        <input type="checkbox" name="fastcharge" value="fastcharge"> Transaksi tanpa mengambil voucher
-                                    </div>
-                                
-                                    <div style="text-align:center;">
-                                        <button type="submit" id="cartSubmit">Proses</button>
-                                    </div>
-                                </div>
-                                
-                            </form>
-                    </div>
-                </div>
+                <?php print render($shopping_cart); ?>
 
                 <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">

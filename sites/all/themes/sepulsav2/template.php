@@ -25,6 +25,9 @@ function sepulsav2_block_view_alter(&$data, $block) {
   }
 }
 
+/**
+ * Implements hook_form_alter().
+ */
 function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
   //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
   $commer_form_id = substr($form_id, 0, 25);
@@ -269,6 +272,29 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
     $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
   }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for views_form_commerce_cart_block_popup().
+ */
+function sepulsav2_form_views_form_commerce_cart_block_popup_alter(&$form, &$form_state, $form_id) {
+  unset($form['#action']);
+  $form['select_voucher'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I want to select voucher'),
+    '#default_value' => TRUE,
+    '#prefix' => '<div class="opsi-voucher">',
+    '#suffix' => '</div>',
+    '#weight' => $form['output']['#weight'] + 1,
+  );
+
+  $form['actions']['#weight'] = 100;
+  $form['actions']['#attributes']['style'] = 'text-align:center';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Process'),
+    '#submit' => array('sepulsav2_form_views_form_commerce_cart_block_popup_submit'),
+  );
 }
 
 /**
@@ -692,6 +718,15 @@ function sepulsav2_theme($existing, $type, $theme, $path) {
       'template' => 'sepulsav2-referral',
     ),
   );
+}
+
+function sepulsav2_form_views_form_commerce_cart_block_popup_submit($form, &$form_state) {
+  if ($form_state['values']['select_voucher']) {
+    $form_state['redirect'] = 'coupon';
+  }
+  else {
+    $form_state['redirect'] = array('checkout/' . $form_state['order']->order_id, array('query' => array('fast_charge' => 1)));
+  }
 }
 
 function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {

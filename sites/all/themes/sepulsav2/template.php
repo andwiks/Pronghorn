@@ -702,8 +702,6 @@ function sepulsav2_views_form_commerce_cart_block_default_ajax_submit($form, $fo
 }
 
 function sepulsav2_preprocess_html(&$variables) {
-  global $user;
-
   if (drupal_is_front_page()) {
     $variables['classes_array'][] = 'home';
   }
@@ -711,9 +709,9 @@ function sepulsav2_preprocess_html(&$variables) {
   $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
   $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
   $variables['footer_second'] = block_get_blocks_by_region('footer_second');
-  if ($user->uid > 0) {
+  if ($variables['user']->uid > 0) {
     module_load_include('module', 'userpoints', 'userpoints');
-    $variables['userpoints'] = userpoints_get_current_points($user->uid);
+    $variables['userpoints'] = userpoints_get_current_points($variables['user']->uid);
   }
 }
 

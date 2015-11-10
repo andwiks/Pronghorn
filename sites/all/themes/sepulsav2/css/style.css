@@ -3714,3 +3714,29 @@ header .right_link .box.lang span.ico{
     background: url(../images/material/cart_ico.png) no-repeat -24px 0px;
     margin-bottom: 6px;
 }
+
+.box_drop #edit-submit
+{
+    display: block;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+    background: #fdb50a;
+    padding:.5em 2em;
+    color: #fff;
+    margin:10px auto;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;   
+}
+
+.box_drop .shopp .delete-line-item {
+    background: url("../images/material/remove.png") center right no-repeat;
+    width: 26px;
+    font-size: 0px;
+    height: 30px;
+    display: block;
+    padding: 1px;
+    margin-left: 2px;
+}

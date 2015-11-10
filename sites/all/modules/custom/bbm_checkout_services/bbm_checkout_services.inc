@@ -82,10 +82,12 @@ function bbm_checkout_order_services($data){
         $account = user_save('', $fields);
     }
     
-    $order = commerce_cart_order_load($account->uid);
+    /*$order = commerce_cart_order_load($account->uid);
     if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
         $order = commerce_cart_order_empty($order);
-    }
+    }*/
+    $order = commerce_order_new($account->uid, 'cart');
+    $order = commerce_cart_order_empty($order);
     
     foreach ($product_container as $value){
         $product = array();
@@ -151,14 +153,15 @@ function bbm_checkout_order_services($data){
         }
     }
     
-    $order = commerce_cart_order_load($account->uid);
+    $order = commerce_order_load($order->order_id);
     
     if($order){
-        //$order = commerce_order_status_update($order, 'checkout_complete', FALSE, NULL);
+        //$order = commerce_order_status_update($order, 'checkout_payment', FALSE, NULL);
+        $order = commerce_order_status_update($order, 'processing', FALSE, NULL);
         //commerce_checkout_complete($order);
-        $order = commerce_order_status_update($order, 'checkout_payment', FALSE, NULL);
         //tag that this order is made from BBM Checkout
         $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'bbm_checkout';
+        $order->data['payment_method'] = 'commerce_veritrans|commerce_payment_commerce_veritrans';
         
         $payment_method = commerce_payment_method_instance_load('commerce_veritrans|commerce_payment_commerce_veritrans');
         
@@ -177,12 +180,13 @@ function bbm_checkout_order_services($data){
         commerce_payment_commerce_payment_transaction_insert($transaction);
         
         commerce_order_save($order);
-        $return["sepulsa_order_id"] = $order->order_number;
+        
+        $return["sepulsa_order_id"] = $order->order_id;
         $return["status"] = "sukses";
         $return["keterangan"] = "";
         $order->return = $return;
         
-        $order = commerce_cart_order_load($account->uid);
+        $order = commerce_order_load($order->order_id);
         
         return $order;
     }

@@ -142,16 +142,19 @@ function dropTransaksi() {
     });
 }
 function dropDownHeader() {
-    /*$("header .right_link .box").hover(function () {
+    $("header .right_link .box").hover(function () {
         $(this).children(".box_drop").stop().fadeIn(300);
     }, function () {
         $(this).children(".box_drop").stop().fadeOut(300);
-    });*/
-
-    $("header .right_link .box a.tooglecart").click(function () {
-        $(".box_drop").stop().fadeToggle(300);
     });
 }
+
+function dropDownCart() {
+    $("header .right_link .box a.tooglecart").click(function () {
+        $("#shopping-cart").stop().fadeToggle(300);
+    });
+}
+
 function  openPop(selector) {
     $("body").css("overflow", "hidden");
     $(selector).delay(100).fadeIn(300)

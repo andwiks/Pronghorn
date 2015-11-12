@@ -27,6 +27,7 @@ $(document).ready(function () {
     kreditTab(); //tab switch at home
     dropTransaksi(); //drop transaksi combobox
     dropDownHeader(); //dropdown menu 
+    dropDownCart(); //dropdown menu 
     popupLogin(); //open popup login    
     stepIsiPulsa();//toogle show nextstep(isi pulsa)
     radioButton(); //radio button custom

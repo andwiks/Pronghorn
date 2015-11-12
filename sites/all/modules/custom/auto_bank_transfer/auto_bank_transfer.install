@@ -11,48 +11,89 @@ function auto_bank_transfer_schema() {
   $schema['auto_bank_bca'] = array(
     'description' => 'The base table for BCA auto bank transfer.',
     'fields' => array(
-      'abtid' => array(
-        'description' => 'The primary identifier for a auto bank transfer process.',
+      'abbid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'note' => array(
+      'description' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
       ),
+      'order_id' => array(
+        'description' => 'Commerce Order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),      
       'amount' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
     ),
-    'primary key' => array('abtid'),
+    'primary key' => array('abbid'),
   );
   $schema['auto_bank_mandiri'] = array(
     'description' => 'The base table for Mandiri auto bank transfer.',
     'fields' => array(
-      'abtid' => array(
-        'description' => 'The primary identifier for a auto bank transfer process.',
+      'abmid' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
       ),
-      'note' => array(
+      'description' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
       ),
+      'order_id' => array(
+        'description' => 'Commerce Order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),      
       'amount' => array(
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
       ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),   
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
     ),
-    'primary key' => array('abtid'),
+    'primary key' => array('abmid'),
   );
-
   return $schema;
 }
 

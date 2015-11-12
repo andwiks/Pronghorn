@@ -40,9 +40,33 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php print t('Kamu bisa memilih 3 Voucher yang kamu suka.'); ?>
                 <span class="border"></span>
             </h5>
+            <div class="filter after_clear">
+                <div class="row">
+                    <label>Sort by :</label>
+                    <div class="input">
+                        <select name="voucher_sort">
+                            <option value="defualt">--Default--</option>
+                            <option value="latest">--Latest Voucher--</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <label>Filter :</label>
+                    <div class="input">
+                        <select name="voucher_filter">
+                            <option value="All">--All--</option>
+                            <option value="Lifestyle">--Lifestyle--</option>
+                            <option value="Food">--Food--</option>
+                            <option value="Fashion">--Fashion--</option>
+                            <option value="Travel">--Travel--</option>
+                            <option value="E-Commerce">--E-Commerce--</option>
+                            <option value="Grocery">--Grocery--</option>
+                            <option value="Kids">--Kids--</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="coupon-separate" style="height:15px; clear:both; display:block;margin-top: 15px;border-top: 1px dashed #999;">&nbsp;</div>
 
         <div class="wrapper_3">
             <div class="list_voucher after_clear">

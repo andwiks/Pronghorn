@@ -146,7 +146,7 @@ function auto_bank_transfer_bca_overview(){
   $build['auto_bank_transfer_filter_form'] = drupal_get_form('auto_bank_transfer_filter_form');
 
   $header = array();
-  $header[] = array('data' => t('ID'), 'field' => 'abbid', 'sort' => 'asc');
+  $header[] = array('data' => t('ID'), 'field' => 'abbid', 'sort' => 'desc');
   $header[] = array('data' => t('Description'));
   $header[] = array('data' => t('Amount'), 'field' => 'amount');
   $header[] = array('data' => t('Created'), 'field' => 'created');
@@ -226,7 +226,7 @@ function auto_bank_transfer_mandiri_overview(){
   $build['auto_bank_transfer_filter_form'] = drupal_get_form('auto_bank_transfer_filter_form');
 
   $header = array();
-  $header[] = array('data' => t('ID'), 'field' => 'abmid', 'sort' => 'asc');
+  $header[] = array('data' => t('ID'), 'field' => 'abmid', 'sort' => 'desc');
   $header[] = array('data' => t('Description'));
   $header[] = array('data' => t('Amount'), 'field' => 'amount');
   $header[] = array('data' => t('Created'), 'field' => 'created');

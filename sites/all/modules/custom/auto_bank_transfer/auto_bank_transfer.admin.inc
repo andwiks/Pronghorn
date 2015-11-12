@@ -346,7 +346,7 @@ function mandiri_list_file() {
     $output .= "<table>";
     while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
       $num = count($data);
-      if ($num == 5) {
+      if ($num == 10) {
         $output .= "<tr>";
         $row++;
         for ($c=0; $c < $num; $c++) {

@@ -1,0 +1,129 @@
+<?php
+/**
+ * @file
+ * merchant_dashboard.module
+ *
+ * @author dwi@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function merchant_dashboard_menu() {
+  $items = array();
+
+  $items['merchant_dashboard'] = array(
+    'title' => 'Merchant Dashboard',
+    'description' => 'Merchant Dashboard',
+    'page callback' => 'merchant_dashboard_dashboard',
+    'access callback' => TRUE,
+    'theme callback' => 'variable_get',
+    'theme arguments' => array('admin_theme'),
+  );
+
+  $items['merchant_dashboard/summary'] = array(
+    //'title' => 'Recharge Your Phone',
+    //no need to put title on front page
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_phone_form', TRUE),
+    'access callback' => TRUE,
+    'file' => 'sepulsa.pages.inc',
+  );
+
+  $items['merchant_dashboard/voucher/%'] = array(
+    'title' => 'Sepulsa Autocomplete',
+    'description' => 'Sepulsa Autocomplete',
+    'page callback' => 'sepulsa_autocomplete',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'file' => 'sepulsa.pages.inc',
+  );
+
+  return $items;
+}
+
+function merchant_dashboard_page_theme() {
+  return 'seven';
+}
+
+function merchant_dashboard_user_voucher() {
+  global $user;
+  $profil = entity_load_single('user', $user->uid);
+  $voucher = array();
+  if (isset($profil->field_user_merchant[LANGUAGE_NONE])) {
+    $user_merchant = $profil->field_user_merchant[LANGUAGE_NONE][0]['value'];
+    $query = new EntityFieldQuery();
+
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'coupon')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->fieldCondition('field_merchant', 'value', $user_merchant, '='); // Run the query as user 1.
+
+    $result = $query->execute();
+
+    if (isset($result['node'])) {
+      $voucher = array_keys($result['node']);
+    }
+  }
+//dpm($voucher, 'voucher');
+
+  return $voucher;
+}
+
+function merchant_dashboard_dashboard() {
+  $coupon_ids = merchant_dashboard_user_voucher();
+
+  $headers = array(
+    array('data' => 'Brand', 'field' => 'brand', 'class'=> array('views-field')),
+    array('data' => 'Skema', 'field' => 'skema', 'class'=> array('views-field')),
+    array('data' => 'Taken', 'field' => 'taken', 'class'=> array('views-field')),
+    array('data' => 'Redeem', 'field' => 'redeem', 'class'=> array('views-field')),
+  );
+
+  foreach ($coupon_ids as $coupon_id) {
+    // load coupon
+    $voucher = node_load($coupon_id);
+    // voucher taken
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'offline_owned_unique')
+      ->propertyCondition('status', NODE_PUBLISHED)
+      ->propertyCondition('uid', 1, '!=')
+      ->fieldCondition('field_simple_coupon', 'target_id', $coupon_id);
+    $result = $query->execute();
+    $taken = 0;
+    if (isset($result['node'])) {
+      $taken = count($result['node']);
+    }
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'offline_owned_unique')
+      ->propertyCondition('status', NODE_NOT_PUBLISHED)
+      ->propertyCondition('uid', 1, '!=')
+      ->fieldCondition('field_simple_coupon', 'target_id', $coupon_id);
+    $result = $query->execute();
+    $redeem = 0;
+    if (isset($result['node'])) {
+      $redeem = count($result['node']);
+    }
+
+    $rows[] = array(
+      array('data' => $voucher->field_merchant[LANGUAGE_NONE][0]['safe_value'], 'class'=> array('views-field')),
+      array('data' => l($voucher->title, 'merchant_dashboard/voucher/' . $voucher->nid ), 'class'=> array('views-field')),
+      array('data' => $taken, 'class'=> array('views-field')),
+      array('data' => $redeem, 'class'=> array('views-field'))
+    );
+  }
+  $table_data = array(
+        'header'     => $headers,
+        'rows'       => $rows
+      );
+
+  $output = theme('table', $table_data);
+  return $output;
+}

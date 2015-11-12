@@ -302,34 +302,32 @@ function auto_bank_transfer_mandiri_overview(){
 //function to get content of BCA CSV file
 function bca_list_file() {
   $dir = 'sites/default/files/bank/summary_bca';
-  $files = scandir($dir);
+  $files = abt_getCSVFiles($dir);
+  //only read latest
+  $filepath = $files[0];
 
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
+  $row = 1;
+  if (($handle = fopen($filepath, "r")) !== FALSE) {
+    $output = "<p><b>".$filepath."</b> "  . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
+    $output .= "<table>";
+    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+      $num = count($data);
+      if ($num == 5) {
+        $output .= "<tr>";
+        $row++;
+        for ($c=0; $c < $num; $c++) {
+          $output .= "<td>";
+          $output .= $data[$c];
+          $output .= "</td>";
         }
-
+        $output .= "</tr>";
       }
-      $output .= "</table>";
-      fclose($handle);
+
     }
+    $output .= "</table>";
+    fclose($handle);
   }
+  
   drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
   return $output;
 }
@@ -338,34 +336,32 @@ function bca_list_file() {
 //function to get content of Mandiri CSV file
 function mandiri_list_file() {
   $dir = 'sites/default/files/bank/summary_mandiri';
-  $files = scandir($dir);
+  $files = abt_getCSVFiles($dir);
+  //only read latest
+  $filepath = $files[0];
 
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        //if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
-        //}
-
+  $row = 1;
+  if (($handle = fopen($filepath, "r")) !== FALSE) {
+    $output = "<p><b>".$filepath."</b> " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
+    $output .= "<table>";
+    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+      $num = count($data);
+      if ($num == 5) {
+        $output .= "<tr>";
+        $row++;
+        for ($c=0; $c < $num; $c++) {
+          $output .= "<td>";
+          $output .= $data[$c];
+          $output .= "</td>";
+        }
+        $output .= "</tr>";
       }
-      $output .= "</table>";
-      fclose($handle);
+
     }
+    $output .= "</table>";
+    fclose($handle);
   }
+  
   drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
   return $output;
 }

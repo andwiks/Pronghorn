@@ -306,8 +306,8 @@ function mandiri_read_csv() {
 					if (!empty($amount)) {
 						if ($amount % 1000 != 0) {
 							$payment[] = array(
-                'note' => $data[4],
-                'amount' => (int)$amount,
+                $data[4],
+                (int)$amount,
               );
 						}
 					}

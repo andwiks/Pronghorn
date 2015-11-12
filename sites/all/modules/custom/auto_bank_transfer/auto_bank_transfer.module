@@ -100,8 +100,8 @@ function bca_read_csv() {
   if(empty($files)){
     return false;
   }else{
-    //read only 1 file, latest.
-    $filepath = $files[0];
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
     $payment = array();
     $row = 1;
     if (($handle = fopen($filepath, "r")) !== FALSE) {
@@ -158,7 +158,7 @@ function bca_read_csv() {
           $flag = false;
         }
       }
-      watchdog('bca_read_csv', 'Security Check: <pre>'. print_r($read_log, TRUE) .'</pre>');
+      watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){
         //data match, splice it, ignore pointer and above
         $payment = array_slice($payment,$pointer);
@@ -364,7 +364,7 @@ function mandiri_read_csv() {
           $flag = false;
         }
       }
-      watchdog('mandiri_read_csv', 'Security Check: <pre>'. print_r($read_log, TRUE) .'</pre>');
+      watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){
         //data match, splice it, ignore pointer and above
         $payment = array_slice($payment,$pointer);

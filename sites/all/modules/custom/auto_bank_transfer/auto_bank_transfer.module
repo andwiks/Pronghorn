@@ -303,8 +303,8 @@ function mandiri_read_csv() {
   if(empty($files)){
     return false;
   }else{
-    //read only 1 file, latest.
-    $filepath = $files[0];
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
     $payment = array();
     $row = 1;
     if (($handle = fopen($filepath, "r")) !== FALSE) {

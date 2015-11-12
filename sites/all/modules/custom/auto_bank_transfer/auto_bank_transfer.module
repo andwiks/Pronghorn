@@ -22,45 +22,54 @@ function auto_bank_transfer_permission() {
 function auto_bank_transfer_menu() {
   $items = array();
 
-  $items['admin/commerce/config/bca'] = array(
+  $items['admin/commerce/config/abt'] = array(
     'title'            => t('Auto Bank Transfer'),
     'description'      => t('Auto Bank Tranfer Configuration'),
     'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('bca_admin_form'),
+    'page arguments'   => array('auto_bank_transfer_admin_form'),
     'access arguments' => array('bca_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
   
-  $items['admin/commerce/config/bca/list_file_bca'] = array(
-    'title'            => t('List BCA File'),
-    'description'      => t('List of BCA Bank Tranfer CSV File'),
+  $items['admin/commerce/config/abt/list_file_bca'] = array(
+    'title'            => t('BCA Latest File'),
+    'description'      => t('Latest BCA Bank Tranfer CSV File'),
     'page callback'    => 'bca_list_file',
     'access arguments' => array('bca_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 3,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
-  $items['admin/commerce/config/bca/list_file_mandiri'] = array(
-    'title'            => t('List Mandiri File'),
-    'description'      => t('List of Mandiri Bank Tranfer CSV File'),
+  $items['admin/commerce/config/abt/list_file_mandiri'] = array(
+    'title'            => t('Mandiri Latest File'),
+    'description'      => t('Latest Mandiri Bank Tranfer CSV File'),
     'page callback'    => 'mandiri_list_file',
     'access arguments' => array('mandiri_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 4,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
-  $items['admin/commerce/config/bca/list_table_bca'] = array(
-    'title'            => t('BCA Table Detail'),
+  $items['admin/commerce/config/abt/bca_overview'] = array(
+    'title'            => t('BCA Auto Transaction Overview'),
     'description'      => t('List of Logged BCA Bank Tranfer'),
-    'page callback'    => 'bca_list_table',
+    'page callback'    => 'auto_bank_transfer_bca_overview',
     'access arguments' => array('bca_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 1,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
-  $items['admin/commerce/config/bca/list_table_mandiri'] = array(
-    'title'            => t('Mandiri Table Detail'),
+  $items['admin/commerce/config/abt/mandiri_overview'] = array(
+    'title'            => t('Mandiri Auto Transaction Overview'),
     'description'      => t('List of Logged Mandiri Bank Tranfer'),
-    'page callback'    => 'mandiri_list_table',
+    'page callback'    => 'auto_bank_transfer_mandiri_overview',
     'access arguments' => array('mandiri_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 2,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );    
 
   $items['bca'] = array(
@@ -81,190 +90,6 @@ function auto_bank_transfer_menu() {
 
 
   return $items;  
-}
-
-// admin page.
-function bca_admin_form($form, &$form_state) {
-  // load order by total order
-
-  $form['bca_csv_file_folder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('BCA CSV file folder'),
-    '#required' => true,
-    '#default_value' => variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca')
-  );
-	
-	$form['activate_bca_cron'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Activate BCA Cron'),
-    '#default_value' => variable_get('activate_bca_cron', 1)
-  );
-	
-	$form['mandiri_csv_file_folder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Mandiri CSV file folder'),
-    '#required' => true,
-    '#default_value' => variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri')
-  );
-	
-	$form['activate_mandiri_cron'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Activate Mandiri Cron'),
-    '#default_value' => variable_get('activate_mandiri_cron', 0)
-  );
-
-  $form['auto_bank_transfer_CS'] = array(
-    '#type' => 'textfield',
-    '#title' => t('CS email to get notifications'),
-    '#description' => t('List of email to get notified when there are more than 1 order to confirm.'),
-    '#required' => true,
-    '#default_value' => variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com')
-  );  
-	
-  return system_settings_form($form);
-}
-
-//function to list BCA transaction table
-function bca_list_table(){
-  $header = array();
-  $header[] = array('data' => t('ID'), 'field' => 'abbid', 'sort' => 'asc');
-  $header[] = array('data' => t('Description'));
-  $header[] = array('data' => t('Amount'), 'field' => 'amount');
-  $header[] = array('data' => t('Created'), 'field' => 'created');
-  $header[] = array('data' => t('Updated'), 'field' => 'updated');
-  $header[] = array('data' => t('Order ID'), 'field' => 'order_id');
-  $header[] = array('data' => t('Status'), 'field' => 'status');
-  $header[] = array('data' => t('Note'));
-
-  $query = db_select('auto_bank_bca')->extend('PagerDefault')->extend('TableSort');
-
-  $result = $query
-  ->fields('auto_bank_bca')
-    ->orderByHeader($header)
-    ->limit(50)
-    ->execute();
-
-  $rows = array();
-  
-  foreach ($result as $data) {
-    $row = array();
-    $row['data']['abbid'] = $data->abbid;
-    $row['data']['description'] = $data->description;
-    $row['data']['amount'] = number_format($data->amount);
-    $row['data']['created'] = date('F j, G:i',$data->created);
-    $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
-    $row['data']['status'] = $data->status;
-    $row['data']['note'] = $data->note;
-    
-
-    // If the system path maps to a different URL alias, highlight this table
-    // row to let the user know of old aliases.
-    if ($data->status == 'Failed') {
-      $row['class'] = array('warning');
-    }
-
-    $rows[] = $row;
-  }
-
-  $build['bca_list_table_table'] = array(
-    '#theme' => 'table',
-    '#header' => $header,
-    '#rows' => $rows,
-    '#empty' => t('No Transactions Logged Yet.'),
-  );
-  $build['bca_list_table_pager'] = array('#theme' => 'pager');
-
-  return $build;
-}
-
-//function to list Mandiri transaction table
-function mandiri_list_table(){
-  $header = array();
-  $header[] = array('data' => t('ID'), 'field' => 'abmid', 'sort' => 'asc');
-  $header[] = array('data' => t('Description'));
-  $header[] = array('data' => t('Amount'), 'field' => 'amount');
-  $header[] = array('data' => t('Created'), 'field' => 'created');
-  $header[] = array('data' => t('Updated'), 'field' => 'updated');
-  $header[] = array('data' => t('Order ID'), 'field' => 'order_id');
-  $header[] = array('data' => t('Status'), 'field' => 'status');
-  $header[] = array('data' => t('Note'));
-
-  $query = db_select('auto_bank_mandiri')->extend('PagerDefault')->extend('TableSort');
-
-  $result = $query
-  ->fields('auto_bank_mandiri')
-    ->orderByHeader($header)
-    ->limit(50)
-    ->execute();
-
-  $rows = array();
-  
-  foreach ($result as $data) {
-    $row = array();
-    $row['data']['abmid'] = $data->abbid;
-    $row['data']['description'] = $data->description;
-    $row['data']['amount'] = number_format($data->amount);
-    $row['data']['created'] = date('F j, G:i',$data->created);
-    $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
-    $row['data']['status'] = $data->status;
-    $row['data']['note'] = $data->note;
-    
-
-    // If the system path maps to a different URL alias, highlight this table
-    // row to let the user know of old aliases.
-    if ($data->status == 'Failed') {
-      $row['class'] = array('warning');
-    }
-
-    $rows[] = $row;
-  }
-
-  $build['bca_list_table_table'] = array(
-    '#theme' => 'table',
-    '#header' => $header,
-    '#rows' => $rows,
-    '#empty' => t('No Transactions Logged Yet.'),
-  );
-  $build['bca_list_table_pager'] = array('#theme' => 'pager');
-
-  return $build;
-}
-
-//function to get content of BCA CSV file
-function bca_list_file() {
-  $dir = 'sites/default/files/bank/summary_bca';
-  $files = scandir($dir);
-
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
-        }
-
-      }
-      $output .= "</table>";
-      fclose($handle);
-    }
-  }
-  drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
-  return $output;
 }
 
 // function to read csv
@@ -461,43 +286,6 @@ function bca_confirm_payment() {
     watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
   }
 }
-
-
-//function to get content of Mandiri CSV file
-function mandiri_list_file() {
-  $dir = 'sites/default/files/bank/summary_mandiri';
-  $files = scandir($dir);
-
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        //if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
-        //}
-
-      }
-      $output .= "</table>";
-      fclose($handle);
-    }
-  }
-  drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
-  return $output;
-}
-
 
 // mandiri function to read csv
 function mandiri_read_csv() {
@@ -713,4 +501,11 @@ function auto_bank_transfer_mail($key, &$message, $params) {
       $message['body'] = array(0=>$params['body']);
     break;
     }
+}
+
+function auto_bank_transfer_date_popup_process_alter(&$element, &$form_state, $context) {
+  if($form_state['build_info']['form_id']=='auto_bank_transfer_filter_form'){
+    unset($element['date']['#description']);
+    unset($element['time']['#description']);
+  }
 }

@@ -54,9 +54,9 @@ function auto_bank_transfer_filter_form($form, &$form_state) {
   );
 
   if($_SESSION['auto_bank_transfer_overview'] == 'bca'){
-    $keys = $_SESSION['auto_bank_transfer_bca_filter'];
+    $keys = isset($_SESSION['auto_bank_transfer_bca_filter']) ? $_SESSION['auto_bank_transfer_bca_filter'] : array();
   }else{
-    $keys = $_SESSION['auto_bank_transfer_mandiri_filter'];
+    $keys = isset($_SESSION['auto_bank_transfer_mandiri_filter']) ? $_SESSION['auto_bank_transfer_mandiri_filter'] : array();
   }
   if(empty($keys)){
     //provide default value
@@ -157,7 +157,7 @@ function auto_bank_transfer_bca_overview(){
 
   $query = db_select('auto_bank_bca')->extend('PagerDefault')->extend('TableSort');
 
-  $keys = $_SESSION['auto_bank_transfer_bca_filter'];
+  $keys = isset($_SESSION['auto_bank_transfer_bca_filter']) ? $_SESSION['auto_bank_transfer_bca_filter'] : array();
   if($keys){
     if(!empty($keys['created_from'])){
       $query->condition('created', strtotime($keys['created_from']), '>=');  
@@ -226,7 +226,7 @@ function auto_bank_transfer_mandiri_overview(){
   $build['auto_bank_transfer_filter_form'] = drupal_get_form('auto_bank_transfer_filter_form');
 
   $header = array();
-  $header[] = array('data' => t('ID'), 'field' => 'abbid', 'sort' => 'asc');
+  $header[] = array('data' => t('ID'), 'field' => 'abmid', 'sort' => 'asc');
   $header[] = array('data' => t('Description'));
   $header[] = array('data' => t('Amount'), 'field' => 'amount');
   $header[] = array('data' => t('Created'), 'field' => 'created');
@@ -237,7 +237,7 @@ function auto_bank_transfer_mandiri_overview(){
 
   $query = db_select('auto_bank_mandiri')->extend('PagerDefault')->extend('TableSort');
 
-  $keys = $_SESSION['auto_bank_transfer_bca_filter'];
+  $keys = isset($_SESSION['auto_bank_transfer_mandiri_filter']) ? $_SESSION['auto_bank_transfer_mandiri_filter'] : array();
   if($keys){
     if(!empty($keys['created_from'])){
       $query->condition('created', strtotime($keys['created_from']), '>=');  
@@ -266,7 +266,7 @@ function auto_bank_transfer_mandiri_overview(){
   
   foreach ($result as $data) {
     $row = array();
-    $row['data']['abmid'] = $data->abbid;
+    $row['data']['abmid'] = $data->abmid;
     $row['data']['description'] = $data->description;
     $row['data']['amount'] = number_format($data->amount);
     $row['data']['created'] = date('F j, G:i',$data->created);

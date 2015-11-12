@@ -70,6 +70,11 @@ $(document).ready(function () {
     });
     hoverShare(); // hover share blog
 
-
+    
+    $(".banner").click(function (event) {
+      if(event.target != $('div.a')[0])
+        /*alert('You clicked the body!');*/
+        $("#shopping-cart").fadeOut();
+    });
 
 });

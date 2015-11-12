@@ -30,7 +30,7 @@
 ?>
 <?php if ($content): ?>
   <div class="<?php print $classes; ?>">
-    <a href="#" ><span class="ico"></span>CART</a>
+    <a href="#cart" class="tooglecart"><span class="ico"></span>CART</a>
 
     <div class="box_drop">
       <div class="arr"></div>

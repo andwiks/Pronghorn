@@ -72,23 +72,6 @@ function auto_bank_transfer_menu() {
     'file'             => 'auto_bank_transfer.admin.inc'
   );    
 
-  $items['bca'] = array(
-    'title'            => t('BCA'),
-    'description'      => t('BCA Bank Tranfer'),
-    'page callback'    => 'bca_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
-  );
-
-  $items['mandiri'] = array(
-    'title'            => t('Mandiri'),
-    'description'      => t('Mandiri Bank Tranfer'),
-    'page callback'    => 'mandiri_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
-  );
-
-
   return $items;  
 }
 

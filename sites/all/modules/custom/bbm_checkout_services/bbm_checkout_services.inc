@@ -8,7 +8,7 @@ function bbm_checkout_order_services($data){
     $return["keterangan"] = "";
     
     //set ip filter
-    $whitelist = explode(",",variable_get("mos_ttl_whitelist", "127.0.0.1,::1"));
+    $whitelist = explode(",",variable_get("bbm_checkout_services_whitelist", "127.0.0.1,::1"));
     $ip_user = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
     if(!in_array($ip_user, $whitelist)){
         $return["keterangan"] = "[" . date('Y-m-d H:i:s') . "] ip error. Ip address diluar akses yang diberikan, ip address: " . $ip_user;

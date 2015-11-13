@@ -72,37 +72,22 @@ function auto_bank_transfer_menu() {
     'file'             => 'auto_bank_transfer.admin.inc'
   );    
 
-  $items['bca'] = array(
-    'title'            => t('BCA'),
-    'description'      => t('BCA Bank Tranfer'),
-    'page callback'    => 'bca_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
-  );
-
-  $items['mandiri'] = array(
-    'title'            => t('Mandiri'),
-    'description'      => t('Mandiri Bank Tranfer'),
-    'page callback'    => 'mandiri_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
-  );
-
-
   return $items;  
 }
 
 // function to read csv
 function bca_read_csv() {
   $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
-  $files = scandir($dir);
-  $payment = array();
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
+  $files = abt_getCSVFiles($dir);
+  
+  if(empty($files)){
+    return false;
+  }else{
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
+    $payment = array();
     $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+    if (($handle = fopen($filepath, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $num = count($data);
         if ($num == 5 && $data[3] != 'Jumlah' && strpos($data[3], 'CR')) {
@@ -132,60 +117,66 @@ function bca_read_csv() {
 
       @drupal_unlink($filepath);
     }
-  }
-  // Get last known pointer
-  $pointer = variable_get('bca_payment_pointer',0);
+    
+    // Get last known pointer
+    $pointer = variable_get('bca_payment_pointer',0);
 
-  // Get up to 3 last data from table and compare it with CSV from pointer
-  $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
-  // If table not empty, run match check with note and amount field pair.
-  if(!empty($result)){
-    $flag = true;
-    $counter = 1;
-    foreach($result as $item){
-      // Check if data from CSV pointer less than 3 then treat it as new data.
-      if(!empty($payment[$pointer-$counter])){
-        if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
-        $counter++;
-      }else{
-        $flag = false;
+    // Get up to 3 last data from table and compare it with CSV from pointer
+    $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
+    // If table not empty, run match check with note and amount field pair.
+    if(!empty($result)){
+      $flag = true;
+      $counter = 1;
+      $read_log = array();
+      foreach($result as $item){
+        // Check if data from CSV pointer less than 3 then treat it as new data.
+        if(!empty($payment[$pointer-$counter])){
+          $read_log[] = $payment[$pointer-$counter][0];
+          $read_log[] = $item->description;
+          $read_log[] = $payment[$pointer-$counter][1];
+          $read_log[] = $item->amount;
+          if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
+          $counter++;
+        }else{
+          $flag = false;
+        }
       }
-    }
-    if($flag){
-      //data match, splice it, ignore pointer and above
-      $payment = array_slice($payment,$pointer);
-    }else{
-      //data not match, reset CSV pointer
-      watchdog('bca_read_csv', 'Table data missmatch or CSV data less than 3, reset csv pointer');
+      watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      if($flag){
+        //data match, splice it, ignore pointer and above
+        $payment = array_slice($payment,$pointer);
+      }else{
+        //data not match, reset CSV pointer
+        $pointer = 0;
+      }
+    } else {
+      //empty table
       $pointer = 0;
     }
-  } else {
-    $pointer = 0;
-  }
-  //Insert new data to table.
-  $temp = array();
-  foreach($payment as $value){
-    $lastid = db_insert('auto_bank_bca')
-    ->fields(array(
-      'description' => $value[0],
-      'created' => time(),
-      'amount' => $value[1],
-    ))
-    ->execute();
-    $temp[$lastid] = $value[1];
-    $pointer++;
-  }
 
-  //Set variable with new record only
-  variable_set('bca_payment_record',$temp);
-  variable_set('bca_payment_pointer',$pointer);
+    //Insert new data to table.
+    $newData = array();
+    foreach($payment as $value){
+      $lastid = db_insert('auto_bank_bca')
+      ->fields(array(
+        'description' => $value[0],
+        'created' => time(),
+        'amount' => $value[1],
+      ))
+      ->execute();
+      $newData[$lastid] = $value[1];
+      $pointer++;
+    }
+
+    variable_set('bca_payment_pointer',$pointer);
+    return $newData;
+  }
 }
 
 // function to confirm payment
 function bca_confirm_payment() {
   //read csv
-  bca_read_csv();
-  $all_payment = variable_get('bca_payment_record', array());
+  $all_payment = bca_read_csv();
 
   //if no new transaction, stop function
   if(empty($all_payment)){
@@ -290,14 +281,16 @@ function bca_confirm_payment() {
 // mandiri function to read csv
 function mandiri_read_csv() {
   $dir = variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri');
-  $files = scandir($dir);
-  $payment = array();
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
+  $files = abt_getCSVFiles($dir);
+  
+  if(empty($files)){
+    return false;
+  }else{
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
+    $payment = array();
     $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+    if (($handle = fopen($filepath, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $num = count($data);
         if ($data[8] != 'Credit') {
@@ -330,60 +323,66 @@ function mandiri_read_csv() {
 
       @drupal_unlink($filepath);
     }
-  }
-  // Get last known pointer
-  $pointer = variable_get('mandiri_payment_pointer',0);
+    
+    // Get last known pointer
+    $pointer = variable_get('mandiri_payment_pointer',0);
 
-  // Get up to 3 last data from table and compare it with CSV from pointer
-  $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
-  // If table not empty, run match check with note and amount field pair.
-  if(!empty($result)){
-    $flag = true;
-    $counter = 1;
-    foreach($result as $item){
-      // Check if data from CSV pointer less than 3 then treat it as new data.
-      if(!empty($payment[$pointer-$counter])){
-        if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
-        $counter++;
-      }else{
-        $flag = false;
+    // Get up to 3 last data from table and compare it with CSV from pointer
+    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
+    // If table not empty, run match check with note and amount field pair.
+    if(!empty($result)){
+      $flag = true;
+      $counter = 1;
+      $read_log = array();
+      foreach($result as $item){
+        // Check if data from CSV pointer less than 3 then treat it as new data.
+        if(!empty($payment[$pointer-$counter])){
+          $read_log[] = $payment[$pointer-$counter][0];
+          $read_log[] = $item->description;
+          $read_log[] = $payment[$pointer-$counter][1];
+          $read_log[] = $item->amount;
+          if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
+          $counter++;
+        }else{
+          $flag = false;
+        }
       }
-    }
-    if($flag){
-      //data match, splice it, ignore pointer and above
-      $payment = array_slice($payment,$pointer);
-    }else{
-      //data not match, reset CSV pointer
-      watchdog('mandiri_read_csv', 'Table data missmatch or CSV data less than 3, reset csv pointer');
+      watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      if($flag){
+        //data match, splice it, ignore pointer and above
+        $payment = array_slice($payment,$pointer);
+      }else{
+        //data not match, reset CSV pointer
+        $pointer = 0;
+      }
+    } else {
+      //empty table
       $pointer = 0;
     }
-  } else {
-    $pointer = 0;
-  }
-  //Insert new data to table.
-  $temp = array();
-  foreach($payment as $value){
-    $lastid = db_insert('auto_bank_mandiri')
-    ->fields(array(
-      'description' => $value[0],
-      'created' => time(),
-      'amount' => $value[1],
-    ))
-    ->execute();
-    $temp[$lastid] = $value[1];
-    $pointer++;
-  }
 
-  //Set variable with new record only
-  variable_set('mandiri_payment_record',$temp);
-  variable_set('mandiri_payment_pointer',$pointer);
+    //Insert new data to table.
+    $newData = array();
+    foreach($payment as $value){
+      $lastid = db_insert('auto_bank_mandiri')
+      ->fields(array(
+        'description' => $value[0],
+        'created' => time(),
+        'amount' => $value[1],
+      ))
+      ->execute();
+      $newData[$lastid] = $value[1];
+      $pointer++;
+    }
+
+    variable_set('mandiri_payment_pointer',$pointer);
+    return $newData;
+  }
 }
 
 // mandiri function to confirm payment
 function mandiri_confirm_payment() {
   //read csv
-  mandiri_read_csv();
-  $all_payment = variable_get('mandiri_payment_record', array());
+  $all_payment = mandiri_read_csv();
 
   //if no new transaction, stop function
   if(empty($all_payment)){
@@ -508,4 +507,17 @@ function auto_bank_transfer_date_popup_process_alter(&$element, &$form_state, $c
     unset($element['date']['#description']);
     unset($element['time']['#description']);
   }
+}
+
+function abt_getCSVFiles($dir){
+  $dirList = file_scan_directory($dir, '/.*\.csv$/');
+  $files = array();
+  foreach ($dirList as $file => $value) {
+    $files[$file] = filemtime($file);
+  }
+
+  arsort($files);
+  $files = array_keys($files);
+
+  return ($files) ? $files : false;
 }

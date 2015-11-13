@@ -20,36 +20,21 @@ function merchant_dashboard_menu() {
     'title' => 'Merchant Dashboard',
     'description' => 'Merchant Dashboard',
     'page callback' => 'merchant_dashboard_dashboard',
-    'access callback' => TRUE,
+    'access callback' => 'merchant_dashboard_has_role',
     'theme callback' => 'variable_get',
     'theme arguments' => array('admin_theme'),
-  );
-
-  $items['merchant_dashboard/summary'] = array(
-    //'title' => 'Recharge Your Phone',
-    //no need to put title on front page
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('sepulsa_phone_form', TRUE),
-    'access callback' => TRUE,
-    'file' => 'sepulsa.pages.inc',
-  );
-
-  $items['merchant_dashboard/voucher/%'] = array(
-    'title' => 'Sepulsa Autocomplete',
-    'description' => 'Sepulsa Autocomplete',
-    'page callback' => 'sepulsa_autocomplete',
-    'page arguments' => array(2),
-    'access callback' => TRUE,
-    'file' => 'sepulsa.pages.inc',
   );
 
   return $items;
 }
 
-function merchant_dashboard_page_theme() {
-  return 'seven';
+function merchant_dashboard_has_role() {
+  global $user;
+  if (in_array('merchant', $user->roles)) {
+    return TRUE;
+  }
+  return FALSE;
 }
-
 function merchant_dashboard_user_voucher() {
   global $user;
   $profil = entity_load_single('user', $user->uid);
@@ -69,7 +54,6 @@ function merchant_dashboard_user_voucher() {
       $voucher = array_keys($result['node']);
     }
   }
-//dpm($voucher, 'voucher');
 
   return $voucher;
 }

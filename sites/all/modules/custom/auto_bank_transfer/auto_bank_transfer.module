@@ -22,284 +22,275 @@ function auto_bank_transfer_permission() {
 function auto_bank_transfer_menu() {
   $items = array();
 
-  $items['admin/commerce/config/bca'] = array(
-    'title'            => t('BCA Configuration'),
-    'description'      => t('BCA Bank Tranfer Configuration'),
+  $items['admin/commerce/config/abt'] = array(
+    'title'            => t('Auto Bank Transfer'),
+    'description'      => t('Auto Bank Tranfer Configuration'),
     'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('bca_admin_form'),
+    'page arguments'   => array('auto_bank_transfer_admin_form'),
     'access arguments' => array('bca_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
   
-  $items['admin/commerce/config/bca/list_file'] = array(
-    'title'            => t('List BCA File'),
-    'description'      => t('List of BCA Bank Tranfer CSV File'),
+  $items['admin/commerce/config/abt/list_file_bca'] = array(
+    'title'            => t('BCA Latest File'),
+    'description'      => t('Latest BCA Bank Tranfer CSV File'),
     'page callback'    => 'bca_list_file',
     'access arguments' => array('bca_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 3,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
-  $items['bca'] = array(
-    'title'            => t('BCA'),
-    'description'      => t('BCA Bank Tranfer'),
-    'page callback'    => 'bca_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
-  );
-	
-	// mandiri
-  
-  $items['admin/commerce/config/mandiri/list_file'] = array(
-    'title'            => t('List Mandiri File'),
-    'description'      => t('List of Mandiri Bank Tranfer CSV File'),
+  $items['admin/commerce/config/abt/list_file_mandiri'] = array(
+    'title'            => t('Mandiri Latest File'),
+    'description'      => t('Latest Mandiri Bank Tranfer CSV File'),
     'page callback'    => 'mandiri_list_file',
     'access arguments' => array('mandiri_configuration'),
     'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 4,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
-  $items['mandiri'] = array(
-    'title'            => t('Mandiri'),
-    'description'      => t('Mandiri Bank Tranfer'),
-    'page callback'    => 'mandiri_confirm_payment',
-    'access arguments' => array('access content'),
-    'type'             => MENU_CALLBACK,
+  $items['admin/commerce/config/abt/bca_overview'] = array(
+    'title'            => t('BCA Auto Transaction Overview'),
+    'description'      => t('List of Logged BCA Bank Tranfer'),
+    'page callback'    => 'auto_bank_transfer_bca_overview',
+    'access arguments' => array('bca_configuration'),
+    'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 1,
+    'file'             => 'auto_bank_transfer.admin.inc'
   );
 
+  $items['admin/commerce/config/abt/mandiri_overview'] = array(
+    'title'            => t('Mandiri Auto Transaction Overview'),
+    'description'      => t('List of Logged Mandiri Bank Tranfer'),
+    'page callback'    => 'auto_bank_transfer_mandiri_overview',
+    'access arguments' => array('mandiri_configuration'),
+    'type'             => MENU_NORMAL_ITEM,
+    'weight'           => 2,
+    'file'             => 'auto_bank_transfer.admin.inc'
+  );    
 
   return $items;  
-}
-
-// admin page.
-function bca_admin_form($form, &$form_state) {
-  // load order by total order
-
-  $form['bca_csv_file_folder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('BCA CSV file folder'),
-    '#required' => true,
-    '#default_value' => variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca')
-  );
-	
-	$form['activate_bca_cron'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Activate BCA Cron'),
-    '#default_value' => variable_get('activate_bca_cron', 1)
-  );
-	
-	$form['mandiri_csv_file_folder'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Mandiri CSV file folder'),
-    '#required' => true,
-    '#default_value' => variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri')
-  );
-	
-	$form['activate_mandiri_cron'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Activate Mandiri Cron'),
-    '#default_value' => variable_get('activate_mandiri_cron', 0)
-  );
-	
-  return system_settings_form($form);
-}
-
-//function to get content of BCA CSV file
-function bca_list_file() {
-  $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
-  $files = scandir($dir);
-
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
-        }
-
-      }
-      $output .= "</table>";
-      fclose($handle);
-    }
-  }
-  drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
-  return $output;
 }
 
 // function to read csv
 function bca_read_csv() {
   $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
-  $files = scandir($dir);
-  $payment = array();
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
+  $files = abt_getCSVFiles($dir);
+  
+  if(empty($files)){
+    return false;
+  }else{
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
+    $payment = array();
     $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+    if (($handle = fopen($filepath, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $num = count($data);
         if ($num == 5 && $data[3] != 'Jumlah' && strpos($data[3], 'CR')) {
           $amount = str_replace(array(',', '.00', ' CR'), '', $data[3]);
           // only uniq amount processed
           if ($amount % 1000 != 0) {
-            $payment[] = (float)$amount;
+            $payment[] = array(
+              $data[1],
+              (int)$amount
+            );
           }
         }
       }
       fclose($handle);
       // delete bca csv file
       $newfile = 'sites/default/files/bank/summary_bca/bca-' . date('dmy') . '.csv';
+      $rawfile = 'sites/default/files/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
 
+      $mydir = file_default_scheme() . '://bank/summary_bca';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
+
+      //save raw csv for future use
+      $mydir = file_default_scheme() . '://bank/raw_bca';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
+      @copy($filepath, $rawfile);
+
       @drupal_unlink($filepath);
     }
     
+    // Get last known pointer
+    $pointer = variable_get('bca_payment_pointer',0);
+
+    // Get up to 3 last data from table and compare it with CSV from pointer
+    $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
+    // If table not empty, run match check with note and amount field pair.
+    if(!empty($result)){
+      $flag = true;
+      $counter = 1;
+      $read_log = array();
+      foreach($result as $item){
+        // Check if data from CSV pointer less than 3 then treat it as new data.
+        if(!empty($payment[$pointer-$counter])){
+          $read_log[] = $payment[$pointer-$counter][0];
+          $read_log[] = $item->description;
+          $read_log[] = $payment[$pointer-$counter][1];
+          $read_log[] = $item->amount;
+          if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
+          $counter++;
+        }else{
+          $flag = false;
+        }
+      }
+      watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      if($flag){
+        //data match, splice it, ignore pointer and above
+        $payment = array_slice($payment,$pointer);
+      }else{
+        //data not match, reset CSV pointer
+        $pointer = 0;
+      }
+    } else {
+      //empty table
+      $pointer = 0;
+    }
+
+    //Insert new data to table.
+    $newData = array();
+    foreach($payment as $value){
+      $lastid = db_insert('auto_bank_bca')
+      ->fields(array(
+        'description' => $value[0],
+        'created' => time(),
+        'amount' => $value[1],
+      ))
+      ->execute();
+      $newData[$lastid] = $value[1];
+      $pointer++;
+    }
+
+    variable_set('bca_payment_pointer',$pointer);
+    return $newData;
   }
-  $payments = variable_get('bca_payment_record', array());
-  $all_payment = array_merge($payments, $payment);
-  $all_payment = array_unique($all_payment);
-  variable_set('bca_payment_record', $all_payment);
 }
 
 // function to confirm payment
 function bca_confirm_payment() {
   //read csv
-  bca_read_csv();
-  $all_payment = variable_get('bca_payment_record', array());
-  $trans_log = array();
-  foreach ($all_payment as $key => $payment) {
-    // load order by total order
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'commerce_order');
-    $query->propertyCondition('status', 'pending');
-    $query->fieldCondition('commerce_order_total', 'amount', $payment);
-    $result = $query->execute();
-    if (isset($result['commerce_order'])) {
-      $order_ids = array_keys($result['commerce_order']);
-      $order = commerce_order_load($order_ids[0]);
+  $all_payment = bca_read_csv();
 
-      foreach ($order_ids as $order_id) {
-        // load commerce payment transaction by order_id and bank transfer method
-        $payment_confirm = 0;
-        foreach (commerce_payment_transaction_load_multiple(array(), 
-            array(
-              'order_id' => $order_id,
-              'payment_method' => 'bank_transfer',
-              'status' => 'pending')) 
-            as $transaction) {
-          
-          $order = commerce_order_load($order_id);
-          // compare total amount
-          if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
-            // if same = confirm payment
+  //if no new transaction, stop function
+  if(empty($all_payment)){
+    watchdog('bca_confirm_payment', 'No new transaction. Stopping.');    
+  }else{
+    watchdog('bca_confirm_payment', 'Comparing payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
+    $trans_log = array();
+
+    foreach ($all_payment as $key => $payment) {
+      // load order by total order
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_order');
+      $query->propertyCondition('status', 'pending');
+      $query->fieldCondition('commerce_order_total', 'amount', $payment);
+      $result = $query->execute();
+      if (isset($result['commerce_order'])) {
+        $order_ids = array_keys($result['commerce_order']);
+        $order = commerce_order_load($order_ids[0]);
+        // Check for single order id only
+        if(count($order_ids) < 2){
+          $order_id = $order_ids[0];
+          // load commerce payment transaction by order_id and bank transfer method
+          $payment_confirm = 0;
+          foreach (commerce_payment_transaction_load_multiple(array(), 
+              array(
+                'order_id' => $order_id,
+                'payment_method' => 'bank_transfer',
+                'status' => 'pending')) 
+              as $transaction) {
+            
+            $order = commerce_order_load($order_id);
+            // compare total amount
+            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
+              // if same = confirm payment
+              $transaction->status = 'success';
+              commerce_payment_transaction_save($transaction);
+              
+              $trans_log[] = 'order id: ' . $transaction->order_id;
+              $payment_confirm = 1;
+              // Update auto bank transfer table
+              db_update('auto_bank_bca')
+              ->fields(array(
+                'status' => 'Success',
+                'updated' => time(),
+                'order_id' => $order_id
+              ))
+              ->condition('abbid', $key, '=')
+              ->execute();
+
+            } else {
+              // if not same = delete payment
+              commerce_payment_transaction_delete($transaction->transaction_id);
+            }
+          }
+          if ($payment_confirm == 0) {
+            $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
+            $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
+            $transaction->amount = $payment;
+            $transaction->currency_code = 'IDR';
             $transaction->status = 'success';
             commerce_payment_transaction_save($transaction);
-            
             $trans_log[] = 'order id: ' . $transaction->order_id;
-            $payment_confirm = 1;
-
-          } else {
-            // if not same = delete payment
-            commerce_payment_transaction_delete($transaction->transaction_id);
+            // Update auto bank transfer table
+            db_update('auto_bank_bca')
+            ->fields(array(
+              'status' => 'Success',
+              'updated' => time(),
+              'order_id' => $order_id,
+              'note' => 'Anomaly. Payment not found.'
+            ))
+            ->condition('abbid', $key, '=')
+            ->execute();
           }
-        }
-        if ($payment_confirm == 0) {
-          $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
-          $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
-          $transaction->amount = $payment;
-          $transaction->currency_code = 'IDR';
-          $transaction->status = 'success';
-          commerce_payment_transaction_save($transaction);
-          $trans_log[] = 'order id: ' . $transaction->order_id;
+        }else{
+          //Double order id. Log it then mail CS yeti@sepulsa.com
+          db_update('auto_bank_bca')
+            ->fields(array(
+              'status' => 'Failed',
+              'updated' => time(),
+              'note' => 'More than 1 order found: '. implode(', ', $order_ids),
+            ))
+            ->condition('abbid', $key, '=')
+            ->execute();
+
+          $from = "info@sepulsa.com";
+          $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com');
+          $message = "Order : ".implode(', ',$order_ids)." have the same amount of: ". $payment ." from Auto BCA confirmation";
+          $subject = "Sepulsa - Auto bank transfer: More than 1 order on payment confirmation.";
+          $params = array(
+            'subject' => $subject,
+            'body' => $message,
+          );
+          drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
         }
       }
     }
-
-    // search payment --old approach
-    /*foreach (commerce_payment_transaction_load_multiple(array(), 
-        array(
-          'amount' => $payment, 
-          'payment_method' => 'bank_transfer',
-          'status' => 'pending')) 
-        as $transaction) {
-      $order = commerce_order_load($transaction->order_id);
-      if ($order->status == 'pending') {
-        // confirm payment
-        $transaction->status = 'success';
-        commerce_payment_transaction_save($transaction);
-        // delete payment
-        
-        $trans_log[] = 'order id: ' . $transaction->order_id;
-      }
-    }*/
+    // set log success payment, if any.
+    watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
   }
-  variable_set('bca_payment_record', array());
-  // set log
-  watchdog('bca_confirm_payment', 'All payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
-  watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
-
 }
-
-
-//function to get content of Mandiri CSV file
-function mandiri_list_file() {
-  $dir = variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri');
-  $files = scandir($dir);
-
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
-    $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
-      $output = "<p><b>File " . $file . "</b> last modified: " . date ("F d Y H:i:s.", filemtime($filepath)) . "</p>\n";
-      $output .= "<table>";
-      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-        $num = count($data);
-        //if ($num == 5) {
-          $output .= "<tr>";
-          $row++;
-          for ($c=0; $c < $num; $c++) {
-            $output .= "<td>";
-            $output .= $data[$c];
-            $output .= "</td>";
-          }
-          $output .= "</tr>";
-        //}
-
-      }
-      $output .= "</table>";
-      fclose($handle);
-    }
-  }
-  drupal_add_css('.field-item.even table tr td {border: 1px solid #000;padding: 5px;}', array('type' => 'inline'));
-  return $output;
-}
-
 
 // mandiri function to read csv
 function mandiri_read_csv() {
   $dir = variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri');
-  $files = scandir($dir);
-  $payment = array();
-  foreach ($files as $file) {
-    $filepath = $dir . '/' . $file;
-    $file_parts = pathinfo($filepath);
-
+  $files = abt_getCSVFiles($dir);
+  
+  if(empty($files)){
+    return false;
+  }else{
+    //read only 1 file, OLDEST.
+    $filepath = $files[count($files)-1];
+    $payment = array();
     $row = 1;
-    if (($handle = fopen($filepath, "r")) !== FALSE && $file_parts['extension'] == 'csv') {
+    if (($handle = fopen($filepath, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
         $num = count($data);
         if ($data[8] != 'Credit') {
@@ -307,7 +298,10 @@ function mandiri_read_csv() {
           // only uniq amount processed
 					if (!empty($amount)) {
 						if ($amount % 1000 != 0) {
-							$payment[] = (float)$amount;
+							$payment[] = array(
+                $data[4],
+                (int)$amount,
+              );
 						}
 					}
         }
@@ -316,77 +310,178 @@ function mandiri_read_csv() {
 				
       // delete mandiri csv file
       $newfile = 'sites/default/files/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
+      $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
 
+      $mydir = file_default_scheme() . '://bank/summary_mandiri';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
+
+      //save raw csv for future use
+      $mydir = file_default_scheme() . '://bank/raw_mandiri';
+      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
+      @copy($filepath, $rawfile);
+
       @drupal_unlink($filepath);
     }
     
+    // Get last known pointer
+    $pointer = variable_get('mandiri_payment_pointer',0);
+
+    // Get up to 3 last data from table and compare it with CSV from pointer
+    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
+    // If table not empty, run match check with note and amount field pair.
+    if(!empty($result)){
+      $flag = true;
+      $counter = 1;
+      $read_log = array();
+      foreach($result as $item){
+        // Check if data from CSV pointer less than 3 then treat it as new data.
+        if(!empty($payment[$pointer-$counter])){
+          $read_log[] = $payment[$pointer-$counter][0];
+          $read_log[] = $item->description;
+          $read_log[] = $payment[$pointer-$counter][1];
+          $read_log[] = $item->amount;
+          if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
+          $counter++;
+        }else{
+          $flag = false;
+        }
+      }
+      watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      if($flag){
+        //data match, splice it, ignore pointer and above
+        $payment = array_slice($payment,$pointer);
+      }else{
+        //data not match, reset CSV pointer
+        $pointer = 0;
+      }
+    } else {
+      //empty table
+      $pointer = 0;
+    }
+
+    //Insert new data to table.
+    $newData = array();
+    foreach($payment as $value){
+      $lastid = db_insert('auto_bank_mandiri')
+      ->fields(array(
+        'description' => $value[0],
+        'created' => time(),
+        'amount' => $value[1],
+      ))
+      ->execute();
+      $newData[$lastid] = $value[1];
+      $pointer++;
+    }
+
+    variable_set('mandiri_payment_pointer',$pointer);
+    return $newData;
   }
-  $payments = variable_get('mandiri_payment_record', array());
-  $all_payment = array_merge($payments, $payment);
-  $all_payment = array_unique($all_payment);
-  variable_set('mandiri_payment_record', $all_payment);
 }
 
 // mandiri function to confirm payment
 function mandiri_confirm_payment() {
   //read csv
-  mandiri_read_csv();
-  $all_payment = variable_get('mandiri_payment_record', array());
-  $trans_log = array();
-  foreach ($all_payment as $key => $payment) {
-    // load order by total order
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'commerce_order');
-    $query->propertyCondition('status', 'pending');
-    $query->fieldCondition('commerce_order_total', 'amount', $payment);
-    $result = $query->execute();
-    if (isset($result['commerce_order'])) {
-      $order_ids = array_keys($result['commerce_order']);
-      $order = commerce_order_load($order_ids[0]);
+  $all_payment = mandiri_read_csv();
 
-      foreach ($order_ids as $order_id) {
-        // load commerce payment transaction by order_id and bank transfer method
-        $payment_confirm = 0;
-        foreach (commerce_payment_transaction_load_multiple(array(), 
-            array(
-              'order_id' => $order_id,
-              'payment_method' => 'bank_transfer',
-              'status' => 'pending')) 
-            as $transaction) {
-          
-          $order = commerce_order_load($order_id);
-          // compare total amount
-          if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
-            // if same = confirm payment
+  //if no new transaction, stop function
+  if(empty($all_payment)){
+    watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.');    
+  }else{
+    watchdog('mandiri_confirm_payment', 'Comparing payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
+    $trans_log = array();
+
+    foreach ($all_payment as $key => $payment) {
+      // load order by total order
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_order');
+      $query->propertyCondition('status', 'pending');
+      $query->fieldCondition('commerce_order_total', 'amount', $payment);
+      $result = $query->execute();
+      if (isset($result['commerce_order'])) {
+        $order_ids = array_keys($result['commerce_order']);
+        $order = commerce_order_load($order_ids[0]);
+        // Check for single order id only
+        if(count($order_ids) < 2){
+          $order_id = $order_ids[0];
+          // load commerce payment transaction by order_id and bank transfer method
+          $payment_confirm = 0;
+          foreach (commerce_payment_transaction_load_multiple(array(), 
+              array(
+                'order_id' => $order_id,
+                'payment_method' => 'bank_transfer',
+                'status' => 'pending')) 
+              as $transaction) {
+            
+            $order = commerce_order_load($order_id);
+            // compare total amount
+            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
+              // if same = confirm payment
+              $transaction->status = 'success';
+              commerce_payment_transaction_save($transaction);
+              
+              $trans_log[] = 'order id: ' . $transaction->order_id;
+              $payment_confirm = 1;
+              // Update auto bank transfer table
+              db_update('auto_bank_mandiri')
+              ->fields(array(
+                'status' => 'Success',
+                'updated' => time(),
+                'order_id' => $order_id
+              ))
+              ->condition('abmid', $key, '=')
+              ->execute();
+
+            } else {
+              // if not same = delete payment
+              commerce_payment_transaction_delete($transaction->transaction_id);
+            }
+          }
+          if ($payment_confirm == 0) {
+            $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
+            $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
+            $transaction->amount = $payment;
+            $transaction->currency_code = 'IDR';
             $transaction->status = 'success';
             commerce_payment_transaction_save($transaction);
-            
             $trans_log[] = 'order id: ' . $transaction->order_id;
-            $payment_confirm = 1;
-
-          } else {
-            // if not same = delete payment
-            commerce_payment_transaction_delete($transaction->transaction_id);
+            // Update auto bank transfer table
+            db_update('auto_bank_mandiri')
+            ->fields(array(
+              'status' => 'Success',
+              'updated' => time(),
+              'order_id' => $order_id,
+              'note' => 'Anomaly. Payment not found.'
+            ))
+            ->condition('abmid', $key, '=')
+            ->execute();
           }
-        }
-        if ($payment_confirm == 0) {
-          $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
-          $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
-          $transaction->amount = $payment;
-          $transaction->currency_code = 'IDR';
-          $transaction->status = 'success';
-          commerce_payment_transaction_save($transaction);
-          $trans_log[] = 'order id: ' . $transaction->order_id;
+        }else{
+          //Double order id. Log it then mail CS yeti@sepulsa.com
+          db_update('auto_bank_mandiri')
+            ->fields(array(
+              'status' => 'Failed',
+              'updated' => time(),
+              'note' => 'More than 1 order found: '. implode(', ', $order_ids),
+            ))
+            ->condition('abmid', $key, '=')
+            ->execute();
+
+          $from = "info@sepulsa.com";
+          $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com');
+          $message = "Order : ".implode(', ',$order_ids)." have the same amount of: ". $payment ." from Auto Mandiri confirmation";
+          $subject = "Sepulsa - Auto bank transfer: More than 1 order on payment confirmation.";
+          $params = array(
+            'subject' => $subject,
+            'body' => $message,
+          );
+          drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
         }
       }
     }
+    // set log success payment, if any.
+    watchdog('mandiri_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
   }
-  variable_set('mandiri_payment_record', array());
-  // set log
-  watchdog('mandiri_confirm_payment', 'All payment Mandiri<pre>'. print_r($all_payment, TRUE) .'</pre>');
-  watchdog('mandiri_confirm_payment', 'Success payment Mandiri<pre>'. print_r($trans_log, TRUE) .'</pre>');
-
 }
 
 /* implement hook_cron(). */
@@ -395,4 +490,34 @@ function auto_bank_transfer_cron() {
 	$mandiri = variable_get('activate_mandiri_cron', 0);
   if ($bca == 1) bca_confirm_payment();
   if ($mandiri == 1) mandiri_confirm_payment();
+}
+
+/* implement hook_mail() */
+function auto_bank_transfer_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'auto_bank_transfer_double_order':
+      $message['subject'] = $params['subject'];
+      $message['body'] = array(0=>$params['body']);
+    break;
+    }
+}
+
+function auto_bank_transfer_date_popup_process_alter(&$element, &$form_state, $context) {
+  if($form_state['build_info']['form_id']=='auto_bank_transfer_filter_form'){
+    unset($element['date']['#description']);
+    unset($element['time']['#description']);
+  }
+}
+
+function abt_getCSVFiles($dir){
+  $dirList = file_scan_directory($dir, '/.*\.csv$/');
+  $files = array();
+  foreach ($dirList as $file => $value) {
+    $files[$file] = filemtime($file);
+  }
+
+  arsort($files);
+  $files = array_keys($files);
+
+  return ($files) ? $files : false;
 }

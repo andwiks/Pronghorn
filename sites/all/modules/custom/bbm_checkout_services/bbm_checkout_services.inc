@@ -161,15 +161,15 @@ function bbm_checkout_order_services($data){
         //commerce_checkout_complete($order);
         //tag that this order is made from BBM Checkout
         $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'bbm_checkout';
-        $order->data['payment_method'] = 'commerce_veritrans|commerce_payment_commerce_veritrans';
+        $order->data['payment_method'] = 'bbm_payment|rules_bbm_payment';
         
-        $payment_method = commerce_payment_method_instance_load('commerce_veritrans|commerce_payment_commerce_veritrans');
+        $payment_method = commerce_payment_method_instance_load('bbm_payment|rules_bbm_payment');
         
         foreach (commerce_payment_transaction_load_multiple(array(), array('order_id' => $order->order_id)) as $transaction) {
           commerce_payment_transaction_delete($transaction->transaction_id);
         }
         
-        $transaction = commerce_payment_transaction_new('commerce_veritrans', $order->order_id);
+        $transaction = commerce_payment_transaction_new('bbm_payment', $order->order_id);
         $transaction->instance_id = $payment_method['instance_id'];
         $transaction->amount = $data['gross_amount'];
         $transaction->currency_code = 'IDR';
@@ -184,11 +184,10 @@ function bbm_checkout_order_services($data){
         $return["sepulsa_order_id"] = $order->order_id;
         $return["status"] = "sukses";
         $return["keterangan"] = "";
-        $order->return = $return;
         
-        $order = commerce_order_load($order->order_id);
+        //$order = commerce_order_load($order->order_id);
         
-        return $order;
+        return $return;
     }
     else{
         $return["keterangan"] = "Order anda tidak tercatat";

@@ -11,7 +11,7 @@ function auto_bank_transfer_permission() {
       'title' => t('BCA Configuration'),
       'description' => t('BCA Bank Tranfer Configuration'),
     ),
-		"mandiri_configuration" => array(
+    "mandiri_configuration" => array(
       'title' => t('Mandiri Configuration'),
       'description' => t('Mandiri Bank Tranfer Configuration'),
     ),
@@ -125,9 +125,15 @@ function bca_read_csv() {
     $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
+      // Add a 2nd layer check to address query anomaly
+      if(empty($result[0]->amount)){
+        watchdog('bca_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
+        return false;
+      }
       $flag = true;
       $counter = 1;
       $read_log = array();
+      print_r($result);exit();
       foreach($result as $item){
         // Check if data from CSV pointer less than 3 then treat it as new data.
         if(!empty($payment[$pointer-$counter])){
@@ -296,18 +302,18 @@ function mandiri_read_csv() {
         if ($data[8] != 'Credit') {
           $amount = str_replace(array(',', '.00'), '', $data[8]);
           // only uniq amount processed
-					if (!empty($amount)) {
-						if ($amount % 1000 != 0) {
-							$payment[] = array(
+          if (!empty($amount)) {
+            if ($amount % 1000 != 0) {
+              $payment[] = array(
                 $data[4],
                 (int)$amount,
               );
-						}
-					}
+            }
+          }
         }
       }
       fclose($handle);
-				
+        
       // delete mandiri csv file
       $newfile = 'sites/default/files/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
       $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
@@ -331,6 +337,10 @@ function mandiri_read_csv() {
     $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
+      if(empty($result[0]->amount)){
+        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
+        return false;
+      }
       $flag = true;
       $counter = 1;
       $read_log = array();
@@ -486,8 +496,8 @@ function mandiri_confirm_payment() {
 
 /* implement hook_cron(). */
 function auto_bank_transfer_cron() {
-	$bca = variable_get('activate_bca_cron', 1);
-	$mandiri = variable_get('activate_mandiri_cron', 0);
+  $bca = variable_get('activate_bca_cron', 1);
+  $mandiri = variable_get('activate_mandiri_cron', 0);
   if ($bca == 1) bca_confirm_payment();
   if ($mandiri == 1) mandiri_confirm_payment();
 }

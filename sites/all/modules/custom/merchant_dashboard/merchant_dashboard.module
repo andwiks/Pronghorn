@@ -127,3 +127,14 @@ function merchant_dashboard_dashboard() {
   $output = theme('table', $table_data);
   return $output;
 }
+
+
+/**
+ * Implements hook_views_api().
+ */
+function merchant_dashboard_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'merchant_dashboard') . 'views',
+  );
+}

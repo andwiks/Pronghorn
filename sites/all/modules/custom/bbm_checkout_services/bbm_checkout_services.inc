@@ -174,6 +174,17 @@ function bbm_checkout_order_services($data){
         $transaction->amount = $data['gross_amount'];
         $transaction->currency_code = 'IDR';
         $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+        $transaction->message = 'Payment Data: <br />!data';
+        $transaction->remote_id = $data['order_id'];
+        $transaction->remote_status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+        $payment_data = '';
+        foreach ((array) $data as $key => $value) {
+          $payment_data[] = str_replace('_', ' ', $key) . ' = ' . ((is_array($value)) ? '<ul><li>' . implode('</li><li>', $value) . '</li></ul>' : $value);
+        }
+        $transaction->message_variables = array(
+          '!data' => implode('<br />', $payment_data),
+        );
+        $transaction->payload = $data;
 
         commerce_payment_transaction_save($transaction);
 
@@ -193,33 +204,4 @@ function bbm_checkout_order_services($data){
         $return["keterangan"] = "Order anda tidak tercatat";
         return $return;
     }
-    
-    /*$order = commerce_order_new($account->uid, 'cart');
-    commerce_order_save($order);
-
-    // line item
-    $product = commerce_product_load(12);
-    $line_item = commerce_product_line_item_new($product, 1, $order->order_id, array(), 'mobile_prepaid');
-    commerce_line_item_save($line_item);
-
-    // wrap the order
-    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-    $order_wrapper->commerce_line_items[] = $line_item;
-    
-    $payment_method = commerce_payment_method_instance_load('commerce_veritrans|commerce_payment_commerce_veritrans');
-        
-        $transaction = commerce_payment_transaction_new('commerce_veritrans', $order->order_id);
-        $transaction->instance_id = $payment_method['instance_id'];
-        $transaction->amount = $data['gross_amount'];
-        $transaction->currency_code = 'IDR';
-        $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
-
-        commerce_payment_transaction_save($transaction);
-
-        commerce_payment_commerce_payment_transaction_insert($transaction);
-
-    // save the order
-    commerce_order_save($order);
-    
-    return $order;*/
 }

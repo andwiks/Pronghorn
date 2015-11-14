@@ -133,7 +133,6 @@ function bca_read_csv() {
       $flag = true;
       $counter = 1;
       $read_log = array();
-      print_r($result);exit();
       foreach($result as $item){
         // Check if data from CSV pointer less than 3 then treat it as new data.
         if(!empty($payment[$pointer-$counter])){

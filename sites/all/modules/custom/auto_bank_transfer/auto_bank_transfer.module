@@ -122,7 +122,8 @@ function bca_read_csv() {
     $pointer = variable_get('bca_payment_pointer',0);
 
     // Get up to 3 last data from table and compare it with CSV from pointer
-    $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
+    $mysql = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->execute();
+    $result = $mysql->fecthAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
       $flag = true;
@@ -142,10 +143,12 @@ function bca_read_csv() {
         }
       }
       // Add a 2nd layer check to address query anomaly
+      /*
       if(empty($read_log)){
         watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
         return false;
       }
+      */
       watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){
         //data match, splice it, ignore pointer and above
@@ -333,7 +336,8 @@ function mandiri_read_csv() {
     $pointer = variable_get('mandiri_payment_pointer',0);
 
     // Get up to 3 last data from table and compare it with CSV from pointer
-    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
+    $mysql = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->execute();
+    $result = $mysql->fecthAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
       $flag = true;
@@ -353,10 +357,12 @@ function mandiri_read_csv() {
         }
       }
       // Add a 2nd layer check to address query anomaly
+      /*
       if(empty($read_log)){
         watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
         return false;
       }
+      */
       watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){
         //data match, splice it, ignore pointer and above

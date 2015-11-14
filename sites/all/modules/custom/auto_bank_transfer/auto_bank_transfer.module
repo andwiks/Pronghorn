@@ -125,11 +125,6 @@ function bca_read_csv() {
     $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
-      // Add a 2nd layer check to address query anomaly
-      if(empty($result[0]->amount)){
-        watchdog('bca_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
-        return false;
-      }
       $flag = true;
       $counter = 1;
       $read_log = array();
@@ -145,6 +140,11 @@ function bca_read_csv() {
         }else{
           $flag = false;
         }
+      }
+      // Add a 2nd layer check to address query anomaly
+      if(empty($read_log)){
+        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
+        return false;
       }
       watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){
@@ -336,10 +336,6 @@ function mandiri_read_csv() {
     $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){
-      if(empty($result[0]->amount)){
-        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
-        return false;
-      }
       $flag = true;
       $counter = 1;
       $read_log = array();
@@ -355,6 +351,11 @@ function mandiri_read_csv() {
         }else{
           $flag = false;
         }
+      }
+      // Add a 2nd layer check to address query anomaly
+      if(empty($read_log)){
+        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
+        return false;
       }
       watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
       if($flag){

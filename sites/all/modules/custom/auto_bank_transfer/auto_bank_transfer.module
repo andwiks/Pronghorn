@@ -336,7 +336,7 @@ function mandiri_read_csv() {
     $pointer = variable_get('mandiri_payment_pointer',0);
 
     // Get up to 3 last data from table and compare it with CSV from pointer
-    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fecthAll();
+    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
     
     // If table not empty, run match check with note and amount field pair.
     if(!empty($result)){

@@ -191,7 +191,7 @@ function auto_bank_transfer_bca_overview(){
     $row['data']['amount'] = number_format($data->amount);
     $row['data']['created'] = date('F j, G:i',$data->created);
     $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
+    $row['data']['order_id'] = l($data->order_id,'admin/commerce/orders/'.$data->order_id);
     $row['data']['status'] = $data->status;
     $row['data']['note'] = $data->note;
     
@@ -271,7 +271,7 @@ function auto_bank_transfer_mandiri_overview(){
     $row['data']['amount'] = number_format($data->amount);
     $row['data']['created'] = date('F j, G:i',$data->created);
     $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
+    $row['data']['order_id'] = l($data->order_id,'admin/commerce/orders/'.$data->order_id);
     $row['data']['status'] = $data->status;
     $row['data']['note'] = $data->note;
     

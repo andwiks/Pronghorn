@@ -80,9 +80,7 @@ function bca_read_csv() {
   $dir = variable_get('bca_csv_file_folder', 'sites/default/files/bank/bca');
   $files = abt_getCSVFiles($dir);
   
-  if(empty($files)){
-    return false;
-  }else{
+  if(!empty($files)){
     //read only 1 file, OLDEST.
     $filepath = $files[count($files)-1];
     $payment = array();
@@ -122,63 +120,77 @@ function bca_read_csv() {
     $pointer = variable_get('bca_payment_pointer',0);
 
     // Get up to 3 last data from table and compare it with CSV from pointer
-    $result = db_query("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC LIMIT 3")->fetchAll();
-    
-    // If table not empty, run match check with note and amount field pair.
-    if(!empty($result)){
+    $result = db_query_range("SELECT * FROM {auto_bank_bca} ORDER BY abbid DESC",0,3);
+
+    // If query successful run security check
+    if($result){
       $flag = true;
       $counter = 1;
+      $match=0;
       $read_log = array();
       foreach($result as $item){
-        // Check if data from CSV pointer less than 3 then treat it as new data.
+        // Log table read
+        $read_log['a-desc'.$counter] = $item->description;
+        $read_log['a-amount'.$counter] = $item->amount;
+        
         if(!empty($payment[$pointer-$counter])){
-          $read_log[] = $payment[$pointer-$counter][0];
-          $read_log[] = $item->description;
-          $read_log[] = $payment[$pointer-$counter][1];
-          $read_log[] = $item->amount;
+          // Log CSV read
+          $read_log['b-desc'.$counter] = $payment[$pointer-$counter][0];
+          $read_log['b-amount'.$counter] = $payment[$pointer-$counter][1];
           if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
           $counter++;
+          $match++;
         }else{
+          $read_log['b'.$counter] = 'Empty on pointer: '.($pointer-$counter);
           $flag = false;
         }
       }
-      // Add a 2nd layer check to address query anomaly
-      /*
-      if(empty($read_log)){
-        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
-        return false;
-      }
-      */
-      watchdog('bca_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      
       if($flag){
-        //data match, splice it, ignore pointer and above
-        $payment = array_slice($payment,$pointer);
+        // If empty read log, assume table empty
+        if(empty($read_log)){
+          $pointer = 0;
+          watchdog('bca_read_csv', 'Empty Table. Reseting Pointer.');
+        }else{
+          //data match, splice it, ignore pointer and above
+          $payment = array_slice($payment,$pointer);
+          watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+        }
       }else{
-        //data not match, reset CSV pointer
-        $pointer = 0;
+        // data not match OR CSV less than 3
+        // if data less than 3, move pointer to last known match
+        $pointer = $match;
+        $payment = array_slice($payment,$pointer);
+        watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
       }
     } else {
-      //empty table
-      $pointer = 0;
+      //For unknown reason, query has failed
+      watchdog('bca_read_csv','Query failed.<pre>'.$result.'</pre>');
+      return false;
     }
 
-    //Insert new data to table.
-    $newData = array();
-    foreach($payment as $value){
-      $lastid = db_insert('auto_bank_bca')
-      ->fields(array(
-        'description' => $value[0],
-        'created' => time(),
-        'amount' => $value[1],
-      ))
-      ->execute();
-      $newData[$lastid] = $value[1];
-      $pointer++;
-    }
+    if(!empty($payment)){
+      //Insert new data to table.
+      $newData = array();
+      foreach($payment as $value){
+        $lastid = db_insert('auto_bank_bca')
+        ->fields(array(
+          'description' => $value[0],
+          'created' => time(),
+          'amount' => $value[1],
+        ))
+        ->execute();
+        $newData[$lastid] = $value[1];
+        $pointer++;
+      }
 
-    variable_set('bca_payment_pointer',$pointer);
-    return $newData;
+      variable_set('bca_payment_pointer',$pointer);
+      return $newData;
+    }
   }
+  // Reason: No new files, no new data
+  watchdog('bca_read_csv','No new files or no new data');
+  return false;
 }
 
 // function to confirm payment
@@ -190,9 +202,7 @@ function bca_confirm_payment() {
   if(empty($all_payment)){
     watchdog('bca_confirm_payment', 'No new transaction. Stopping.');    
   }else{
-    watchdog('bca_confirm_payment', 'Comparing payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
     $trans_log = array();
-
     foreach ($all_payment as $key => $payment) {
       // load order by total order
       $query = new EntityFieldQuery();
@@ -282,7 +292,7 @@ function bca_confirm_payment() {
       }
     }
     // set log success payment, if any.
-    watchdog('bca_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
+    watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
   }
 }
 
@@ -291,9 +301,7 @@ function mandiri_read_csv() {
   $dir = variable_get('mandiri_csv_file_folder', 'sites/default/files/bank/mandiri');
   $files = abt_getCSVFiles($dir);
   
-  if(empty($files)){
-    return false;
-  }else{
+  if(!empty($files)){
     //read only 1 file, OLDEST.
     $filepath = $files[count($files)-1];
     $payment = array();
@@ -335,64 +343,81 @@ function mandiri_read_csv() {
     // Get last known pointer
     $pointer = variable_get('mandiri_payment_pointer',0);
 
+    // Freaking Mandiri have reversed order than BCA
+    $payment = array_reverse($payment);
+
     // Get up to 3 last data from table and compare it with CSV from pointer
-    $result = db_query("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC LIMIT 3")->fetchAll();
+    $result = db_query_range("SELECT * FROM {auto_bank_mandiri} ORDER BY abmid DESC",0,3);
     
-    // If table not empty, run match check with note and amount field pair.
-    if(!empty($result)){
+    // If query successful run security check
+    if($result){
       $flag = true;
       $counter = 1;
+      $match=0;
       $read_log = array();
       foreach($result as $item){
-        // Check if data from CSV pointer less than 3 then treat it as new data.
+        // Log table read
+        $read_log['a-desc'.$counter] = $item->description;
+        $read_log['a-amount'.$counter] = $item->amount;
+        
         if(!empty($payment[$pointer-$counter])){
-          $read_log[] = $payment[$pointer-$counter][0];
-          $read_log[] = $item->description;
-          $read_log[] = $payment[$pointer-$counter][1];
-          $read_log[] = $item->amount;
+          // Log CSV read
+          $read_log['b-desc'.$counter] = $payment[$pointer-$counter][0];
+          $read_log['b-amount'.$counter] = $payment[$pointer-$counter][1];
           if($payment[$pointer-$counter][0] != $item->description || $payment[$pointer-$counter][1] != $item->amount) $flag = false;
           $counter++;
+          $match++;
         }else{
+          $read_log['b'.$counter] = 'Empty on pointer: '.($pointer-$counter);
           $flag = false;
         }
       }
-      // Add a 2nd layer check to address query anomaly
-      /*
-      if(empty($read_log)){
-        watchdog('mandiri_read_csv','Query anomaly. Result: <pre>'.$result.'</pre>');
-        return false;
-      }
-      */
-      watchdog('mandiri_read_csv', $filepath.' : <pre>'. print_r($read_log, TRUE) .'</pre>');
+      
       if($flag){
-        //data match, splice it, ignore pointer and above
-        $payment = array_slice($payment,$pointer);
+        // If empty read log, assume table empty
+        if(empty($read_log)){
+          $pointer = 0;
+          watchdog('mandiri_read_csv', 'Empty Table. Reseting Pointer.');
+        }else{
+          //data match, splice it, ignore pointer and above
+          $payment = array_slice($payment,$pointer);
+          watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+        }
       }else{
-        //data not match, reset CSV pointer
-        $pointer = 0;
+        // data not match OR CSV less than 3
+        // if data less than 3, move pointer to last known match
+        $pointer = $match;
+        $payment = array_slice($payment,$pointer);
+        watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
       }
     } else {
-      //empty table
-      $pointer = 0;
+      //For unknown reason, query has failed
+      watchdog('mandiri_read_csv','Query failed.<pre>'.$result.'</pre>');
+      return false;
     }
 
-    //Insert new data to table.
-    $newData = array();
-    foreach($payment as $value){
-      $lastid = db_insert('auto_bank_mandiri')
-      ->fields(array(
-        'description' => $value[0],
-        'created' => time(),
-        'amount' => $value[1],
-      ))
-      ->execute();
-      $newData[$lastid] = $value[1];
-      $pointer++;
-    }
+    if(!empty($payment)){
+      //Insert new data to table.
+      $newData = array();
+      foreach($payment as $value){
+        $lastid = db_insert('auto_bank_mandiri')
+        ->fields(array(
+          'description' => $value[0],
+          'created' => time(),
+          'amount' => $value[1],
+        ))
+        ->execute();
+        $newData[$lastid] = $value[1];
+        $pointer++;
+      }
 
-    variable_set('mandiri_payment_pointer',$pointer);
-    return $newData;
+      variable_set('mandiri_payment_pointer',$pointer);
+      return $newData;
+    }
   }
+  // Reason: No new files, no new data
+  watchdog('mandiri_read_csv','No new files or no new data');
+  return false;
 }
 
 // mandiri function to confirm payment
@@ -404,9 +429,7 @@ function mandiri_confirm_payment() {
   if(empty($all_payment)){
     watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.');    
   }else{
-    watchdog('mandiri_confirm_payment', 'Comparing payment <pre>'. print_r($all_payment, TRUE) .'</pre>');
     $trans_log = array();
-
     foreach ($all_payment as $key => $payment) {
       // load order by total order
       $query = new EntityFieldQuery();
@@ -496,7 +519,7 @@ function mandiri_confirm_payment() {
       }
     }
     // set log success payment, if any.
-    watchdog('mandiri_confirm_payment', 'Success payment <pre>'. print_r($trans_log, TRUE) .'</pre>');
+    watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
   }
 }
 

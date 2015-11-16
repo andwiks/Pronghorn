@@ -1090,7 +1090,20 @@ section.std_content .filter{padding: 19px 0;border-top:1px dashed #999;border-bo
 section.std_content .filter .row{float: left;width: 410px;}
 section.std_content .filter .row:first-child{margin-left:160px}
 section.std_content .filter .row label {float: left;font-size: 16px;margin: 12px 40px 0 0}
-section.std_content .filter .row select{width: 250px;}
+section.std_content .filter .row select{
+    width: 250px;
+    
+    border: 1px solid #fecc0a;
+    line-height: 20px;
+    outline: none;
+    display: inline-block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    padding: 10px;
+    background: url(../images/material/drop_select.png) no-repeat 94% center;
+}
 section.std_content .filter .row .cover_combo{
     background: url(../images/material/drop_select.png) no-repeat 94% center;
     width: 248px;

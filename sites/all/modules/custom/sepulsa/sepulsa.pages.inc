@@ -235,7 +235,7 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
   // Submit button: add to cart.
   $form['add']['cart'] = array(
     '#type' => 'submit',
-    '#value' => t('Add to Cart'),
+    '#value' => t('Add to cart'),
     '#attributes' => array(
       'class' => array('btn', 'style1', 'inactive'),
     ),

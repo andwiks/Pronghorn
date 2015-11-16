@@ -102,17 +102,17 @@ function bca_read_csv() {
       fclose($handle);
       // delete bca csv file
       $newfile = 'sites/default/files/bank/summary_bca/bca-' . date('dmy') . '.csv';
-      $rawfile = 'sites/default/files/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
-
       $mydir = file_default_scheme() . '://bank/summary_bca';
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
-      //save raw csv for future use
-      $mydir = file_default_scheme() . '://bank/raw_bca';
-      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
-      @copy($filepath, $rawfile);
-
+      if(variable_get('auto_bank_trasnfer_logging', 0)){
+        //save raw csv for future use
+        $rawfile = 'sites/default/files/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
+        $mydir = file_default_scheme() . '://bank/raw_bca';
+        file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
+        @copy($filepath, $rawfile);
+      }
       @drupal_unlink($filepath);
     }
     
@@ -150,18 +150,18 @@ function bca_read_csv() {
         // If empty read log, assume table empty
         if(empty($read_log)){
           $pointer = 0;
-          watchdog('bca_read_csv', 'Empty Table. Reseting Pointer.');
+          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Empty Table. Reseting Pointer.'); }
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+        if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
       }
     } else {
       //For unknown reason, query has failed
@@ -189,7 +189,7 @@ function bca_read_csv() {
     }
   }
   // Reason: No new files, no new data
-  watchdog('bca_read_csv','No new files or no new data');
+  if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv','No new files or no new data'); }
   return false;
 }
 
@@ -200,7 +200,7 @@ function bca_confirm_payment() {
 
   //if no new transaction, stop function
   if(empty($all_payment)){
-    watchdog('bca_confirm_payment', 'No new transaction. Stopping.');    
+    if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_confirm_payment', 'No new transaction. Stopping.'); }
   }else{
     $trans_log = array();
     foreach ($all_payment as $key => $payment) {
@@ -326,17 +326,17 @@ function mandiri_read_csv() {
         
       // delete mandiri csv file
       $newfile = 'sites/default/files/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
-      $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
-
       $mydir = file_default_scheme() . '://bank/summary_mandiri';
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
-      //save raw csv for future use
-      $mydir = file_default_scheme() . '://bank/raw_mandiri';
-      file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
-      @copy($filepath, $rawfile);
-
+      if(variable_get('auto_bank_trasnfer_logging', 0)){
+         //save raw csv for future use
+        $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
+        $mydir = file_default_scheme() . '://bank/raw_mandiri';
+        file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
+        @copy($filepath, $rawfile);
+      }
       @drupal_unlink($filepath);
     }
     
@@ -377,18 +377,18 @@ function mandiri_read_csv() {
         // If empty read log, assume table empty
         if(empty($read_log)){
           $pointer = 0;
-          watchdog('mandiri_read_csv', 'Empty Table. Reseting Pointer.');
+          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Empty Table. Reseting Pointer.'); }
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath);
+        if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
       }
     } else {
       //For unknown reason, query has failed
@@ -416,7 +416,7 @@ function mandiri_read_csv() {
     }
   }
   // Reason: No new files, no new data
-  watchdog('mandiri_read_csv','No new files or no new data');
+  if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv','No new files or no new data'); }
   return false;
 }
 
@@ -427,7 +427,7 @@ function mandiri_confirm_payment() {
 
   //if no new transaction, stop function
   if(empty($all_payment)){
-    watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.');    
+    if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.'); }
   }else{
     $trans_log = array();
     foreach ($all_payment as $key => $payment) {

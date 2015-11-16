@@ -35,7 +35,13 @@ function auto_bank_transfer_admin_form($form, &$form_state) {
     '#description' => t('List of email to get notified when there are more than 1 order to confirm.'),
     '#required' => true,
     '#default_value' => variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com')
-  );  
+  );
+  $form['auto_bank_trasnfer_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Logging'),
+    '#default_value' => variable_get('auto_bank_trasnfer_logging', 0),
+    '#description' => t('Enable database logging and raw CSV backup.')
+  );
   
   return system_settings_form($form);
 }

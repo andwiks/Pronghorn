@@ -134,6 +134,25 @@ function token_reload_entity_presave($entity, $type) {
 }
 
 /**
+ * Implements hook_field_attach_validate().
+ */
+function token_reload_field_attach_validate($entity_type, $entity, &$errors) {
+  if ($entity_type == 'commerce_line_item' && $entity->type == 'electricity_prepaid') {
+    $order = commerce_cart_order_load($GLOBALS['user']->uid);
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      if ($line_item_wrapper->getBundle() == $entity->type && $line_item_wrapper->electricity_customer_number->value() == $entity->electricity_customer_number[LANGUAGE_NONE][0]['value']) {
+        $errors['electricity_customer_number'][LANGUAGE_NONE][0][] = array(
+          'error' => 'token_reload_duplicate_number',
+          'message' => t('The number you enter already on cart'),
+        );
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_forms().
  */
 function token_reload_forms($form_id, $args) {

@@ -32,7 +32,7 @@
   <div class="<?php print $classes; ?>">
     <a href="#cart" class="tooglecart"><span class="ico"></span>CART</a>
 
-    <div class="box_drop" id="shopping-cart">
+    <div class="box_drop" id="shopping-cart" style="display:block">
       <div class="arr"></div>
 
       <?php print $content; ?>

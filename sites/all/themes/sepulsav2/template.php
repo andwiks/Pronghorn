@@ -433,6 +433,10 @@ function sepulsav2_preprocess_page(&$variables) {
       $variables['active_tab'] = 'topup';
     }
   }
+  if (isset($variables['node'])) {
+    // If the node type is "blog roy" the template suggestion will be "page--type-blog_roy.tpl.php".
+    $variables['theme_hook_suggestions'][] = 'page__type_'. $variables['node']->type;
+  }
 }
 
 /**

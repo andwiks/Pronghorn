@@ -80,6 +80,7 @@ function bbm_checkout_order_services($data){
           'status' => 1,
         );
         $account = user_save('', $fields);
+        _user_mail_notify('register_pending_approval', $account);
     }
     
     /*$order = commerce_cart_order_load($account->uid);

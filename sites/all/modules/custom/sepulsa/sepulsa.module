@@ -43,6 +43,15 @@ function sepulsa_menu() {
     'file' => 'sepulsa.pages.inc',
   );
 
+  $items['admin/commerce/config/sepulsa'] = array(
+    'title' => t('Sepulsa'),
+    'description' => t('Sepulsa related configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_settings_form'),
+    'access arguments' => array('configure store'),
+    'file' => 'sepulsa.admin.inc',
+  );
+
   return $items;
 }
 

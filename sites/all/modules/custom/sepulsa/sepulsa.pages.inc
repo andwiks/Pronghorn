@@ -258,6 +258,11 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
       ),
     );
   }
+  else {
+    $form['add']['charge'] = array(
+      '#type' => 'value',
+    );
+  }
 
   // Return form array.
   return $form;

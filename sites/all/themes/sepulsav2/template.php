@@ -216,6 +216,8 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
   } else if ($form_id == "views_form_commerce_cart_block_default") {
+    $form['#action'] = url('coupon');
+
     unset($form['#prefix']);
     unset($form['#suffix']);
 

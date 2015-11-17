@@ -105,8 +105,8 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
         a.order_id = b.order_id
         AND b.line_item_id = c.entity_id
         AND (a.status = 'completed' OR a.status = 'invoiced')
-        AND a.uid = :uid
-        ORDER BY a.created DESC";
+        AND a.uid = :uid;";
+        // ORDER BY a.created DESC";
     $result = db_query($query, array(':uid' => $user->uid));
     foreach ($result as $row) {
     $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
@@ -338,14 +338,21 @@ function sepulsa_phone_form_validate($form, &$form_state) {
   }
 
   $order = commerce_cart_order_load($GLOBALS['user']->uid);
-  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-  $form_state['order'] = $order;
+  if (empty($order)) {
+    $order = commerce_cart_order_new($GLOBALS['user']->uid);
+    $order->data ['last_cart_refresh'] = REQUEST_TIME;
+  }
+  else {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
 
-  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-    if ($line_item_wrapper->getBundle() == 'mobile_prepaid' && $line_item_wrapper->field_phone_number->value() == $phone) {
-      form_set_error('phone', t('The number you enter already on cart'));
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      if ($line_item_wrapper->getBundle() == 'mobile_prepaid' && $line_item_wrapper->field_phone_number->value() == $phone) {
+        form_set_error('phone', t('The number you enter already on cart'));
+      }
     }
   }
+
+  $form_state['order'] = $order;
 }
 
 /**

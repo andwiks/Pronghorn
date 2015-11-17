@@ -216,8 +216,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['buttons']['continue']['#attributes']['class'] = array('btn', 'style1');
     $form['buttons']['continue']['#prefix'] = '<br />';
   } else if ($form_id == "views_form_commerce_cart_block_default") {
-    $form['#action'] = url('coupon');
-
     unset($form['#prefix']);
     unset($form['#suffix']);
 
@@ -744,7 +742,7 @@ function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
 
     $variables = array(
       'order' => $order,
-      'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id)),
+      'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id), 'coupon'),
     );
 
     $commands[] = array(

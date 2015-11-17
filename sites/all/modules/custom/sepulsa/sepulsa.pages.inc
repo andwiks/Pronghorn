@@ -33,9 +33,16 @@ function sepulsa_autocomplete($type, $string = '') {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
-  global $user;
-  // Get cart order.
-  $order = commerce_cart_order_load($user->uid);
+  $settings = variable_get('sepulsa_settings', array());
+  if (empty($settings['multipaid_product'])) {
+    // Get cart order.
+    $order = commerce_cart_order_load($GLOBALS['user']->uid);
+    // Check whether order is not empty.
+    if (!empty($order)) {
+      // For now, always empty cart when visit homepage.
+      commerce_cart_order_empty($order);
+    }
+  }
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
   // Return sepulsa phone form.
@@ -240,6 +247,17 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
       'class' => array('btn', 'style1', 'inactive'),
     ),
   );
+  // Submit button: fast charge.
+  $settings = variable_get('sepulsa_settings', array());
+  if (empty($settings['multipaid_product'])) {
+    $form['add']['charge'] = array(
+      '#type' => 'submit',
+      '#value' => t('Fast Charge'),
+      '#attributes' => array(
+        'class' => array('btn', 'style1', 'inactive'),
+      ),
+    );
+  }
 
   // Return form array.
   return $form;
@@ -321,6 +339,7 @@ function sepulsa_phone_form_validate($form, &$form_state) {
 
   $order = commerce_cart_order_load($GLOBALS['user']->uid);
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  $form_state['order'] = $order;
 
   foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
     if ($line_item_wrapper->getBundle() == 'mobile_prepaid' && $line_item_wrapper->field_phone_number->value() == $phone) {
@@ -355,6 +374,23 @@ function sepulsa_phone_form_submit($form, &$form_state) {
 
   // Add the line item to cart.
   commerce_cart_product_add($user->uid, $line_item);
+
+  // Redirect to coupon page.
+  // By default redirection is handled by rules.
+  // Check fast charge operation: redirect to checkout page.
+  if ($form_state['values']['op'] == $form_state['values']['add']['charge']) {
+    // Check rules action go to.
+    if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
+      unset($GLOBALS['_rules_action_drupal_goto_do']);
+    }
+    // Redirect to checkout page.
+    $form_state['redirect'] = array(
+      'checkout/' . $form_state['order']->order_id,
+      array(
+        'query' => array('fast_charge' => TRUE),
+      ),
+    );
+  }
 }
 
 /**

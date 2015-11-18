@@ -105,8 +105,8 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
         a.order_id = b.order_id
         AND b.line_item_id = c.entity_id
         AND (a.status = 'completed' OR a.status = 'invoiced')
-        AND a.uid = :uid;";
-        // ORDER BY a.created DESC";
+        AND a.uid = :uid
+        ORDER BY a.created DESC";
     $result = db_query($query, array(':uid' => $user->uid));
     foreach ($result as $row) {
     $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;

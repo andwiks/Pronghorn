@@ -27,6 +27,7 @@ $(document).ready(function () {
     kreditTab(); //tab switch at home
     dropTransaksi(); //drop transaksi combobox
     dropDownHeader(); //dropdown menu 
+    dropDownCart(); //dropdown menu 
     popupLogin(); //open popup login    
     stepIsiPulsa();//toogle show nextstep(isi pulsa)
     radioButton(); //radio button custom
@@ -70,6 +71,11 @@ $(document).ready(function () {
     });
     hoverShare(); // hover share blog
 
-
+    
+    $(".banner").click(function (event) {
+      if(event.target != $('div.a')[0])
+        /*alert('You clicked the body!');*/
+        $("#shopping-cart").fadeOut();
+    });
 
 });

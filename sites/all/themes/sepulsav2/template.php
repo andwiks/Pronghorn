@@ -52,6 +52,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['add']['#prefix'] = '<p></p>';
 
     $form['add']['#prefix'] = '<div class="topup-action">';
+    $form['add']['cart']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
     $form['add']['cart']['#attributes']['style'] = 'float:right';
     $form['add']['charge']['#value'] = t('Pay Now');
     $form['add']['charge']['#attributes']['style'] = 'float:right;';
@@ -310,6 +311,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         break;
 
       case 'electricity_prepaid':
+        dpm($form);
         global $active_tab;
         $active_tab = 'token_reload';
 
@@ -334,6 +336,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
 
 
         $form['add']['#prefix'] = '<div class="topup-action-2">';
+        $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';

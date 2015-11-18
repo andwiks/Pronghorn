@@ -311,7 +311,6 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         break;
 
       case 'electricity_prepaid':
-        dpm($form);
         global $active_tab;
         $active_tab = 'token_reload';
 

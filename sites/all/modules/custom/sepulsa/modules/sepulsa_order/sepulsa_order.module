@@ -39,6 +39,10 @@ function sepulsa_order_commerce_line_item_update($line_item) {
     $line_item_success = TRUE;
     $order_wrapper = entity_metadata_wrapper('commerce_order', $line_item->order_id);
 
+    if (!in_array($order_wrapper->status->value(), array_keys(commerce_order_statuses(array('state' => 'pending'))))) {
+      return;
+    }
+
     foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
       if (isset($line_item_wrapper->field_line_item_status)) {
         if ($line_item_wrapper->field_line_item_status->value() != 'success') {

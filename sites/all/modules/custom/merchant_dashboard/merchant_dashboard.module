@@ -62,19 +62,22 @@ function merchant_dashboard_dashboard() {
   $coupon_ids = merchant_dashboard_user_voucher();
 
   $headers = array(
-    array('data' => 'Brand', 'field' => 'brand', 'class'=> array('views-field')),
-    array('data' => 'Skema', 'field' => 'skema', 'class'=> array('views-field')),
-    array('data' => 'Taken', 'field' => 'taken', 'class'=> array('views-field')),
-    array('data' => 'Redeem', 'field' => 'redeem', 'class'=> array('views-field')),
+    array('data' => 'Tipe Voucher', 'class'=> array('views-field')),
+    array('data' => 'Skema', 'class'=> array('views-field')),
+    array('data' => 'Masa Tayang', 'class'=> array('views-field')),
+    array('data' => 'Stok   ', 'class'=> array('views-field')),
+    array('data' => 'Diambil', 'class'=> array('views-field')),
+    array('data' => 'Diredeem', 'class'=> array('views-field')),
+    array('data' => 'Belum Diredeem', 'class'=> array('views-field')),
   );
 
   foreach ($coupon_ids as $coupon_id) {
     // load coupon
     $voucher = node_load($coupon_id);
+    //dpm($voucher);
     // voucher taken
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'offline_owned_unique')
       ->propertyCondition('status', NODE_PUBLISHED)
       ->propertyCondition('uid', 1, '!=')
       ->fieldCondition('field_simple_coupon', 'target_id', $coupon_id);
@@ -86,7 +89,6 @@ function merchant_dashboard_dashboard() {
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', 'offline_owned_unique')
       ->propertyCondition('status', NODE_NOT_PUBLISHED)
       ->propertyCondition('uid', 1, '!=')
       ->fieldCondition('field_simple_coupon', 'target_id', $coupon_id);
@@ -96,19 +98,37 @@ function merchant_dashboard_dashboard() {
       $redeem = count($result['node']);
     }
 
+
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->fieldCondition('field_simple_coupon', 'target_id', $coupon_id);
+    $result = $query->execute();
+    $stok = 0;
+    if (isset($result['node'])) {
+      $stok = count($result['node']);
+    }
+
+    $notredeem = $taken - $redeem;
+    $taken = ($taken ? l($taken, 'merchant_dashboard/taken/' . $coupon_id) : $taken);
+    $redeem = ($redeem ? l($redeem, 'merchant_dashboard/redeem/' . $coupon_id) : $redeem);
+    $notredeem = ($notredeem ? l($notredeem, 'merchant_dashboard/notredeem/' . $coupon_id) : $notredeem);
+    $tayang = date('d-m-Y',$voucher->field_active_time[LANGUAGE_NONE][0]['value']) . ' - ' . date('d-m-Y',$voucher->field_active_time[LANGUAGE_NONE][0]['value2']);
     $rows[] = array(
-      array('data' => $voucher->field_merchant[LANGUAGE_NONE][0]['safe_value'], 'class'=> array('views-field')),
-      array('data' => l($voucher->title, 'merchant_dashboard/voucher/' . $voucher->nid ), 'class'=> array('views-field')),
+      array('data' => $voucher->field_coupon_type[LANGUAGE_NONE][0]['value'], 'class'=> array('views-field')),
+      array('data' => $voucher->title, 'class'=> array('views-field')),
+      array('data' => $tayang, 'class'=> array('views-field')),
+      array('data' => $stok, 'class'=> array('views-field')),
       array('data' => $taken, 'class'=> array('views-field')),
-      array('data' => $redeem, 'class'=> array('views-field'))
+      array('data' => $redeem, 'class'=> array('views-field')),
+      array('data' => $notredeem, 'class'=> array('views-field'))
     );
   }
   $table_data = array(
         'header'     => $headers,
         'rows'       => $rows
       );
-
-  $output = theme('table', $table_data);
+  $h1 = '<h1><b>Brand: </b>' .  $voucher->field_merchant[LANGUAGE_NONE][0]['safe_value'] . '</h1>';
+  $output = $h1 . theme('table', $table_data);
   return $output;
 }
 
@@ -119,6 +139,16 @@ function merchant_dashboard_dashboard() {
 function merchant_dashboard_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'merchant_dashboard') . 'views',
+    'path' => drupal_get_path('module', 'merchant_dashboard') . '/views',
   );
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function merchant_dashboard_views_pre_render(&$view) {
+  if ($view->name == 'merchant_reporting') {
+    $voucher = node_load(arg(2));
+    $view->build_info['title'] = $voucher->title;
+  }
 }

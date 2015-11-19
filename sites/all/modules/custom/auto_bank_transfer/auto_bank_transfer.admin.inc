@@ -36,10 +36,10 @@ function auto_bank_transfer_admin_form($form, &$form_state) {
     '#required' => true,
     '#default_value' => variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com')
   );
-  $form['auto_bank_trasnfer_logging'] = array(
+  $form['auto_bank_transfer_logging'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable Logging'),
-    '#default_value' => variable_get('auto_bank_trasnfer_logging', 0),
+    '#default_value' => variable_get('auto_bank_transfer_logging', 0),
     '#description' => t('Enable database logging and raw CSV backup.')
   );
   

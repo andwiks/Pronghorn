@@ -106,7 +106,7 @@ function bca_read_csv() {
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
-      if(variable_get('auto_bank_trasnfer_logging', 0)){
+      if(variable_get('auto_bank_transfer_logging', 0)){
         //save raw csv for future use
         $rawfile = 'sites/default/files/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
         $mydir = file_default_scheme() . '://bank/raw_bca';
@@ -150,18 +150,18 @@ function bca_read_csv() {
         // If empty read log, assume table empty
         if(empty($read_log)){
           $pointer = 0;
-          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Empty Table. Reseting Pointer.'); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Empty Table. Reseting Pointer.'); }
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
       }
     } else {
       //For unknown reason, query has failed
@@ -172,16 +172,37 @@ function bca_read_csv() {
     if(!empty($payment)){
       //Insert new data to table.
       $newData = array();
+      $dupeData = array();
       foreach($payment as $value){
-        $lastid = db_insert('auto_bank_bca')
-        ->fields(array(
-          'description' => $value[0],
-          'created' => time(),
-          'amount' => $value[1],
-        ))
-        ->execute();
-        $newData[$lastid] = $value[1];
-        $pointer++;
+        // Adding a 2nd layer of security before insert. Since we MIGHT come into partial CSV file read.
+        // Checking if the data already on table or not.
+        $sql = db_query("SELECT abbid FROM {auto_bank_bca} WHERE description = :description AND amount = :amount",
+          array(':description' => $value[0], 'amount' => $value[1]));
+        // Query successfuly executed
+        if($sql){
+          // No entry in database yet
+          if($sql->rowCount() == 0){
+            $lastid = db_insert('auto_bank_bca')
+            ->fields(array(
+              'description' => $value[0],
+              'created' => time(),
+              'amount' => $value[1],
+            ))
+            ->execute();
+            $newData[$lastid] = $value[1];
+            $pointer++;
+          } else {
+            // Log duplicated entry
+            $dupeData[] = ($value[0].' - '.$value[1]);
+          }
+        } else {
+          //For unknown reason, query has failed for 2nd layer of security
+          watchdog('bca_read_csv','Query 2 failed.<pre>'.$result.'</pre>');
+          return false;
+        }
+      }
+      if(!empty($dupeData) && variable_get('auto_bank_transfer_logging', 0)==1){
+        watchdog('bca_read_csv','Duplicate data:<pre>'.implode('<br>',$dupeData).'</pre>');
       }
 
       variable_set('bca_payment_pointer',$pointer);
@@ -189,7 +210,7 @@ function bca_read_csv() {
     }
   }
   // Reason: No new files, no new data
-  if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_read_csv','No new files or no new data'); }
+  if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv','No new files or no new data'); }
   return false;
 }
 
@@ -200,7 +221,7 @@ function bca_confirm_payment() {
 
   //if no new transaction, stop function
   if(empty($all_payment)){
-    if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('bca_confirm_payment', 'No new transaction. Stopping.'); }
+    if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_confirm_payment', 'No new transaction. Stopping.'); }
   }else{
     $trans_log = array();
     foreach ($all_payment as $key => $payment) {
@@ -291,8 +312,10 @@ function bca_confirm_payment() {
         }
       }
     }
-    // set log success payment, if any.
-    watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+    if(variable_get('auto_bank_transfer_logging', 0)){
+      // set log success payment, if any.
+      watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+    }
   }
 }
 
@@ -330,7 +353,7 @@ function mandiri_read_csv() {
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
-      if(variable_get('auto_bank_trasnfer_logging', 0)){
+      if(variable_get('auto_bank_transfer_logging', 0)){
          //save raw csv for future use
         $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
         $mydir = file_default_scheme() . '://bank/raw_mandiri';
@@ -377,18 +400,18 @@ function mandiri_read_csv() {
         // If empty read log, assume table empty
         if(empty($read_log)){
           $pointer = 0;
-          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Empty Table. Reseting Pointer.'); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Empty Table. Reseting Pointer.'); }
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
       }
     } else {
       //For unknown reason, query has failed
@@ -399,24 +422,45 @@ function mandiri_read_csv() {
     if(!empty($payment)){
       //Insert new data to table.
       $newData = array();
+      $dupeData = array();
       foreach($payment as $value){
-        $lastid = db_insert('auto_bank_mandiri')
-        ->fields(array(
-          'description' => $value[0],
-          'created' => time(),
-          'amount' => $value[1],
-        ))
-        ->execute();
-        $newData[$lastid] = $value[1];
-        $pointer++;
+        // Adding a 2nd layer of security before insert. Since we MIGHT come into partial CSV file read.
+        // Checking if the data already on table or not.
+        $sql = db_query("SELECT abmid FROM {auto_bank_mandiri} WHERE description = :description AND amount = :amount",
+          array(':description' => $value[0], 'amount' => $value[1]));
+        // Query successfuly executed
+        if($sql){
+          // No entry in database yet
+          if($sql->rowCount() == 0){
+            $lastid = db_insert('auto_bank_mandiri')
+            ->fields(array(
+              'description' => $value[0],
+              'created' => time(),
+              'amount' => $value[1],
+            ))
+            ->execute();
+            $newData[$lastid] = $value[1];
+            $pointer++;
+          } else {
+            // Log duplicated entry
+            $dupeData[] = ($value[0].' - '.$value[1]);
+          }
+        } else {
+          //For unknown reason, query has failed for 2nd layer of security
+          watchdog('mandiri_read_csv','Query 2 failed.<pre>'.$result.'</pre>');
+          return false;
+        }
       }
-
+      if(!empty($dupeData) && variable_get('auto_bank_transfer_logging', 0)==1){
+        watchdog('mandiri_read_csv','Duplicate data:<pre>'.implode('<br>',$dupeData).'</pre>');
+      }
+      
       variable_set('mandiri_payment_pointer',$pointer);
       return $newData;
     }
   }
   // Reason: No new files, no new data
-  if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_read_csv','No new files or no new data'); }
+  if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv','No new files or no new data'); }
   return false;
 }
 
@@ -427,7 +471,7 @@ function mandiri_confirm_payment() {
 
   //if no new transaction, stop function
   if(empty($all_payment)){
-    if(variable_get('auto_bank_trasnfer_logging', 0)){ watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.'); }
+    if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_confirm_payment', 'No new transaction. Stopping.'); }
   }else{
     $trans_log = array();
     foreach ($all_payment as $key => $payment) {
@@ -518,8 +562,10 @@ function mandiri_confirm_payment() {
         }
       }
     }
-    // set log success payment, if any.
-    watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+    if(variable_get('auto_bank_transfer_logging', 0)){
+      // set log success payment, if any.
+      watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+    }
   }
 }
 

@@ -32,6 +32,49 @@ function sepulsa_order_commerce_order_presave($order) {
 }
 
 /**
+ * Implements hook_commerce_line_item_presave().
+ */
+function sepulsa_order_commerce_line_item_update($line_item) {
+  if (in_array($line_item->type, variable_get('sepulsa_order_processing_line_item', array('mobile_prepaid', 'electricity_prepaid')))) {
+    $line_item_success = TRUE;
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $line_item->order_id);
+
+    if (!in_array($order_wrapper->status->value(), array_keys(commerce_order_statuses(array('state' => 'pending'))))) {
+      return;
+    }
+
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      if (isset($line_item_wrapper->field_line_item_status)) {
+        if ($line_item_wrapper->field_line_item_status->value() != 'success') {
+          $line_item_success = FALSE;
+          break;
+        }
+      }
+      elseif (isset($line_item_wrapper->field_topup_status)) {
+        if ($line_item_wrapper->field_topup_status->value() != TOPUP_SUCCESS) {
+          $line_item_success = FALSE;
+          break;
+        }
+      }
+      elseif ($line_item_wrapper->getBundle() == 'electricity_prepaid') {
+        $token_reloads = entity_load('token_reload', FALSE, array('line_item_id' => $line_item_wrapper->getIdentifier()));
+        if (!empty($token_reloads)) {
+          $token_reload = reset($token_reloads);
+          if ($token_reload->status != 'success') {
+            $line_item_success = FALSE;
+            break;
+          }
+        }
+      }
+    }
+
+    if ($line_item_success) {
+      commerce_order_status_update($order_wrapper->value(), 'completed', FALSE, NULL, t('All line item success.'));
+    }
+  }
+}
+
+/**
  * Implements hook_cronapi().
  */
 function sepulsa_order_cronapi() {

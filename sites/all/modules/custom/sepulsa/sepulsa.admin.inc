@@ -13,7 +13,7 @@ function sepulsa_settings_form($form, &$form_state) {
   $form['sepulsa_settings']['multipaid_product'] = array(
     '#title' => t('Multipaid product'),
     '#type' => 'checkbox',
-    '#default_value' => empty($settings['multipaid_product']) ? FALSE : TRUE,
+    '#default_value' => !empty($settings['multipaid_product']),
   );
 
   return system_settings_form($form);

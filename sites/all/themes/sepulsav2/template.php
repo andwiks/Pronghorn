@@ -510,18 +510,21 @@ function sepulsav2_preprocess_views_view_unformatted(&$variables) {
         $variables['row_classes'] = array();
         $products = array();
         $cart = commerce_cart_order_load($variables['user']->uid);
-        $cart_wrapper = entity_metadata_wrapper('commerce_order', $cart);
 
-        foreach ($cart_wrapper->commerce_line_items as $line_item) {
-          if ($line_item->getBundle() == 'coupon') {
-            $products[] = $line_item->commerce_product->getIdentifier();
+        if (!empty($cart)) {
+          $cart_wrapper = entity_metadata_wrapper('commerce_order', $cart);
+
+          foreach ($cart_wrapper->commerce_line_items as $line_item) {
+            if ($line_item->getBundle() == 'coupon') {
+              $products[] = $line_item->commerce_product->getIdentifier();
+            }
           }
-        }
 
-        foreach ($view->result as $key => $result) {
-          $product_id = $result->field_field_product[0]['raw']['product_id'];
-          if (in_array($product_id, $products)) {
-            $variables['row_classes'][$key] = 'hidden coupon-' . $product_id;
+          foreach ($view->result as $key => $result) {
+            $product_id = $result->field_field_product[0]['raw']['product_id'];
+            if (in_array($product_id, $products)) {
+              $variables['row_classes'][$key] = 'hidden coupon-' . $product_id;
+            }
           }
         }
       }

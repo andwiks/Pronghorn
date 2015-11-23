@@ -1,0 +1,107 @@
+<?php
+/**
+ * @file
+ * auto_bank_transfer.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function auto_bank_transfer_schema() {
+  $schema['auto_bank_bca'] = array(
+    'description' => 'The base table for BCA auto bank transfer.',
+    'fields' => array(
+      'abbid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'description' => 'Commerce Order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),      
+      'amount' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+    ),
+    'primary key' => array('abbid'),
+  );
+  $schema['auto_bank_mandiri'] = array(
+    'description' => 'The base table for Mandiri auto bank transfer.',
+    'fields' => array(
+      'abmid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'order_id' => array(
+        'description' => 'Commerce Order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),      
+      'amount' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'updated' => array(
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),   
+      'note' => array(
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+    ),
+    'primary key' => array('abmid'),
+  );
+  return $schema;
+}
+
+/**
+ * Add a table for auto_bank_transfer module.
+ */
+function auto_bank_transfer_update_7001(&$sandbox) {
+  $schema = module_invoke('auto_bank_transfer', 'schema');
+  db_create_table('auto_bank_bca', $schema['auto_bank_bca']);
+  db_create_table('auto_bank_mandiri', $schema['auto_bank_mandiri']);
+}

@@ -93,7 +93,11 @@ header .logo{
     right: 0;
 }
 header .logo img{display: block;margin: 15px auto 0;} 
-header .right_link{float: right;width: 146px;}
+header .right_link{
+    float: right;
+    width: 146px;
+    width: 240px;
+}
 header .right_link .box{float:left;width: 80px;height: 80px;position: relative;}
 header .right_link .box a{    
     display: block;
@@ -3518,7 +3522,7 @@ hr.smallsize
 /* hide lang for a moment */
 header .right_link .box.lang
 {
-    display: none !important;
+    /*display: none !important;*/
 }
 
 .m_lang
@@ -3600,3 +3604,152 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 .voucher_vendor .bx-wrapper a.bx-next {background-position: top left;right: -40px}
 .voucher_vendor .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
 .voucher_vendor .bx-wrapper a.bx-next:hover {background-position:top right;}
+
+/*CART*/
+header .right_link .box.cart{
+    width: 85px;
+    margin: 0 5px 0 1px;
+}
+
+header .right_link .box.cart a
+{
+    background-position-y:65px !important;
+}
+
+header .right_link .box.cart .box_drop
+{
+    /*width: 260px;
+    left: -88px;*/
+    width: 230px;
+    left: -74px;
+    background: #f2f5f7;
+    padding:5px;   
+    border: 1px solid #fdb50a;
+    border-top: 5px solid #fdb50a;
+    /*-webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;*/
+}
+
+.shopp,.cart-total{ 
+    border:solid #ccc 1px; padding:8px; 
+    /*-webkit-border-radius: 8px;
+    -moz-border-radius: 8px; 
+    border-radius: 8px; */
+    font-size:14px;
+    background: #e0e0e0;
+    background: #fff;
+    /*background:url("../images/material/remove.png") center right  no-repeat;*/
+    
+    font-family:"LubalGraphBdBTBold",Tahoma; 
+    margin-bottom:5px;
+    /*width:240px;*/
+    width:210px;
+}
+
+
+    
+div.shopp span{  float:left;}   
+div.shopp div.label{ 
+    /*width:110px; */
+    float:left; 
+    padding-right:5px;
+    border-right: 1px dashed;  
+    width:175px;
+}     
+div.shopp div.shopp-price{ 
+    width:70px; 
+    float:left; 
+    margin-left:10px;
+}
+.quantity{ 
+    float:left; 
+    margin-top:-3px; 
+    width:25px;
+}
+
+img.remove{float:right;cursor:pointer;}
+.cart-total b{width:130px;}
+
+
+div.cart-total span{  float:left;}   
+div.cart-total div.label{ 
+    width:70px; 
+    float:left; 
+}     
+div.cart-total div.shopp-price{ 
+    /*width:110px; */
+    float:left; 
+    margin-left:17px;
+    margin-left:0px;
+}
+
+#cart_form #cartSubmit
+{
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+    background: #fdb50a;
+    padding:.5em 2em;
+    color: #fff;
+    margin:10px 0;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+br.all
+{
+    clear: both;
+}
+
+.cart-total{
+    background:#fdb50a;
+    font-weight: bold;
+    color: #fff;
+}
+
+.opsi-voucher
+{
+    margin:1em 0;
+}
+
+div.shopp div a
+{
+    border: none !important;
+    padding: 0 2px !important;
+}
+
+header .right_link .box.lang span.ico{
+    width:24px;
+    background: url(../images/material/cart_ico.png) no-repeat -24px 0px;
+    margin-bottom: 6px;
+}
+
+.box_drop #edit-submit
+{
+    display: block;
+    -webkit-border-radius: 7px;
+    -moz-border-radius: 7px;
+    -ms-border-radius: 7px;
+    -o-border-radius: 7px;
+    background: #fdb50a;
+    padding:.5em 2em;
+    color: #fff;
+    margin:10px auto;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;   
+}
+
+.box_drop .shopp .delete-line-item {
+    background: url("../images/material/remove.png") center right no-repeat;
+    width: 26px;
+    font-size: 0px;
+    height: 30px;
+    display: block;
+    padding: 1px;
+    margin-left: 2px;
+}

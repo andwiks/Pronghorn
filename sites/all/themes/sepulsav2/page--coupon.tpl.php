@@ -42,26 +42,17 @@ $theme_path = $base_url . '/' . path_to_theme();
             </h5>
             <div class="filter after_clear">
                 <div class="row">
-                    <label>Sort by :</label>
+                    <label><?php print t('Filter :'); ?></label>
                     <div class="input">
-                        <select name="voucher_sort">
-                            <option value="defualt">--Default--</option>
-                            <option value="latest">--Latest Voucher--</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <label>Filter :</label>
-                    <div class="input">
-                        <select name="voucher_filter">
-                            <option value="All">--All--</option>
-                            <option value="Lifestyle">--Lifestyle--</option>
-                            <option value="Food">--Food--</option>
-                            <option value="Fashion">--Fashion--</option>
-                            <option value="Travel">--Travel--</option>
-                            <option value="E-Commerce">--E-Commerce--</option>
-                            <option value="Grocery">--Grocery--</option>
-                            <option value="Kids">--Kids--</option>
+                        <select name="voucher_filter" id="voucher_filter">
+                            <option value="All">--<?php print t('All'); ?>--</option>
+                            <option value="Lifestyle">--<?php print t('Lifestyle'); ?>--</option>
+                            <option value="Food">--<?php print t('Food'); ?>--</option>
+                            <option value="Fashion">--<?php print t('Fashion'); ?>--</option>
+                            <option value="Travel">--<?php print t('Travel'); ?>--</option>
+                            <option value="E-Commerce">--<?php print t('E-Commerce'); ?>--</option>
+                            <option value="Grocery">--<?php print t('Grocery'); ?>--</option>
+                            <option value="Kids">--<?php print t('Kids'); ?>--</option>
                         </select>
                     </div>
                 </div>

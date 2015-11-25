@@ -339,7 +339,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
-        $form['add']['#suffix'] = '</div">';
+        $form['add']['#suffix'] = '</div>';
 
         if ($form_state['submitted'] === FALSE) {
           $form['submit']['#attributes']['class'][] = 'inactive';
@@ -351,6 +351,34 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
           ),
         );
 
+        break;
+
+      case 'biznet':
+        $form['product_id']['#attributes']['class'][] = 'input-text';
+        $form['product_id']['#attributes']['class'][] = 'full-width';
+        $form['product_id']['#suffix'] = '<p></p>';
+
+        $form['line_item_fields']['#weight'] = 0;
+
+        $form['line_item_fields']['field_customer_number']['#weight'] = -10;
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+
+        $form['add']['#prefix'] = '<div class="topup-action-2">';
+        $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
+        $form['submit']['#attributes']['class'][] = 'btn';
+        $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'pull-right';
+        $form['add']['#suffix'] = '</div>';
+
+        $form['submit']['#states'] = array(
+          'enabled' => array(
+            ':input[name="line_item_fields[customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+          ),
+        );
         break;
     }
   }

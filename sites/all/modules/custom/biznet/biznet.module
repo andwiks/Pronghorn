@@ -98,7 +98,6 @@ function biznet_preprocess_page(&$variables) {
 
       $variables['biznet_form'] = drupal_get_form('commerce_cart_add_to_cart_form', $line_item);
     }
-    // dpm($variables);
   }
 }
 
@@ -135,7 +134,7 @@ function biznet_products($nominal = NULL) {
 
 function biznet_topup_execute($order_wrapper) {
   foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-    if ($line_item_wrapper->getBundle() == 'biznet' && $line_item_wrapper->field_line_item_status == 'pending') {
+    if ($line_item_wrapper->getBundle() == 'biznet' && $line_item_wrapper->field_line_item_status->value() == 'pending') {
       biznet_topup_line_item($line_item_wrapper);
     }
   }
@@ -148,6 +147,13 @@ function biznet_topup_line_item($line_item_wrapper) {
     'product_id' => biznet_products($line_item_wrapper->commerce_product->commerce_price->amount->value()),
   );
 
-  module_load_include('inc', 'kraken');
+  module_load_include('inc', 'kraken_api');
   $response = kraken_api_call('transaction', 'POST', $data);
+
+  $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
+  $line_item_wrapper->field_line_item_status->set($response['status']);
+
+  $line_item = $line_item_wrapper->value();
+  $line_item->data = $response;
+  entity_save('commerce_line_item', $line_item);
 }

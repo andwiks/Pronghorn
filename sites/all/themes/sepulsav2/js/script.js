@@ -11,7 +11,15 @@
           }
         });
       }
+      $('#voucher_filter').change(function () {
+        var filter = $(this).val();
+        if (filter == 'All') {
+            $('.box_voucher').show();
+        } else {
+            $('.box_voucher').hide();
+            $('.' + filter).show();
+        }
+      });
     }
   }
-
 })(jQuery);

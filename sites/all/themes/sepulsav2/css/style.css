@@ -1908,7 +1908,7 @@ section.h_middle_top .form-select
     section.h_middle_top .form-select
     {
         width: 100%;
-        padding: 15px;
+        /*padding: 15px;*/
         height: 55px;
     }
 

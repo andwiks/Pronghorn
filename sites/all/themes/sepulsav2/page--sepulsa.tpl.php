@@ -18,7 +18,7 @@ $page_state = "home";
   <div class="wrapper">
     <div class="home_tab">
       <div class="nav_tab after_clear">
-        <table class="tab-pulsa">
+        <!-- <table class="tab-pulsa">
           <tr>
             <td>
               <a href="" class="active" target="target_1">
@@ -39,7 +39,19 @@ $page_state = "home";
               </a>
             </td>
           </tr>
-        </table>
+        </table> -->
+        <a href="" class="active" target="target_1">
+              <span class="ico pulsa"></span>
+              <?php print t('isi pulsa & bolt'); ?>
+        </a>
+        <a href="" target="target_2">
+            <span class="ico listrik"></span>
+            <?php print t('token listrik'); ?>
+        </a>
+        <a href="" target="target_3">
+            <span class="ico bolt"></span>
+            <?php print t('biznet wifi'); ?>
+        </a>
       </div>
 
       <div class="content_tab">

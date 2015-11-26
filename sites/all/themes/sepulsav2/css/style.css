@@ -1992,13 +1992,13 @@ table.tab-pulsa tr td
 
 section.h_middle_top .home_tab .nav_tab a
 {
-    width: 100%;
+    /*width: 100%;*/
 }
 
 section.h_middle_top .home_tab .nav_tab a.active
 {
-    padding-left: 20%;
-    width: 80%;
+    /*padding-left: 20%;
+    width: 80%;*/
 }
 
 section.transaction table.cart{width: 100%;border:1px solid #105c8c;font-size: 14px;margin:0 0 30px }

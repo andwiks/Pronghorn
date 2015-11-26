@@ -1886,7 +1886,9 @@ section.h_middle_top #sepulsa-autocomplete-packets
     margin-bottom: 10px;
 }
 
-section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id
+section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, 
+section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id, 
+section.h_middle_top .form-select
 {
     font-size: 24px;
     font-family: "robotoregular";

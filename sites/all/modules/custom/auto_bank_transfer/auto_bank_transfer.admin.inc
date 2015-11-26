@@ -35,7 +35,13 @@ function auto_bank_transfer_admin_form($form, &$form_state) {
     '#description' => t('List of email to get notified when there are more than 1 order to confirm.'),
     '#required' => true,
     '#default_value' => variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com')
-  );  
+  );
+  $form['auto_bank_transfer_logging'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Logging'),
+    '#default_value' => variable_get('auto_bank_transfer_logging', 0),
+    '#description' => t('Enable database logging and raw CSV backup.')
+  );
   
   return system_settings_form($form);
 }
@@ -191,7 +197,7 @@ function auto_bank_transfer_bca_overview(){
     $row['data']['amount'] = number_format($data->amount);
     $row['data']['created'] = date('F j, G:i',$data->created);
     $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
+    $row['data']['order_id'] = l($data->order_id,'admin/commerce/orders/'.$data->order_id);
     $row['data']['status'] = $data->status;
     $row['data']['note'] = $data->note;
     
@@ -271,7 +277,7 @@ function auto_bank_transfer_mandiri_overview(){
     $row['data']['amount'] = number_format($data->amount);
     $row['data']['created'] = date('F j, G:i',$data->created);
     $row['data']['updated'] = date('F j, G:i',$data->updated);
-    $row['data']['order_id'] = $data->order_id;
+    $row['data']['order_id'] = l($data->order_id,'admin/commerce/orders/'.$data->order_id);
     $row['data']['status'] = $data->status;
     $row['data']['note'] = $data->note;
     

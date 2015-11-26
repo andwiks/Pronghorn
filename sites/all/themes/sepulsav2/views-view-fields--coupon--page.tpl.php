@@ -26,12 +26,12 @@
 
 global $base_url;
 $web_name = $fields['field_website']->content;
-$web_link = $fields['field_website_link']->content; 
+$web_link = $fields['field_website_link']->content;
 if (!isset($web_link)) {
-  $web_link = 'http://'.$fields['field_website']->content; 
+  $web_link = 'http://'.$fields['field_website']->content;
 }
 ?>
-<div class="box_voucher">
+<div class="box_voucher <?php print $fields['field_coupon_category']->content; ?>">
     <div class="image"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></div>
     <h4><?php print $fields['title']->content; ?></h4>
     <p class="voucher-description"><?php print $fields['field_description']->content; ?>.</p>

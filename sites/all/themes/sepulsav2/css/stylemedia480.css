@@ -775,3 +775,32 @@ section.std_content .akun .c_right .share input[type=text]
     width: 410px;
     margin: auto;
 }
+
+
+/* Shopping Cart */
+header .right_link .box .box_drop .arr
+{
+    right: -85px;
+}
+
+header .right_link .box.cart .box_drop
+{
+    left: -130px;
+    top: 70px;
+}
+
+header .right_link .box.cart
+{
+    display: block;
+    float: right;
+    right: 0;
+    height: 60px;
+    width: 65px;
+}
+
+body.home header .right_link .box.lang a
+{
+    height: 50px;
+    padding: 5px 0;
+    background-position: 30px 50px !important;
+}

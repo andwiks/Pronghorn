@@ -59,6 +59,14 @@ function biznet_field_attach_validate($entity_type, $entity, &$errors) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form_biznet().
+ */
+function biznet_form_commerce_cart_add_to_cart_form_biznet_alter(&$form, &$form_state, $form_id) {
+  $form['#attributes']['class'][] = 'commerce-cart-add-to-cart-form-biznet';
+  $form['description'] = field_view_field('commerce_product', $form_state['default_product'], 'field_description', array('label' => 'hidden', 'weight' => 1));
+}
+
+/**
  * Implements hook_node_info().
  */
 function biznet_node_info() {
@@ -80,6 +88,7 @@ function biznet_preprocess_page(&$variables) {
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'commerce_product');
     $query->entityCondition('bundle', 'biznet');
+    $query->fieldOrderBy('commerce_price', 'amount', 'DESC');
 
     $result = $query->execute();
 
@@ -96,7 +105,7 @@ function biznet_preprocess_page(&$variables) {
       );
       $line_item = entity_create('commerce_line_item', $values);
 
-      $variables['biznet_form'] = drupal_get_form('commerce_cart_add_to_cart_form', $line_item);
+      $variables['biznet_form'] = drupal_get_form('commerce_cart_add_to_cart_form_biznet', $line_item);
     }
   }
 }

@@ -18,40 +18,20 @@ $page_state = "home";
   <div class="wrapper">
     <div class="home_tab">
       <div class="nav_tab after_clear">
-        <!-- <table class="tab-pulsa">
-          <tr>
-            <td>
-              <a href="" class="active" target="target_1">
-                  <span class="ico pulsa"></span>
-                  <?php print t('isi pulsa & bolt'); ?>
-              </a>
-            </td>
-            <td>
-              <a href="" target="target_2">
-                  <span class="ico listrik"></span>
-                  <?php print t('token listrik'); ?>
-              </a>
-            </td>
-            <td>
-              <a href="" target="target_3">
-                  <span class="ico listrik"></span>
-                  <?php print t('biznet wifi'); ?>
-              </a>
-            </td>
-          </tr>
-        </table> -->
         <a href="" class="active" target="target_1">
-              <span class="ico pulsa"></span>
-              <?php print t('isi pulsa & bolt'); ?>
+          <span class="ico pulsa"></span>
+          <?php print t('isi pulsa & bolt'); ?>
         </a>
         <a href="" target="target_2">
-            <span class="ico listrik"></span>
-            <?php print t('token listrik'); ?>
+          <span class="ico listrik"></span>
+          <?php print t('token listrik'); ?>
         </a>
-        <a href="" target="target_3">
+        <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
+          <a href="" target="target_3">
             <span class="ico bolt"></span>
             <?php print t('biznet wifi'); ?>
-        </a>
+          </a>
+        <?php endif; ?>
       </div>
 
       <div class="content_tab">

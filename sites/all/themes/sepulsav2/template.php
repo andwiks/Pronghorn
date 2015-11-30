@@ -367,7 +367,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
-        $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;>';
+        $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
         $form['description']['#suffix'] = '</div>';
 
         $form['add']['#prefix'] = '<div class="topup-action-2">';

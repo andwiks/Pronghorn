@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function kraken_api_menu() {
+  $items = array();
+  $items['admin/config/services/kraken-api'] = array(
+    'title' => 'Kraken API settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('kraken_api_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'kraken_api.admin.inc',
+  );
+
+  $items['notification/kraken-api'] = array(
+    'page callback' => 'kraken_api_notification_callback',
+    'access callback' => TRUE,
+    'file' => 'kraken_api.pages.inc',
+  );
+
+  return $items;
+}

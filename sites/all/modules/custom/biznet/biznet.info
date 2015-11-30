@@ -1,0 +1,4 @@
+name = "Biznet"
+description = "Biznet Wifi."
+core = "7.x"
+package = "Sepulsa"

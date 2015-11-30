@@ -1,0 +1,6 @@
+name = "Kraken API"
+description = "Kraken integration."
+core = "7.x"
+package = "Sepulsa"
+
+configure = admin/config/services/kraken

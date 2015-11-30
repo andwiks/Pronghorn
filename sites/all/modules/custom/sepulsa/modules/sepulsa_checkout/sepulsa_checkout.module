@@ -125,8 +125,8 @@ function sepulsa_checkout_form_commerce_checkout_form_checkout_alter(&$form, &$f
     $order = $form_state['order'];
     $selected_payment_method = $form['commerce_payment']['payment_method']['#default_value'];
 
-    if ($selected_payment_method == 'bank_transfer|commerce_payment_bank_transfer') {
-      $campaign = $order->payment_methods['bank_transfer|commerce_payment_bank_transfer']['settings']['sepulsa_campaign'];
+    if ($selected_payment_method == 'bank_transfer|commerce_payment_bca_bank_transfer' || $selected_payment_method == 'bank_transfer|commerce_payment_bank_transfer') {
+      $campaign = $order->payment_methods[$selected_payment_method]['settings']['sepulsa_campaign'];
       global $user;
       $additional_fee = substr(commerce_cart_order_id($user->uid), -3);
 

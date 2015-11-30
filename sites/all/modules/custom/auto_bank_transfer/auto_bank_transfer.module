@@ -243,6 +243,7 @@ function bca_confirm_payment() {
               array(
                 'order_id' => $order_id,
                 'payment_method' => 'bank_transfer',
+                'instance_id' => 'bank_transfer|commerce_payment_bca_bank_transfer',
                 'status' => 'pending')) 
               as $transaction) {
             
@@ -493,6 +494,7 @@ function mandiri_confirm_payment() {
               array(
                 'order_id' => $order_id,
                 'payment_method' => 'bank_transfer',
+                'instance_id' => 'bank_transfer|commerce_payment_mandiri_bank_transfer',
                 'status' => 'pending')) 
               as $transaction) {
             

@@ -254,7 +254,7 @@ function bca_confirm_payment() {
               $transaction->status = 'success';
               commerce_payment_transaction_save($transaction);
               
-              $trans_log[] = 'order id: ' . $transaction->order_id;
+              $trans_log[] = 'Success-' . $transaction->order_id;
               $payment_confirm = 1;
               // Update auto bank transfer table
               db_update('auto_bank_bca')
@@ -271,24 +271,36 @@ function bca_confirm_payment() {
               commerce_payment_transaction_delete($transaction->transaction_id);
             }
           }
+          // If order found but payment not found or logged on different bank. Alert CS.
           if ($payment_confirm == 0) {
+            /*
             $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
-            $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
+            $transaction->instance_id = 'bank_transfer|commerce_payment_bca_bank_transfer';
             $transaction->amount = $payment;
             $transaction->currency_code = 'IDR';
             $transaction->status = 'success';
             commerce_payment_transaction_save($transaction);
-            $trans_log[] = 'order id: ' . $transaction->order_id;
+            */
+            $trans_log[] = 'Anomaly-' . $order_id;
             // Update auto bank transfer table
             db_update('auto_bank_bca')
             ->fields(array(
-              'status' => 'Success',
+              'status' => 'Anomaly',
               'updated' => time(),
               'order_id' => $order_id,
-              'note' => 'Anomaly. Payment not found.'
+              'note' => 'Logged on BCA or payment not found.'
             ))
             ->condition('abbid', $key, '=')
             ->execute();
+            $from = "info@sepulsa.com";
+            $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com');
+            $message = "Order : ".$order_id." logged on Auto BCA confirmation or payment not found.";
+            $subject = "Sepulsa - Auto bank transfer: Anomaly";
+            $params = array(
+              'subject' => $subject,
+              'body' => $message,
+            );
+            drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
           }
         }else{
           //Double order id. Log it then mail CS yeti@sepulsa.com
@@ -315,7 +327,7 @@ function bca_confirm_payment() {
     }
     if(variable_get('auto_bank_transfer_logging', 0)){
       // set log success payment, if any.
-      watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+      watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Result: ".implode(', ',$trans_log));
     }
   }
 }
@@ -505,7 +517,7 @@ function mandiri_confirm_payment() {
               $transaction->status = 'success';
               commerce_payment_transaction_save($transaction);
               
-              $trans_log[] = 'order id: ' . $transaction->order_id;
+              $trans_log[] = 'Success-' . $transaction->order_id;
               $payment_confirm = 1;
               // Update auto bank transfer table
               db_update('auto_bank_mandiri')
@@ -522,24 +534,28 @@ function mandiri_confirm_payment() {
               commerce_payment_transaction_delete($transaction->transaction_id);
             }
           }
+          // If order found but payment not found or logged on different bank. Alert CS.
           if ($payment_confirm == 0) {
-            $transaction = commerce_payment_transaction_new('bank_transfer', $order->order_id);
-            $transaction->instance_id = 'bank_transfer|commerce_payment_bank_transfer';
-            $transaction->amount = $payment;
-            $transaction->currency_code = 'IDR';
-            $transaction->status = 'success';
-            commerce_payment_transaction_save($transaction);
-            $trans_log[] = 'order id: ' . $transaction->order_id;
+            $trans_log[] = 'Anomaly-' . $order_id;
             // Update auto bank transfer table
             db_update('auto_bank_mandiri')
             ->fields(array(
-              'status' => 'Success',
+              'status' => 'Anomaly',
               'updated' => time(),
               'order_id' => $order_id,
-              'note' => 'Anomaly. Payment not found.'
+              'note' => 'Logged on Mandiri or payment not found.'
             ))
             ->condition('abmid', $key, '=')
             ->execute();
+            $from = "info@sepulsa.com";
+            $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com');
+            $message = "Order : ".$order_id." logged on Auto Mandiri confirmation or payment not found.";
+            $subject = "Sepulsa - Auto bank transfer: Anomaly";
+            $params = array(
+              'subject' => $subject,
+              'body' => $message,
+            );
+            drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
           }
         }else{
           //Double order id. Log it then mail CS yeti@sepulsa.com
@@ -566,7 +582,7 @@ function mandiri_confirm_payment() {
     }
     if(variable_get('auto_bank_transfer_logging', 0)){
       // set log success payment, if any.
-      watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Success payment: ".implode(', ',$trans_log));
+      watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Result: ".implode(', ',$trans_log));
     }
   }
 }

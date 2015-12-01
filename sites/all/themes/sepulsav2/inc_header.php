@@ -6,8 +6,6 @@
  * @author dwi@sepulsa.com
  * @since January 27th 2015.
  */
-
-global $base_url, $user, $language;
 ?>
     <header>
         <div class="wrapper">
@@ -21,6 +19,8 @@ global $base_url, $user, $language;
                 </a>
             </div>
             <div class="right_link">
+
+                <?php print render($shopping_cart); ?>
 
                 <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">

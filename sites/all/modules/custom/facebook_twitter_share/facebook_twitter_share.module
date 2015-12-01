@@ -1,7 +1,7 @@
 <?php
 
 function facebook_twitter_share_menu() {
-    $items['admin/config/facebook_twitter_share'] = array(
+    $items['admin/config/administration/facebook_twitter_share'] = array(
         'title'             => 'Facebook And Twitter Share Configuration',
         'description'       => 'Configure url, predefined text and enable disable sharing for sharing',
         'page callback'     => 'drupal_get_form',

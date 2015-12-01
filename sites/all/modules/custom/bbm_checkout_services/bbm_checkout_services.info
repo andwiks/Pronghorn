@@ -1,0 +1,7 @@
+; $Id$
+name = BBM Checkout Services
+description = Service gateway for veritrans BBM Checkout
+package = services
+dependencies[] = hybridauth
+version = 0.1
+core = 7.x

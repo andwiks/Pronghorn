@@ -189,7 +189,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
-      $settings = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings'];
+      $settings = $form['commerce_payment']['payment_methods']['#value'][$form['commerce_payment']['payment_method']['#default_value']]['settings'];
 
       $form['commerce_payment']['payment_details']['bank_details'] = array();
       $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';

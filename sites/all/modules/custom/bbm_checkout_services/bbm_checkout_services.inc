@@ -73,7 +73,7 @@ function bbm_checkout_order_services($data){
     //create user if email is not registered
     $account = user_load_by_mail($data["email"]);
     if(!$account){
-        if(isset($data["name"]) && !empty($data["name"])){
+        if(isset($data["name"]) && !empty($data["name"]) && $data["name"] != "-"){
           $username["username"] = $data["name"];
         }
         else{

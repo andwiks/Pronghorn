@@ -34,24 +34,28 @@ function bbm_checkout_order_services($data){
     }
     
     //set/split parameter from veritrans
-    $data["container_product_id_and_email"] = explode(",", $data["product_id_and_email"]);
-    $data["email"] = $data["container_product_id_and_email"][1];
+    $data["container_customer_details"] = explode(",", $data["customer_details"]);
+    $data["name"] = $data["container_customer_details"][0];
+    $data["email"] = $data["container_customer_details"][1];
+    $data["phone_number"] = $data["container_customer_details"][2];
     $product_container = array();
-    if(isset($data["container_product_id_and_email"][0]) && !empty($data["container_product_id_and_email"][0] && isset($data["phone_number"]) && !empty($data["phone_number"]))){
-        $product_container[0]["product_id"] = $data["container_product_id_and_email"][0];
+    $data["container_product"] = explode(",", $data["product_details"]);
+    if(isset($data["container_product"][0]) && !empty($data["container_product"][0] && isset($data["phone_number"]) && !empty($data["phone_number"]))){
+        $product_container[0]["product_id"] = $data["container_product"][0];
         $product_container[0]["field_phone_number"] = $data["phone_number"];
         $product_container[0]['quantity'] = 1;
         $product_container[0]['type'] = "mobile_prepaid";
     }
     
     //set coupon data list from veritrans
-    $data["container_coupon"] = explode(",", $data["coupon_id"]);
     $i = 1;
-    foreach ($data["container_coupon"] as $value) {
-        $product_container[$i]["product_id"] = $value;
-        $product_container[$i]['quantity'] = 1;
-        $product_container[$i]['type'] = "coupon";
-        $i++;
+    foreach ($data["container_product"] as $index => $value) {
+        if($index > 0){
+          $product_container[$i]["product_id"] = $value;
+          $product_container[$i]['quantity'] = 1;
+          $product_container[$i]['type'] = "coupon";
+          $i++;
+        }
     }
     
     //set empty email restriction
@@ -69,8 +73,13 @@ function bbm_checkout_order_services($data){
     //create user if email is not registered
     $account = user_load_by_mail($data["email"]);
     if(!$account){
-        $username["username"] = explode("@", $data["email"]);
-        $username["username"] = $username["username"][0];
+        if(isset($data["name"]) && !empty($data["name"])){
+          $username["username"] = $data["name"];
+        }
+        else{
+          $username["username"] = explode("@", $data["email"]);
+          $username["username"] = $username["username"][0];
+        }
         $fields = array(
           'name' => _hybridauth_make_username($username),
           'mail' => $data["email"],

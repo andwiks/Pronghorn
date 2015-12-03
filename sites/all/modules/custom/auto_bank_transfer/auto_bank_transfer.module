@@ -248,8 +248,8 @@ function bca_confirm_payment() {
               as $transaction) {
             
             $order = commerce_order_load($order_id);
-            // compare total amount
-            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
+            // compare total amount & confirm for 1st payment only
+            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount && $payment_confirm == 0) {
               // if same = confirm payment
               $transaction->status = 'success';
               commerce_payment_transaction_save($transaction);
@@ -265,10 +265,6 @@ function bca_confirm_payment() {
               ))
               ->condition('abbid', $key, '=')
               ->execute();
-
-            } else {
-              // if not same = delete payment
-              commerce_payment_transaction_delete($transaction->transaction_id);
             }
           }
           // If order found but payment not found or logged on different bank. Alert CS.
@@ -511,8 +507,8 @@ function mandiri_confirm_payment() {
               as $transaction) {
             
             $order = commerce_order_load($order_id);
-            // compare total amount
-            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount) {
+            // compare total amount & confirm only 1st payment
+            if ($order->commerce_order_total['und'][0]['amount'] == $transaction->amount && $payment_confirm == 0) {
               // if same = confirm payment
               $transaction->status = 'success';
               commerce_payment_transaction_save($transaction);
@@ -528,10 +524,6 @@ function mandiri_confirm_payment() {
               ))
               ->condition('abmid', $key, '=')
               ->execute();
-
-            } else {
-              // if not same = delete payment
-              commerce_payment_transaction_delete($transaction->transaction_id);
             }
           }
           // If order found but payment not found or logged on different bank. Alert CS.

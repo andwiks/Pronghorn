@@ -53,9 +53,9 @@ h6 { font-size: 14px; }
 
 /* header
 ----------------------------------------------------------------------------------------------*/
-header { 
+header {
     background: #FFF;
-    position: relative; 
+    position: relative;
     width: 100%;
     height: 80px;
     top:0;
@@ -92,14 +92,14 @@ header .logo{
     left: 0;
     right: 0;
 }
-header .logo img{display: block;margin: 15px auto 0;} 
+header .logo img{display: block;margin: 15px auto 0;}
 header .right_link{
     float: right;
     width: 146px;
     width: 240px;
 }
 header .right_link .box{float:left;width: 80px;height: 80px;position: relative;}
-header .right_link .box a{    
+header .right_link .box a{
     display: block;
     height: 61px;
     padding: 19px 0 0 0;
@@ -331,7 +331,7 @@ section.std_content .c_right .row.accordion .label span.ico{
     -o-border-radius: 48px;
 }
 .form.style_1 .drop_transaksi.active .box_drop{display: block;}
-.form.style_1 .drop_transaksi .box_drop{ 
+.form.style_1 .drop_transaksi .box_drop{
     display: none;
     padding: 8px 0 10px 0;
     border-top:1px dashed #feb60a;
@@ -348,7 +348,7 @@ section.std_content .c_right .row.accordion .label span.ico{
     font-size: 24px;
     padding: 9px 0px;
     height: 60px;
-    width: 200px;   
+    width: 200px;
     cursor:pointer;
     color:#FFF;
 }
@@ -401,7 +401,7 @@ section.std_content .c_right .row.accordion .label span.ico{
 ----------------------------------------------------------------------------------------------*/
 section { position: relative;z-index: 0;}
 
-section.banner, 
+section.banner,
 section.banner img{width: 100%;}
 section.banner .caption{
     position: absolute;
@@ -470,7 +470,7 @@ section.h_middle_top .home_tab .nav_tab a:last-child{border-right: none;}
 
 section.h_middle_top .home_tab .nav_tab a.active,
 section.h_middle_top .home_tab .nav_tab a:hover{
-    background:#feb60a;color:#FFF;border-color: #FFF 
+    background:#feb60a;color:#FFF;border-color: #FFF
 }
 
 
@@ -519,7 +519,7 @@ section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next {background-position:
 section.h_middle_top .voucher_vendor .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
 section.h_middle_top .voucher_vendor .bx-wrapper a.bx-next:hover {background-position:top right;}
 
-section.promo_banner .bt_std{    
+section.promo_banner .bt_std{
     position: absolute;
     z-index: 1;
     right: 116px;
@@ -590,7 +590,7 @@ section.easy_step .box_step .label{
     -o-border-radius: 100%;
 }
 section.easy_step .box_step p{width: 190px;margin:0 auto 80px;}
-section.easy_step a.bt_std:hover{color:#feb60a;background: #FFF} 
+section.easy_step a.bt_std:hover{color:#feb60a;background: #FFF}
 
 section.h_keuntungan{
     background: url(../images/content/bg_hkeuntungan.jpg) no-repeat top;
@@ -613,7 +613,7 @@ section.h_keuntungan .box h5{
 section.h_keuntungan .box p{font-size: 12px;color:#797979}
 section.newsletter{
     background: url(../images/material/bg_newsletter.png);
-    height:140px; 
+    height:140px;
     border-bottom:1px solid #feb60a;
 }
 section.newsletter .left{
@@ -723,11 +723,11 @@ section.std_content .c_right .row.accordion .label span.ico{
 }
 section.std_content .c_right .row.accordion .content{display:none;}
 section.std_content .c_right .row.accordion.active span.ico{
-    transform:rotate(180deg); 
-    -webkit-transform:rotate(180deg); 
-    -moz-transform:rotate(180deg); 
-    -ms-transform:rotate(180deg); 
-    -o-transform:rotate(180deg); 
+    transform:rotate(180deg);
+    -webkit-transform:rotate(180deg);
+    -moz-transform:rotate(180deg);
+    -ms-transform:rotate(180deg);
+    -o-transform:rotate(180deg);
 
 }
 
@@ -747,7 +747,7 @@ section.std_content .other .kontak_thank h5{
     margin: 20px 0 0 ;
     font-size: 20px;
     font-family: "robotoregular";
-} 
+}
 
 section.std_content .akun .c_right{
     width: 720px;
@@ -813,7 +813,7 @@ section.std_content .akun .c_right  .share .bt{
     color: #FFF;
 }
 section.std_content .akun .c_right  .share.socmed .right a{
-    float:left;	
+    float:left;
     display:block;
     background:url(../images/material/socmed_share.png) no-repeat;
     width:46px;
@@ -881,7 +881,7 @@ section.std_content .akun hr{margin:40px 0 45px;}
 section.std_content .akun .kredit{color: #105c8c;font-size: 30px;margin:40px 0 50px }
 section.std_content .akun .kredit span{font-family: "robotomedium";font-size: 14px;display: block;margin: 0 0 5px}
 
-section.std_content .akun .nav_tab a{  
+section.std_content .akun .nav_tab a{
     display: block;
     float: left;
     height: 58px;
@@ -897,7 +897,7 @@ section.std_content .akun .nav_tab a{
     background: #FFF;
 }
 section.std_content .akun .nav_tab a:hover{color:#155f8e  }
-section.std_content .akun .nav_tab a.active{  
+section.std_content .akun .nav_tab a.active{
     border-top:5px solid #155f8e;
     height: 54px;
     font-family: "robotomedium";
@@ -920,7 +920,7 @@ section.std_content .akun .content_tab table td:nth-child(2) a{
 section.std_content .voucher .c_left{width: 730px;background: #f2f5f7;border-top:5px solid #105c8c ;}
 section.std_content .voucher .c_right{width: 290px;border-top:5px solid #c72127;}
 
-section.std_content .voucher .c_left .grid_voucher_order table{width: 670px;margin:0 auto;} 
+section.std_content .voucher .c_left .grid_voucher_order table{width: 670px;margin:0 auto;}
 section.std_content .voucher .c_left .grid_voucher_order table tr{border-bottom:5px solid #f2f5f7;    box-shadow:0px 2px 3px -1px #000;}
 section.std_content .voucher .c_left .grid_voucher_order table tr td{
     position: relative;
@@ -998,7 +998,7 @@ section.std_content .voucher .c_right .grid_promo_bank table tr td a{
     color: #c72127;
     padding: 3px 10px;
     font-size: 11px;
-    border:1px solid #c72127;    
+    border:1px solid #c72127;
 }
 section.std_content .voucher .c_right .grid_promo_bank table tr td a:hover{background: #c72127;color:#FFF;}
 section.std_content .voucher .c_right .grid_promo_bank .bt_toogle,
@@ -1092,7 +1092,7 @@ section.std_content .filter .row:first-child{margin-left:160px}
 section.std_content .filter .row label {float: left;font-size: 16px;margin: 12px 40px 0 0}
 section.std_content .filter .row select{
     width: 250px;
-    
+
     border: 1px solid #fecc0a;
     line-height: 20px;
     outline: none;
@@ -1180,7 +1180,7 @@ section.transaction .table_order thead th{padding:15px;border-right: 1px solid #
 section.transaction .table_order thead th:last-child{border:none;}
 
 section.transaction .table_order .sub_foot ,
-section.transaction .table_order tfoot{                                                     
+section.transaction .table_order tfoot{
     font-family: "robotomedium";
     font-size: 16px;
     text-transform: uppercase;
@@ -1261,7 +1261,7 @@ section.transaction .c_right .form_cc .row .input .inner_combo{
 }
 
 section.transaction .thanks_page h2,
-section.transaction .thanks_page h5{text-align: center;font-family:"robotoregular";color:#424143;} 
+section.transaction .thanks_page h5{text-align: center;font-family:"robotoregular";color:#424143;}
 section.transaction .thanks_page h2{font-size: 35px;margin:0 0 10px;text-transform: uppercase;}
 section.transaction .thanks_page h5{font-size: 16px;margin:0 0 30px;}
 section.transaction .thanks_page span.border{
@@ -1292,7 +1292,7 @@ section.transaction .thanks_page div.facebook_twitter_share_description{
     text-align: center;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 10px;    
+    margin-bottom: 10px;
     font-family: "robotoregular";
     color: #424143;
     font-size: 14px;
@@ -1305,7 +1305,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 
 /* popup
 ----------------------------------------------------------------------------------------------*/
-.wrap_popup{ 
+.wrap_popup{
     display: none;
     position: fixed;
     background: url(../images/material/bg_popup.png) repeat;
@@ -1333,7 +1333,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 
 .wrap_popup .box_popup.login{
     position: relative;
-    background:#FFF url(../images/content/bg_login.jpg) no-repeat left bottom;  
+    background:#FFF url(../images/content/bg_login.jpg) no-repeat left bottom;
     padding:30px;
 }
 .wrap_popup .box_popup.login h2,
@@ -1381,7 +1381,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 .wrap_popup .box_popup.login .left.spar {
     width: 95px;
     text-align: center;
-    font-size: 16px; 
+    font-size: 16px;
     color:#797979;
     padding: 55px 0 0;
 }
@@ -1485,11 +1485,11 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 
 #frameBlog .fsearch {padding:0 0 35px 0;}
 #frameBlog .fsearch .search_select {
-    float:left; 
-    width: 305px; 
+    float:left;
+    width: 305px;
     border:1px solid #7b8793;
     margin:0 0 0 0;
-    padding:0 0;    
+    padding:0 0;
     border-radius:5px;
     -moz-border-radius:5px;
     -webkit-border-radius:5px;
@@ -1500,9 +1500,9 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 #frameBlog .fsearch .cover_combo {width:90% !important; padding:13px 5%;}
 #frameBlog .fsearch .cover_combo select {width:100%; padding:10px; cursor:pointer; font-size: 14px;}
 #frameBlog .fsearch input[type="submit"] {
-    float:right; 
-    width:102px; 
-    height: 42px; 
+    float:right;
+    width:102px;
+    height: 42px;
     line-height: 42px;
     font-size:14px;
     color:#fff;
@@ -1516,7 +1516,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     transition:background .3s ease-out;
     -moz-transition:background .3s ease-out;
     -webkit-transition:background .3s ease-out;
-} 
+}
 #frameBlog .fsearch input[type="submit"]:hover {
     background:#129d4a;
 }
@@ -1530,9 +1530,9 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
 #frameBlog .content_blog .head_post .author,
 #frameBlog .content_blog .head_post .comment,
 #frameBlog .content_blog .head_post .share {
-    float:left; 
-    padding:0 13px 0 0; 
-    margin:10px 15px 0 0; 
+    float:left;
+    padding:0 13px 0 0;
+    margin:10px 15px 0 0;
     border-right:2px solid #ccc;
     font-size:14px;
 }
@@ -1552,15 +1552,15 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     margin: 0 9px 0 0;
 }
 #frameBlog .content_blog .head_post .share .show_share {
-    float:left;    
+    float:left;
     background:url('../images/material/arrow_share.png') no-repeat 0 50%;
     height:33px;
     width: 230px;
     display: none;
 }
 #frameBlog .content_blog .head_post .share .show_share ul {
-    height: 33px; 
-    background: #b8b8b8; 
+    height: 33px;
+    background: #b8b8b8;
     margin-left: 7px;
     padding-left: 12px;
     border-radius:3px;
@@ -1642,7 +1642,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     background:url('../images/material/sr_btn_search.png') no-repeat center 50%;
     width:40px;
     height:36px;
-    margin:0;    
+    margin:0;
     border:none;
 }
 
@@ -1743,7 +1743,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     margin-top:25px;
     padding-top:30px;
     border-top:1px dashed #ccc;
-} 
+}
 
 
 
@@ -1886,8 +1886,8 @@ section.h_middle_top #sepulsa-autocomplete-packets
     margin-bottom: 10px;
 }
 
-section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, 
-section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id, 
+section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone,
+section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id,
 section.h_middle_top .form-select
 {
     font-size: 24px;
@@ -2021,7 +2021,7 @@ section.transaction table.cart thead th{padding:15px;border-right: 1px solid #FF
 section.transaction table.cart thead th:last-child{border:none;}
 
 section.transaction table.cart .sub_foot ,
-section.transaction table.cart tfoot{                                                     
+section.transaction table.cart tfoot{
     font-family: "robotomedium";
     font-size: 16px;
     text-transform: uppercase;
@@ -2101,10 +2101,10 @@ section.transaction .form-item, .form-actions
     display: none;
 }
 
-.commerce_coupon #edit-commerce-coupon-coupon-add--2, 
-.commerce_coupon #edit-commerce-coupon-coupon-add, 
-.commerce_coupon #edit-commerce-coupon-coupon-add--4, 
-.commerce_coupon input[name='coupon_add'] 
+.commerce_coupon #edit-commerce-coupon-coupon-add--2,
+.commerce_coupon #edit-commerce-coupon-coupon-add,
+.commerce_coupon #edit-commerce-coupon-coupon-add--4,
+.commerce_coupon input[name='coupon_add']
 {
     float: left;
     width: 178px;
@@ -2117,10 +2117,10 @@ section.transaction .form-item, .form-actions
     border: none;
 }
 
-.commerce_coupon #edit-commerce-coupon-coupon-code, 
-.commerce_coupon #edit-commerce-coupon-coupon-code--2, 
-.commerce_coupon #edit-commerce-coupon-coupon-code--4, 
-.commerce_coupon input[name='commerce_coupon[coupon_code]'] 
+.commerce_coupon #edit-commerce-coupon-coupon-code,
+.commerce_coupon #edit-commerce-coupon-coupon-code--2,
+.commerce_coupon #edit-commerce-coupon-coupon-code--4,
+.commerce_coupon input[name='commerce_coupon[coupon_code]']
 {
     width: 400px;
     padding: 0 15px;
@@ -2296,7 +2296,7 @@ section.std_content .box_voucher
     margin-bottom: 10px;
 }
 
-.box_voucher .image img 
+.box_voucher .image img
 {
     height:195px;
 }
@@ -2460,7 +2460,7 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     background:#fff;
 }
 
-.hidden 
+.hidden
 {
     display: none;
 }
@@ -2516,7 +2516,7 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
 }
-    
+
         #webform-client-form-4907 .form-item select {
             width: 460px !important;
         }
@@ -2565,13 +2565,13 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     margin: 5px 0 0 140px;
 }
 
-#webform-client-form-4907 .form-actions input[type=submit]:hover, #webform-client-form-4907 .form-actions input[type=button]:hover 
+#webform-client-form-4907 .form-actions input[type=submit]:hover, #webform-client-form-4907 .form-actions input[type=button]:hover
 {
     background: #105c8c;
     color: #FFF;
 }
 
-.std_content .alert-block 
+.std_content .alert-block
 {
     /*
     text-align: center;
@@ -2706,10 +2706,10 @@ button[disabled=disabled]
     background: #CCC !important;
 }
 
-.grid_voucher_order .btn.disabled, 
-.grid_voucher_order .btn[disabled], 
-.grid_voucher_order fieldset[disabled], 
-.grid_voucher_order input[type=submit][disabled=disabled], 
+.grid_voucher_order .btn.disabled,
+.grid_voucher_order .btn[disabled],
+.grid_voucher_order fieldset[disabled],
+.grid_voucher_order input[type=submit][disabled=disabled],
 .grid_voucher_order button[disabled=disabled]
 {
     background: none !important;
@@ -2746,8 +2746,8 @@ section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
 #block-menu-menu-sidebar2 ul li a:hover {
     text-decoration: underline;
 }
-.home #block-menu-menu-sidebar2 ul li a,  
-.home #block-menu-menu-sidebar2 ul li a.active,  
+.home #block-menu-menu-sidebar2 ul li a,
+.home #block-menu-menu-sidebar2 ul li a.active,
 .home #block-menu-menu-sidebar2 ul li a:hover {
     color: #feb60a;
 }
@@ -2909,7 +2909,7 @@ header .right_link .box .box_drop a:hover
     margin-left: 45px;
 }
 
-#frameBlog #right_column .block-block, #frameBlog #right_column .block-views  
+#frameBlog #right_column .block-block, #frameBlog #right_column .block-views
 {
     margin-bottom: 15px;
 }
@@ -2973,7 +2973,7 @@ header .right_link .box .box_drop a:hover
 /*
 #frameBlog #right_column h2:before {
     background: url('../images/material/sr_post.png') no-repeat 42px 50%;
-}    
+}
 */
 
 #frameBlog #right_column .views-row
@@ -2990,7 +2990,7 @@ header .right_link .box .box_drop a:hover
 
     #frameBlog #right_column .views-field-title, #frameBlog #right_column .views-field-title a
     {
-        color: #535353;    
+        color: #535353;
         font-size: 14px;
         line-height: 18px;
     }
@@ -3003,7 +3003,7 @@ header .right_link .box .box_drop a:hover
         padding-top: 4px;
     }
 
-#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a, 
+#frameBlog .view-blog .views-row h2, #frameBlog .view-blog .views-row h2 a,
 #frameBlog h2, #frameBlog h2 a
 {
     color: #535353;
@@ -3110,7 +3110,7 @@ section.std_content .akun .c_right .hybridauth-widget-wrapper
     margin-top: 40px;
 }
 
-section.std_content .akun .c_right .form-actions input[type=submit], 
+section.std_content .akun .c_right .form-actions input[type=submit],
 section.std_content .akun .c_right .form-actions input[type=button]
 {
     border: 1px solid #105c8c;
@@ -3126,14 +3126,14 @@ section.std_content .akun .c_right .form-actions input[type=button]
     -o-border-radius: 7px;
 }
 
-section.std_content .akun .c_right .form-actions input[type=submit]:hover, 
+section.std_content .akun .c_right .form-actions input[type=submit]:hover,
 section.std_content .akun .c_right .form-actions input[type=button]:hover
 {
     background: #105c8c;
     color: #FFF;
 }
 
-#commerce-checkout-coupon-ajax-wrapper table tr td, 
+#commerce-checkout-coupon-ajax-wrapper table tr td,
 #commerce-checkout-coupon-ajax-wrapper table tr th {
     background-color: #fff;
     padding: 10px;
@@ -3227,7 +3227,7 @@ padding: 0;
 @media (max-width:601px){.w3-modal-dialog .w3-modal-content{margin:50px 10px 10px 10px;width:auto !important}}
 @media (max-width:768px){.w3-modal-dialog .w3-modal-content{width:500px}}
 @media (min-width:992px){.w3-modal-dialog .w3-modal-content{width:900px}}
-@media screen and (max-width:601px){.w3-topnav a{display:block}.w3-topnav a:first-child{padding:0 8px}} 
+@media screen and (max-width:601px){.w3-topnav a{display:block}.w3-topnav a:first-child{padding:0 8px}}
 @media screen and (max-width:600px){.w3-topnav{text-align:center}}
 @media (max-width:600px){.w3-hide-small{display:none !important;}}
 @media (max-width:991px) and (min-width:601px){.w3-hide-medium{display:none !important;}}
@@ -3244,12 +3244,12 @@ padding: 0;
 }
 
 .alert-success
-{    
+{
     background: green !important;
 }
 .alert-error
 {
-    background: red !important;    
+    background: red !important;
 }
 .alert-warning
 {
@@ -3305,7 +3305,7 @@ padding: 0;
     -o-border-radius: 5px;
 }
 
-.wrap_popup.voucher .redeem .form input[type=submit], 
+.wrap_popup.voucher .redeem .form input[type=submit],
 .wrap_popup.voucher .redeem .form input[type=button]
 {
     padding: 15px 30px;
@@ -3359,8 +3359,8 @@ section.std_content .akun .c_right .hybridauth-widget-wrapper
     margin-top: 0;
 }
 
-section.std_content .akun .c_right .user-form-login input, 
-section.std_content .akun .c_right .user-form-login textarea, 
+section.std_content .akun .c_right .user-form-login input,
+section.std_content .akun .c_right .user-form-login textarea,
 section.std_content .akun .c_right .user-form-login select
 {
     width:90%;
@@ -3558,6 +3558,9 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 {
     padding: .7em;
 }
+.voucher_vendor .slider .image {
+    text-align: center;
+}
 
 .voucher_vendor h3
 {
@@ -3582,10 +3585,14 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 
 .voucher_vendor .slider .slide h4
 {
-    padding: 0 .7em;
     text-align: center;
     font-weight: bold;
+    /*conflict: dev*/
     font-size: 1.6em;
+    padding: 0 .7em;
+    /*conflict: PRON-186*/
+    font-size: 1.4em;
+    padding: 0 1.6em;
 }
 
 .voucher_vendor .slider .slide h4 span
@@ -3625,7 +3632,7 @@ header .right_link .box.cart .box_drop
     width: 230px;
     left: -74px;
     background: #f2f5f7;
-    padding:5px;   
+    padding:5px;
     border: 1px solid #fdb50a;
     border-top: 5px solid #fdb50a;
     /*-webkit-border-radius: 10px;
@@ -3634,40 +3641,40 @@ header .right_link .box.cart .box_drop
     -o-border-radius: 10px;*/
 }
 
-.shopp,.cart-total{ 
-    border:solid #ccc 1px; padding:8px; 
+.shopp,.cart-total{
+    border:solid #ccc 1px; padding:8px;
     /*-webkit-border-radius: 8px;
-    -moz-border-radius: 8px; 
+    -moz-border-radius: 8px;
     border-radius: 8px; */
     font-size:14px;
     background: #e0e0e0;
     background: #fff;
     /*background:url("../images/material/remove.png") center right  no-repeat;*/
-    
-    font-family:"LubalGraphBdBTBold",Tahoma; 
+
+    font-family:"LubalGraphBdBTBold",Tahoma;
     margin-bottom:5px;
     /*width:240px;*/
     width:210px;
 }
 
 
-    
-div.shopp span{  float:left;}   
-div.shopp div.label{ 
+
+div.shopp span{  float:left;}
+div.shopp div.label{
     /*width:110px; */
-    float:left; 
+    float:left;
     padding-right:5px;
-    border-right: 1px dashed;  
+    border-right: 1px dashed;
     width:175px;
-}     
-div.shopp div.shopp-price{ 
-    width:70px; 
-    float:left; 
+}
+div.shopp div.shopp-price{
+    width:70px;
+    float:left;
     margin-left:10px;
 }
-.quantity{ 
-    float:left; 
-    margin-top:-3px; 
+.quantity{
+    float:left;
+    margin-top:-3px;
     width:25px;
 }
 
@@ -3675,14 +3682,14 @@ img.remove{float:right;cursor:pointer;}
 .cart-total b{width:130px;}
 
 
-div.cart-total span{  float:left;}   
-div.cart-total div.label{ 
-    width:70px; 
-    float:left; 
-}     
-div.cart-total div.shopp-price{ 
+div.cart-total span{  float:left;}
+div.cart-total div.label{
+    width:70px;
+    float:left;
+}
+div.cart-total div.shopp-price{
     /*width:110px; */
-    float:left; 
+    float:left;
     margin-left:17px;
     margin-left:0px;
 }
@@ -3743,7 +3750,7 @@ header .right_link .box.lang span.ico{
     margin:10px auto;
     cursor: pointer;
     font-weight: bold;
-    text-transform: uppercase;   
+    text-transform: uppercase;
 }
 
 .box_drop .shopp .delete-line-item {

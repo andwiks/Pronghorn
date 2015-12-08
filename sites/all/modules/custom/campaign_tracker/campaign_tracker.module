@@ -7,11 +7,11 @@
 define('UTM_SOURCE_COOKIE', 'utm_source_cookie');
 define('UTM_MEDIUM_COOKIE', 'utm_medium_cookie');
 define('UTM_CAMPAIGN_COOKIE', 'utm_campaign_cookie');
-variable_set('cookie_lifetime', 604800); // 1 week
+variable_set('cookie_lifetime', 2592000); // 1 week
 
 /* implement hook_boot */
 function campaign_tracker_boot() {
-  $cookie_lifetime = variable_get('cookie_lifetime', 604800);
+  $cookie_lifetime = variable_get('cookie_lifetime', 2592000);
   //set cookie
 
   if (isset($_GET['utm_source'])) {
@@ -29,7 +29,7 @@ function campaign_tracker_boot() {
 
 /* implement hook_user_presave() */
 function campaign_tracker_user_presave(&$edit, $account, $category) {
-  $cookie_lifetime = variable_get('cookie_lifetime', 604800);
+  $cookie_lifetime = variable_get('cookie_lifetime', 2592000);
 
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
     $edit['field_reg_utm_source'][LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];
@@ -52,7 +52,7 @@ function campaign_tracker_user_presave(&$edit, $account, $category) {
 
 /* implement hook_commerce_order_presave() */
 function campaign_tracker_commerce_order_presave($order) {
-  $cookie_lifetime = variable_get('cookie_lifetime', 604800);
+  $cookie_lifetime = variable_get('cookie_lifetime', 2592000);
 
   if (isset($_COOKIE[UTM_SOURCE_COOKIE])) {
     $order->field_utm_source[LANGUAGE_NONE][0]['value'] = $_COOKIE[UTM_SOURCE_COOKIE];

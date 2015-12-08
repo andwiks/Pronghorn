@@ -34,12 +34,12 @@ function bbm_checkout_order_services($data){
     }
     
     //set/split parameter from veritrans
-    $data["container_customer_details"] = explode(",", $data["customer_details"]);
+    $data["container_customer_details"] = explode(",", $data["custom_field1"]);
     $data["name"] = $data["container_customer_details"][0];
     $data["email"] = $data["container_customer_details"][1];
     $data["phone_number"] = $data["container_customer_details"][2];
     $product_container = array();
-    $data["container_product"] = explode(",", $data["product_details"]);
+    $data["container_product"] = explode(",", $data["custom_field2"]);
     if(isset($data["container_product"][0]) && !empty($data["container_product"][0] && isset($data["phone_number"]) && !empty($data["phone_number"]))){
         $product_container[0]["product_id"] = $data["container_product"][0];
         $product_container[0]["field_phone_number"] = $data["phone_number"];

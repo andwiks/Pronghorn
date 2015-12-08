@@ -3515,3 +3515,13 @@ section.h_middle_top .home_tab .nav_tab a:hover {
     -ms-filter: contrast(150%) !important;
     -o-filter: contrast(150%) !important;
 }
+
+.voucher_vendor .slider .image {
+    text-align: center;
+}
+
+.voucher_vendor .slider .slide h4
+{
+    font-size: 1.4em;
+    padding: 0 1.6em;
+}

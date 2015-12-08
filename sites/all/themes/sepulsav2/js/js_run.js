@@ -2,12 +2,12 @@ $(document).ready(function () {
     $("input[type=text]").placeHolder();//placeholder custom
     $(".form input[type=password]").placeHolder();//placeholder custom
     $(".voucher_vendor .slider").bxSlider({
-        slideWidth: "175px",
-        minSlides: 2,
-        maxSlides: 6,
-        ticker: true,
+        slideWidth: "265px",
+        minSlides: 1,
+        maxSlides: 4
+        /*ticker: true,
         tickerHover: true,
-        speed: 40000
+        speed: 40000*/
     });// carousel voucher vendor
 
     $(".slider_voucher .slider").bxSlider({
@@ -27,6 +27,7 @@ $(document).ready(function () {
     kreditTab(); //tab switch at home
     dropTransaksi(); //drop transaksi combobox
     dropDownHeader(); //dropdown menu 
+    dropDownCart(); //dropdown menu 
     popupLogin(); //open popup login    
     stepIsiPulsa();//toogle show nextstep(isi pulsa)
     radioButton(); //radio button custom
@@ -70,6 +71,11 @@ $(document).ready(function () {
     });
     hoverShare(); // hover share blog
 
-
+    
+    $(".banner").click(function (event) {
+      if(event.target != $('div.a')[0])
+        /*alert('You clicked the body!');*/
+        $("#shopping-cart").fadeOut();
+    });
 
 });

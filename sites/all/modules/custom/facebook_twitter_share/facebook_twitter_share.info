@@ -1,0 +1,6 @@
+; $Id$
+name = Facebook Twitter Share
+description = Module to provide data sharing to Facebook and Twitter
+package = Other
+version = 1.0
+core = 7.x

@@ -43,6 +43,15 @@ function sepulsa_menu() {
     'file' => 'sepulsa.pages.inc',
   );
 
+  $items['admin/commerce/config/sepulsa'] = array(
+    'title' => t('Sepulsa'),
+    'description' => t('Sepulsa related configuration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_settings_form'),
+    'access arguments' => array('configure store'),
+    'file' => 'sepulsa.admin.inc',
+  );
+
   return $items;
 }
 
@@ -127,11 +136,17 @@ function sepulsa_get_packet($nid, $data_packet = FALSE) {
       if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.
         $price = field_get_items('commerce_product', $product, 'commerce_price');
+        // Get product description
+        $desc = "";
+        if (isset($product->field_deskripsi[LANGUAGE_NONE][0]['value'])) {
+          $desc = $product->field_deskripsi[LANGUAGE_NONE][0]['value'];
+        }
         // Add it inside options array.
         $options[] = array(
           'id' => $product->product_id,
           'title' => $product->title,
           'price' => (isset($price[0]['amount'])) ? $price[0]['amount'] : 0,
+          'desc' => $desc,
         );
       }
     }

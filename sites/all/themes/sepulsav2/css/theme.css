@@ -224,7 +224,9 @@ body.home.red footer ,
 	    background: #105c8c;
     }
 
-	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone, .home.blue section.h_middle_top #edit-product-id
+	.home.blue section.h_middle_top #sepulsa-autocomplete-packets select, .home.blue section.h_middle_top #edit-existing-phone, 
+	.home.blue section.h_middle_top #edit-product-id,
+	.home.blue section.h_middle_top .form-select
 	{		
 	    color: #105c8c;
 	    border-color: #105c8c;
@@ -246,7 +248,9 @@ body.home.red footer ,
 	    background: #129d4a;
     }
 
-	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone, .home.green section.h_middle_top #edit-product-id
+	.home.green section.h_middle_top #sepulsa-autocomplete-packets select, .home.green section.h_middle_top #edit-existing-phone, 
+	.home.green section.h_middle_top #edit-product-id,
+	.home.green section.h_middle_top .form-select
 	{		
 	    color: #129d4a;
 	    border-color: #129d4a;
@@ -268,7 +272,9 @@ body.home.red footer ,
 	    background: #c72127;
     }
 
-	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone, .home.red section.h_middle_top #edit-product-id
+	.home.red section.h_middle_top #sepulsa-autocomplete-packets select, .home.red section.h_middle_top #edit-existing-phone, 
+	.home.red section.h_middle_top #edit-product-id,
+	.home.red section.h_middle_top .form-select
 	{		
 	    color: #c72127;
 	    border-color: #c72127;

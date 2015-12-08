@@ -55,7 +55,9 @@ function kraken_settings_form($settings = array()) {
 
 function kraken_topup_process($topup, $settings, &$output = NULL) {
   $uri = @parse_url($settings['endpoint']);
-  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $uri['host'] . $uri['path'] . '/transaction';
+  $hostaddr = $uri['host'];
+  if(!empty($uri['port'])) $hostaddr .= ':' . $uri['port'];
+  $url = $uri['scheme'] . '://' . $settings['username'] . ':' . $settings['secret'] . '@' . $hostaddr . $uri['path'] . '/transaction';
 
   $data = array(
     'customer_number' => $topup['field_topup_phone_number'],
@@ -72,6 +74,7 @@ function kraken_topup_process($topup, $settings, &$output = NULL) {
   );
 
   $result = drupal_http_request($url, $options);
+
   if (!is_null($output)) {
     if (in_array($result->code, array(200, 201))) {
       $transaction = drupal_json_decode($result->data);
@@ -139,6 +142,7 @@ function kraken_topup_callback() {
               $token_reload->$key = $value;
             }
           }
+          $token_reload->no_ref_2 = $payload['transaction_id'];
 
           if (isset($token_reload->token_pln)) {
             $token_reload->token_pln = implode(' ', str_split($token_reload->token_pln, 4));
@@ -148,9 +152,9 @@ function kraken_topup_callback() {
           $token_reload->revision = TRUE;
           entity_save('token_reload', $token_reload);
 
-          if ($payload['status'] == 'success') {
-            commerce_order_status_update(entity_metadata_wrapper('commerce_line_item', $token_reload->line_item_id)->order->value(), 'completed');
-          }
+          $line_item = commerce_line_item_load($token_reload->line_item_id);
+          $line_item->field_line_item_status[LANGUAGE_NONE][0]['value'] = $payload['status'];
+          commerce_line_item_save($line_item);
         }
         break;
 
@@ -170,6 +174,9 @@ function kraken_topup_callback() {
           }
 
           $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $topup->line_item_id);
+          $line_item_wrapper->field_line_item_status->set($payload['status']);
+          $line_item_wrapper->save();
+
           $user = user_load($line_item_wrapper->order->uid->value());
           $topup->status = $status;
           entity_save('topup', $topup);

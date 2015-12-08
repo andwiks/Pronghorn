@@ -1,0 +1,86 @@
+<?php
+
+function facebook_twitter_share_menu() {
+    $items['admin/config/administration/facebook_twitter_share'] = array(
+        'title'             => 'Facebook And Twitter Share Configuration',
+        'description'       => 'Configure url, predefined text and enable disable sharing for sharing',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('facebook_twitter_share_setting_form'),
+        'access arguments'  => array('access_facebook_twitter_share_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'facebook_twitter_share.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function facebook_twitter_share_permission() {
+    return array(
+        'access_facebook_twitter_share_config' => array(
+            'title'         => t('Accessing Facebook Twitter Share Configuration'),
+            'description'   => t('Accessing Facebook Twitter Share Configuration.')
+        ),
+    );
+}
+
+/**
+ * call all the setting url and return in in array
+ */
+function facebook_twitter_share_set_return($order_id = ""){
+    $return = array();
+    $url = variable_get('facebook_twitter_share_url', 'http://www.sepulsa.com?o=<order_id>');
+    $url = str_replace("<order_id>",$order_id,$url);
+    
+    $return["info"] = variable_get('facebook_twitter_share_info', 'Share transaksimu ke akun Media Sosial dan dapatkan kesempatan memenangkan tambahan sepulsa kredit');
+    
+    if(variable_get('enable_facebook_share', 1) && !empty($url)){
+        $return["facebook"] = variable_get('facebook_share_endpoint', 'https://www.facebook.com/sharer/sharer.php?u=') . $url;
+        $return["facebook_content"] = $url;
+    }
+    
+    if(variable_get('enable_twitter_share', 1)){
+        $text_before = variable_get('twitter_predefined_text_before_url', 'Saya membeli pulsa di sepulsa - ');
+        $text_after = variable_get('twitter_predefined_text_after_url', '');
+        $twitter_content = $text_before . $url . $text_after;
+        if(isset($twitter_content) && !empty($twitter_content)){
+            $return["twitter"] = variable_get('twitter_share_endpoint', 'https://twitter.com/intent/tweet?text=') . $twitter_content;
+            $return["twitter_content"] = $twitter_content;
+        }
+    }
+    
+    return $return;
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function facebook_twitter_share_services_resources() {
+    return array(
+        'facebook_twitter_share' => array(
+            'actions' => array(
+                'get_share' => array(
+                    'help' => 'Get Predefined share data for Facebook Twitter',
+                    'callback' => 'facebook_twitter_share_get_share',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'facebook_twitter_share',
+                        'name' => 'facebook_twitter_share',
+                    ),
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                        array(
+                            'name' => 'data',
+                            'optional' => TRUE,
+                            'source' => 'data',
+                            'description' => t('data.'),
+                            'type' => 'array',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}

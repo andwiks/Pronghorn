@@ -1,0 +1,7 @@
+; $Id$
+name = HybridAuth Facebook Twitter Login Services
+description = HybridAuth Facebook Twitter Login Connector for mobile apps
+package = HybridAuth
+dependencies[] = hybridauth
+version = 0.1
+core = 7.x

@@ -84,48 +84,6 @@ function topup_cron_queue_info() {
   return $queues;
 }
 
-function topup_commerce_line_item_update($line_item) {
-  $topup_lineitem_type = variable_get('topup_lineitem_type', 'mobile_prepaid');
-  $wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
-
-  if ($line_item->type == $topup_lineitem_type && $wrapper->field_topup_status->value() == TOPUP_SUCCESS) {
-    // Define all topup success variable.
-    $all_topup_success = FALSE;
-    // Define topup line item counter.
-    $topup_counter_success = $topup_counter = 0;
-    // Define order wrapper: to get total order amount.
-    $order_wrapper = entity_metadata_wrapper('commerce_order', $line_item->order_id);
-    // Looping for each line item.
-    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-      // Only for line item: topup_lineitem_type.
-      if ($line_item_wrapper->type->value() == $line_item_wrapper) {
-        $topup_counter++;
-        // Check field topup status.
-        if ($line_item_wrapper->field_topup_status->value() == TOPUP_SUCCESS) {
-          $topup_counter_success++;
-        }
-      }
-    }
-    // Update variable all topup success.
-    $all_topup_success = ($topup_counter_success >= $topup_counter) ? TRUE : $all_topup_success;
-
-    // Invoke event when all topups success.
-    if ($all_topup_success) {
-      // Define order.
-      $order = $order_wrapper->value();
-
-      // Trigger the event now.
-      rules_invoke_all('all_topup_success', $order);
-
-      // Update the order's data array to indicate this just happened.
-      $order->data['all_topup_success_invoked'] = TRUE;
-
-      // Save the updated order.
-      commerce_order_save($order);
-    }
-  }
-}
-
 /**
  * Implements hook_entity_info().
  */

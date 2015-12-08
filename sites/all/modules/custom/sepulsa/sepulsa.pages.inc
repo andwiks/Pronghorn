@@ -33,13 +33,15 @@ function sepulsa_autocomplete($type, $string = '') {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
-  global $user;
-  // Get cart order.
-  $order = commerce_cart_order_load($user->uid);
-  // Check whether order is not empty.
-  if (!empty($order)) {
-    // For now, always empty cart when visit homepage.
-    commerce_cart_order_empty($order);
+  $settings = variable_get('sepulsa_settings', array());
+  if (empty($settings['multipaid_product'])) {
+    // Get cart order.
+    $order = commerce_cart_order_load($GLOBALS['user']->uid);
+    // Check whether order is not empty.
+    if (!empty($order)) {
+      // For now, always empty cart when visit homepage.
+      commerce_cart_order_empty($order);
+    }
   }
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
@@ -89,6 +91,8 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     0 => t('Select Packet'),
   );
 
+  // Define default packet description
+  $desc = "";
   // Check previous form state.
   $phone = (isset($form_state['input']['phone']) && !empty($form_state['input']['phone'])) ? $form_state['input']['phone'] : '';
   // Autocorrect phone prefix.
@@ -177,6 +181,11 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
         }
       }
     }
+    foreach ($data['packet'] as $packets) {
+      foreach ($packets as $packet) {
+        $descs[$packet['id']] = (isset($packet['desc']) ? $packet['desc'] : "");
+      }
+    }
   }
 
   // Define operator dropdown select.
@@ -215,6 +224,16 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     '#validated' => TRUE,
   );
 
+  // Data package information
+  $data_info = "";
+  foreach ($descs as $key => $desc) {
+    if ($desc != '') {
+      $data_info .= '<div id="packet-description' . $key . '" class="hidden_div" style="border: 1px solid; padding: 1em; margin: 15px 0; font-size:1.2em; clear:both;">' . $desc . '</div>';
+    }
+  }
+  $form['data_info'] = array(
+    '#markup' => $data_info
+  );
   // Define add to cart: currently as markup.
   // Check autocomplete for cart.
   $form['add'] = array(
@@ -223,19 +242,27 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
   // Submit button: add to cart.
   $form['add']['cart'] = array(
     '#type' => 'submit',
-    '#value' => t('Add to Cart'),
+    '#value' => t('Add to cart'),
     '#attributes' => array(
       'class' => array('btn', 'style1', 'inactive'),
     ),
   );
   // Submit button: fast charge.
-  $form['add']['charge'] = array(
-    '#type' => 'submit',
-    '#value' => t('Fast Charge'),
-    '#attributes' => array(
-      'class' => array('btn', 'style1', 'inactive'),
-    ),
-  );
+  $settings = variable_get('sepulsa_settings', array());
+  if (empty($settings['multipaid_product'])) {
+    $form['add']['charge'] = array(
+      '#type' => 'submit',
+      '#value' => t('Fast Charge'),
+      '#attributes' => array(
+        'class' => array('btn', 'style1', 'inactive'),
+      ),
+    );
+  }
+  else {
+    $form['add']['charge'] = array(
+      '#type' => 'value',
+    );
+  }
 
   // Return form array.
   return $form;
@@ -314,6 +341,23 @@ function sepulsa_phone_form_validate($form, &$form_state) {
     // This section always return error.
     form_set_error('phone', t('We apologize, your phone number is not supported by our system.'));
   }
+
+  $order = commerce_cart_order_load($GLOBALS['user']->uid);
+  if (empty($order)) {
+    $order = commerce_cart_order_new($GLOBALS['user']->uid);
+    $order->data ['last_cart_refresh'] = REQUEST_TIME;
+  }
+  else {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+      if ($line_item_wrapper->getBundle() == 'mobile_prepaid' && $line_item_wrapper->field_phone_number->value() == $phone) {
+        form_set_error('phone', t('The number you enter already on cart'));
+      }
+    }
+  }
+
+  $form_state['order'] = $order;
 }
 
 /**
@@ -340,17 +384,6 @@ function sepulsa_phone_form_submit($form, &$form_state) {
   // Set field_phone_number based on user input.
   $line_item_wrapper->field_phone_number->set($form_state['values']['phone']);
 
-  // Check fast charge operation: empty previous cart.
-  if ($form_state['values']['op'] == $form_state['values']['add']['charge']) {
-    // Get cart order.
-    $order = commerce_cart_order_load($user->uid);
-    // Check whether order is not empty.
-    if (!empty($order)) {
-      // Empty the cart.
-      commerce_cart_order_empty($order);
-    }
-  }
-
   // Add the line item to cart.
   commerce_cart_product_add($user->uid, $line_item);
 
@@ -362,10 +395,13 @@ function sepulsa_phone_form_submit($form, &$form_state) {
     if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
       unset($GLOBALS['_rules_action_drupal_goto_do']);
     }
-    $order = commerce_cart_order_load($user->uid);
     // Redirect to checkout page.
-    //$form_state['redirect'] = 'checkout/'.$order->order_number."/".urlencode("?fast_charge=1");
-    drupal_goto('checkout/'.$order->order_number, array("query" => array("fast_charge" => 1) ));
+    $form_state['redirect'] = array(
+      'checkout/' . $form_state['order']->order_id,
+      array(
+        'query' => array('fast_charge' => TRUE),
+      ),
+    );
   }
 }
 

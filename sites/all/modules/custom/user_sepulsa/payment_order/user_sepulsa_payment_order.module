@@ -1,0 +1,47 @@
+<?php
+
+/*
+ * Implements hook_menu_alter()
+ */
+function user_sepulsa_payment_order_menu() {
+	$items['admin/user_payment_order'] = array(
+		'title'            => t('User Payment Order'),
+		'description'      => t('User Payment Order'),
+		'page callback'    => 'user_payment_order',
+		'access arguments' => array('administer site configuration'),
+		'type'             => MENU_CALLBACK,
+	);
+	return $items;
+}
+
+function user_payment_order() {
+	$from = arg(2);
+	$to = arg(3);
+	if (empty($from) && empty($to)) {
+		drupal_set_message('invalid parameter', 'error');
+	} else {
+		$users = db_query("SELECT uid FROM users WHERE uid BETWEEN :from AND :to", array('from' => $from, 'to' => $to));
+		foreach ($users as $user) {
+			$user_load = user_load($user->uid);
+			$orders = db_query("SELECT order_id FROM commerce_order WHERE uid=:uid AND status IN ('completed', 'invoiced')", array('uid' => $user->uid));
+			foreach ($orders as $order) {
+				$transactions = db_query("SELECT DISTINCT(payment_method) FROM commerce_payment_transaction WHERE order_id=:order_id AND status='success'", array('order_id' => $order->order_id));
+				foreach ($transactions as $transaction) {
+					$insertpayment = true;
+					$payment_method = $transaction->payment_method;
+					if (!empty($user_load->field_payment_order)) {
+						foreach($user_load->field_payment_order[LANGUAGE_NONE] as $user_payment) {
+							if ($user_payment['value'] == $payment_method) $insertpayment = false;
+						}
+					}
+					if ($insertpayment == true) { // insert payment order into user
+						$user_load->field_payment_order[LANGUAGE_NONE][] = array('value' => $payment_method, 'format' => '', 'safe_value' => $payment_method);
+						user_save($user_load);
+					}
+					//drupal_set_message("<pre>User ".$user->uid.' '.print_r($transaction->payment_method, true)."</pre>");
+				}
+			}
+		}	
+	}
+	return '';
+}

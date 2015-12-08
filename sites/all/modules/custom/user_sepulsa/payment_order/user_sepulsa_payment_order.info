@@ -1,0 +1,4 @@
+name = User Sepulsa Payment Order
+description = Module to assign all payment used by user into their account
+core = 7.x
+package = Sepulsa

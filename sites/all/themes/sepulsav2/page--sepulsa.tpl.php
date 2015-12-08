@@ -11,29 +11,27 @@ $theme_path = $base_url . '/' . path_to_theme();
 $page_state = "home";
 ?>
   <!-- middle -->
-<section class="banner">
+<section class="banner" style="min-height:441px">
 <?php print render($page['banner']); ?>
 </section>
 <section class="h_middle_top">
   <div class="wrapper">
     <div class="home_tab">
-      <div class="nav_tab after_clear"> 
-        <table class="tab-pulsa">
-          <tr>
-            <td>
-              <a href="" class="active" target="target_1">
-                  <span class="ico pulsa"></span>
-                  <?php print t('isi pulsa & bolt'); ?>
-              </a>
-            </td>
-            <td>
-              <a href="" target="target_2">
-                  <span class="ico listrik"></span>
-                  <?php print t('token listrik'); ?>
-              </a>
-            </td>
-          </tr>
-        </table>
+      <div class="nav_tab after_clear">
+        <a href="" class="active" target="target_1">
+          <span class="ico pulsa"></span>
+          <?php print t('isi pulsa & bolt'); ?>
+        </a>
+        <a href="" target="target_2">
+          <span class="ico listrik"></span>
+          <?php print t('token listrik'); ?>
+        </a>
+        <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
+          <a href="" target="target_3">
+            <span class="ico bolt"></span>
+            <?php print t('biznet wifi'); ?>
+          </a>
+        <?php endif; ?>
       </div>
 
       <div class="content_tab">
@@ -41,25 +39,37 @@ $page_state = "home";
           <?php print render($messages); ?>
           <?php print render($page['content']); ?>
 
-          <div class="topup-notes"> 
+          <div class="topup-notes">
               <ul>
                 <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
                 <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
               </ul>
           </div>
         </div>
-        <div class="tab form style_1" id="target_2">
-          <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
-          <?php print render($token_reload_form); ?>
-          <?php endif; ?>
-          
-          <div class="topup-notes topup-notes-2"> 
-              <ul>
-                <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
-                <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
-              </ul>
+        <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
+          <div class="tab form style_1" id="target_2">
+            <?php print render($token_reload_form); ?>
+
+            <div class="topup-notes topup-notes-2">
+                <ul>
+                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                </ul>
+            </div>
           </div>
-        </div>
+        <?php endif; ?>
+        <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
+          <div class="tab form style_1" id="target_3">
+            <?php print render($biznet_form); ?>
+
+            <div class="topup-notes topup-notes-3">
+                <ul>
+                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                </ul>
+            </div>
+          </div>
+        <?php endif; ?>
       </div>
 
     </div>

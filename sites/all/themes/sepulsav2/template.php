@@ -25,6 +25,9 @@ function sepulsav2_block_view_alter(&$data, $block) {
   }
 }
 
+/**
+ * Implements hook_form_alter().
+ */
 function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
   //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
   $commer_form_id = substr($form_id, 0, 25);
@@ -49,7 +52,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['add']['#prefix'] = '<p></p>';
 
     $form['add']['#prefix'] = '<div class="topup-action">';
-    $form['add']['cart']['#value'] = t('Get Voucher');
+    $form['add']['cart']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
     $form['add']['cart']['#attributes']['style'] = 'float:right';
     $form['add']['charge']['#value'] = t('Pay Now');
     $form['add']['charge']['#attributes']['style'] = 'float:right;';
@@ -186,7 +189,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       }
     }
     elseif (isset($form['commerce_payment']['payment_details']['bank_details'])) {
-      $settings = $form['commerce_payment']['payment_methods']['#value']['bank_transfer|commerce_payment_bank_transfer']['settings'];
+      $settings = $form['commerce_payment']['payment_methods']['#value'][$form['commerce_payment']['payment_method']['#default_value']]['settings'];
 
       $form['commerce_payment']['payment_details']['bank_details'] = array();
       $form['commerce_payment']['payment_details']['bank_details']['#prefix'] = '<p></p><p><strong>' . t('Please make payment to:') . '</strong>';
@@ -272,6 +275,29 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for views_form_commerce_cart_block_popup().
+ */
+function sepulsav2_form_views_form_commerce_cart_block_popup_alter(&$form, &$form_state, $form_id) {
+  unset($form['#action']);
+  $form['select_voucher'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('I want to select voucher'),
+    '#default_value' => TRUE,
+    '#prefix' => '<div class="opsi-voucher">',
+    '#suffix' => '</div>',
+    '#weight' => $form['output']['#weight'] + 1,
+  );
+
+  $form['actions']['#weight'] = 100;
+  $form['actions']['#attributes']['style'] = 'text-align:center';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Process'),
+    '#submit' => array('sepulsav2_form_views_form_commerce_cart_block_popup_submit'),
+  );
+}
+
+/**
  * Implements hook_form_BASE_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
@@ -309,11 +335,11 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
 
 
         $form['add']['#prefix'] = '<div class="topup-action-2">';
-        $form['submit']['#value'] = t('Process');
+        $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
-        $form['add']['#suffix'] = '</div">';
+        $form['add']['#suffix'] = '</div>';
 
         if ($form_state['submitted'] === FALSE) {
           $form['submit']['#attributes']['class'][] = 'inactive';
@@ -325,6 +351,37 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
           ),
         );
 
+        break;
+
+      case 'biznet':
+        $form['product_id']['#attributes']['class'][] = 'input-text';
+        $form['product_id']['#attributes']['class'][] = 'full-width';
+        $form['product_id']['#suffix'] = '<p></p>';
+
+        $form['line_item_fields']['#weight'] = 0;
+
+        $form['line_item_fields']['field_customer_number']['#weight'] = -10;
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+
+        $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
+        $form['description']['#suffix'] = '</div>';
+
+        $form['add']['#prefix'] = '<div class="topup-action-2">';
+        $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
+        $form['submit']['#attributes']['class'][] = 'btn';
+        $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'pull-right';
+        $form['add']['#suffix'] = '</div>';
+
+        $form['submit']['#states'] = array(
+          'enabled' => array(
+            ':input[name="line_item_fields[customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+          ),
+        );
         break;
     }
   }
@@ -403,21 +460,34 @@ function sepulsav2_menu_tree__sidebar($variables) {
   return '<nav>' . $variables['tree'] . '</nav>';
 }
 
-function sepulsav2_preprocess_block(&$vars, $hook) {
-  //drupal_set_message("<pre>".print_r($vars, true)."</pre>");
-  foreach ($vars['classes_array'] as $key => $value) {
-    if ($value == 'block') {
-      $vars['classes_array'][$key] = NULL;
-    }
-  }
-}
-
 /**
- * Implements hook_preprocess_menu_link ().
+ * Implements hook_preprocess_menu_link().
  */
 function sepulsav2_preprocess_menu_link(&$variables) {
   if ($variables['element']['#original_link']['in_active_trail']) {
     $variables['element']['#attributes']['class'][] = 'active';
+  }
+}
+
+/**
+ * Implements hook_preprocess_html().
+ */
+function sepulsav2_preprocess_html(&$variables) {
+  if (drupal_is_front_page()) {
+    $variables['classes_array'][] = 'home';
+  }
+
+  if (isset($variables['page']['shopping_cart'])) {
+    $variables['shopping_cart'] = $variables['page']['shopping_cart'];
+    unset($variables['page']['shopping_cart']);
+  }
+
+  $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
+  $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
+  $variables['footer_second'] = block_get_blocks_by_region('footer_second');
+  if ($variables['user']->uid > 0) {
+    module_load_include('module', 'userpoints', 'userpoints');
+    $variables['userpoints'] = userpoints_get_current_points($variables['user']->uid);
   }
 }
 
@@ -436,6 +506,30 @@ function sepulsav2_preprocess_page(&$variables) {
 }
 
 /**
+ * Implements hook_preprocess_region().
+ */
+function sepulsav2_preprocess_region(&$variables) {
+  switch ($variables['region']) {
+    case 'shopping_cart':
+      $variables['classes_array'][] = 'box';
+      $variables['classes_array'][] = 'lang';
+      $variables['classes_array'][] = 'cart';
+      break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_block().
+ */
+function sepulsav2_preprocess_block(&$variables) {
+  foreach ($variables['classes_array'] as $key => $value) {
+    if ($value == 'block') {
+      $variables['classes_array'][$key] = NULL;
+    }
+  }
+}
+
+/**
  * Implements hook_preprocess_views_view_unformatted().
  */
 function sepulsav2_preprocess_views_view_unformatted(&$variables) {
@@ -447,18 +541,21 @@ function sepulsav2_preprocess_views_view_unformatted(&$variables) {
         $variables['row_classes'] = array();
         $products = array();
         $cart = commerce_cart_order_load($variables['user']->uid);
-        $cart_wrapper = entity_metadata_wrapper('commerce_order', $cart);
 
-        foreach ($cart_wrapper->commerce_line_items as $line_item) {
-          if ($line_item->getBundle() == 'coupon') {
-            $products[] = $line_item->commerce_product->getIdentifier();
+        if (!empty($cart)) {
+          $cart_wrapper = entity_metadata_wrapper('commerce_order', $cart);
+
+          foreach ($cart_wrapper->commerce_line_items as $line_item) {
+            if ($line_item->getBundle() == 'coupon') {
+              $products[] = $line_item->commerce_product->getIdentifier();
+            }
           }
-        }
 
-        foreach ($view->result as $key => $result) {
-          $product_id = $result->field_field_product[0]['raw']['product_id'];
-          if (in_array($product_id, $products)) {
-            $variables['row_classes'][$key] = 'hidden coupon-' . $product_id;
+          foreach ($view->result as $key => $result) {
+            $product_id = $result->field_field_product[0]['raw']['product_id'];
+            if (in_array($product_id, $products)) {
+              $variables['row_classes'][$key] = 'hidden coupon-' . $product_id;
+            }
           }
         }
       }
@@ -502,6 +599,16 @@ function sepulsav2_preprocess_views_view_table(&$variables) {
       $line_items = $order_wrapper->commerce_line_items;
       $variables['order_total'] = commerce_line_items_total($line_items);
       break;
+  }
+}
+
+/**
+ * Implements hook_preprocess_sepulsa_checkout_completion_message().
+ */
+function sepulsav2_preprocess_sepulsa_checkout_completion_message(&$variables) {
+  $variables['user'] = $GLOBALS['user'];
+  if ($variables['user']->uid) {
+    $variables['authenticated'] = TRUE;
   }
 }
 
@@ -647,13 +754,12 @@ function sepulsav2_theme($existing, $type, $theme, $path) {
   );
 }
 
-/**
- * Implements hook_preprocess_sepulsa_checkout_completion_message().
- */
-function sepulsav2_preprocess_sepulsa_checkout_completion_message(&$variables) {
-  $variables['user'] = $GLOBALS['user'];
-  if ($variables['user']->uid) {
-    $variables['authenticated'] = TRUE;
+function sepulsav2_form_views_form_commerce_cart_block_popup_submit($form, &$form_state) {
+  if ($form_state['values']['select_voucher']) {
+    $form_state['redirect'] = 'coupon';
+  }
+  else {
+    $form_state['redirect'] = array('checkout/' . $form_state['order']->order_id, array('query' => array('fast_charge' => 1)));
   }
 }
 
@@ -672,7 +778,7 @@ function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
 
     $variables = array(
       'order' => $order,
-      'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id)),
+      'contents_view' => commerce_embed_view('commerce_cart_block', 'default', array($order->order_id), 'coupon'),
     );
 
     $commands[] = array(
@@ -699,22 +805,6 @@ function sepulsav2_views_form_commerce_cart_block_default_ajax_submit($form, $fo
   drupal_get_messages('status');
 
   return array('#type' => 'ajax', '#commands' => $commands);
-}
-
-function sepulsav2_preprocess_html(&$variables) {
-  global $user;
-
-  if (drupal_is_front_page()) {
-    $variables['classes_array'][] = 'home';
-  }
-
-  $variables['footer_sub_left'] = block_get_blocks_by_region('footer_sub_left');
-  $variables['footer_sub_right'] = block_get_blocks_by_region('footer_sub_right');
-  $variables['footer_second'] = block_get_blocks_by_region('footer_second');
-  if ($user->uid > 0) {
-    module_load_include('module', 'userpoints', 'userpoints');
-    $variables['userpoints'] = userpoints_get_current_points($user->uid);
-  }
 }
 
 /**

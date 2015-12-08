@@ -3762,3 +3762,9 @@ header .right_link .box.lang span.ico{
     padding: 1px;
     margin-left: 2px;
 }
+
+/* gratis voucher belanja */
+section.gratis_voucher .desc
+{
+    width: 555px;
+}

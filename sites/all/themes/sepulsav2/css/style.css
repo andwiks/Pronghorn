@@ -3516,6 +3516,7 @@ section.h_middle_top .home_tab .nav_tab a:hover {
     -o-filter: contrast(150%) !important;
 }
 
+/* voucher di homepage */
 .voucher_vendor .slider .image {
     text-align: center;
 }
@@ -3524,4 +3525,11 @@ section.h_middle_top .home_tab .nav_tab a:hover {
 {
     font-size: 1.4em;
     padding: 0 1.6em;
+}
+
+
+/* gratis voucher belanja */
+section.gratis_voucher .desc
+{
+    width: 555px;
 }

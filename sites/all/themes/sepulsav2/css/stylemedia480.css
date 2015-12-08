@@ -114,13 +114,13 @@ section.gratis_voucher {
 	min-height: 310px;
 	background-position: top center;
 	margin-top: 0;
-	margin-bottom: 30px;	
+	margin-bottom: 30px;
 }
 section.gratis_voucher .desc {width: 100%;}
 section.gratis_voucher .desc a img {max-height: 40px;}
 section.easy_step {/*height: 1050px;*/ height:auto; padding-bottom:35px;}
 section.easy_step .box_step {width: 50%;}
-section.h_keuntungan h2, 
+section.h_keuntungan h2,
 section.easy_step h2 {
     font-size: 22px;padding: 35px 0 8px;
 }
@@ -139,7 +139,7 @@ section.h_keuntungan
 section.h_keuntungan {
   padding: 10px 0 35px 0;
 }
-section.h_keuntungan h4, 
+section.h_keuntungan h4,
 
 section.easy_step h4 {
     font-size: 14px;
@@ -238,7 +238,7 @@ section.std_content .akun .grid_akun.order_transaksi tbody tr:after{
     position: relative;
     display: block;
     content:" ";
-    border-bottom:1px solid #d7d7d7; 
+    border-bottom:1px solid #d7d7d7;
     bottom: -17px
 }
 section.std_content .akun .grid_akun.order_transaksi tbody tr:last-child{margin: 0}
@@ -248,7 +248,7 @@ section.std_content .akun .grid_akun.order_transaksi tbody td{
     display: block;
     text-align: left !important;
     padding:12px 0 12px 140px;
-    border-bottom:1px solid #d7d7d7; 
+    border-bottom:1px solid #d7d7d7;
     font-size: 14px;
     font-family: "robotomedium";
     font-weight: bold;
@@ -288,7 +288,7 @@ section.std_content .akun .paging{border: none;}
 section.std_content .akun .grid_akun.kartu{
     position: relative;
     width: 320px;
-    left:-20px; 
+    left:-20px;
     border:none;
 }
 section.std_content .akun .grid_akun.kartu thead{display: none;}
@@ -399,8 +399,8 @@ section.transaction .thanks_page .c_right, section.transaction .thanks_page .c_l
     padding: 0;
     width: 440px;
 }
-section.std_content .voucher, 
-section.std_content .voucher .wrapper_2, 
+section.std_content .voucher,
+section.std_content .voucher .wrapper_2,
 section.std_content .voucher .wrapper_3 {
     width: 440px;
 }
@@ -493,7 +493,7 @@ section.h_middle_top .voucher_vendor .slider .slide img{width: 130px;}
 	*/
 	width: 415px;
 }
-#frameBlog #right_column .block_cloud, 
+#frameBlog #right_column .block_cloud,
 #frameBlog #right_column .block_follow {width: 440px}
 #frameBlog #right_column .block_cloud .inner img {
 	/*
@@ -530,7 +530,7 @@ section.h_middle_top .voucher_vendor .slider .slide img{width: 130px;}
 .wrap_popup .box_popup.login h2 {font-size: 16px;}
 .wrap_popup .box_popup.login h6 {font-family: "robotolight";font-size: 14px;line-height: 18px;}
 .wrap_popup .box_popup.login .border{margin: 20px auto 25px;}
-.wrap_popup .box_popup.login .left.form input[type=password], 
+.wrap_popup .box_popup.login .left.form input[type=password],
 .wrap_popup .box_popup.login .left.form input[type=text] {
     width: 208px;
     height: 40px;
@@ -607,7 +607,7 @@ section.h_middle_top .home_tab .nav_tab a.active
     width: 80%;
 }
 
-.topup-action 
+.topup-action
 {
     width:86%;
     margin:0 auto;
@@ -623,7 +623,7 @@ section.h_middle_top .home_tab .nav_tab a.active
     width: 158px
 }
 
-.commerce_coupon #edit-commerce-coupon-coupon-code, 
+.commerce_coupon #edit-commerce-coupon-coupon-code,
 .commerce_coupon #edit-commerce-coupon-coupon-code--2
 {
     width: 250px;
@@ -639,7 +639,7 @@ section.std_content .list_voucher .box_voucher
     width: 210px;
 }
 
-.box_voucher .image img 
+.box_voucher .image img
 {
     height:140px;
 }
@@ -700,7 +700,7 @@ section.std_content .voucher, section.std_content .voucher .wrapper_2, section.s
 .slide_content a.bt_slider
 {
     width: 165px;
-    padding: 10px 25px;    
+    padding: 10px 25px;
     margin: 5px auto;
 }
 
@@ -803,4 +803,30 @@ body.home header .right_link .box.lang a
     height: 50px;
     padding: 5px 0;
     background-position: 30px 50px !important;
+}
+
+/*fixing css for main/header banner */
+section.banner {
+    overflow: hidden;
+    min-height: 320px;
+    padding: 0 !important;
+}
+
+section.banner img{
+    position: relative;
+    right: 50%;
+    top:0;
+    max-height: 320px !important;
+    max-width: none;
+    width: auto;
+}
+
+section.banner .caption
+{
+    top:25%;
+}
+
+section.banner .bx-viewport
+{
+    left:0 !important;
 }

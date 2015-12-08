@@ -3768,3 +3768,19 @@ section.gratis_voucher .desc
 {
     width: 555px;
 }
+
+/* banner top */
+section.banner .bx-viewport
+{
+    left:0 !important;
+}
+
+.caption .btn:hover
+{
+    background-color:rgba(255, 255, 255, 1) !important;
+}
+
+section.banner .caption
+{
+    top:30%;
+}

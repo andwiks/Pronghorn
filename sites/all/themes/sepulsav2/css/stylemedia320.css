@@ -140,7 +140,7 @@ section.std_content .akun .grid_akun.order_transaksi tbody tr:after{
     position: relative;
     display: block;
     content:" ";
-    border-bottom:1px solid #d7d7d7; 
+    border-bottom:1px solid #d7d7d7;
     bottom: -17px
 }
 section.std_content .akun .grid_akun.order_transaksi tbody tr:last-child{margin: 0}
@@ -150,7 +150,7 @@ section.std_content .akun .grid_akun.order_transaksi tbody td{
     display: block;
     text-align: left !important;
     padding:12px 0 12px 140px;
-    border-bottom:1px solid #d7d7d7; 
+    border-bottom:1px solid #d7d7d7;
     font-size: 14px;
     font-family: "robotomedium";
     font-weight: bold;
@@ -190,7 +190,7 @@ section.std_content .akun .paging{border: none;}
 section.std_content .akun .grid_akun.kartu{
     position: relative;
     width: 320px;
-    left:-20px; 
+    left:-20px;
     border:none;
 }
 section.std_content .akun .grid_akun.kartu thead{display: none;}
@@ -296,8 +296,8 @@ section.transaction .thanks_page .c_right, section.transaction .thanks_page .c_l
     padding: 0;
     width: 280px;
 }
-section.std_content .voucher, 
-section.std_content .voucher .wrapper_2, 
+section.std_content .voucher,
+section.std_content .voucher .wrapper_2,
 section.std_content .voucher .wrapper_3 {
     width: 280px;
 }
@@ -359,7 +359,7 @@ section.h_middle_top .voucher_vendor .slider .slide img{width: 130px;}
 #frameBlog .content_blog .bag_bottom .tag{display: none;}
 #frameBlog .content_blog .bag_bottom .readMore{width: 280px}
 #frameBlog #right_column .latest_post ul li {width: 240px;}
-#frameBlog #right_column .block_cloud, 
+#frameBlog #right_column .block_cloud,
 #frameBlog #right_column .block_follow {width: 280px}
 #frameBlog #right_column .block_cloud .inner img {max-width: 275px;margin-left: -30px;}
 #frameBlog #right_column .block_follow .blsubcribe input[type="text"] {width: 130px;}
@@ -375,7 +375,7 @@ section.h_middle_top .voucher_vendor .slider .slide img{width: 130px;}
 .wrap_popup .box_popup.login h2 {font-size: 16px;}
 .wrap_popup .box_popup.login h6 {font-family: "robotolight";font-size: 14px;line-height: 18px;}
 .wrap_popup .box_popup.login .border{margin: 20px auto 25px;}
-.wrap_popup .box_popup.login .left.form input[type=password], 
+.wrap_popup .box_popup.login .left.form input[type=password],
 .wrap_popup .box_popup.login .left.form input[type=text] {
     width: 208px;
     height: 40px;
@@ -436,7 +436,7 @@ section.h_middle_top .cover_combo, section.h_middle_top #sepulsa-autocomplete-ca
 
 section.h_middle_top #sepulsa-autocomplete-packets
 {
-    width: 100% !important;    
+    width: 100% !important;
 }
 
 .topup-notes
@@ -494,7 +494,7 @@ section.h_middle_top .home_tab .nav_tab a.active
 }
 
 
-.commerce_coupon #edit-commerce-coupon-coupon-code, 
+.commerce_coupon #edit-commerce-coupon-coupon-code,
 .commerce_coupon #edit-commerce-coupon-coupon-code--2
 {
     width: 55%;
@@ -520,7 +520,7 @@ section.transaction .form-radios
 }
 
 section.transaction #edit-commerce-payment-payment-method input[type=checkbox], section.transaction #edit-commerce-payment-payment-method input[type=radio]
-{    
+{
     display: block;
     clear: both;
     width: 10%;
@@ -587,7 +587,7 @@ section.transaction .alert-block
     margin: 0;
 }
 
-.box_voucher .image img 
+.box_voucher .image img
 {
     height:185px;
 }
@@ -838,4 +838,26 @@ body.home header .right_link .box.lang a
     height: 50px;
     padding: 5px 0;
     background-position: 30px 50px !important;
+}
+
+/*fixing css for main/header banner */
+section.banner {
+    overflow: hidden;
+    min-height: 320px;
+    padding: 0 !important;
+}
+
+section.banner img{right: -55%;}
+section.banner img{
+    position: relative;
+    right: 160%;
+    bottom:0;
+    max-height: 320px !important;
+    max-width: none;
+    width: auto;
+}
+
+section.banner .caption
+{
+    top:25%;
 }

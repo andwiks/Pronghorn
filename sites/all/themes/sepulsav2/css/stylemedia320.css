@@ -796,3 +796,25 @@ section.transaction table.cart td.product-price
     margin:10px 0 50px 0;
     width:100%;
 }
+
+/*fixing css for main/header banner */
+section.banner {
+    overflow: hidden;
+    min-height: 320px;
+    padding: 0 !important;
+}
+
+section.banner img{right: -55%;}
+section.banner img{
+    position: relative;
+    right: 160%;
+    bottom:0;
+    max-height: 320px !important;
+    max-width: none;
+    width: auto;
+}
+
+section.banner .caption
+{
+    top:25%;
+}

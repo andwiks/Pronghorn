@@ -406,3 +406,29 @@ section.std_content .box_voucher h4
     margin:10px 0 50px 0;
     width:100%;
 }
+
+/*fixing css for main/header banner */
+section.banner {
+    overflow: hidden;
+    min-height: 360px;
+    padding: 0 !important;
+}
+
+section.banner img{
+    position: relative;
+    right: 35%;
+    top:0;
+    max-height: 360px !important;
+    max-width: none;
+    width: auto;
+}
+
+section.banner .caption
+{
+    top:25%;
+}
+
+section.banner .bx-viewport
+{
+    left:0 !important;
+}

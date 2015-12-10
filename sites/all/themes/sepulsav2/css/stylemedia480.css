@@ -747,41 +747,60 @@ section.std_content .akun .c_right .share input[type=text]
     padding-right:0;
 }
 
-/* paket data */
-.info-paket-data
-{
-    width: 440px;
-    margin:75px auto 0;
+
+/* paket-data */
+.info-paket-data {
+    width: 440px !important;
+    margin:45px auto 15px auto !important
 }
 
-.detail-paket-data
+.detail-paket-data {
+    width: 100% !important;
+    margin: 10px 0 30px 0 !important;
+}
+
+/* Voucher Homepage */
+.voucher_vendor .slider .slide
 {
-    margin:10px 0 50px 0;
+    width: 205px !important;
+}
+
+.voucher_vendor .slider .slide .image img
+{
     width:100%;
 }
 
-/*fixing css for main/header banner */
-section.banner {
-    overflow: hidden;
-    min-height: 320px;
-    padding: 0 !important;
+.voucher_vendor {
+    /*width: 260px;*/
+    width: 410px;
+    margin: auto;
 }
 
-section.banner img{
-    position: relative;
-    right: 50%;
-    top:0;
-    max-height: 320px !important;
-    max-width: none;
-    width: auto;
-}
 
-section.banner .caption
+/* Shopping Cart */
+header .right_link .box .box_drop .arr
 {
-    top:25%;
+    right: -85px;
 }
 
-section.banner .bx-viewport
+header .right_link .box.cart .box_drop
 {
-    left:0 !important;
+    left: -130px;
+    top: 70px;
+}
+
+header .right_link .box.cart
+{
+    display: block;
+    float: right;
+    right: 0;
+    height: 60px;
+    width: 65px;
+}
+
+body.home header .right_link .box.lang a
+{
+    height: 50px;
+    padding: 5px 0;
+    background-position: 30px 50px !important;
 }

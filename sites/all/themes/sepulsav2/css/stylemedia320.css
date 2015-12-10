@@ -784,37 +784,58 @@ section.transaction table.cart td.product-price
     width: 110px;
 }
 
-/* paket data */
-.info-paket-data
-{
-    width:95%;
-    margin:75px auto 0;
+/* paket-data */
+.info-paket-data {
+    width: 280px !important;
+    margin:45px auto 15px auto !important
 }
 
-.detail-paket-data
+.detail-paket-data {
+    width: 100% !important;
+    margin: 10px 0 30px 0 !important;
+}
+
+/* Voucher Homepage */
+.voucher_vendor .slider .slide
 {
-    margin:10px 0 50px 0;
+    width: 260px !important;
+}
+
+.voucher_vendor .slider .slide .image img
+{
     width:100%;
 }
 
-/*fixing css for main/header banner */
-section.banner {
-    overflow: hidden;
-    min-height: 320px;
-    padding: 0 !important;
-}
+.voucher_vendor {width: 260px;margin: auto}
 
-section.banner img{right: -55%;}
-section.banner img{
-    position: relative;
-    right: 160%;
-    bottom:0;
-    max-height: 320px !important;
-    max-width: none;
-    width: auto;
-}
+.voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;left: -25px;}
+.voucher_vendor .bx-wrapper a.bx-next {background-position: top left;right: -25px;}
 
-section.banner .caption
+
+/* Shopping Cart */
+header .right_link .box .box_drop .arr
 {
-    top:25%;
+    right: -85px;
+}
+
+header .right_link .box.cart .box_drop
+{
+    left: -130px;
+    top: 70px;
+}
+
+header .right_link .box.cart
+{
+    display: block;
+    float: right;
+    right: 50px;
+    height: 60px;
+    width: 65px;
+}
+
+body.home header .right_link .box.lang a
+{
+    height: 50px;
+    padding: 5px 0;
+    background-position: 30px 50px !important;
 }

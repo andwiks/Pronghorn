@@ -93,11 +93,7 @@ header .logo{
     right: 0;
 }
 header .logo img{display: block;margin: 15px auto 0;} 
-header .right_link{
-    float: right;
-    width: 146px;
-    width: 240px;
-}
+header .right_link{float: right;width: 146px;}
 header .right_link .box{float:left;width: 80px;height: 80px;position: relative;}
 header .right_link .box a{    
     display: block;
@@ -1090,20 +1086,7 @@ section.std_content .filter{padding: 19px 0;border-top:1px dashed #999;border-bo
 section.std_content .filter .row{float: left;width: 410px;}
 section.std_content .filter .row:first-child{margin-left:160px}
 section.std_content .filter .row label {float: left;font-size: 16px;margin: 12px 40px 0 0}
-section.std_content .filter .row select{
-    width: 250px;
-    
-    border: 1px solid #fecc0a;
-    line-height: 20px;
-    outline: none;
-    display: inline-block;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    cursor: pointer;
-    padding: 10px;
-    background: url(../images/material/drop_select.png) no-repeat 94% center;
-}
+section.std_content .filter .row select{width: 250px;}
 section.std_content .filter .row .cover_combo{
     background: url(../images/material/drop_select.png) no-repeat 94% center;
     width: 248px;
@@ -1284,24 +1267,6 @@ section.transaction .thanks_page p span{font-family:"robotolight";}
 section.transaction .thanks_page p.note{color:#c72127;font-size: 12px;}
 section.transaction .thanks_page p a{color:#105c8c;text-decoration: underline;}
 
-section.transaction .thanks_page div.facebook_twitter_share_container{
-    margin: 0 0 25px;
-}
-
-section.transaction .thanks_page div.facebook_twitter_share_description{
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;    
-    font-family: "robotoregular";
-    color: #424143;
-    font-size: 14px;
-    max-width: 450px;
-}
-
-section.transaction .thanks_page div.facebook_twitter_share_icon{
-    text-align: center;
-}
 
 /* popup
 ----------------------------------------------------------------------------------------------*/
@@ -1886,9 +1851,7 @@ section.h_middle_top #sepulsa-autocomplete-packets
     margin-bottom: 10px;
 }
 
-section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, 
-section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id, 
-section.h_middle_top .form-select
+section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-existing-phone, section.h_middle_top #edit-product-id
 {
     font-size: 24px;
     font-family: "robotoregular";
@@ -1908,7 +1871,7 @@ section.h_middle_top .form-select
     section.h_middle_top .form-select
     {
         width: 100%;
-        /*padding: 15px;*/
+        padding: 15px;
         height: 55px;
     }
 
@@ -1994,13 +1957,13 @@ table.tab-pulsa tr td
 
 section.h_middle_top .home_tab .nav_tab a
 {
-    /*width: 100%;*/
+    width: 100%;
 }
 
 section.h_middle_top .home_tab .nav_tab a.active
 {
-    /*padding-left: 20%;
-    width: 80%;*/
+    padding-left: 20%;
+    width: 80%;
 }
 
 section.transaction table.cart{width: 100%;border:1px solid #105c8c;font-size: 14px;margin:0 0 30px }
@@ -3524,7 +3487,7 @@ hr.smallsize
 /* hide lang for a moment */
 header .right_link .box.lang
 {
-    /*display: none !important;*/
+    display: none !important;
 }
 
 .m_lang
@@ -3553,205 +3516,36 @@ section.h_middle_top .home_tab .nav_tab a:hover {
     -o-filter: contrast(150%) !important;
 }
 
-/* voucher homepage*/
-.voucher_vendor .slider .slide .image
-{
-    padding: .7em;
-}
-
-.voucher_vendor h3
-{
-    font-family: "robotoregular";
-    font-size: 16px;
-    text-transform: uppercase;
-    color: #feb60a;
-    margin: 0px 0 30px;
+/* voucher di homepage */
+.voucher_vendor .slider .image {
     text-align: center;
-    width: 85%;
-    margin:0 auto !important;
-}
-
-.voucher_vendor h3 span.ico{
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    background: url(../images/material/ico_voucher.png) left ;
-    position: relative;
-    margin:0 10px -3px 0;
 }
 
 .voucher_vendor .slider .slide h4
 {
-    padding: 0 .7em;
-    text-align: center;
-    font-weight: bold;
-    font-size: 1.6em;
+    font-size: 1.4em;
+    padding: 0 1.6em;
 }
 
-.voucher_vendor .slider .slide h4 span
+
+/* gratis voucher belanja */
+section.gratis_voucher .desc
 {
-    font-size: .8em;
-    font-weight: normal;
+    width: 555px;
 }
 
-
-.voucher_vendor .bx-pager{display:none;}
-.voucher_vendor .bx-wrapper .bx-controls-direction a {
-    background: url(../images/material/arr_carousel.png) no-repeat;
-    width: 18px;
-    height: 30px;
-    margin-top: -16px;
-}
-.voucher_vendor .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
-.voucher_vendor .bx-wrapper a.bx-next {background-position: top left;right: -40px}
-.voucher_vendor .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
-.voucher_vendor .bx-wrapper a.bx-next:hover {background-position:top right;}
-
-/*CART*/
-header .right_link .box.cart{
-    width: 85px;
-    margin: 0 5px 0 1px;
-}
-
-header .right_link .box.cart a
+/* banner top */
+section.banner .bx-viewport
 {
-    background-position-y:65px !important;
+    left:0 !important;
 }
 
-header .right_link .box.cart .box_drop
+.caption .btn:hover
 {
-    /*width: 260px;
-    left: -88px;*/
-    width: 230px;
-    left: -74px;
-    background: #f2f5f7;
-    padding:5px;   
-    border: 1px solid #fdb50a;
-    border-top: 5px solid #fdb50a;
-    /*-webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    -ms-border-radius: 10px;
-    -o-border-radius: 10px;*/
+    background-color:rgba(255, 255, 255, 1) !important;
 }
 
-.shopp,.cart-total{ 
-    border:solid #ccc 1px; padding:8px; 
-    /*-webkit-border-radius: 8px;
-    -moz-border-radius: 8px; 
-    border-radius: 8px; */
-    font-size:14px;
-    background: #e0e0e0;
-    background: #fff;
-    /*background:url("../images/material/remove.png") center right  no-repeat;*/
-    
-    font-family:"LubalGraphBdBTBold",Tahoma; 
-    margin-bottom:5px;
-    /*width:240px;*/
-    width:210px;
-}
-
-
-    
-div.shopp span{  float:left;}   
-div.shopp div.label{ 
-    /*width:110px; */
-    float:left; 
-    padding-right:5px;
-    border-right: 1px dashed;  
-    width:175px;
-}     
-div.shopp div.shopp-price{ 
-    width:70px; 
-    float:left; 
-    margin-left:10px;
-}
-.quantity{ 
-    float:left; 
-    margin-top:-3px; 
-    width:25px;
-}
-
-img.remove{float:right;cursor:pointer;}
-.cart-total b{width:130px;}
-
-
-div.cart-total span{  float:left;}   
-div.cart-total div.label{ 
-    width:70px; 
-    float:left; 
-}     
-div.cart-total div.shopp-price{ 
-    /*width:110px; */
-    float:left; 
-    margin-left:17px;
-    margin-left:0px;
-}
-
-#cart_form #cartSubmit
+section.banner .caption
 {
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    -ms-border-radius: 7px;
-    -o-border-radius: 7px;
-    background: #fdb50a;
-    padding:.5em 2em;
-    color: #fff;
-    margin:10px 0;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-br.all
-{
-    clear: both;
-}
-
-.cart-total{
-    background:#fdb50a;
-    font-weight: bold;
-    color: #fff;
-}
-
-.opsi-voucher
-{
-    margin:1em 0;
-}
-
-div.shopp div a
-{
-    border: none !important;
-    padding: 0 2px !important;
-}
-
-header .right_link .box.lang span.ico{
-    width:24px;
-    background: url(../images/material/cart_ico.png) no-repeat -24px 0px;
-    margin-bottom: 6px;
-}
-
-.box_drop #edit-submit
-{
-    display: block;
-    -webkit-border-radius: 7px;
-    -moz-border-radius: 7px;
-    -ms-border-radius: 7px;
-    -o-border-radius: 7px;
-    background: #fdb50a;
-    padding:.5em 2em;
-    color: #fff;
-    margin:10px auto;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;   
-}
-
-.box_drop .shopp .delete-line-item {
-    background: url("../images/material/remove.png") center right no-repeat;
-    width: 26px;
-    font-size: 0px;
-    height: 30px;
-    display: block;
-    padding: 1px;
-    margin-left: 2px;
+    top:30%;
 }

@@ -1,0 +1,168 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function biznet_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types['biznet'] = array(
+    'type' => 'biznet',
+    'name' => t('Biznet Wifi'),
+    'description' => t('References an biznet wifi product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
+ * Implements hook_commerce_product_type_info().
+ */
+function biznet_commerce_product_type_info() {
+  $product_types = array();
+
+  $product_types['biznet'] = array(
+    'type' => 'biznet',
+    'name' => t('Biznet Wifi'),
+    'description' => t('An biznet wifi product.'),
+  );
+
+  return $product_types;
+}
+
+/**
+ * Implements hook_field_attach_validate().
+ */
+function biznet_field_attach_validate($entity_type, $entity, &$errors) {
+  if ($entity_type == 'commerce_line_item' && $entity->type == 'biznet') {
+    $order = commerce_cart_order_load($GLOBALS['user']->uid);
+    if (!empty($order)) {
+      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+      foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+        if ($line_item_wrapper->getBundle() == $entity->type && $line_item_wrapper->field_customer_number->value() == $entity->field_customer_number[LANGUAGE_NONE][0]['value']) {
+          $errors['field_customer_number'][LANGUAGE_NONE][0][] = array(
+            'error' => 'biznet_duplicate_number',
+            'message' => t('The number you enter already on cart'),
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form_biznet().
+ */
+function biznet_form_commerce_cart_add_to_cart_form_biznet_alter(&$form, &$form_state, $form_id) {
+  $form['#attributes']['class'][] = 'commerce-cart-add-to-cart-form-biznet';
+  $form['description'] = field_view_field('commerce_product', $form_state['default_product'], 'field_description', array('label' => 'hidden', 'weight' => 1));
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function biznet_node_info() {
+  return array(
+    'biznet' => array(
+      'name' => t('Biznet Wifi'),
+      'base' => 'node_content',
+      'description' => t('Biznet wifi product display'),
+      'locked' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function biznet_preprocess_page(&$variables) {
+  if (drupal_is_front_page() && user_access('view any commerce_product entity of bundle biznet')) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_product');
+    $query->entityCondition('bundle', 'biznet');
+    $query->fieldOrderBy('commerce_price', 'amount', 'DESC');
+
+    $result = $query->execute();
+
+    if (!empty($result['commerce_product'])) {
+      $product_ids = array_keys($result['commerce_product']);
+
+      $values = array(
+        'type' => 'biznet',
+        'data' => array(
+          'context' => array(
+            'product_ids' => $product_ids,
+          ),
+        ),
+      );
+      $line_item = entity_create('commerce_line_item', $values);
+
+      $variables['biznet_form'] = drupal_get_form('commerce_cart_add_to_cart_form_biznet', $line_item);
+    }
+  }
+}
+
+function biznet_products($nominal = NULL) {
+  $cache = cache_get('biznet_products');
+
+  if ($cache) {
+    $products = $cache->data;
+  }
+  else {
+    $products = array();
+
+    module_load_include('inc', 'kraken_api');
+    $kraken_products = kraken_api_call('product?operator=biznet');
+    foreach ($kraken_products['list'] as $product) {
+      $products[$product['nominal']] = $product['product_id'];
+    }
+
+    cache_set('biznet_products', $products, 'cache', CACHE_TEMPORARY);
+  }
+
+  if (empty($nominal)) {
+    return $products;
+  }
+  elseif (!empty($products[$nominal])) {
+    return $products[$nominal];
+  }
+  else {
+    return FALSE;
+  }
+
+  return $products;
+}
+
+function biznet_topup_execute($order_wrapper) {
+  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+    if ($line_item_wrapper->getBundle() == 'biznet' && $line_item_wrapper->field_line_item_status->value() == 'pending') {
+      biznet_topup_line_item($line_item_wrapper);
+    }
+  }
+}
+
+function biznet_topup_line_item($line_item_wrapper) {
+  $data = array(
+    'customer_number' => $line_item_wrapper->field_customer_number->value(),
+    'order_id' => $line_item_wrapper->order_id->value(),
+    'product_id' => biznet_products($line_item_wrapper->commerce_product->commerce_price->amount->value()),
+  );
+
+  module_load_include('inc', 'kraken_api');
+  $response = kraken_api_call('transaction', 'POST', $data);
+
+  $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
+  $line_item_wrapper->field_line_item_status->set($response['status']);
+
+  $line_item = $line_item_wrapper->value();
+  $line_item->data = $response;
+  entity_save('commerce_line_item', $line_item);
+}

@@ -473,7 +473,7 @@ table.tab-pulsa tr td
     width: auto;
 }
 
-section.h_middle_top .home_tab .nav_tab a
+/*section.h_middle_top .home_tab .nav_tab a
 {
     width: 100%;
 }
@@ -483,7 +483,7 @@ section.h_middle_top .home_tab .nav_tab a.active
     padding-left: 20%;
     width: 80%;
 }
-
+*/
 
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
 {
@@ -850,7 +850,7 @@ section.banner {
 section.banner img{right: -55%;}
 section.banner img{
     position: relative;
-    right: 160%;
+    right: 130%;
     bottom:0;
     max-height: 320px !important;
     max-width: none;

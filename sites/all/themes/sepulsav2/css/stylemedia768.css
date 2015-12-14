@@ -113,11 +113,11 @@ section.gratis_voucher .desc a img{max-height:50px;}
 
 section.easy_step {height: 1050px;}
 section.easy_step .box_step {width: 50%;}
-section.h_keuntungan h2, 
+section.h_keuntungan h2,
 section.easy_step h2 {
     font-size: 22px;padding: 35px 0 8px;
 }
-section.h_keuntungan h4, 
+section.h_keuntungan h4,
 section.easy_step h4 {
     font-size: 14px;
 }
@@ -194,7 +194,7 @@ section.std_content .akun .c_right {
 .wrap_popup .box_popup {background: #FFF;width: 590px;}
 .wrap_popup .box_popup.login .wrapper{width: 588px;padding: 0;}
 .wrap_popup .box_popup.login .left.form {width: 265px;}
-.wrap_popup .box_popup.login .left.form input[type=password], 
+.wrap_popup .box_popup.login .left.form input[type=password],
 .wrap_popup .box_popup.login .left.form input[type=text] {
     width: 213px;
     height: 48px;
@@ -204,7 +204,7 @@ section.std_content .akun .c_right {
 .wrap_popup .box_popup.login .left.spar {width: 53px;font-size: 14px;}
 .wrap_popup .box_popup.login h2{font-family: "robotoregular";font-size: 24px;margin: 0 0 8px;}
 .wrap_popup .box_popup.login .left.form .row input.bt{
-    border: none;    
+    border: none;
     border-radius: 5px;
     -webkit-border-radius:5px;
     -moz-border-radius:5px;
@@ -219,7 +219,7 @@ section.transaction .wrapper_2 .c_right {
     padding: 50px 0 0 ;
     margin: 50px 0 0 ;
     border: none;
-    border-top: 1px dashed #d8d8d8;   
+    border-top: 1px dashed #d8d8d8;
 }
 /*section.transaction .wrapper_3.thanks_page{
     width: 708px;
@@ -229,7 +229,7 @@ section.transaction .wrapper_3.thanks_page{
     width: 960px;
 
 }
-section.transaction .thanks_page .c_right, 
+section.transaction .thanks_page .c_right,
 section.transaction .thanks_page .c_left{width: 335px;}
 section.transaction .c_right {padding: 0 0 0 38px;}
 
@@ -352,7 +352,7 @@ table.tab-pulsa tr td
     width: 50%;
 }
 
-section.h_middle_top .home_tab .nav_tab a
+/*section.h_middle_top .home_tab .nav_tab a
 {
     width: 100%;
 }
@@ -361,9 +361,9 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     padding-left: 20%;
     width: 80%;
-}
+}*/
 
-.box_voucher .image img 
+.box_voucher .image img
 {
     height:130px;
 }
@@ -413,7 +413,7 @@ section.std_content .box_voucher h4
 
 .voucher_vendor .slider .slide .image img
 {
-    width: 100%;
+    width:100%;
 }
 
 .voucher_vendor {
@@ -448,4 +448,29 @@ body.home header .right_link .box.lang a
     height: 50px;
     padding: 5px 0;
     background-position: 30px 50px !important;
+}
+/*fixing css for main/header banner */
+section.banner {
+    overflow: hidden;
+    min-height: 360px;
+    padding: 0 !important;
+}
+
+section.banner img{
+    position: relative;
+    right: 35%;
+    top:0;
+    max-height: 360px !important;
+    max-width: none;
+    width: auto;
+}
+
+section.banner .caption
+{
+    top:25%;
+}
+
+section.banner .bx-viewport
+{
+    left:0 !important;
 }

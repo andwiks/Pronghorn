@@ -167,7 +167,7 @@ function bbm_checkout_order_services($data){
     
     if($order){
         //$order = commerce_order_status_update($order, 'checkout_payment', FALSE, NULL);
-        $order = commerce_order_status_update($order, 'processing', FALSE, NULL);
+        $order = commerce_order_status_update($order, 'pending', FALSE, NULL);
         //commerce_checkout_complete($order);
         //tag that this order is made from BBM Checkout
         $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'bbm_checkout';

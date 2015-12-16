@@ -33,6 +33,18 @@ function bbm_checkout_order_services($data){
         }
     }
     
+    if(isset($data["order_id"]) && !empty($data["order_id"])){
+      $order_id_exists = db_query('SELECT 1 FROM {commerce_payment_transaction} WHERE remote_id = :remote_id', array(':remote_id' => $data["order_id"]))->fetchField();
+      if($order_id_exists){
+        $return["keterangan"] = "Order anda telah terdaftar sebelumnya di sistem kami";
+        return $return;
+      }
+    }
+    else{
+      $return["keterangan"] = "Order Id anda tidak dapat kosong";
+      return $return;
+    }
+    
     //set/split parameter from veritrans
     $data["container_customer_details"] = explode(",", $data["custom_field1"]);
     $data["name"] = $data["container_customer_details"][0];
@@ -167,7 +179,7 @@ function bbm_checkout_order_services($data){
     
     if($order){
         //$order = commerce_order_status_update($order, 'checkout_payment', FALSE, NULL);
-        $order = commerce_order_status_update($order, 'processing', FALSE, NULL);
+        $order = commerce_order_status_update($order, 'pending', FALSE, NULL);
         //commerce_checkout_complete($order);
         //tag that this order is made from BBM Checkout
         $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'bbm_checkout';

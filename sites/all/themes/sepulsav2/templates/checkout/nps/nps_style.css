@@ -1,0 +1,63 @@
+#block-webform-client-block-106{
+  display: none;
+}
+.nps
+{
+  margin:10px auto;
+  width:442px;
+}
+
+.nps p.question
+{
+  text-align:center;
+  padding:15px 45px;
+  font-weight:bold;
+}
+
+table.nps-rate tr td
+{
+  font-size:12px;
+}
+
+table.nps-rate tr td .title
+{
+  font-size:14px;
+  font-weight:bold;
+}
+
+table.nps-rate tr td .title-bad
+{
+  color:#c72127;
+}
+
+table.nps-rate tr td .title-good
+{
+  color:#129d4a;
+}
+
+/* syle_320 */
+@media only screen and (max-width: 479px) {
+  .nps
+  {
+    margin:10px auto;
+    width:302px;
+  }
+  
+  input.labelauty + label > span.labelauty-unchecked-image,
+  input.labelauty + label > span.labelauty-checked-image
+  {
+    width:6px;
+    height:10px;
+    padding:4px;
+  }
+  
+  input.labelauty + label
+  {
+    padding:6px 3px;
+  }
+  
+  table.nps-rate tr td
+  {
+    padding:0 2px;
+  }
+}

@@ -5,6 +5,11 @@ if (module_exists('facebook_twitter_share')) {
     $returned_facebook_twitter_share = facebook_twitter_share_set_return($order_id);
 }
 ?>
+<link rel="stylesheet" href="<?php print base_path() ?>sites/all/themes/sepulsav2/templates/checkout/nps/jquery-labelauty.css">
+<script src="<?php print base_path() ?>sites/all/themes/sepulsav2/templates/checkout/nps/jquery-labelauty.js"></script>
+<link rel="stylesheet" href="<?php print base_path() ?>sites/all/themes/sepulsav2/templates/checkout/nps/nps_style.css">
+<script src="<?php print base_path() ?>sites/all/themes/sepulsav2/templates/checkout/nps/nps_script.js"></script>
+
 <section class="transaction">
     <div class="wrapper_3 thanks_page after_clear ">
         <h2>Transaksi Anda Sukses</h2>
@@ -25,7 +30,62 @@ if (module_exists('facebook_twitter_share')) {
         </div>
         <?php } ?>
         <span class="border"></span>
-
+        <div class="nps">
+            <p class="question">Seberapa ingin anda merekomendasikan website ini kepada teman anda?</p>
+            <table class="nps-rate">
+            <tr>
+              <td colspan="5" style="text-align:left;">
+                <span class="title title-bad">Tidak Ingin</span>
+              </td>
+              <td colspan="5" style="text-align:right;">
+                <span class="title title-good">Sangat Ingin</span>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="radio" name="nps" value="1">
+                1
+              </td>
+              <td>
+                <input type="radio" name="nps" value="2">
+                2
+              </td>
+              <td>  
+                <input type="radio" name="nps" value="3">
+                3
+              </td>
+              <td>
+                <input type="radio" name="nps" value="4">
+                4
+              </td>
+              <td>
+                <input type="radio" name="nps" value="5">
+                5
+              </td>
+              <td>
+                <input type="radio" name="nps" value="6">
+                6
+              </td>
+              <td>
+                <input type="radio" name="nps" value="7">
+                7
+              </td>
+              <td>
+                <input type="radio" name="nps" value="8">
+                8
+              </td>
+              <td>
+                <input type="radio" name="nps" value="9">
+                9
+              </td>
+              <td>
+                <input type="radio" name="nps" value="10">
+                10
+              </td>
+            </tr>
+          </table>
+           <button name="nps-submit" type="button">Vote</button> 
+          </div>
         <?php
         //if bank transfer
         /*

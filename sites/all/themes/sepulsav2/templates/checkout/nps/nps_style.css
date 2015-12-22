@@ -1,6 +1,19 @@
 .block-webform{
   display: none;
 }
+
+input.labelauty + label
+{
+display:block;
+}
+
+button[name="nps-submit"] 
+{
+margin: 15px auto;
+    width: 50px;
+    text-align: center;
+    display: block;
+}
 .nps
 {
   margin:10px auto;
@@ -14,9 +27,16 @@
   font-weight:bold;
 }
 
+table.nps-rate
+{
+  width:96%;
+  padding:0 2%;
+}
+
 table.nps-rate tr td
 {
   font-size:12px;
+padding:2px;
 }
 
 table.nps-rate tr td .title
@@ -28,11 +48,13 @@ table.nps-rate tr td .title
 table.nps-rate tr td .title-bad
 {
   color:#c72127;
+  padding-bottom:10px;
 }
 
 table.nps-rate tr td .title-good
 {
   color:#129d4a;
+  padding-bottom:10px;
 }
 
 /* syle_320 */
@@ -58,6 +80,6 @@ table.nps-rate tr td .title-good
   
   table.nps-rate tr td
   {
-    padding:0 2px;
+    padding:5px 2px;
   }
 }

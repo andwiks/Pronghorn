@@ -33,6 +33,11 @@ function bbm_checkout_order_services($data){
         }
     }
     
+    if($data["status_code"] != "200"){
+      $return["keterangan"] = "Order anda tidak valid";
+      return $return;
+    }
+    
     if(isset($data["order_id"]) && !empty($data["order_id"])){
       $order_id_exists = db_query('SELECT 1 FROM {commerce_payment_transaction} WHERE remote_id = :remote_id', array(':remote_id' => $data["order_id"]))->fetchField();
       if($order_id_exists){

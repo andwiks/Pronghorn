@@ -1,0 +1,13 @@
+name = S3 File System Migrate
+description = Migrate existing files from local storage to the S3 File System.
+core = 7.x
+dependencies[] = s3fs (2.x)
+configure = admin/config/media/s3fs/migrate
+files[] = test/s3fs_migrate.test
+
+; Information added by Drupal.org packaging script on 2015-01-15
+version = "7.x-1.0-beta3"
+core = "7.x"
+project = "s3fs_migrate"
+datestamp = "1421357889"
+

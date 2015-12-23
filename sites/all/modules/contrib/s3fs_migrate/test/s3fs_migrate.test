@@ -1,0 +1,385 @@
+<?php
+
+/**
+ * @file
+ * An example of simpletest tests to accompany the tutorial at
+ * http://drupal.org/node/890654.
+ */
+
+/**
+ * Tests the functionality of the S3FS Migrate module.
+ * 
+ * @ingroup s3fs_migrate_test
+ */
+class S3FSMigrateTestCase extends DrupalWebTestCase {
+  protected $privileged_user;
+  protected $s3_client;
+  protected $s3fs_config;
+  protected $files = array();
+  protected $files_data = array();
+  protected $num_files_per_type = 2;
+  protected $expected_files_to_migrate;
+  protected $set_up_successful = TRUE;
+  
+
+  public static function getInfo() {
+    // Note: getInfo() strings are not translated with t().
+    return array(
+      'name' => 'S3FS Migrate',
+      'description' => 'Test migration of files by the S3FS Migrate module.',
+      'group' => 'S3FS',
+    );
+  }
+  
+  public function setUp() {
+    // Enable modules required for the test.
+    parent::setUp(array('file', 'libraries', 's3fs', 's3fs_migrate'));
+    
+    // Create and log in our privileged user.
+    $this->privileged_user = $this->drupalCreateUser(array(
+      'administer s3fs',
+    ));
+    $this->drupalLogin($this->privileged_user);
+    
+    // Configure S3FS.
+    $s3fs_config = array();
+    include(substr(DRUPAL_ROOT, 0, strrpos(DRUPAL_ROOT, '/')). '/s3fs_migrate_test_settings.php');
+    $s3fs_config['s3fs_bucket'] = 's3fs-migrate-test-'. date('Ymd-His'). '-'. $this->randomName(8);
+    foreach ($s3fs_config as $key => $val) {
+      variable_set($key, $val);
+    }
+    
+    $s3fs_config = _s3fs_get_config();
+    
+    try {
+      $this->s3_client = _s3fs_get_amazons3_client($s3fs_config);
+      
+      $this->s3_client->createBucket(array(
+        'ACL' => 'authenticated-read',
+        'Bucket' => $s3fs_config['bucket'],
+      ));
+      
+      $this->s3_client->waitUntil('BucketExists', array('Bucket' => $s3fs_config['bucket']));
+      
+      // Wait for bucket to be created (max 30 seconds).
+      /*for ($i = 0; $i < 30; $i++) {
+        $bucket_exists = $this->s3_client->doesBucketExist($s3fs_config['bucket']);
+        if ($bucket_exists) break;
+        sleep(1);
+      }
+      if (!$bucket_exists) {
+        $this->fail(t("Could not create S3 bucket %bucket", array('%bucket' => $s3fs_config['bucket'])));
+      }*/
+      
+      
+      $this->pass(t("Created S3 bucket %bucket", array('%bucket' => $s3fs_config['bucket'])));
+        
+      // Make sure all files are deleted even if the test goes completely awry and the files don't get deleted in tearDown().
+      $this->s3_client->putBucketLifecycle(array(
+        'Bucket' => $s3fs_config['bucket'],
+        'Rules' => array(array(
+          'Expiration' => array(
+            'Days' => 1,
+          ),
+          'Prefix'     => '',
+          'Status'     => 'Enabled',
+        )),
+      ));
+    }
+    catch (Exception $ex) {
+      $this->fail("Unable to set-up S3 client or bucket: ". $ex->getMessage());
+      $this->set_up_successful = FALSE;
+      return;
+    }
+    
+    
+    // Add files to public and private file systems, and create file fields, 
+    // one saving files in private and the other saving files in public and add files to them, too.
+    foreach (array('public', 'private') as $fs) {
+      $this->createFiles($fs);
+      
+      $field_name = 'field_'. $fs;
+      field_create_field(array(
+        'field_name' => $field_name,
+        'cardinality' => $this->num_files_per_type,
+        'module' => 'file',
+        'settings' => array(
+          'uri_scheme' => $fs,
+        ),
+        'type' => 'file',
+      ));
+      field_create_instance(array(
+        'field_name' => $field_name, 
+        'entity_type' => 'node',
+        'bundle' => 'page'
+      ));
+      
+      $node = array(
+        'type' => 'page',
+        'language' => LANGUAGE_NONE,
+        'status' => 1,
+        'title' => $fs,
+      );
+      foreach($this->createFiles($fs, $field_name) as $file) {
+        if (!empty($file)) {
+          $file->display = 0;
+          $node[$field_name][LANGUAGE_NONE][] = (array) $file;
+        }
+      }
+      $node = (object) $node;
+      node_object_prepare($node);
+      node_submit($node);
+      node_save($node);
+    }
+    
+    $this->debug($this->files, 'created files');
+  }
+  
+  function createFiles($file_system, $field='') {
+    $ref = empty($field) ? $file_system : $field;
+    $this->files[$ref] = array();
+    for ($i = 0; $i < $this->num_files_per_type; $i++) {
+      $data = $this->randomString(rand(8, 32768));
+      $dest = $file_system. '://'. $ref. '_'. $i. '_'. $this->randomName(7). '.'. $this->randomName(3);
+      $file = file_save_data($data, $dest);
+      if (empty($file)) {
+        $this->fail(t("Could not create file %dest.", array('%dest' => $dest)));
+        //drupal_exit();
+      }
+      else {
+        $this->files[$ref][$file->fid] = $file;
+        $this->files_data[$file->fid] = $data;
+      }
+    }
+    return $this->files[$ref];
+  }
+  
+  function tearDown() {
+    $this->s3_client->clearBucket($this->s3fs_config['bucket']);
+    $this->s3_client->deleteBucket(array(
+      'Bucket' => $this->s3fs_config['bucket'],
+    ));
+    
+    parent::tearDown();
+  }
+  
+
+  /**
+   * Tests non-migration of files when migration is disabled.
+   */
+  public function testMigrateDisabled() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 0;
+    $scope = array();
+    
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in public file system.
+   */
+  public function testMigratePublic() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'file_system';
+    $scope = array('public');
+    
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in private file system.
+   */
+  public function testMigratePrivate() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'file_system';
+    $scope = array('private');
+    
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in public and private file systems.
+   */
+  public function testMigratePublicPrivate() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'file_system';
+    $scope = array('public', 'private');
+    
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in field stored in public file system.
+   */
+  public function testMigrateFieldPublic() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'field';
+    $scope = array('field_public');
+  
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in field stored in private file system.
+   */
+  public function testMigrateFieldPrivate() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'field';
+    $scope = array('field_private');
+  
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  /**
+   * Tests migration of files in fields stored in public and private file systems.
+   */
+  public function testMigrateFieldPublicPrivate() {
+    if (!$this->set_up_successful) return;
+    
+    $type = 'field';
+    $scope = array('field_public', 'field_private');
+    
+    $this->setUpFor($type, $scope);
+    $this->doMigration();
+    $this->checkMigration();
+  }
+  
+  
+  protected function setUpFor($type, $scope_fields = array()) {
+    $this->pass(t("===== Starting test of type %type with scope/fields %sf =====", array('%type' => $type, '%sf' => implode(", ", $scope_fields))));
+    
+    variable_set('s3fs_migrate_scope', $type == 'file_system' ? implode('', $scope_fields) : ($type == 'field' ? 'field' : '0'));
+    variable_set('s3fs_migrate_fields', $type == 'field' ? $scope_fields : array());
+    variable_set('s3fs_migrate_backup', 1);
+    
+    $this->s3fs_config = _s3fs_get_config();
+    
+    // * 2 if type is file_system because we include the files added independent of fields as well as those attached to fields.
+    $this->expected_files_to_migrate = $this->num_files_per_type * count($scope_fields) * ($type == 'file_system' ? 2 : ($type == 'field' ? 1 : 0));
+  }
+  
+  protected function doMigration() {
+    $num_to_migrate = ceil($this->expected_files_to_migrate / 2); // Should do all files in two batches.
+    
+    $this->doStatsTest(0, $this->expected_files_to_migrate);
+    
+    _s3fs_migrate($this->s3fs_config, $num_to_migrate);
+    
+    $this->doStatsTest($num_to_migrate, $this->expected_files_to_migrate - $num_to_migrate);
+    
+    _s3fs_migrate($this->s3fs_config, $num_to_migrate);
+    
+    $this->doStatsTest($this->expected_files_to_migrate, 0);
+  }
+  
+  protected function doStatsTest($desired_migrated, $desired_remaining, $desired_failed=0) {
+    $stated_migrated = s3fs_migrate_get_migrated_count($this->s3fs_config);
+    $this->assertTrue($stated_migrated == $desired_migrated, t("s3fs_migrate_get_migrated_count() says there are %stated files migrated, should be %desired.", array('%stated' => $stated_migrated, '%desired' => $desired_migrated)));
+    
+    $stated_remaining = s3fs_migrate_get_remaining_count($this->s3fs_config);
+    $this->assertTrue($stated_remaining == $desired_remaining, t("s3fs_migrate_get_remaining_count() says there are %stated files to migrate, should be %desired.", array('%stated' => $stated_remaining, '%desired' => $desired_remaining)));
+    
+    $stated_failed = s3fs_migrate_get_failed_count($this->s3fs_config);
+    $this->assertTrue($stated_failed == $desired_failed, t("s3fs_migrate_get_failed_count() says there are %stated files to migrate, should be %desired.", array('%stated' => $stated_failed, '%desired' => $desired_failed)));
+  }
+  
+  protected function checkMigration() {
+    $scope = $this->s3fs_config['migrate_scope'];
+    $scope_fields = array();
+    $scope_type = $scope;
+    if (!empty($scope)) {
+      if ($scope == 'field') {
+        $scope_fields = $this->s3fs_config['migrate_fields'];
+      }
+      else {
+        $scope_type = 'file_system';
+        if (strpos($scope, 'public') !== FALSE) $scope_fields[] = 'public';
+        if (strpos($scope, 'private') !== FALSE) $scope_fields[] = 'private';
+      }
+    }
+    
+    foreach ($this->files as $filetype => $files) {
+      $new_files = file_load_multiple(array_keys($files));
+      
+      $should_be_migrated = FALSE;
+      $should_start_with = (strpos($filetype, 'public') !== FALSE ? 'public' : 'private'). '://';
+      if (!empty($scope_type)) {
+        foreach ($scope_fields as $filesystem_or_field) {
+          if ((($scope_type == 'field') && ($filetype == $filesystem_or_field)) ||
+              (($scope_type == 'file_system') && (strpos($filetype, $filesystem_or_field) !== FALSE))) {
+            $should_be_migrated = TRUE;
+            $should_start_with = 's3://s3fs-'. (strpos($filesystem_or_field, 'public') !== FALSE ? 'public' : 'private'). '/';
+            break;
+          }
+        }
+      }
+      
+      foreach ($files as $fid => $orig_file) {
+        $new_file = $new_files[$fid];
+        
+        if ($should_be_migrated) {
+          $this->assertTrue(strpos($new_file->uri, $should_start_with) === 0, t("File migrated from %orig to %new.",
+            array('%orig' => $orig_file->uri, '%new' => $new_file->uri)));
+          
+          $contents = file_get_contents($new_file->uri);
+          $this->assertTrue(!empty($contents), t("Contents of migrated file is not empty for %uri", array('%uri' => $new_file->uri)));
+          $this->assertTrue($contents == $this->files_data[$fid], t("Contents of file is correct for %uri", array('%uri' => $new_file->uri)));
+          
+          $backup_location = 'private://s3fs_migrate_backup/'. preg_replace("/^(public|private):\/\//", "", $orig_file->uri);
+          $this->assertTrue(file_exists($backup_location), t("Backup exists at %loc", array('%loc' => $backup_location)));
+        }
+        else {
+          $this->assertTrue($orig_file->uri == $new_file->uri, t("URI of file to not be migrated not changed (was %orig , is now %new).",
+            array('%orig' => $orig_file->uri, '%new' => $new_file->uri)));
+        }
+      }
+    }
+  }
+  
+  /**
+   * Logs debug messages, in a text file if longer than 80 characters, or directly otherwise.
+   *
+   * (A link to) the debug message will be placed in the test results as a passing assertion.
+   *
+   * @param $message
+   *   The verbose message to be stored.
+   * @param $ref
+   *   A reference, name or context indicator for the message.
+   */
+  protected function debug($message, $ref='Debug message') {
+    if (!is_string($message)) {
+      $message = '<pre>'. $ref. ": ". print_r($message, true). '</pre>';
+    }
+    else {
+      $message = $ref. ": ". $message;
+    }
+    if (strlen($message) > 80) {
+      if ($id = simpletest_verbose($message)) {
+        $class_safe = str_replace('\\', '_', get_class($this));
+        $url = file_create_url($this->originalFileDirectory . '/simpletest/verbose/' . $class_safe . '-' . $id . '.html');
+        $this->error(l($ref, $url, array('attributes' => array('target' => '_blank'))), 'User notice');
+      }
+    }
+    else {
+      $this->error($message, 'User notice');
+    }
+  }
+}

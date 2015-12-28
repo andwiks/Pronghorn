@@ -11,8 +11,8 @@ dependencies[] = commerce_payment
 files[] = tests/commerce_xero_install.test
 
 ; Information added by Drupal.org packaging script on 2015-02-18
-version = "7.x-1.0-beta1"
+version = "7.x-1.0-beta1+0-dev"
 core = "7.x"
 project = "commerce_xero"
-datestamp = "1424291253"
+datestamp = "1424291217"
 

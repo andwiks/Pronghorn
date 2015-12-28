@@ -1,0 +1,8 @@
+name = Sepulsa Xero
+description = Integrate Pronghorn with Xero bank transactions or payments.
+core = 7.x
+configure = admin/commerce/config/sepulsa_xero
+package = "Sepulsa"
+
+dependencies[] = commerce_xero
+

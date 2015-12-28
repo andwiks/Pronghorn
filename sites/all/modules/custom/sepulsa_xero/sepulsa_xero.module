@@ -1,0 +1,126 @@
+<?php
+/**
+ * @file
+ *   Sepulsa Xero.
+ */
+
+/* implement hook_commerce_xero_invoice_alter() */
+function sepulsa_xero_commerce_xero_invoice_alter(&$invoice, $order, $bank) {
+  // rewrite LineItems
+  unset($invoice['Invoice']['LineItems']);
+  // This must be the sub-total minus the total tax amount inclusive or exclusive.
+  $subtotal = 0.0;
+
+  // This must be the total tax regardless of inclusive or exclusive.
+  $total_tax = 0.0;
+
+  $tax_enabled = module_exists('commerce_tax');
+  $i = 0;
+
+  foreach ($order->commerce_line_items as $line_item_wrapper) {
+    dpm($line_item_wrapper->type->value(),'type');
+    if ($line_item_wrapper->type->value() == 'coupon') {
+      continue;
+    }
+
+    // Find the Xero UnitAmount and TaxAmount data for each line item in the
+    // Commerce order.
+
+    // The unit price must be either be inclusive or exclusive of taxes based
+    // on VAT/GST or Sales Tax.
+    $unit_price = 0.0;
+    $unit_price_exclusive = 0.0;
+    $price_exclusive = 0.0;
+
+    // Regardless of Inclusive or Exclusive, the tax amount must be set to the
+    // total tax for a line item including the quantity.
+    $line_item_tax = 0.0;
+    $tax_rate_amount = 0.0;
+
+    $price_data = $line_item_wrapper->commerce_unit_price->data->value();
+    foreach ($price_data['components'] as $component) {
+      // Add up the unit price inclusive and exclusive of taxes because there
+      // is no Commerce method to do so without mucking about with formatting.
+      // CommerceWTF.
+      $unit_price += commerce_currency_amount_to_decimal($component['price']['amount'], $line_item_wrapper->commerce_unit_price->currency_code->raw());
+
+      if ($tax_enabled && empty($component['price']['data']['tax_rate'])) {
+        // Add to the unit price exclusive of tax.
+        $unit_price_exclusive += commerce_currency_amount_to_decimal($component['price']['amount'], $line_item_wrapper->commerce_unit_price->currency_code->raw());
+      }
+      elseif ($tax_enabled && !empty($component['price']['data']['tax_rate'])) {
+        // Add to the line item tax after converting and correctly rounding the
+        // price component amount. commerce_tax_rate_round_amount() is bugged
+        // because 15.75 -> .01575 and thus does not get rounded correctly, and
+        // an off by 1 error. This means that this code will assume to round
+        // half up always in order to get the correct tax. It's odd that the
+        // Commerce module will produce two different results. Why is there not
+        // a standard way to get the tax in a decimal format without any stupid
+        // formatting? CommerceWTF.
+        $tax_rate_amount = commerce_currency_convert($component['price']['amount'] * $line_item_wrapper->quantity->value(), $component['price']['currency_code'], $line_item_wrapper->commerce_unit_price->currency_code->raw());
+        $rounded = commerce_round(COMMERCE_ROUND_HALF_UP, $tax_rate_amount);
+        $line_item_tax += commerce_currency_amount_to_decimal($rounded, $line_item_wrapper->commerce_unit_price->currency_code->raw());
+
+        if (in_array($component['price']['data']['tax_rate']['type'], array('gst', 'vat'))) {
+          // Set the LineAmountTypes value to Inclusive tax.
+          $invoice['Invoice']['LineAmountTypes'] = 'Inclusive';
+        }
+      }
+    }
+
+    if ($unit_price_exclusive == 0.0) {
+      // If no tax, then use the full unit price.
+      $unit_price_exclusive = $unit_price;
+    }
+
+    if ($invoice['Invoice']['LineAmountTypes'] == 'Exclusive') {
+      // Unit price is without any tax in Exclusive tax.
+      $unit_price = $unit_price_exclusive;
+    }
+
+    // Get the formatted values for unit amount, tax amount, and subtotal.
+    $unit_amount = number_format($unit_price, 2, '.', '');
+    $tax_amount = number_format($line_item_tax, 2, '.', '');
+
+    // Set values.
+    $invoice['Invoice']['LineItems'][$i]['LineItem']['Description'] = $line_item_wrapper->line_item_label->value();
+    $invoice['Invoice']['LineItems'][$i]['LineItem']['Quantity'] = $line_item_wrapper->quantity->value();
+    $invoice['Invoice']['LineItems'][$i]['LineItem']['UnitAmount'] = $unit_amount;
+    $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = $bank->revenue_code;
+
+    switch ($line_item_wrapper->type->value()) {
+      case 'userpoints':
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 2521;
+        break;
+      case 'electricity_prepaid':
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 4112;
+        break;
+      case 'mobile_prepaid':
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 4111;
+        break;
+      case 'fee':
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 4191;
+        break;
+      case 'deposit_sepulsa':
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 2521;
+        break;
+
+      default:
+        $invoice['Invoice']['LineItems'][$i]['LineItem']['AccountCode'] = 4119;
+        break;
+    }
+    $invoice['Invoice']['LineItems'][$i]['LineItem']['TaxAmount'] = $tax_amount;
+    unset($invoice['Invoice']['LineItems'][$i]['LineItem']['Tracking']);
+
+    // Add to the subtotal and total tax of the invoice.
+    $subtotal += $unit_price_exclusive * $line_item_wrapper->quantity->value();
+    $total_tax += $line_item_tax;
+    $i++;
+  }
+  $invoice['Invoice']['Reference'] = $order->order_id->value();
+}
+
+/* implement hook_commerce_xero_payment_alter()*/
+function sepulsa_xero_commerce_xero_payment_alter(&$payment, $order, $bank, $invoice) {
+  $payment['Payment']['Reference'] = $order->order_id->value();
+}

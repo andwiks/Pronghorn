@@ -628,29 +628,30 @@ function commerce_xero_create_invoice_payment($payment, $order, $bank, $invoice)
   setlocale(LC_MONETARY, 'en_US');
 
   $currency = commerce_currency_load($payment->currency_code->raw());
-  $amount = commerce_currency_amount_to_decimal($payment->amount->raw(), $payment->currency_code->raw());
-  $amount = number_format($amount, 2, '.', '');
+  if ($currency > 0) {
+    $amount = commerce_currency_amount_to_decimal($payment->amount->raw(), $payment->currency_code->raw());
+    $amount = number_format($amount, 2, '.', '');
 
-  // Create a new Payment array.
-  $transaction = xero_make('Payment', 'all', array('id', 'code'));
+    // Create a new Payment array.
+    $transaction = xero_make('Payment', 'all', array('id', 'code'));
 
-  $transaction['Payment']['Invoice']['InvoiceID'] = $invoice['Invoice']['InvoiceID'];
-  $transaction['Payment']['Account']['Code'] = $bank->bank_account;
-  $transaction['Payment']['Date'] = format_date($payment->created->raw(), 'custom', 'Y-m-d');
-  $transaction['Payment']['Amount'] = $amount;
-  $transaction['Payment']['Reference'] = $payment->remote_id->value();
+    $transaction['Payment']['Invoice']['InvoiceID'] = $invoice['Invoice']['InvoiceID'];
+    $transaction['Payment']['Account']['Code'] = $bank->bank_account;
+    $transaction['Payment']['Date'] = format_date($payment->created->raw(), 'custom', 'Y-m-d');
+    $transaction['Payment']['Amount'] = $amount;
+    $transaction['Payment']['Reference'] = $payment->remote_id->value();
 
-  // Allow other modules to modify the payment bofer its posted.
-  drupal_alter('commerce_xero_payment', $payment, $order, $bank, $invoice);
+    // Allow other modules to modify the payment bofer its posted.
+    drupal_alter('commerce_xero_payment', $transaction, $order, $bank, $invoice);
 
-  // Post payment.
-  $result = xero_query('post', 'Payments', FALSE, FALSE, $transaction);
+    // Post payment.
+    $result = xero_query('post', 'Payments', FALSE, FALSE, $transaction);
 
-  if ($result && isset($result['Payments']['Payment']['PaymentID'])) {
-    // Return the GUID on success.
-    return $result['Payments']['Payment']['PaymentID'];
+    if ($result && isset($result['Payments']['Payment']['PaymentID'])) {
+      // Return the GUID on success.
+      return $result['Payments']['Payment']['PaymentID'];
+    }
   }
-
   return FALSE;
 }
 

@@ -1,0 +1,6 @@
+name = "Multifinance"
+description = "Multifinance."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = kraken_api

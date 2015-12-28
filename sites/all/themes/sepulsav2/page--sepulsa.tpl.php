@@ -32,6 +32,12 @@ $page_state = "home";
             <?php print t('biznet wifi'); ?>
           </a>
         <?php endif; ?>
+        <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
+          <a href="" target="target_4">
+            <span class="ico bolt"></span>
+            <?php print t('multifinance'); ?>
+          </a>
+        <?php endif; ?>
       </div>
 
       <div class="content_tab">
@@ -61,6 +67,18 @@ $page_state = "home";
         <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
           <div class="tab form style_1" id="target_3">
             <?php print render($biznet_form); ?>
+
+            <div class="topup-notes topup-notes-3">
+                <ul>
+                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                </ul>
+            </div>
+          </div>
+        <?php endif; ?>
+        <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
+          <div class="tab form style_1" id="target_4">
+            <?php print render($multifinance_form); ?>
 
             <div class="topup-notes topup-notes-3">
                 <ul>

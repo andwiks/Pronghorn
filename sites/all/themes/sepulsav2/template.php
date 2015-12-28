@@ -354,6 +354,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         break;
 
       case 'biznet':
+      case 'multifinance':
         $form['product_id']['#attributes']['class'][] = 'input-text';
         $form['product_id']['#attributes']['class'][] = 'full-width';
         $form['product_id']['#suffix'] = '<p></p>';
@@ -367,8 +368,10 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
-        $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
-        $form['description']['#suffix'] = '</div>';
+        if (!empty($form['description'])) {
+          $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
+          $form['description']['#suffix'] = '</div>';
+        }
 
         $form['add']['#prefix'] = '<div class="topup-action-2">';
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));

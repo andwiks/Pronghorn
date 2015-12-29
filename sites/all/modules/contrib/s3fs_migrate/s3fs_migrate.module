@@ -1,0 +1,476 @@
+<?php
+
+/**
+ * @file
+ * Handling of migration of existing files from 'public://' or 'private://' storage to S3 File System.
+ *
+ * TODO Add option to revert migration (all or specific fields), using S3 copies of files or the backups if S3 files are missing.
+ * TODO Add option to automatically enable "Use S3 for public:// files" (or private) once migration is completed, when scope is set to public/private?
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function s3fs_migrate_menu() {
+  $items = array();
+
+  $items['admin/config/media/s3fs/migrate'] = array(
+    'title' => 'Migrate',
+    'description' => 'Migrate existing files to S3 File System.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('s3fs_migrate_admin'),
+    'access arguments' => array('administer s3fs'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 11,
+  );
+  
+  return $items;
+}
+
+/**
+ * Implements hook_help().
+ */
+function s3fs_migrate_help($path, $arg) {
+  if ($path == 'admin/config/media/s3fs/migrate') {
+    $msg = t("Here you can configure S3 File System Migrate to incrementally migrate existing uploaded files on your site to S3 via the cron system.");
+    $msg .= '<br/>'. t("NOTE 1: Migration can only occur if one of the <em>Use S3 for public:// files</em> and
+        <em>Use S3 for private:// files</em> options are disabled on the main S3 File System settings page. If one or both of 
+        these file systems are being migrated then the corresponding options will be automatically enabled once migration is complete.");
+    $msg .= '<br/>'. t("NOTE 2: If you intend to use Drupal's performance options which aggregate your CSS or Javascript
+        files, or will be using any other system that writes CSS or Javascript files into your site's public:// file system,
+        you <strong>must</strong> perform some additional configuration on your webserver to make those
+        files work correctly when stored in S3. Please see the section titled \"Aggregated CSS and JS in S3\" in the
+        !README for details.", array('!README' => l('README', drupal_get_path('module', 's3fs') . '/README.txt')));
+    return "<p>$msg</p>";
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function s3fs_migrate_cron() {
+  $config = _s3fs_get_config();
+  _s3fs_migrate($config, !empty($config['migrate_cron_limit']) ? $config['migrate_cron_limit'] : 20);
+}
+
+/**
+ * Builds the migrate settings form.
+*/
+function s3fs_migrate_admin() {
+  $config = _s3fs_get_config();
+  
+  $form = array();
+  
+  if (!empty($config['use_s3_for_public']) && !empty($config['use_s3_for_private'])) {
+    $form['s3fs_migrate_disabled'] = array(
+      '#type' => 'item',
+      '#title' => t('Disabled'),
+      '#markup' => t('Migration is currently disabled because the <em>Use S3 for public:// files</em> and <em>Use S3 for private:// files</em> options are enabled on the main S3 File System settings page.'),
+    );
+  }
+  else {
+    // Get some stats about progress.
+    $migrated_count = _s3fs_migrate_build_base_query($config, TRUE)
+      ->countQuery()->execute()->fetchField();
+    // If some files have been migrated and migration is not disabled, show the stats.
+    if ($migrated_count != 0 && !empty($config['migrate_scope'])) {
+      $total_count = $migrated_count + _s3fs_migrate_build_base_query($config)
+        ->countQuery()->execute()->fetchField();
+      
+      if ($migrated_count == $total_count) {
+        $form['s3fs_migrate_stats'] = array(
+          '#type' => 'item',
+          '#title' => t('Migration complete'),
+          '#markup' => t('All files configured to be migrated have been migrated to S3. If files for specific fields were set to be migrated then additional fields may be migrated by selecting the specific fields option in the Scope and selecting those fields.'),
+        );
+      }
+      else {
+        $new_pass = variable_get('s3fs_migrate_next_fid', FALSE) === FALSE;
+        if (!$new_pass) {
+          $direction = empty($config['migrate_newer_first']) ? 'ASC' : 'DESC';
+          $start_fid = variable_get('s3fs_migrate_next_fid');
+          $failed_count = _s3fs_migrate_build_base_query($config)
+            ->condition('fid', $start_fid, $direction == 'ASC' ? '<' : '>')->countQuery()->execute()->fetchField();
+        }
+        $form['s3fs_migrate_stats'] = array(
+          '#type' => 'item',
+          '#title' => t('Current progress'),
+          '#markup' => t('Migrated !migrated of !total to S3.', array('!migrated' => $migrated_count, '!total' => $total_count)).
+            ' '. ($new_pass ? t('At the beginning of a new pass.') : t('Failed to migrate !failed (will retry on the next pass).', array('!failed' => $failed_count))),
+        );
+      }
+    }
+    
+    $scope_options = array();
+    $scope_options[0] = t("Disabled");
+    if (empty($config['use_s3_for_public'])) $scope_options['public'] = t("Files in Public file system");
+    if (empty($config['use_s3_for_private'])) $scope_options['private'] = t("Files in Private file system");
+    if (empty($config['use_s3_for_public']) && empty($config['use_s3_for_private'])) $scope_options['publicprivate'] = t("Files in Public and Private file systems");
+    $scope_options['field'] = t("Specific file or image fields");
+    
+    $form['s3fs_migrate_scope'] = array(
+      '#type'           => 'select',
+      '#options'        => $scope_options,
+      '#title'          => t("Scope"),
+      '#description'    => t("Whether to migrate all files in Drupals Public and/or Private file systems, or to only migrate files for specific file or image fields."),
+      '#default_value'  => !empty($config['migrate_scope']) ? $config['migrate_scope'] : '',
+    );
+    
+    $file_fields = array();
+    foreach (field_info_field_map() as $field_name => $basic_field_info) {
+      if ($basic_field_info['type'] == 'file' || $basic_field_info['type'] == 'image') {
+        $file_fields[$field_name] = $field_name;
+      }
+    }
+    
+    $form['s3fs_migrate_fields'] = array(
+      '#type'           => 'checkboxes',
+      '#options'        => $file_fields,
+      '#title'          => t("Specific file or image fields to migrate"),
+      '#description'    => t("Select the fields to migrate to S3. <strong>Once a field that has existing files has been set to be migrated to S3, the change cannot (yet) be easily reverted, and even if migration is later disabled for this field new files will continue to be saved to S3.</strong>"),
+      '#default_value'  => !empty($config['migrate_fields']) ? $config['migrate_fields'] : array('', ''),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="s3fs_migrate_scope"]' => array('value' => 'field'),
+        ),
+      ),
+    );
+    
+    $form['s3fs_migrate_cron_limit'] = array(
+      '#type'           => 'select',
+      '#options'        => drupal_map_assoc(array(2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000)),
+      '#title'          => t("Cron limit"),
+      '#description'    => t("The maximum number of files to migrate to S3 during a cron run."),
+      '#default_value'  => !empty($config['migrate_cron_limit']) ? $config['migrate_cron_limit'] : 20,
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="s3fs_migrate_scope"]' => array('value' => 0),
+        ),
+      ),
+    );
+    
+    $form['s3fs_migrate_backup'] = array(
+      '#type'           => 'checkbox',
+      '#title'          => t("Backup migrated files"),
+      '#description'    => t("If enabled then the local copy of files migrated to S3 will be moved to the folder <em>s3fs_migrate_backup</em> in the private file system immediately after migration, \"just in case\"."),
+      '#default_value'  => !empty($config['migrate_backup']) ? $config['migrate_backup'] : 1,
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="s3fs_migrate_scope"]' => array('value' => 0),
+        ),
+      ),
+    );
+    
+    $form['s3fs_migrate_newer_first_orig'] = array(
+      '#type'   => 'value',
+      '#value'  => !empty($config['migrate_newer_first']) ? $config['migrate_newer_first'] : NULL,
+    );
+  
+    $form['s3fs_migrate_newer_first'] = array(
+      '#type'           => 'checkbox',
+      '#title'          => t("Migrate newer files first"),
+      '#description'    => t("If enabled then newer files will be migrated before older files. Changing this setting will reset the marker that S3FS Migrate uses to remember where it's up to, thus beginning a new pass and resetting the failed migrations statistic."),
+      '#default_value'  => !empty($config['migrate_newer_first']) ? $config['migrate_newer_first'] : NULL,
+      '#states' => array(
+        'invisible' => array(
+          ':input[name="s3fs_migrate_scope"]' => array('value' => 0),
+        ),
+      ),
+    );
+    
+    // Tell system_settings_form_submit() to remove empty values from multiple value fields ('s3fs_migrate_fields' in our case).
+    $form['array_filter'] = array(
+      '#type' => 'value',
+      '#value' => TRUE,
+    );
+  
+    $form = system_settings_form($form);
+    $form['#submit'][] = 's3fs_migrate_admin_submit';
+  }
+  
+  return $form;
+}
+
+function s3fs_migrate_admin_submit($form, &$form_state) {
+  if (variable_get('s3fs_migrate_newer_first', FALSE) != $form_state['values']['s3fs_migrate_newer_first_orig']) {
+    variable_del('s3fs_migrate_next_fid');
+  }
+  
+  if (variable_get('s3fs_migrate_scope') == 'field') {
+    $fields = variable_get('s3fs_migrate_fields', array());
+
+    // Update selected fields to use s3fs.
+    foreach ($fields as $field_name) {
+      $field_info = field_info_field($field_name);
+      if ($field_info['settings']['uri_scheme'] != 's3') {
+        $field_info['settings']['uri_scheme'] = 's3';
+        try {
+          // The API for field_update_field() says "Any module may forbid any update for any reason. For example, the field's
+          // storage module might forbid an update if it would change the storage schema while data for the field exists."
+          // And yet the below seems to work. However we put it in a try-catch in case it stops working.
+          field_update_field($field_info);
+          drupal_set_message(t("Updated <em>Upload destination</em> for %f to S3 File System.", array('%f' => $field_name)));
+        } catch (Exception $ex) {
+          drupal_set_message(t("Could not update <em>Upload destination</em> for %f: <br />\n%e.", array('%f' => $field_name, '%e' => $ex->getMessage())), 'error');
+          unset($fields[$field_name]);
+        }
+      }
+    }
+
+    // In case we couldn't update some fields.
+    variable_set('s3fs_migrate_fields', $fields);
+  }
+}
+
+function s3fs_migrate_get_migrated_count($config) {
+  return _s3fs_migrate_build_base_query($config, TRUE)
+    ->countQuery()->execute()->fetchField();
+}
+
+function s3fs_migrate_get_remaining_count($config) {
+  return _s3fs_migrate_build_base_query($config)
+    ->countQuery()->execute()->fetchField();
+}
+
+function s3fs_migrate_get_total_count($config) {
+  // Hardly efficient, but it's only used for showing stats on admin page.
+  return s3fs_migrate_get_migrated_count() + s3fs_migrate_get_remaining_count();
+}
+
+function s3fs_migrate_get_failed_count($config) {
+  $start_fid = variable_get('s3fs_migrate_next_fid', FALSE) === FALSE;
+  if ($start_fid !== FALSE) {
+    $direction = empty($config['migrate_newer_first']) ? 'ASC' : 'DESC';
+    return  _s3fs_migrate_build_base_query($config)
+      ->condition('fid', $start_fid, $direction == 'ASC' ? '<' : '>')->countQuery()->execute()->fetchField();
+  }
+  return 0;
+}
+
+/**
+ * Implementation of hook_form_FORMID_alter().
+ */
+function s3fs_migrate_form_s3fs_settings_alter(&$form, &$form_state) {
+  $form['#submit'][] = '_s3fs_migrate_form_s3fs_settings_submit';
+}
+
+/**
+ * Disable migration for public and/or private file system if 
+ * Use S3 for Public/Private option is selected in s3fs settings form.
+ */ 
+function _s3fs_migrate_form_s3fs_settings_submit($form, &$form_state) {
+  $config = _s3fs_get_config();
+  if (!empty($config['migrate_scope'])) {
+    $scope = $config['migrate_scope'];
+    $disabled = array();
+    foreach(array('public', 'private') as $fs) {
+      if (!empty($config['use_s3_for_'. $fs]) && strpos($scope, $fs) !== FALSE) {
+        $scope = str_replace($fs, '', $scope);
+        $disabled[] = $fs;
+      }
+    }
+    if (!empty($disabled)) {
+      variable_set('s3fs_migrate_scope', empty($scope) ? 0 : $scope);
+      drupal_set_message(t("Disabled migration for the file system(s) %fs because S3FS was set to take it/them over.", array('%fs' => implode(', ', $disabled))));
+      watchdog('s3fs_migrate', "Disabled migration for the file system(s) %fs because S3FS was set to take it/them over.", array('%fs' => implode(', ', $disabled)));
+    }
+  }
+}
+
+/**
+ * Incrementally migrate files to S3 (if s3fs_migrate has been configured to do so).
+ *
+ * @param $config An s3fs configuration array.
+ * @param $limit The maximum number of files to migrate.
+ */
+function _s3fs_migrate($config, $limit) {
+  // If migration has been enabled, and s3fs isn't taking over the public or private file systems.
+  if (!empty($config['migrate_scope']) && empty($config['use_s3_for_public']) && empty($config['use_s3_for_private'])) {
+    $start_time = microtime(true);
+    
+    $direction = empty($config['migrate_newer_first']) ? 'ASC' : 'DESC';
+    $start_fid = variable_get('s3fs_migrate_next_fid', $direction == 'ASC' ? 0 : PHP_INT_MAX);
+    
+    $query = _s3fs_migrate_build_base_query($config)
+      ->condition('fid', $start_fid, $direction == 'ASC' ? '>=' : '<=')
+      ->range(0, $limit);
+
+    $result = $query->execute();
+    
+    $total_count = $result->rowCount();
+    
+    if ($total_count == 0) {
+      // Reset pass.
+      variable_del('s3fs_migrate_next_fid');
+      
+      // See if there are any remaining that failed in last pass or that were added while we were migrating files during this cron run.
+      $failed_count = _s3fs_migrate_build_base_query($config)
+        ->countQuery()->execute()->fetchField();
+      if ($failed_count == 0) {
+        // No remaining files to be migrated, so don't keep checking for them.
+        variable_del('s3fs_migrate_scope');
+        watchdog('s3fs_migrate', "All configured files have been migrated.");
+        
+        // Enable the 'Use S3 for public|private:// files' options if necessary.
+        foreach(array('public', 'private') as $fs) {
+          if (empty($config['use_s3_for_'. $fs]) && _s3fs_migrate_is_migrating($fs, $config)) {
+            variable_set('s3fs_use_s3_for_'. $fs, 1);
+            watchdog('s3fs_migrate', "Enabling the 'Use S3 for %fs:// files' option because all files for the %fs file system have been migrated.", array('%fs' => $fs));
+          }
+        }
+        return;
+      }
+      watchdog('s3fs_migrate', "Finished pass, resetting to retry failed files.");
+      
+      // TODO Set limit on number of passes?
+      return;
+    }
+    
+    $success_count = 0;
+    foreach ($result as $record) {
+      variable_set('s3fs_migrate_next_fid', $record->fid + ($direction == 'ASC' ? 1 : -1));
+      
+      $realpath = drupal_realpath($record->uri);
+      
+      if (file_exists($realpath)) {
+        $dst = preg_replace("/^(public|private):\/\//", "s3://s3fs-$1/", $record->uri);
+        
+        $alter_data = array(
+          'fid' => $record->fid,
+          'uri_orig' => $record->uri,
+          'uri_dest' => $dst,
+        );
+        drupal_alter('s3fs_migrate_destination_uri', $alter_data);
+        $dst = $alter_data['uri_dest'];
+        
+        $mtime = filemtime($realpath);
+        
+        // Try copying the file to S3.
+        if (copy($record->uri, $dst)) {
+          $updated = FALSE;
+          // If the modified time hasn't changed while we were copying the file to S3 then it's safe to update the DB.
+          if ($mtime == filemtime($realpath)) {
+            $updated = db_update('file_managed')
+            ->fields(array(
+              'uri' => $dst
+            ))
+            ->condition('fid', $record->fid)
+            ->condition('uri', $record->uri) // Make sure uri hasn't changed either.
+            ->execute();
+          }
+
+          if (empty($updated)) {
+            // Delete the copy we sent to s3, it's stale. Try again next time.
+            unlink($dst);
+          } else {
+            $success_count++;
+            
+            if (!empty($config['migrate_backup'])) {
+              // Move the file to a backup in the private file system.
+              $backup_location = drupal_realpath('private://'). '/'. dirname('s3fs_migrate_backup/'. preg_replace("/^(public|private):\/\//", "", $record->uri));
+              file_prepare_directory($backup_location, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
+              rename($realpath, $backup_location. '/'. basename($realpath));
+            }
+            else {
+              // Delete the local copy of the file.
+              unlink($realpath);
+            }
+
+            // Clear the static loading cache.
+            entity_get_controller('file')->resetCache(array($record->fid));
+            $file = file_load($record->fid);
+            // Inform modules that the file has been updated.
+            module_invoke_all('file_update', $file);
+            module_invoke_all('entity_update', $file, 'file');
+          }
+        }
+        else {
+          drupal_set_message(t("Unable to copy %rp to Amazon S3 during migrate operation. Will try again next time.", array('%rp' => $realpath)), 'warning');
+          watchdog('s3fs_migrate', "Unable to copy %rp to Amazon S3 during migrate operation. Will try again next time.", array('%rp' => $realpath), WATCHDOG_WARNING);
+        }
+      }
+    } //foreach ($result as $record)
+    
+    // TODO Do we really want to clear caches here? Perhaps this should be an option on the admin form.
+    // Clear potentially relevant caches (just clearing, for example, field
+    // caches won't always be sufficient). Below taken from admin_menu.
+    // Don't clear cache_form - in-progress form submissions may break.
+    // Ordered so clearing the page cache will always be the last action.
+    // @see drupal_flush_all_caches()
+    $core = array('cache', 'cache_bootstrap', 'cache_filter', 'cache_page');
+    $cache_tables = array_merge(module_invoke_all('flush_caches'), $core);
+    foreach ($cache_tables as $table) {
+      cache_clear_all('*', $table, TRUE);
+    }
+    
+    watchdog('s3fs_migrate', "Migrated %count of %total files in %time seconds.", array('%count' => $success_count, '%total' => $total_count, '%time' => round(microtime(true) - $start_time, 2)), WATCHDOG_NOTICE);
+  }
+}
+
+/**
+ * Build the query to select files to migrate (or which have already been migrated).
+ * @param array $config S3FS config.
+ * @param string $migrated Set to TRUE to select files that have already been migrated.
+ * @return SelectQuery
+ */
+function _s3fs_migrate_build_base_query($config, $migrated=FALSE) {
+  $direction = empty($config['migrate_newer_first']) ? 'ASC' : 'DESC';
+  
+  $query = db_select('file_managed', 'fm')
+    ->fields('fm', array('fid', 'uri'))
+    ->orderBy('fid', $direction)
+    // This condition generally shouldn't be necessary, but just in case some process updates the file_managed table with files stored in the private:// folder.
+    ->condition('uri', 'private://s3fs_migrate_backup/%', 'NOT LIKE')
+    ->distinct(TRUE); // It's possible that multiple field instances refer to the same fid.
+  
+  if (!empty($config['migrate_scope'])) {
+    // We either filter files to migrate by field or by file system.
+    
+    if ($config['migrate_scope'] == 'field') {
+      // Filter by field.
+      if (!empty($config['migrate_fields'])) {
+        $or = db_or();
+        foreach ($config['migrate_fields'] as $field_name) {
+          $query->leftJoin('field_data_'. $field_name, $field_name, "fm.fid = $field_name.". $field_name. "_fid");
+          $or->where("fm.fid = $field_name.". $field_name. "_fid");
+        }
+        $query->condition($or);
+      }
+      else {
+        // Fields scope selected but no fields selected, just make the query select nothing.
+        $query->condition('fid', -1);
+      }
+      
+      // Only get files (not) migrated.
+      $query->condition('uri', 's3://%', ($migrated ? '' : 'NOT '). 'LIKE');
+    }
+    else {
+      // Filter by file system.
+      $or = db_or();
+      foreach(array('public', 'private') as $fs) {
+        if (_s3fs_migrate_is_migrating($fs, $config)) {
+          if (!$migrated) {
+            $or->condition('uri', $fs. '://%', 'LIKE');
+          }
+          else {
+            $or->condition('uri', 's3://s3fs-'. $fs.'/%', 'LIKE');
+          }
+        }
+      }
+      $query->condition($or);
+    }
+  }
+  else {
+    // Migration disabled, just make the query select nothing.
+    $query->condition('fid', -1);
+  }
+  
+  return $query;
+}
+
+/**
+ * Returns TRUE iff the specified file_system ('public', 'private') is currently set to be migrated to S3.
+ */
+function _s3fs_migrate_is_migrating($file_system, $config) {
+  return strpos($config['migrate_scope'], $file_system) !== FALSE;
+}

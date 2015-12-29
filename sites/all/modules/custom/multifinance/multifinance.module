@@ -138,7 +138,6 @@ function multifinance_add_to_cart_form_validate(&$form, &$form_state) {
       form_set_error('inquiry', 'Please retry');
     }
   }
-  form_set_error('inquiry', 'Please retry');
 }
 
 function multifinance_products($operator = NULL) {

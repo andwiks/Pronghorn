@@ -307,7 +307,7 @@ function auto_bank_transfer_mandiri_overview(){
 
 //function to get content of BCA CSV file
 function bca_list_file() {
-  $dir = 'sites/default/files/bank/summary_bca';
+  $dir = file_default_scheme() . '://bank/summary_bca';
   $files = abt_getCSVFiles($dir);
   //only read latest
   $filepath = $files[0];
@@ -341,7 +341,7 @@ function bca_list_file() {
 
 //function to get content of Mandiri CSV file
 function mandiri_list_file() {
-  $dir = 'sites/default/files/bank/summary_mandiri';
+  $dir = file_default_scheme() . '://bank/summary_mandiri';
   $files = abt_getCSVFiles($dir);
   //only read latest
   $filepath = $files[0];

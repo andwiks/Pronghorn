@@ -101,14 +101,14 @@ function bca_read_csv() {
       }
       fclose($handle);
       // delete bca csv file
-      $newfile = 'sites/default/files/bank/summary_bca/bca-' . date('dmy') . '.csv';
       $mydir = file_default_scheme() . '://bank/summary_bca';
+      $newfile = $mydir.'/bank/summary_bca/bca-' . date('dmy') . '.csv';
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
       if(variable_get('auto_bank_transfer_logging', 0)){
         //save raw csv for future use
-        $rawfile = 'sites/default/files/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
+        $rawfile = $mydir.'/bank/raw_bca/bca-'.date('dmy-Gi').'.csv';
         $mydir = file_default_scheme() . '://bank/raw_bca';
         file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
         @copy($filepath, $rawfile);
@@ -357,14 +357,15 @@ function mandiri_read_csv() {
       fclose($handle);
         
       // delete mandiri csv file
-      $newfile = 'sites/default/files/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
+      $mydir = file_default_scheme() . '://bank/summary_mandiri';
+      $newfile = $mydir.'/bank/summary_mandiri/mandiri-' . date('dmy') . '.csv';
       $mydir = file_default_scheme() . '://bank/summary_mandiri';
       file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
       @copy($filepath, $newfile);
 
       if(variable_get('auto_bank_transfer_logging', 0)){
          //save raw csv for future use
-        $rawfile = 'sites/default/files/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
+        $rawfile = $mydir.'/bank/raw_mandiri/mandiri-'.date('dmy-Gi').'.csv';
         $mydir = file_default_scheme() . '://bank/raw_mandiri';
         file_prepare_directory($mydir, FILE_CREATE_DIRECTORY);
         @copy($filepath, $rawfile);

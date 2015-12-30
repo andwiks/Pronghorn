@@ -26,9 +26,9 @@ function multifinance_commerce_line_item_type_info() {
  * Implements hook_commerce_cart_line_item_refresh().
  */
 function multifinance_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
-  if ($line_item->type == 'multifinance' && !empty($line_item->data['inquiry']['jumlah_tagihan'])) {
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['jumlah_tagihan'];
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['jumlah_tagihan'];
+  if ($line_item->type == 'multifinance' && !empty($line_item->data['inquiry']['total_x'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['total_x'];
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['total_x'];
   }
 }
 
@@ -36,8 +36,8 @@ function multifinance_commerce_cart_line_item_refresh($line_item, $order_wrapper
  * Implements hook_commerce_product_calculate_sell_price_line_item_alter().
  */
 function multifinance_commerce_product_calculate_sell_price_line_item_alter($line_item) {
-  if ($line_item->type == 'multifinance' && !empty($line_item->data['inquiry']['jumlah_tagihan'])) {
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['jumlah_tagihan'];
+  if ($line_item->type == 'multifinance' && !empty($line_item->data['inquiry']['total_x'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['total_x'];
   }
 }
 

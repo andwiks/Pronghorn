@@ -57,27 +57,6 @@ function multifinance_commerce_product_type_info() {
 }
 
 /**
- * Implements hook_field_attach_validate().
- */
-function multifinance_field_attach_validate($entity_type, $entity, &$errors) {
-  if ($entity_type == 'commerce_line_item' && $entity->type == 'multifinance') {
-    $order = commerce_cart_order_load($GLOBALS['user']->uid);
-    if (!empty($order)) {
-      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-
-      foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
-        if ($line_item_wrapper->getBundle() == $entity->type && $line_item_wrapper->field_customer_number->value() == $entity->field_customer_number[LANGUAGE_NONE][0]['value']) {
-          $errors['field_customer_number'][LANGUAGE_NONE][0][] = array(
-            'error' => 'token_reload_duplicate_number',
-            'message' => t('The number you enter already on cart'),
-          );
-        }
-      }
-    }
-  }
-}
-
-/**
  * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function multifinance_form_commerce_cart_add_to_cart_form_multifinance_alter(&$form, &$form_state, $form_id) {

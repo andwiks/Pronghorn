@@ -16,7 +16,7 @@ function auto_bank_transfer_admin_form($form, &$form_state) {
 
   $form['abt_ftp_detail']['domain'] = array(
     '#type' => 'textfield',
-    '#title' => t('Database Name'),
+    '#title' => t('Domain'),
     '#default_value' => empty($settings['domain']) ? 'gapura.sepulsa.net' : $settings['domain'],
   ); 
   $form['abt_ftp_detail']['username'] = array(

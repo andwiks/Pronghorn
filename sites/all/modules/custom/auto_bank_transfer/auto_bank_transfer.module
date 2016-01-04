@@ -635,6 +635,8 @@ function abt_getCSVFiles($dir){
     $login_result = ftp_login($connect, $username, $password);
     $files = ftp_nlist($connect, $dir.'/.');
     $files = array_reverse($files);
+    // close the connection
+    ftp_close($connect);
   }else{
     $dirList = file_scan_directory($dir, '/.*\.csv$/');
     $files = array();

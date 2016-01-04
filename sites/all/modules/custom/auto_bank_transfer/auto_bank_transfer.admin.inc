@@ -2,6 +2,33 @@
 // admin page.
 function auto_bank_transfer_admin_form($form, &$form_state) {
   // load order by total order
+  $settings = variable_get('abt_ftp_detail');
+
+  $form['auto_bank_transfer_ftp'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Using FTP Connection'),
+    '#default_value' => variable_get('auto_bank_transfer_ftp', 1)
+  );
+  $form['abt_ftp_detail'] = array(
+    '#type' => 'container',
+    '#tree' => TRUE,
+  );
+
+  $form['abt_ftp_detail']['domain'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Database Name'),
+    '#default_value' => empty($settings['domain']) ? 'gapura.sepulsa.net' : $settings['domain'],
+  ); 
+  $form['abt_ftp_detail']['username'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Username'),
+    '#default_value' => empty($settings['username']) ? 'sepulsa' : $settings['username'],
+  );
+  $form['abt_ftp_detail']['password'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Password'),
+    '#default_value' => empty($settings['password']) ? 'hacker' : $settings['password'],
+  );
 
   $form['bca_csv_file_folder'] = array(
     '#type' => 'textfield',

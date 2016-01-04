@@ -82,7 +82,15 @@ function bca_read_csv() {
   
   if(!empty($files)){
     //read only 1 file, OLDEST.
-    $filepath = $files[count($files)-1];
+    $filename = $files[count($files)-1];
+
+    //$filepath = 'ftp://sepftp:53pulsa_2015ftp@gapura.sepulsa.net/home/sepftp/files/s3fs-public/bank/amazon.csv';
+    $ftp = variable_get('auto_bank_transfer_ftp',0);
+    if($ftp){
+      $fsettings = variable_get('abt_ftp_detail');
+      $filepath = 'ftp://'.$fsettings['username'].':'.$fsettings['password'].'@'.$fsettings['domain'].$filename;
+    }
+
     $payment = array();
     $row = 1;
     if (($handle = fopen($filepath, "r")) !== FALSE) {
@@ -154,14 +162,14 @@ function bca_read_csv() {
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filename); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filename); }
       }
     } else {
       //For unknown reason, query has failed
@@ -216,6 +224,7 @@ function bca_read_csv() {
 
 // function to confirm payment
 function bca_confirm_payment() {
+  $start = time();
   //read csv
   $all_payment = bca_read_csv();
 
@@ -326,6 +335,7 @@ function bca_confirm_payment() {
       watchdog('bca_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Result: ".implode(', ',$trans_log));
     }
   }
+  if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_confirm_payment', 'Time:' .(time() - $start).' s'); }
 }
 
 // mandiri function to read csv
@@ -335,7 +345,14 @@ function mandiri_read_csv() {
   
   if(!empty($files)){
     //read only 1 file, OLDEST.
-    $filepath = $files[count($files)-1];
+    $filename = $files[count($files)-1];
+
+    $ftp = variable_get('auto_bank_transfer_ftp',0);
+    if($ftp){
+      $fsettings = variable_get('abt_ftp_detail');
+      $filepath = 'ftp://'.$fsettings['username'].':'.$fsettings['password'].'@'.$fsettings['domain'].$filename;
+    }
+
     $payment = array();
     $row = 1;
     if (($handle = fopen($filepath, "r")) !== FALSE) {
@@ -413,14 +430,14 @@ function mandiri_read_csv() {
         }else{
           //data match, splice it, ignore pointer and above
           $payment = array_slice($payment,$pointer);
-          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+          if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filename); }
         }
       }else{
         // data not match OR CSV less than 3
         // if data less than 3, move pointer to last known match
         $pointer = $match;
         $payment = array_slice($payment,$pointer);
-        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filepath); }
+        if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv', 'Data Not Match: <pre>'. print_r($read_log, TRUE) .'</pre>'.$filename); }
       }
     } else {
       //For unknown reason, query has failed
@@ -475,6 +492,7 @@ function mandiri_read_csv() {
 
 // mandiri function to confirm payment
 function mandiri_confirm_payment() {
+  $start = time();
   //read csv
   $all_payment = mandiri_read_csv();
 
@@ -577,6 +595,7 @@ function mandiri_confirm_payment() {
       watchdog('mandiri_confirm_payment', 'Comparing payment: '.implode(', ',$all_payment).'<br>'."Result: ".implode(', ',$trans_log));
     }
   }
+  if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_confirm_payment', 'Time:' .(time() - $start).' s'); }
 }
 
 /* implement hook_cron(). */
@@ -605,14 +624,26 @@ function auto_bank_transfer_date_popup_process_alter(&$element, &$form_state, $c
 }
 
 function abt_getCSVFiles($dir){
-  $dirList = file_scan_directory($dir, '/.*\.csv$/');
-  $files = array();
-  foreach ($dirList as $file => $value) {
-    $files[$file] = filemtime($file);
+  // ftp://sepftp:53pulsa_2015ftp@gapura.sepulsa.net
+  $ftp = variable_get('auto_bank_transfer_ftp',0);
+
+  if($ftp){
+    $fsettings = variable_get('abt_ftp_detail');
+    $username = $fsettings['username'];
+    $password = $fsettings['password'];
+    $connect = ftp_connect($fsettings['domain']);
+    $login_result = ftp_login($connect, $username, $password);
+    $files = ftp_nlist($connect, $dir.'/.');
+    $files = array_reverse($files);
+  }else{
+    $dirList = file_scan_directory($dir, '/.*\.csv$/');
+    $files = array();
+    foreach ($dirList as $file => $value) {
+      $files[$file] = filemtime($file);
+    }
+    arsort($files);
+    $files = array_keys($files);
   }
-
-  arsort($files);
-  $files = array_keys($files);
-
+  
   return ($files) ? $files : false;
 }

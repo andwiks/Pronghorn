@@ -21,7 +21,7 @@ section.banner .caption p {font-size: 14px;}
 section.banner .caption {width: 280px;margin: auto;left: 0;right: 0;}
 section.banner .caption a{  margin: 25px 0 0 0;font-size: 12px;padding: 0 0 22px 0;}
 
-section.h_middle_top .home_tab {top: -96px;width: 280px;}
+section.h_middle_top .home_tab {top: -96px;width: 281px;}
 section.h_middle_top .home_tab .nav_tab a {position: relative;height: 55px;width: 55px;text-indent: -999px;  line-height: 55px;}
 section.h_middle_top .home_tab .nav_tab a span.ico {
     transform: scale(0.8);

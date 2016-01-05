@@ -440,6 +440,7 @@ section.h_middle_top .home_tab{
     position: relative;
     top: -107px;
     width: 806px;
+    width: 807px;
     margin: 0 auto -33px;
     border:1px solid #feb60a;
 }
@@ -448,7 +449,8 @@ section.h_middle_top .home_tab .nav_tab a{
     float: left;
     display: block;
     height: 64px;
-    width: 268px;
+    /*width: 268px;*/
+    width: 201px;
     border-right: 1px solid #feb60a;
     text-align: center;
     font-size: 16px;

@@ -458,7 +458,7 @@ section.banner {
 
 section.banner img{
     position: relative;
-    right: 35%;
+    right: 0;
     top:0;
     max-height: 360px !important;
     max-width: none;

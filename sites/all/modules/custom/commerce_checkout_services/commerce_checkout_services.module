@@ -324,8 +324,8 @@ function commerce_checkout_services_resource_process($checkout) {
       $order = $form_state['order'];
       
       //stripos($order->field_app["und"][0]["value"],'ios') is a workaround to fix issues with missing discount code in live environment from ios order
-      if(stripos($order->field_app["und"][0]["value"],'ios') !== false){
-          return $order;
+      if(isset($order->field_app["und"][0]["value"]) && stripos($order->field_app["und"][0]["value"],'ios') !== false){
+        return $order;
       }
       
       // Return order object.

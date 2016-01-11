@@ -54,9 +54,14 @@ section.h_middle_top .home_tab .nav_tab a {
 	height: 55px;
 	/*width: 55px;
 	text-indent: -999px;*/
-	width:119px;
+	/*width:119px;
 	line-height: 55px;
-	padding-left: 30px;
+	padding-left: 30px;*/
+
+    width:189px;
+    line-height: 55px;
+    padding-left: 30px;
+    border-bottom: 1px solid;
 }
 section.h_middle_top .home_tab .nav_tab a span.ico {
     transform: scale(0.8);
@@ -66,10 +71,10 @@ section.h_middle_top .home_tab .nav_tab a span.ico {
 }
 section.h_middle_top .home_tab .nav_tab a.active{
 	/*width: 118px;*/
-	width: 90px;
+	/*width: 90px;
 	text-indent: 0;
 	padding-left: 50px;
-	text-align: left;
+	text-align: left;*/
 }
 section.h_middle_top .home_tab .content_tab { padding: 22px 20px 15px;}
 section.h_middle_top .home_tab .form input[type=text] {

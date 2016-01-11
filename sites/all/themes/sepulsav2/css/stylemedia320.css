@@ -22,14 +22,24 @@ section.banner .caption {width: 280px;margin: auto;left: 0;right: 0;}
 section.banner .caption a{  margin: 25px 0 0 0;font-size: 12px;padding: 0 0 22px 0;}
 
 section.h_middle_top .home_tab {top: -96px;width: 281px;}
-section.h_middle_top .home_tab .nav_tab a {position: relative;height: 55px;width: 55px;text-indent: -999px;  line-height: 55px;}
+section.h_middle_top .home_tab .nav_tab a {
+    position: relative;height: 55px;width: 55px;text-indent: -999px;  line-height: 55px;
+    width: 50px;
+}
 section.h_middle_top .home_tab .nav_tab a span.ico {
-    transform: scale(0.8);
     position: absolute;
-    left: 9px;
+    /*transform: scale(0.8);
+    left: 9px;*/
+    transform: scale(0.6);
+    left: 4px;
     bottom:11px;
 }
-section.h_middle_top .home_tab .nav_tab a.active{width: 118px;text-indent: 0;padding-left: 50px;text-align: left}
+section.h_middle_top .home_tab .nav_tab a.active{
+    width: 118px;text-indent: 0;padding-left: 50px;text-align: left;
+    width: 82px;
+    padding-left: 45px;
+    font-size: 14px;
+}
 section.h_middle_top .home_tab .content_tab { padding: 22px 20px 15px;}
 section.h_middle_top .home_tab .form input[type=text] {width: 153px;height: 30px;padding: 10px 75px 10px 10px;}
 section.h_middle_top .home_tab .form input.bt {right: 10px;top: 10px;}

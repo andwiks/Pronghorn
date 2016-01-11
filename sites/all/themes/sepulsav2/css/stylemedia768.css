@@ -80,7 +80,10 @@ section.newsletter .right input[type=text] {width: 292px;font-size: 14px;}
 section.newsletter .right input.bt {top: 12px;}
 
 section.h_middle_top .home_tab {top: -105px;width: 660px;}
-section.h_middle_top .home_tab .nav_tab a {width: 219px;}
+section.h_middle_top .home_tab .nav_tab a {
+    /*width: 219px;*/
+    width: 164px;
+}
 section.h_middle_top .home_tab .content_tab {padding: 22px 48px 15px;border-top: 1px solid #feb60a;}
 section.h_middle_top .home_tab .form input[type=text] {width: 503px;}
 

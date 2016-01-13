@@ -15,7 +15,7 @@ $.fn.styledSelect = function (options) {
         if (isFF2)
             return false;
         var selElm = $(this);
-        
+
         /*if (!selElm.next('span.' + prefs.innerClass).length) {
             selElm.wrap('<span><' + '/span>');
             selElm.after('<span><' + '/span>');
@@ -80,7 +80,7 @@ $.fn.styledSelect = function (options) {
             });
 
         }*/
-        
+
     });
 };
 $.fn.placeHolder = function (e) {
@@ -100,8 +100,18 @@ $.fn.placeHolder = function (e) {
 };
 function homeTab() {
     //init
-    var target = $(".home_tab .nav_tab a.active").attr('target');
-    $(".home_tab .content_tab #" + target).css('display', 'block');
+    var hash = window.location.hash.substr(1);
+    if (hash=='multifinance')
+    {
+        $(".home_tab .content_tab #target_4").css('display', 'block');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.finance').parent().addClass('active');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
+    }
+    else
+    {
+        var target = $(".home_tab .nav_tab a.active").attr('target');
+        $(".home_tab .content_tab #" + target).css('display', 'block');
+    }
 
     $(".home_tab .nav_tab a").click(function (e) {
         e.preventDefault();

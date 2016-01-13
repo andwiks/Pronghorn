@@ -34,7 +34,7 @@ $page_state = "home";
         <?php endif; ?>
         <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
           <a href="" target="target_4">
-            <span class="ico bolt"></span>
+            <span class="ico finance"></span>
             <?php print t('multifinance'); ?>
           </a>
         <?php endif; ?>

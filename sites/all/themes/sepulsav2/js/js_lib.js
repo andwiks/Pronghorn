@@ -107,6 +107,18 @@ function homeTab() {
         $('section.h_middle_top .home_tab .nav_tab a span.ico.finance').parent().addClass('active');
         $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
     }
+    else if (hash=='biznet')
+    {
+        $(".home_tab .content_tab #target_3").css('display', 'block');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.bolt').parent().addClass('active');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
+    }
+    else if (hash=='pln')
+    {
+        $(".home_tab .content_tab #target_2").css('display', 'block');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.listrik').parent().addClass('active');
+        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
+    }
     else
     {
         var target = $(".home_tab .nav_tab a.active").attr('target');

@@ -84,7 +84,7 @@ function bca_read_csv() {
     //read only 1 file, OLDEST.
     $filename = $files[count($files)-1];
 
-    //$filepath = 'ftp://sepftp:53pulsa_2015ftp@gapura.sepulsa.net/home/sepftp/files/s3fs-public/bank/amazon.csv';
+    //$filepath = 'ftp://sepftp:53pulsa_2015ftp@gapura.sepulsa.net
     $ftp = variable_get('auto_bank_transfer_ftp',0);
     if($ftp){
       $fsettings = variable_get('abt_ftp_detail');
@@ -217,6 +217,8 @@ function bca_read_csv() {
       return $newData;
     }
   }
+
+  auto_bank_transfer_cekLatest('bca');
   // Reason: No new files, no new data
   if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv','No new files or no new data'); }
   return false;
@@ -485,6 +487,8 @@ function mandiri_read_csv() {
       return $newData;
     }
   }
+  // Perform check on latest summary
+  auto_bank_transfer_checkLatest('mandiri');
   // Reason: No new files, no new data
   if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('mandiri_read_csv','No new files or no new data'); }
   return false;
@@ -623,8 +627,41 @@ function auto_bank_transfer_date_popup_process_alter(&$element, &$form_state, $c
   }
 }
 
+function auto_bank_transfer_checkLatest($bank){
+  // Perform check on latest summary
+  $dir = file_default_scheme() . '://bank/summary_'.$bank;
+  $dirList = file_scan_directory($dir, '/.*\.csv$/');
+  $files = array();
+  foreach ($dirList as $file => $value) {
+    $files[$file] = filemtime($file);
+  }
+  arsort($files);
+  $files = array_keys($files);
+
+  $diffTime = time() - filemtime($files[0]);
+  $bankmaintenance = variable_get('auto_bank_transfer_status_'.$bank,0);
+  $maintenishour = date('G', time());
+
+  // If latest file is behind more than 1 hour AND maintenance status = 0 AND time not between 22:00 to 2:59, alert CS and dev.
+  if($diffTime > 3600 && $bankmaintenance == 0 && $maitenishour < 22 && $maintenishour > 2){
+    $from = "info@sepulsa.com";
+    $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com').',banktransfer@sepulsa.com';
+    $message = ucwords($bank). " Auto Bank Transfer latest file update: ".date ("F d Y H:i:s.", filemtime($filepath));
+    $subject = "Sepulsa - Bank Transfer server fail for: ".ucwords($bank);
+    $params = array(
+      'subject' => $subject,
+      'body' => $message,
+    );
+    drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
+    variable_set('auto_bank_transfer_status_'.$bank,1);
+  // When the BT server is up again set the maintenance status to 0 
+  }else if($diffTime < 3600 && $bankmaintenance == 1){
+    variable_set('auto_bank_transfer_status_'.$bank,0);
+  }
+}
+
 function abt_getCSVFiles($dir){
-  // ftp://sepftp:53pulsa_2015ftp@gapura.sepulsa.net
+  // $dir = '/home/sepftp/files/s3fs-public/bank/bca';
   $ftp = variable_get('auto_bank_transfer_ftp',0);
 
   if($ftp){

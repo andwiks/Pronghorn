@@ -47,8 +47,8 @@ $page_state = "home";
 
           <div class="topup-notes">
               <ul>
-                <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
-                <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
+                <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
               </ul>
           </div>
         </div>
@@ -58,8 +58,8 @@ $page_state = "home";
 
             <div class="topup-notes topup-notes-2">
                 <ul>
-                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
-                  <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                  <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
                 </ul>
             </div>
           </div>
@@ -70,8 +70,8 @@ $page_state = "home";
 
             <div class="topup-notes topup-notes-3">
                 <ul>
-                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
-                  <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                  <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
                 </ul>
             </div>
           </div>
@@ -82,7 +82,7 @@ $page_state = "home";
 
             <div class="topup-notes topup-notes-3">
                 <ul>
-                  <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
                 </ul>
             </div>
           </div>

@@ -1,0 +1,151 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function slack_pron_menu() {
+  $items = array();
+  $items['admin/config/services/slack/slash-commands'] = array(
+    'title' => 'Slack slash command',
+    'description' => 'Slack slash command configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('slack_pron_settings'),
+    'access arguments' => array('administer site configuration'),
+  );
+  $items['slack/slash-command/bank'] = array(
+    'page callback' => 'slack_pron_callback_bank',
+    'delivery callback' => 'slack_pron_deliver_page',
+    'access callback' => 'slack_pron_access',
+    'access arguments' => array('bank'),
+  );
+  return $items;
+}
+
+/**
+  * Configuration form page for Slack Slash Command
+  */
+function slack_pron_settings($form, &$form_state) {
+  // Token for /bank slash command
+  $form['slack_pron_token_bank'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Token - Bank'),
+    '#default_value' => variable_get('slack_pron_token_bank'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+  * Deliver json output for valid result
+  * 403 - for invalid access
+  * 503 - when site under maintenance mode
+  */
+function slack_pron_deliver_page($page_callback_result) {
+  global $language;
+  drupal_add_http_header('Content-Language', $language->language);
+
+  if (is_int($page_callback_result)) {
+    // @todo: Break these up into separate functions?
+    switch ($page_callback_result) {
+      case MENU_ACCESS_DENIED:
+        drupal_add_http_header('Status', '403 Forbidden');
+        break;
+
+      case MENU_SITE_OFFLINE:
+        // Print a 503 page.
+        drupal_add_http_header('Status', '503 Service unavailable');
+        break;
+    }
+  }
+  // Quick check to restrict POST method only
+  elseif ($_SERVER['REQUEST_METHOD'] != 'POST') {
+    drupal_add_http_header('status', '405 Method Not Allowed');
+  }
+  // Return the result in JSON format
+  elseif (isset($page_callback_result)) {
+    drupal_json_output($page_callback_result);
+  }
+}
+
+/**
+  * Slack slash command for Bank related
+  * /bank/status will return the last updated file for each bank
+  * MOAR to come
+  */
+function slack_pron_callback_bank() {
+  switch ($_POST['text']) {
+    // Check latest bank file updated time
+    case 'status':
+      // The header, 2 column. Bank name and the time of latest file
+      $response = array(
+        'response_type' => 'in_channel',
+        'attachments' => array(
+          array(
+            'fields' => array(
+              array(
+                'title' => t('Bank name'),
+                'short' => TRUE,
+              ),
+              array(
+                'title' => t('Status'),
+                'short' => TRUE,
+              ),
+            ),
+          ),
+        ),
+      );
+      // Get BCA latest file
+      $dirList = file_scan_directory('public://bank/summary_bca', '/.*\.csv$/');
+      $files = array();
+      foreach ($dirList as $file => $value) {
+        $files[$file] = filemtime($file);
+      }
+      arsort($files);
+      $files = array_keys($files);
+      
+      $response['attachments'][0]['fields'][] = array(
+        'value' => 'BCA',
+        'short' => TRUE,
+      );
+      $response['attachments'][0]['fields'][] = array(
+        'value' => date ("F d Y H:i:s.", filemtime($files[0])),
+        'short' => TRUE,
+      );
+
+      // Get Mandiri latest file
+      $dirList = file_scan_directory('public://bank/summary_mandiri', '/.*\.csv$/');
+      $files = array();
+      foreach ($dirList as $file => $value) {
+        $files[$file] = filemtime($file);
+      }
+      arsort($files);
+      $files = array_keys($files);
+      
+      $response['attachments'][0]['fields'][] = array(
+        'value' => 'Mandiri',
+        'short' => TRUE,
+      );
+      $response['attachments'][0]['fields'][] = array(
+        'value' => date ("F d Y H:i:s.", filemtime($files[0])),
+        'short' => TRUE,
+      );
+
+      return $response;
+
+    default:
+      return array('text' => t('Unknown option @option.', array('@option' => $_POST['text'])));
+  }
+}
+
+/**
+  * Restrict access coming from Sepulsa team only
+  */
+function slack_pron_access($slash) {
+  if (empty($_POST['token'])) {
+    return FALSE;
+  }
+  // Check for token validation on each command
+  else {
+    if($slash == 'bank') return $_POST['token'] == variable_get('slack_pron_token_bank');
+  }
+}

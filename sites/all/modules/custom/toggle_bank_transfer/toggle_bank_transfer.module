@@ -1,0 +1,146 @@
+<?php
+/**
+ * @file
+ * toogle_bank_transfer.module
+ *
+ * @author andreas
+ * @since January 18, 2016
+ *
+ * @desc
+ *   Add permission which able to toggle bank transfer.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function toggle_bank_transfer_permission() {
+  // Define list permission container.
+  $permissions = array(
+    'access toggle bank transfer' => array(
+      'title' => t('Access toggle bank transfer menu'),
+      'description' => t('Access page to enable / disable bank transfer payment method.'),
+    ),
+  );
+
+  // Get bank transfer payment options.
+  $options = variable_get('toggle_bank_transfer_options', toogle_bank_transfer_get_options());
+
+  // Looping for each option key.
+  foreach ($options as $key => $option) {
+    $key = str_replace('_', ' ', $key);
+    // Add permission.
+    $permissions['toggle ' . $key] = array(
+      'title' => t('Toogle ' . $key),
+      'description' => t('Perform enable / disable ' . $key . ' payment method.'),
+    );
+  }
+
+  // Return permission container.
+  return $permissions;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function toggle_bank_transfer_menu() {
+  // Toggle bank transfer page.
+  $items['admin/commerce/config/toggle-bank-transfer'] = array(
+    'title' => 'Toggle Bank Transfer',
+    'description' => 'Page to enable / disable bank transfer payment method.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('toggle_bank_transfer_admin_form'),
+    'access arguments' => array('access toggle bank transfer'),
+    'file' => 'toggle_bank_transfer.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_form_commerce_checkout_form_checkout_alter().
+ */
+function toggle_bank_transfer_form_commerce_checkout_form_checkout_alter(&$form, &$form_state, $form_id) {
+  // Get bank transfer payment options toggle.
+  $toggle = variable_get('toggle_bank_transfer_options', toogle_bank_transfer_get_options());
+  // Get commerce_payment => payment_method => #options.
+  if (isset($form['commerce_payment']['payment_method']['#options'])) {
+    // Get the payment options.
+    $options = $form['commerce_payment']['payment_method']['#options'];
+    // Looping for each option.
+    foreach ($options as $key => $option) {
+      // Check bank_transfer prefix.
+      if (isset($toggle[$key]) && $toggle[$key] === TRUE) {
+        // Check configuration whether need to disable.
+        unset($form['commerce_payment']['payment_method']['#options'][$key]);
+        unset($form['commerce_payment']['payment_methods']['#value'][$key]);
+      }
+    }
+  }
+  // Add validate function: validate checkout form.
+  array_unshift($form['buttons']['continue']['#validate'], 'toggle_bank_transfer_checkout_form_validate');
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function toggle_bank_transfer_checkout_form_validate().
+ *
+ * Validate payment method option at checkout form.
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function toggle_bank_transfer_checkout_form_validate($form, &$form_state) {
+  // Check form state values for payment input.
+  if (isset($form_state['values']['commerce_payment']['payment_method'])
+    && !empty($form_state['values']['commerce_payment']['payment_method'])
+  ) {
+    // Get bank transfer payment options toggle.
+    $toggle = variable_get('toggle_bank_transfer_options', toogle_bank_transfer_get_options());
+    if (isset($toggle[$form_state['values']['commerce_payment']['payment_method']])
+      && $toggle[$form_state['values']['commerce_payment']['payment_method']] === TRUE
+    ) {
+      form_set_error('commerce_payment][payment_method', t('Your selected payment method is not available at the moment.'));
+    }
+  }
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function toogle_bank_transfer_get_options().
+ *
+ * @return array
+ *   List of Bank Transfer payment method option as array key.
+ */
+function toogle_bank_transfer_get_options() {
+  // Define bank transfer options.
+  $bank_transfer_options = array();
+  // Create fake order with highest permission.
+  $order = commerce_order_new(1);
+  $order->payment_methods = array();
+  entity_metadata_wrapper('commerce_order', $order)->commerce_order_total->set(array(
+    'amount' => 1, 'currency_code' => 'IDR',
+  ));
+  // Invoke rules to getting all payment methods.
+  rules_invoke_all('commerce_payment_methods', $order);
+  // Check the results.
+  foreach ($order->payment_methods as $key => $method) {
+    // Check bank_transfer prefix.
+    if (strpos($key, 'bank_transfer') === 0) {
+      // Get bank transfer payment method.
+      $bank_transfer_options[$key] = FALSE;
+    }
+  }
+  // Return it.
+  return $bank_transfer_options;
+}

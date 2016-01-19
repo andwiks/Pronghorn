@@ -1,0 +1,4 @@
+name = Slack Pronghorn
+description = Slack slash commands integration for Pronghorn
+core = 7.x
+configure = admin/config/services/slack/slash-commands

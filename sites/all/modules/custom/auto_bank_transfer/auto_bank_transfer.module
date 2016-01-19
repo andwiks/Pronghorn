@@ -218,7 +218,7 @@ function bca_read_csv() {
     }
   }
 
-  auto_bank_transfer_cekLatest('bca');
+  auto_bank_transfer_checkLatest('bca');
   // Reason: No new files, no new data
   if(variable_get('auto_bank_transfer_logging', 0)){ watchdog('bca_read_csv','No new files or no new data'); }
   return false;
@@ -646,16 +646,25 @@ function auto_bank_transfer_checkLatest($bank){
   if($diffTime > 3600 && $bankmaintenance == 0 && $maitenishour < 22 && $maintenishour > 2){
     $from = "info@sepulsa.com";
     $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com').',banktransfer@sepulsa.com';
-    $message = ucwords($bank). " Auto Bank Transfer latest file update: ".date ("F d Y H:i:s.", filemtime($filepath));
-    $subject = "Sepulsa - Bank Transfer server fail for: ".ucwords($bank);
+    $message = ucwords($bank). " Auto Bank Transfer latest file update: ".date ("F d Y H:i:s.", filemtime($files[0]));
+    $subject = "Sepulsa - Bank Transfer server FAIL for: ".ucwords($bank);
     $params = array(
       'subject' => $subject,
       'body' => $message,
     );
     drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
     variable_set('auto_bank_transfer_status_'.$bank,1);
-  // When the BT server is up again set the maintenance status to 0 
+  // When the BT server is up again set the maintenance status to 0 also inform CS and dev
   }else if($diffTime < 3600 && $bankmaintenance == 1){
+    $from = "info@sepulsa.com";
+    $to = variable_get('auto_bank_transfer_CS', 'yeti@sepulsa.com').',banktransfer@sepulsa.com';
+    $message = ucwords($bank). " Auto Bank Transfer latest file update: ".date ("F d Y H:i:s.", filemtime($files[0]));
+    $subject = "Sepulsa - Bank Transfer server is UP for: ".ucwords($bank);
+    $params = array(
+      'subject' => $subject,
+      'body' => $message,
+    );
+    drupal_mail('auto_bank_transfer', 'auto_bank_transfer_double_order', $to, language_default(), $params, $from);
     variable_set('auto_bank_transfer_status_'.$bank,0);
   }
 }

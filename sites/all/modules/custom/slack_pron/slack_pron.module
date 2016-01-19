@@ -146,6 +146,6 @@ function slack_pron_access($slash) {
   }
   // Check for token validation on each command
   else {
-    if($bank == 'bank') return $_POST['token'] == variable_get('slack_pron_token_bank');
+    if($slash == 'bank') return $_POST['token'] == variable_get('slack_pron_token_bank');
   }
 }

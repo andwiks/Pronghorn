@@ -16,6 +16,7 @@ function slack_pron_menu() {
     'page callback' => 'slack_pron_callback_bank',
     'delivery callback' => 'slack_pron_deliver_page',
     'access callback' => 'slack_pron_access',
+    'access arguments' => array('bank'),
   );
   return $items;
 }
@@ -24,10 +25,11 @@ function slack_pron_menu() {
   * Configuration form page for Slack Slash Command
   */
 function slack_pron_settings($form, &$form_state) {
-  $form['slack_pron_token'] = array(
+  // Token for /bank slash command
+  $form['slack_pron_token_bank'] = array(
     '#type' => 'textfield',
-    '#title' => t('Token'),
-    '#default_value' => variable_get('slack_pron_token'),
+    '#title' => t('Token - Bank'),
+    '#default_value' => variable_get('slack_pron_token_bank'),
   );
 
   return system_settings_form($form);
@@ -138,11 +140,12 @@ function slack_pron_callback_bank() {
 /**
   * Restrict access coming from Sepulsa team only
   */
-function slack_pron_access() {
+function slack_pron_access($slash) {
   if (empty($_POST['token'])) {
     return FALSE;
   }
+  // Check for token validation on each command
   else {
-    return $_POST['token'] == variable_get('slack_pron_token');
+    if($bank == 'bank') return $_POST['token'] == variable_get('slack_pron_token_bank');
   }
 }

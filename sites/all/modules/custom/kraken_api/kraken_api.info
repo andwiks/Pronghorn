@@ -4,3 +4,5 @@ core = "7.x"
 package = "Sepulsa"
 
 configure = admin/config/services/kraken
+
+files[] = includes/views/handlers/kraken_api_views_handler_kraken_data.inc

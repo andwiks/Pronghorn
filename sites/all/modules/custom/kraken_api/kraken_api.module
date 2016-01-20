@@ -25,3 +25,20 @@ function kraken_api_menu() {
 
   return $items;
 }
+
+function kraken_api_products() {
+  module_load_include('inc', 'kraken_api');
+  $products = kraken_api_call('product');
+
+  return $products;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function kraken_api_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'kraken_api') . '/includes/views',
+  );
+}

@@ -52,9 +52,9 @@ $page_state = "home";
               </ul>
           </div>
         </div>
-        <?php if (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
+        <?php if (module_exists('pln_prepaid') && user_access('view any commerce_product entity of bundle pln_prepaid')): ?>
           <div class="tab form style_1" id="target_2">
-            <?php print render($token_reload_form); ?>
+            <?php print render($pln_prepaid_form); ?>
 
             <div class="topup-notes topup-notes-2">
                 <ul>

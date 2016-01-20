@@ -26,9 +26,13 @@ function kraken_api_menu() {
   return $items;
 }
 
-function kraken_api_products() {
+function kraken_api_products($field, $instance, $entity_type, $entity, $cacheable) {
   module_load_include('inc', 'kraken_api');
-  $products = kraken_api_call('product');
+  $products_list = kraken_api_call('product');
+
+  foreach ($products_list['list'] as $product) {
+    $products[$product['product_id']] = "{$product['type']}: {$product['operator']} ({$product['nominal']})";
+  }
 
   return $products;
 }

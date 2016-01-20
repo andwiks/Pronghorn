@@ -121,3 +121,30 @@ function pln_prepaid_add_to_cart_form_validate(&$form, &$form_state) {
     }
   }
 }
+
+function pln_prepaid_payment_execute($order_wrapper) {
+  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+    if ($line_item_wrapper->getBundle() == 'pln_prepaid' && $line_item_wrapper->field_line_item_status->value() == 'pending') {
+      pln_prepaid_payment_line_item($line_item_wrapper);
+    }
+  }
+}
+
+function pln_prepaid_payment_line_item($line_item_wrapper) {
+  $data = array(
+    'customer_number' => $line_item_wrapper->field_customer_number->value(),
+    'order_id' => $line_item_wrapper->order_id->value(),
+    'product_id' => $line_item_wrapper->commerce_product->kraken_product->value()),
+  );
+
+  module_load_include('inc', 'kraken_api');
+  $response = kraken_api_call('transaction', 'POST', $data);
+
+  $status = $response['status'] ? 'success' : 'failed';
+  $line_item_wrapper->field_line_item_status->set($status);
+  $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
+
+  $line_item = $line_item_wrapper->value();
+  $line_item->data = $response;
+  entity_save('commerce_line_item', $line_item);
+}

@@ -107,7 +107,6 @@ function pln_prepaid_add_to_cart_form_validate(&$form, &$form_state) {
     );
 
     $inquiry = kraken_api_call('inquire', 'POST', $data);
-    dpm($inquiry);
     if (!empty($inquiry)) {
       if ($inquiry['status']) {
         $form_state['line_item']->data['inquiry'] = $inquiry;
@@ -133,8 +132,9 @@ function pln_prepaid_payment_execute($order_wrapper) {
 function pln_prepaid_payment_line_item($line_item_wrapper) {
   $data = array(
     'customer_number' => $line_item_wrapper->field_customer_number->value(),
+    'meter_number' => $line_item_wrapper->field_customer_number->value(),
     'order_id' => $line_item_wrapper->order_id->value(),
-    'product_id' => $line_item_wrapper->commerce_product->kraken_product->value()),
+    'product_id' => $line_item_wrapper->commerce_product->kraken_product->value(),
   );
 
   module_load_include('inc', 'kraken_api');

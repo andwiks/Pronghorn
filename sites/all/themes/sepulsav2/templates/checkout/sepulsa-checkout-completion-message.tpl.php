@@ -84,6 +84,7 @@ if (module_exists('facebook_twitter_share')) {
             </td>
           </tr>
         </table>
+        <button name="nps-submit" type="button">Vote</button>
         </div>
         <?php
         //if bank transfer

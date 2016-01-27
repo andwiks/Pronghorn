@@ -89,8 +89,7 @@ table.nps-rate tr td .title-good
   
   .nps .inner
   {
-    top:10px !important;
-    left:10px !important;
+    top:-21px;
   }
 }
 

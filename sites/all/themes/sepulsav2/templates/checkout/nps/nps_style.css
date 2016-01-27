@@ -48,6 +48,19 @@ table.nps-rate tr td .title-good
   color:#129d4a;
 }
 
+.nps .outer td
+{
+  position:relative;
+  padding:5px;
+}
+
+.nps .inner
+{
+  position:absolute;
+  top:15px;
+  left:15px;
+}
+
 /* syle_320 */
 @media only screen and (max-width: 479px) {
   .nps
@@ -76,19 +89,17 @@ table.nps-rate tr td .title-good
   
   .nps .inner
   {
-    top:10px;
-    right:10px;
+    top:10px !important;
+    left:10px !important;
   }
 }
 
-.nps .outer td
+input.labelauty + label > span.labelauty-unchecked-image
 {
-  position:relative;
+  background-image: none;
 }
-
-.nps .inner
+​
+input.labelauty + label > span.labelauty-checked-image
 {
-  position:absolute;
-  top:15px;
-  right:15px;
+  background-image: none;
 }

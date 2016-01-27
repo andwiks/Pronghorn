@@ -27,16 +27,9 @@ margin: 15px auto;
   font-weight:bold;
 }
 
-table.nps-rate
-{
-  width:96%;
-  padding:0 2%;
-}
-
 table.nps-rate tr td
 {
   font-size:12px;
-padding:2px;
 }
 
 table.nps-rate tr td .title
@@ -48,13 +41,11 @@ table.nps-rate tr td .title
 table.nps-rate tr td .title-bad
 {
   color:#c72127;
-  padding-bottom:10px;
 }
 
 table.nps-rate tr td .title-good
 {
   color:#129d4a;
-  padding-bottom:10px;
 }
 
 /* syle_320 */
@@ -80,6 +71,24 @@ table.nps-rate tr td .title-good
   
   table.nps-rate tr td
   {
-    padding:5px 2px;
+    padding:0 2px;
   }
+  
+  .nps .inner
+  {
+    top:10px;
+    right:10px;
+  }
+}
+
+.nps .outer td
+{
+  position:relative;
+}
+
+.nps .inner
+{
+  position:absolute;
+  top:15px;
+  right:15px;
 }

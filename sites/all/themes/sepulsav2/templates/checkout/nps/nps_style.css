@@ -7,12 +7,24 @@ input.labelauty + label
 display:block;
 }
 
-button[name="nps-submit"] 
-{
-margin: 15px auto;
-    width: 50px;
-    text-align: center;
-    display: block;
+button[name="nps-submit"] {
+  margin: 15px auto;
+  width: 50px;
+  text-align: center;
+  display: block;
+  border-radius: 7px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  background: #129d4a;
+  border: none;
+  font-family: "robotoregular";
+  padding: 9px 5px;
+  text-transform: uppercase;
+  width: 120px;
+  cursor: pointer;
+  color: #FFF;
 }
 .nps
 {

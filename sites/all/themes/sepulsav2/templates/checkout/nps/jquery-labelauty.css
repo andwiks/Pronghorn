@@ -97,6 +97,7 @@ input.labelauty:not(:checked) + label > span.labelauty-checked
 /* When Checked */
 input.labelauty:checked + label
 {
+	opacity: 1;
 	background-color: #3498db;
 	color: #ffffff;
 }

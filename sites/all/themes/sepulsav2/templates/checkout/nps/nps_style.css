@@ -1,7 +1,19 @@
 .block-webform{
   display: none;
 }
+input.labelauty + label
+{
+  opacity: 0.5;
+display:block;
+}
 
+button[name="nps-submit"] 
+{
+margin: 15px auto;
+    width: 50px;
+    text-align: center;
+    display: block;
+}
 .nps
 {
   margin:10px auto;
@@ -44,9 +56,9 @@ table.nps-rate tr td .title-good
 
 .nps .inner
 {
-  position:absolute;
-  top:15px;
-  left:20px;
+  top:-23px;
+  position: relative;
+  z-index: -9;
 }
 
 /* syle_320 */

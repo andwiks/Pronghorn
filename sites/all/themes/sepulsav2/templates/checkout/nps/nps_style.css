@@ -2,18 +2,6 @@
   display: none;
 }
 
-input.labelauty + label
-{
-display:block;
-}
-
-button[name="nps-submit"] 
-{
-margin: 15px auto;
-    width: 50px;
-    text-align: center;
-    display: block;
-}
 .nps
 {
   margin:10px auto;
@@ -58,7 +46,7 @@ table.nps-rate tr td .title-good
 {
   position:absolute;
   top:15px;
-  left:15px;
+  left:20px;
 }
 
 /* syle_320 */
@@ -84,7 +72,7 @@ table.nps-rate tr td .title-good
   
   table.nps-rate tr td
   {
-    padding:0 2px;
+    padding:2px 4px !important;
   }
   
   .nps .inner
@@ -96,10 +84,10 @@ table.nps-rate tr td .title-good
 
 input.labelauty + label > span.labelauty-unchecked-image
 {
-  background-image: none;
+  background-image: none !important;
 }
 ​
 input.labelauty + label > span.labelauty-checked-image
 {
-  background-image: none;
+  background-image: none !important;
 }

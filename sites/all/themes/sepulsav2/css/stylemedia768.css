@@ -477,3 +477,16 @@ section.banner .bx-viewport
 {
     left:0 !important;
 }
+.topup-action {
+   width: 86%;
+   margin: 0 auto;
+}
+section.h_middle_top input[type=submit], input[type=button] {
+   width: 45%;
+   white-space: pre-wrap;
+   overflow-wrap: break-word;
+   word-wrap: break-word;
+}
+.topup-notes {
+   width: 100%;
+}

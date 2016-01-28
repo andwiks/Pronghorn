@@ -90,7 +90,15 @@ section.h_middle_top .voucher_vendor {
 	width: 410px;
 	margin: auto;
 }
-
+section.h_middle_top input[type=submit], input[type=button] {
+   width: 45%;
+   white-space: pre-wrap;
+   overflow-wrap: break-word;
+   word-wrap: break-word;
+   padding: 10px;
+   font-size: 14px;
+   height: 65px;
+}
 .form.style_1 input[type=text] {font-size: 12px;}
 
 section.promo_banner .slide{

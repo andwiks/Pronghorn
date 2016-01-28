@@ -59,9 +59,9 @@ $(document).ready(function () {
         }, 1000);
     });
 
-
-    onclick="return confirm('Apakah Anda yakin ingin melanjutkan pembayaran tanpa memilih Voucher?')"
-
+    $('#edit-add-charge, input[id^=edit-charge]').click(function() {
+      return confirm('Apakah Anda yakin ingin melanjutkan pembayaran tanpa memilih Voucher?');
+    });
 
     /* blog
      ================================================================ */

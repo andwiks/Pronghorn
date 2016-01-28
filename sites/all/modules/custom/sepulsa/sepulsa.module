@@ -64,6 +64,26 @@ function sepulsa_menu_alter(&$items) {
 }
 
 /**
+ * Implement hook_form_FORM_ID_alter().
+ */
+function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  // Get sepulsa settings.
+  $settings = variable_get('sepulsa_settings', array());
+  // Check if multipaid is disabled and currently on front page.
+  if (!(isset($settings['multipaid_product']) && !empty($settings['multipaid_product']))
+    && drupal_is_front_page()
+  ) {
+    // Add pay now submit button.
+    $form['charge'] = array(
+      '#type' => 'submit',
+      '#value' => t('Pay Now'),
+    );
+    // Add submit function to check for charge redirection.
+    $form['#submit'][] = 'sepulsa_add_to_cart_charge_form_submit';
+  }
+}
+
+/**
  * Public Functions.
  */
 
@@ -227,9 +247,15 @@ function sepulsa_get_all_operator_data($reset = FALSE, $data_packet = FALSE) {
   return $operators;
 }
 
+/**
+ * Function sepulsa_get_existing_number().
+ *
+ * @return array.
+ *   List of existing phone number.
+ */
 function sepulsa_get_existing_number() {
   global $user;
-  $existing_number = [];
+  $existing_number = array();
   $query = "SELECT distinct(field_phone_number_value)
 			FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c
 			WHERE
@@ -244,4 +270,38 @@ function sepulsa_get_existing_number() {
   }
 
   return $existing_number;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function sepulsa_add_to_cart_charge_form_submit().
+ *
+ * Callback to check if customer choose to charge.
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function sepulsa_add_to_cart_charge_form_submit($form, &$form_state) {
+  // Redirect to coupon page:  By default redirection is handled by rules.
+  // Check charge operation: redirect to checkout page.
+  if (isset($form['charge']) && !empty($form['charge'])
+    && $form_state['values']['op'] == $form_state['values']['charge']
+  ) {
+    // Check rules action go to.
+    if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
+      unset($GLOBALS['_rules_action_drupal_goto_do']);
+    }
+    // Redirect to checkout page.
+    $form_state['redirect'] = array(
+      'checkout/' . $form_state['order']->order_id,
+      array(
+        'query' => array('fast_charge' => TRUE),
+      ),
+    );
+  }
 }

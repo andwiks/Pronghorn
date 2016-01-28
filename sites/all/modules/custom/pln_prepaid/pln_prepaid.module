@@ -131,7 +131,7 @@ function pln_prepaid_payment_execute($order_wrapper) {
 
 function pln_prepaid_payment_line_item($line_item_wrapper) {
   $data = array(
-    'customer_number' => $line_item_wrapper->field_customer_number->value(),
+    'customer_number' => $line_item_wrapper->field_phone_number->value(),
     'meter_number' => $line_item_wrapper->field_customer_number->value(),
     'order_id' => $line_item_wrapper->order_id->value(),
     'product_id' => $line_item_wrapper->commerce_product->kraken_product->value(),

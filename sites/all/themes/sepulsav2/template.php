@@ -422,13 +422,12 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
           $form['description']['#suffix'] = '</div>';
         }
 
-        $form['add']['#prefix'] = '<div class="topup-action-2">';
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
-        $form['add']['#suffix'] = '</div>';
 
+        $form['submit']['#weight'] = 3;
         $form['submit']['#states'] = array(
           'enabled' => array(
             '#' . $form['#id'] . ' :input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),

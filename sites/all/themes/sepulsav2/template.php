@@ -431,9 +431,21 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
 
         $form['submit']['#states'] = array(
           'enabled' => array(
-            ':input[name="line_item_fields[customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ':input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ':input[name="line_item_fields[field_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
+
+        // Add charge state: if available.
+        if (isset($form['charge']) && !empty($form['charge'])) {
+          $form['charge']['#states'] = array(
+            'enabled' => array(
+              ':input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+              ':input[name="line_item_fields[field_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ),
+          );
+        }
+        $form['#action'] .= '#pln';
         break;
     }
   }

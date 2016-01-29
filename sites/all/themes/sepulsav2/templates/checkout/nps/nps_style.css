@@ -1,0 +1,116 @@
+.block-webform{
+  display: none;
+}
+input.labelauty + label
+{
+  opacity: 0.5;
+display:block;
+}
+
+button[name="nps-submit"] {
+  margin: 15px auto;
+  width: 50px;
+  text-align: center;
+  display: block;
+  border-radius: 7px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  background: #129d4a;
+  border: none;
+  font-family: "robotoregular";
+  padding: 9px 5px;
+  text-transform: uppercase;
+  width: 120px;
+  cursor: pointer;
+  color: #FFF;
+}
+.nps
+{
+  margin:10px auto;
+  width:442px;
+}
+
+.nps p.question
+{
+  text-align:center;
+  padding:15px 45px;
+  font-weight:bold;
+}
+
+table.nps-rate tr td
+{
+  font-size:12px;
+}
+
+table.nps-rate tr td .title
+{
+  font-size:14px;
+  font-weight:bold;
+}
+
+table.nps-rate tr td .title-bad
+{
+  color:#c72127;
+}
+
+table.nps-rate tr td .title-good
+{
+  color:#129d4a;
+}
+
+.nps .outer td
+{
+  position:relative;
+  padding:5px;
+}
+
+.nps .inner
+{
+  top:-23px;
+  position: relative;
+  z-index: -9;
+}
+
+/* syle_320 */
+@media only screen and (max-width: 479px) {
+  .nps
+  {
+    margin:10px auto;
+    width:302px;
+  }
+  
+  input.labelauty + label > span.labelauty-unchecked-image,
+  input.labelauty + label > span.labelauty-checked-image
+  {
+    width:6px;
+    height:10px;
+    padding:4px;
+  }
+  
+  input.labelauty + label
+  {
+    padding:6px 3px;
+  }
+  
+  table.nps-rate tr td
+  {
+    padding:2px 4px !important;
+  }
+  
+  .nps .inner
+  {
+    top:-21px;
+  }
+}
+
+input.labelauty + label > span.labelauty-unchecked-image
+{
+  background-image: none !important;
+}
+​
+input.labelauty + label > span.labelauty-checked-image
+{
+  background-image: none !important;
+}

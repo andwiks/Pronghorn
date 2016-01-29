@@ -1824,7 +1824,6 @@ section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
     font-family: "robotoregular";
     padding: 9px 5px;
     height: 50px;
-    width: 160px;
     cursor: pointer;
     color: #FFF;
     border-radius: 7px;
@@ -1833,6 +1832,7 @@ section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
     -ms-border-radius: 7px;
     -o-border-radius: 7px;
     margin:5px;
+    text-transform: uppercase;
 }
 
 
@@ -1917,8 +1917,7 @@ section.h_middle_top .form-select
     section.h_middle_top #edit-add-cart, section.h_middle_top #edit-submit--2
     {
         content:"";
-        clear: both;
-        display: block
+        display: block;
     }
 
 .voucher_vendor
@@ -1956,28 +1955,27 @@ table.tab-isi-pulsa tr td:first-child a
 
 .topup-notes
 {
-    width:50%;
     float:left;
     display: block !important;
+    width: 40%;
 }
 
-.topup-notes-2
+.topup-notes-multi {
+	width: 70%;
+}
+
+.topup-notes ul
 {
-    width:70%;
+    margin: 0 0 0 20px;
+    padding: 0;
 }
 
-    .topup-notes ul
-    {
-        margin: 0 0 0 20px;
-        padding: 0;
-    }
-
-    .topup-notes ul li
-    {
-        list-style: disc;
-        padding: 5px;
-        margin:0;
-    }
+.topup-notes ul li
+{
+    list-style: disc;
+    padding: 5px;
+    margin:0;
+}
 
 .pull-right
 {

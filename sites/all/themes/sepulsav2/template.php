@@ -29,10 +29,7 @@ function sepulsav2_block_view_alter(&$data, $block) {
  * Implements hook_form_alter().
  */
 function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
-  //drupal_set_message("<pre>".print_r($form_id, true)."</pre>");
-  $commer_form_id = substr($form_id, 0, 25);
   if ($form_id == "sepulsa_phone_form") {
-    //drupal_set_message("<pre>".print_r($form['add'], true)."</pre>");
     $form['phone']['#title'] = NULL;
     $form['phone']['#attributes']['class'] = array('input-text', 'full-width');
     $form['phone']['#attributes']['placeholder'] = t('Masukkan Nomor Handphone (mis. 081234567890)');
@@ -44,22 +41,17 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 
     $form['card_type']['#title'] = NULL;
     $form['card_type']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Kartu');
-    //$form['card_type']['#suffix'] = '<p></p>';
 
     $form['packet']['#title'] = NULL;
     $form['packet']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Paket');
 
-    $form['add']['#prefix'] = '<p></p>';
-
     $form['add']['#prefix'] = '<div class="topup-action">';
     $form['add']['cart']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
     $form['add']['cart']['#attributes']['style'] = 'float:right';
-    $form['add']['charge']['#value'] = t('Pay Now');
     $form['add']['charge']['#attributes']['style'] = 'float:right;';
     $form['add']['#suffix'] = '</div>';
 
   } else if ($form_id == "user_login_block") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p></p>';
@@ -72,7 +64,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
 
   } else if ($form_id == "user_login") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p></p>';
@@ -85,7 +76,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['links']['#markup'] = l(t('Request New Password'), 'user/password');
 
   } else if ($form_id == "user_register_form") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['account']['name']['#title'] = NULL;
     $form['account']['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Username');
 
@@ -96,7 +86,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['submit']['#attributes'] = array('class' => array('btn', 'style1'));
 
   } else if ($form_id == "user_pass") {
-    //drupal_set_message("<pre>".print_r($form, true)."</pre>");
     $form['name']['#title'] = NULL;
     $form['name']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Alamat Email');
     $form['name']['#suffix'] = '<p><br /></p>';
@@ -301,7 +290,15 @@ function sepulsav2_form_views_form_commerce_cart_block_popup_alter(&$form, &$for
  * Implements hook_form_BASE_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
-  if (!empty($form_state['line_item'])) {
+  // Check for charge button.
+  if (isset($form['charge']) && !empty($form['charge'])) {
+    $form['charge']['#attributes']['class'][] = 'btn';
+    $form['charge']['#attributes']['class'][] = 'style1';
+    $form['charge']['#attributes']['class'][] = 'pull-right';
+    $form['charge']['#attributes']['style'][] = 'float:right;';
+    $form['charge']['#weight'] = 4;
+  }
+  if (isset($form_state['line_item']) && !empty($form_state['line_item'])) {
     switch ($form_state['line_item']->type) {
       case 'coupon':
         $form['submit']['#ajax'] = array(
@@ -311,10 +308,6 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         break;
 
       case 'electricity_prepaid':
-        global $active_tab;
-        $active_tab = 'token_reload';
-
-        // $form['product_id']['#weight'] = 5;
         $form['product_id']['#attributes']['class'][] = 'input-text';
         $form['product_id']['#attributes']['class'][] = 'full-width';
         $form['product_id']['#suffix'] = '<p></p>';
@@ -334,23 +327,29 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
 
-        $form['add']['#prefix'] = '<div class="topup-action-2">';
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
-        $form['add']['#suffix'] = '</div>';
+        $form['submit']['#attributes']['style'][] = 'float:right;';
 
-        if ($form_state['submitted'] === FALSE) {
-          $form['submit']['#attributes']['class'][] = 'inactive';
-        }
+        $form['submit']['#weight'] = 3;
         $form['submit']['#states'] = array(
           'enabled' => array(
             ':input[name="line_item_fields[electricity_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
             ':input[name="line_item_fields[electricity_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
-
+        // Add charge state: if available.
+        if (isset($form['charge']) && !empty($form['charge'])) {
+          $form['charge']['#states'] = array(
+            'enabled' => array(
+              ':input[name="line_item_fields[electricity_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+              ':input[name="line_item_fields[electricity_phone_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ),
+          );
+        }
+        $form['#action'] .= '#pln';
         break;
 
       case 'biznet':
@@ -371,20 +370,30 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         if (!empty($form['description'])) {
           $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
           $form['description']['#suffix'] = '</div>';
+          $form['description']['#weight'] = 1;
         }
 
-        $form['add']['#prefix'] = '<div class="topup-action-2">';
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
         $form['submit']['#attributes']['class'][] = 'pull-right';
-        $form['add']['#suffix'] = '</div>';
+        $form['submit']['#attributes']['style'][] = 'float:right;';
+        $form['submit']['#weight'] = 3;
 
         $form['submit']['#states'] = array(
           'enabled' => array(
-            ':input[name="line_item_fields[customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
+        // Add charge state: if available.
+        if (isset($form['charge']) && !empty($form['charge'])) {
+          $form['charge']['#states'] = array(
+            'enabled' => array(
+              'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            ),
+          );
+        }
+        $form['#action'] .= '#' . $form_state['line_item']->type;
         break;
 
       case 'pln_prepaid':

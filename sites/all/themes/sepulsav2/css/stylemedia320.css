@@ -458,6 +458,9 @@ section.h_middle_top input[type=submit], input[type=button]
 {
     width: 45%;
     font-size: 12px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 section.h_middle_top #sepulsa-autocomplete-packets select, section.h_middle_top #edit-existing-phone, section.h_middle_top .home_tab .form input[type=text]
 {
@@ -870,4 +873,8 @@ section.banner img{
 section.banner .caption
 {
     top:25%;
+}
+
+.topup-action {
+   width: 100%;
 }

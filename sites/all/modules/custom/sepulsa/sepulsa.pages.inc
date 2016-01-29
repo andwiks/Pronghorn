@@ -33,10 +33,16 @@ function sepulsa_autocomplete($type, $string = '') {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
+  // Get sepulsa settings.
   $settings = variable_get('sepulsa_settings', array());
-  if (empty($settings['multipaid_product'])) {
+  // Check if multipaid is disabled.
+  if (!(isset($settings['multipaid_product'])
+    && !empty($settings['multipaid_product'])
+  )) {
+    // Get global user object.
+    global $user;
     // Get cart order.
-    $order = commerce_cart_order_load($GLOBALS['user']->uid);
+    $order = commerce_cart_order_load($user->uid);
     // Check whether order is not empty.
     if (!empty($order)) {
       // For now, always empty cart when visit homepage.
@@ -243,24 +249,13 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
   $form['add']['cart'] = array(
     '#type' => 'submit',
     '#value' => t('Add to cart'),
-    '#attributes' => array(
-      'class' => array('btn', 'style1', 'inactive'),
-    ),
   );
   // Submit button: fast charge.
   $settings = variable_get('sepulsa_settings', array());
-  if (empty($settings['multipaid_product'])) {
+  if (!(isset($settings['multipaid_product']) && !empty($settings['multipaid_product']))) {
     $form['add']['charge'] = array(
       '#type' => 'submit',
-      '#value' => t('Fast Charge'),
-      '#attributes' => array(
-        'class' => array('btn', 'style1', 'inactive'),
-      ),
-    );
-  }
-  else {
-    $form['add']['charge'] = array(
-      '#type' => 'value',
+      '#value' => t('Pay Now'),
     );
   }
 
@@ -390,7 +385,9 @@ function sepulsa_phone_form_submit($form, &$form_state) {
   // Redirect to coupon page.
   // By default redirection is handled by rules.
   // Check fast charge operation: redirect to checkout page.
-  if ($form_state['values']['op'] == $form_state['values']['add']['charge']) {
+  if (isset($form_state['values']['add']['charge'])
+    && $form_state['values']['op'] == $form_state['values']['add']['charge']
+  ) {
     // Check rules action go to.
     if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
       unset($GLOBALS['_rules_action_drupal_goto_do']);

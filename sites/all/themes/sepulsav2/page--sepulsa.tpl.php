@@ -9,6 +9,9 @@
 global $base_url;
 $theme_path = $base_url . '/' . path_to_theme();
 $page_state = "home";
+
+// Get sepulsa settings.
+$settings = variable_get('sepulsa_settings', array());
 ?>
   <!-- middle -->
 <section class="banner" style="min-height:441px">
@@ -45,7 +48,7 @@ $page_state = "home";
           <?php print render($messages); ?>
           <?php print render($page['content']); ?>
 
-          <div class="topup-notes">
+          <div class="topup-notes<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
               <ul>
                 <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
                 <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
@@ -54,9 +57,9 @@ $page_state = "home";
         </div>
         <?php if (module_exists('pln_prepaid') && user_access('view any commerce_product entity of bundle pln_prepaid')): ?>
           <div class="tab form style_1" id="target_2">
+            <?php print render($messages); ?>
             <?php print render($pln_prepaid_form); ?>
-
-            <div class="topup-notes topup-notes-2">
+            <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
                   <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
@@ -66,9 +69,10 @@ $page_state = "home";
         <?php endif; ?>
         <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
           <div class="tab form style_1" id="target_3">
+            <?php print render($messages); ?>
             <?php print render($biznet_form); ?>
 
-            <div class="topup-notes topup-notes-3">
+            <div class="topup-notes topup-notes-3<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
                   <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
@@ -78,9 +82,10 @@ $page_state = "home";
         <?php endif; ?>
         <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
           <div class="tab form style_1" id="target_4">
+            <?php print render($messages); ?>
             <?php print render($multifinance_form); ?>
 
-            <div class="topup-notes topup-notes-3">
+            <div class="topup-notes topup-notes-3<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
                 </ul>

@@ -1,0 +1,6 @@
+name = "PLN Prepaid"
+description = "PLN prepaid."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = kraken_api

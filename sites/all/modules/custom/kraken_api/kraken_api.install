@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * Add kraken_product field.
+ */
+function kraken_api_update_7001(&$sandbox) {
+  if (!field_info_field('kraken_product')) {
+    $field = array(
+      'field_name' => 'kraken_product',
+      'type' => 'list_integer',
+      'entity_types' => array('commerce_product'),
+      'module' => 'list',
+      'settings' => array(
+        'allowed_values_function' => 'kraken_api_products',
+      ),
+    );
+    field_create_field($field);
+  }
+}

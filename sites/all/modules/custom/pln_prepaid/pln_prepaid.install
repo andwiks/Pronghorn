@@ -1,0 +1,102 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_install().
+ */
+function pln_prepaid_install() {
+  $t = get_t();
+
+  $instances = array(
+    'field_transaction_id' => array(
+      'field_name' => 'field_transaction_id',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'pln_prepaid',
+      'label' => $t('Transaction ID'),
+    ),
+    'field_customer_number' => array(
+      'field_name' => 'field_customer_number',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'pln_prepaid',
+      'label' => $t('Customer Number'),
+      'required' => TRUE,
+      'commerce_cart_settings' => array(
+        'field_access' => TRUE,
+      ),
+    ),
+    'field_line_item_status' => array(
+      'field_name' => 'field_line_item_status',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'pln_prepaid',
+      'label' => $t('Line Item Status'),
+      'default_value' => array(
+        0 => array(
+          'value' => 'pending',
+        ),
+      ),
+    ),
+    'field_product' => array(
+      'field_name' => 'field_product',
+      'entity_type' => 'node',
+      'bundle' => 'pln_prepaid',
+      'label' => $t('Product variations'),
+      'required' => TRUE,
+      'settings' => array(
+        'field_injection' => TRUE,
+        'referenceable_types' => array('pln_prepaid' => 'pln_prepaid'),
+      ),
+      'widget' => array(
+        'type' => 'inline_entity_form',
+        'settings' => array(
+          'type_settings' => array(
+            'delete_references' => TRUE,
+          ),
+        ),
+      ),
+      'display' => array(
+        'default' => array(
+          'label' => 'hidden',
+          'type' => 'commerce_cart_add_to_cart_form',
+          'settings' => array(
+            'combine' => FALSE,
+            'line_item_type' => 'pln_prepaid',
+          ),
+        ),
+      ),
+    ),
+    'kraken_product' => array(
+      'field_name' => 'kraken_product',
+      'entity_type' => 'commerce_product',
+      'bundle' => 'pln_prepaid',
+      'label' => $t('Kraken product'),
+      'required' => TRUE,
+    ),
+  );
+
+  foreach ($instances as $instance) {
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function pln_prepaid_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  if ($phase == 'install' && drupal_get_installed_schema_version('kraken_api') < 7001) {
+    $requirements['pln_prepaid'] = array(
+      'title' => $t('PLN Prepaid'),
+      'value' => VERSION,
+      'description' => $t('PLN Prepaid require installed kraken_api schema version 7001 or later, please run database update.'),
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  return $requirements;
+}

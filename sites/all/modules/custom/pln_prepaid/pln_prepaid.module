@@ -1,0 +1,150 @@
+<?php
+
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function pln_prepaid_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types['pln_prepaid'] = array(
+    'type' => 'pln_prepaid',
+    'name' => t('PLN Prepaid'),
+    'description' => t('References an PLN prepaid product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
+ * Implements hook_commerce_product_type_info().
+ */
+function pln_prepaid_commerce_product_type_info() {
+  $product_types = array();
+
+  $product_types['pln_prepaid'] = array(
+    'type' => 'pln_prepaid',
+    'name' => t('PLN Prepaid'),
+    'description' => t('An PLN prepaid product.'),
+  );
+
+  return $product_types;
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function pln_prepaid_node_info() {
+  return array(
+    'pln_prepaid' => array(
+      'name' => t('PLN Prepaid'),
+      'base' => 'node_content',
+      'description' => t('PLN prepaid product display'),
+      'locked' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
+ */
+function pln_prepaid_form_commerce_cart_add_to_cart_form_pln_prepaid_alter(&$form, &$form_state, $form_id) {
+  $form['#validate'][] = 'pln_prepaid_add_to_cart_form_validate';
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function pln_prepaid_preprocess_page(&$variables) {
+  if (drupal_is_front_page() && user_access('view any commerce_product entity of bundle pln_prepaid')) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_product');
+    $query->entityCondition('bundle', 'pln_prepaid');
+    $query->fieldOrderBy('commerce_price', 'amount', 'DESC');
+
+    $result = $query->execute();
+
+    if (!empty($result['commerce_product'])) {
+      $product_ids = array_keys($result['commerce_product']);
+
+      $values = array(
+        'type' => 'pln_prepaid',
+        'data' => array(
+          'context' => array(
+            'product_ids' => $product_ids,
+          ),
+        ),
+      );
+      $line_item = entity_create('commerce_line_item', $values);
+
+      $variables['pln_prepaid_form'] = drupal_get_form('commerce_cart_add_to_cart_form_pln_prepaid', $line_item);
+    }
+  }
+}
+
+function pln_prepaid_add_to_cart_form_validate(&$form, &$form_state) {
+  if ($form_state['submitted']) {
+    $customer_number = $form_state['values']['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value'];
+    $inquiry = &drupal_static('pln_prepaid_inquiry_data__' . $customer_number);
+
+    // foreach (array_keys($form['submit']['#attributes']['class'], 'inactive') as $key) {
+    //   unset($form['submit']['#attributes']['class'][$key]);
+    // }
+
+    module_load_include('inc', 'kraken_api');
+
+    $product = commerce_product_load($form_state['values']['product_id']);
+
+    $data = array(
+      'customer_number' => $customer_number,
+      'product_id' => entity_metadata_wrapper('commerce_product', $form_state['values']['product_id'])->kraken_product->value(),
+    );
+
+    $inquiry = kraken_api_call('inquire', 'POST', $data);
+    if (!empty($inquiry)) {
+      if ($inquiry['status']) {
+        $form_state['line_item']->data['inquiry'] = $inquiry;
+      }
+      else {
+        form_set_error('inquiry', $inquiry['message']);
+      }
+    }
+    else {
+      form_set_error('inquiry', 'Please retry');
+    }
+  }
+}
+
+function pln_prepaid_payment_execute($order_wrapper) {
+  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+    if ($line_item_wrapper->getBundle() == 'pln_prepaid' && $line_item_wrapper->field_line_item_status->value() == 'pending') {
+      pln_prepaid_payment_line_item($line_item_wrapper);
+    }
+  }
+}
+
+function pln_prepaid_payment_line_item($line_item_wrapper) {
+  $data = array(
+    'customer_number' => $line_item_wrapper->field_phone_number->value(),
+    'meter_number' => $line_item_wrapper->field_customer_number->value(),
+    'order_id' => $line_item_wrapper->order_id->value(),
+    'product_id' => $line_item_wrapper->commerce_product->kraken_product->value(),
+  );
+
+  module_load_include('inc', 'kraken_api');
+  $response = kraken_api_call('transaction', 'POST', $data);
+
+  $status = $response['status'] ? 'success' : 'failed';
+  $line_item_wrapper->field_line_item_status->set($status);
+  $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
+
+  $line_item = $line_item_wrapper->value();
+  $line_item->data = $response;
+  entity_save('commerce_line_item', $line_item);
+}

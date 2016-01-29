@@ -2,11 +2,11 @@
 
 function bbm_checkout_order_services($data){
     $return = array();
-    
+
     $return["sepulsa_order_id"] = 0;
     $return["status"] = "gagal";
     $return["keterangan"] = "";
-    
+
     //set ip filter
     $whitelist = explode(",",variable_get("bbm_checkout_services_whitelist", "127.0.0.1,::1"));
     $ip_user = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']);
@@ -17,7 +17,7 @@ function bbm_checkout_order_services($data){
         }
         return $return;
     }
-    
+
     //set veritrans signature filter
     if(variable_get('bbm_checkout_services_check_signature', 1)){
         if(!isset($data["signature_key"]) || empty($data["signature_key"])){
@@ -32,13 +32,13 @@ function bbm_checkout_order_services($data){
             }
         }
     }
-    
-    
+
+
     if($data["status_code"] != "200"){
       $return["keterangan"] = "Order anda tidak valid";
       return $return;
     }
-    
+
     if(isset($data["order_id"]) && !empty($data["order_id"])){
       $order_id_exists = db_query('SELECT 1 FROM {commerce_payment_transaction} WHERE remote_id = :remote_id', array(':remote_id' => $data["order_id"]))->fetchField();
       if($order_id_exists){
@@ -50,7 +50,7 @@ function bbm_checkout_order_services($data){
       $return["keterangan"] = "Order Id anda tidak dapat kosong";
       return $return;
     }
-    
+
     //set/split parameter from veritrans
     $data["container_customer_details"] = explode(",", $data["custom_field1"]);
     $data["name"] = $data["container_customer_details"][0];
@@ -64,7 +64,7 @@ function bbm_checkout_order_services($data){
         $product_container[0]['quantity'] = 1;
         $product_container[0]['type'] = "mobile_prepaid";
     }
-    
+
     //set coupon data list from veritrans
     $i = 1;
     foreach ($data["container_product"] as $index => $value) {
@@ -75,19 +75,19 @@ function bbm_checkout_order_services($data){
           $i++;
         }
     }
-    
+
     //set empty email restriction
     if(!isset($data["email"]) || empty($data["email"])){
         $return["keterangan"] = "Mohon untuk memberikan data email";
         return $return;
     }
-    
+
     //set product restriction
     if(!isset($product_container[0]) || empty($product_container[0]) || count($product_container[0]) < 1){
         $return["keterangan"] = "Produk pulsa tidak ditemukan";
         return $return;
     }
-    
+
     //create user if email is not registered
     $account = user_load_by_mail($data["email"]);
     if(!$account){
@@ -109,14 +109,14 @@ function bbm_checkout_order_services($data){
         $account = user_save('', $fields);
         _hybridauth_mail_notify('hybridauth_email_verification', $account);
     }
-    
+
     /*$order = commerce_cart_order_load($account->uid);
     if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
         $order = commerce_cart_order_empty($order);
     }*/
     $order = commerce_order_new($account->uid, 'cart');
     $order = commerce_cart_order_empty($order);
-    
+
     foreach ($product_container as $value){
         $product = array();
         $product['product_id'] = $value["product_id"];
@@ -180,9 +180,9 @@ function bbm_checkout_order_services($data){
             }
         }
     }
-    
+
     $order = commerce_order_load($order->order_id);
-    
+
     if($order){
         //$order = commerce_order_status_update($order, 'checkout_payment', FALSE, NULL);
         $order = commerce_order_status_update($order, 'pending', FALSE, NULL);
@@ -190,13 +190,13 @@ function bbm_checkout_order_services($data){
         //tag that this order is made from BBM Checkout
         $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'bbm_checkout';
         $order->data['payment_method'] = 'commerce_veritrans|rules_bbm_payment';
-        
+
         $payment_method = commerce_payment_method_instance_load('commerce_veritrans|rules_bbm_payment');
-        
+
         foreach (commerce_payment_transaction_load_multiple(array(), array('order_id' => $order->order_id)) as $transaction) {
           commerce_payment_transaction_delete($transaction->transaction_id);
         }
-        
+
         $transaction = commerce_payment_transaction_new('commerce_veritrans', $order->order_id);
         $transaction->instance_id = $payment_method['instance_id'];
         $transaction->amount = $data['gross_amount'];
@@ -217,15 +217,18 @@ function bbm_checkout_order_services($data){
         commerce_payment_transaction_save($transaction);
 
         commerce_payment_commerce_payment_transaction_insert($transaction);
-        
+
         commerce_order_save($order);
-        
+
+        // Refresh order to calculate discount.
+        commerce_cart_order_refresh($order);
+
         $return["sepulsa_order_id"] = $order->order_id;
         $return["status"] = "sukses";
         $return["keterangan"] = "";
-        
+
         //$order = commerce_order_load($order->order_id);
-        
+
         return $return;
     }
     else{

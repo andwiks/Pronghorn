@@ -66,6 +66,17 @@ $settings = variable_get('sepulsa_settings', array());
                 </ul>
             </div>
           </div>
+        <?php elseif (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
+          <div class="tab form style_1" id="target_2">
+            <?php print render($messages); ?>
+            <?php print render($token_reload_form); ?>
+            <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
+                <ul>
+                  <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
+                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
+                </ul>
+            </div>
+          </div>
         <?php endif; ?>
         <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
           <div class="tab form style_1" id="target_3">

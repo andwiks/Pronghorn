@@ -88,7 +88,7 @@ function commerce_cart_services_resource_add($product) {
   global $user;
 
   // Backward compatibilty for old electricity product.
-  if ($product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
+  if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
     $product['type'] = 'pln_prepaid';
     $product['fields'][0]['field_customer_number'] = $product['fields'][0]['electricity_customer_number'];
     $product['fields'][0]['field_phone_number'] = $product['fields'][0]['electricity_phone_number'];

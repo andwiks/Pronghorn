@@ -124,6 +124,11 @@ function _sepulsa_services_existing_number() {
 }
 
 function _sepulsa_services_resource_product_index($type = NULL) {
+  // Backward compatibilty for old electricity product.
+  if ($type == 'electricity') {
+    $type = 'pln_prepaid';
+  }
+
   $products = &drupal_static(__FUNCTION__, array());
 
   if (empty($products)) {

@@ -22,7 +22,11 @@ function kraken_api_call($entity, $method = 'GET', $data = array()) {
   );
 
   $result = drupal_http_request($url, $options);
-  $data = drupal_json_decode($result->data);
-
-  return empty($data) ? $result->data : $data;
+  if (!empty($result->data)) {
+    $data = drupal_json_decode($result->data);
+    return empty($data) ? $result->data : $data;
+  }
+  else {
+    return;
+  }
 }

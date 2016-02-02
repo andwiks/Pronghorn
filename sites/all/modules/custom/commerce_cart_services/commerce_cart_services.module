@@ -87,6 +87,15 @@ function commerce_cart_services_services_resources() {
 function commerce_cart_services_resource_add($product) {
   global $user;
 
+  // Backward compatibilty for old electricity product.
+  if ($product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
+    $product['type'] = 'pln_prepaid';
+    $product['fields'][0]['field_customer_number'] = $product['fields'][0]['electricity_customer_number'];
+    $product['fields'][0]['field_phone_number'] = $product['fields'][0]['electricity_phone_number'];
+    unset($product['fields'][0]['electricity_customer_number']);
+    unset($product['fields'][0]['electricity_phone_number']);
+  }
+
   // Check input product data:
   // 1. product_id: (int) valid product id loaded by commerce_product_load.
   // 2. type: (string) valid line item type. (optional: product).
@@ -132,12 +141,16 @@ function commerce_cart_services_resource_add($product) {
         }
       }
       // Return line item object.
-      $line_item = commerce_cart_product_add($user->uid, $line_item);
-      if ($line_item !== FALSE) {
-        return order_services_line_item($line_item);
-      }
-      else {
-        return services_error(t('Unable to add product'), 406);
+      try {
+        $line_item = commerce_cart_product_add($user->uid, $line_item);
+        if ($line_item !== FALSE) {
+          return order_services_line_item($line_item);
+        }
+        else {
+          return services_error(t('Unable to add product'), 406);
+        }
+      } catch (Exception $e) {
+        return services_error($e->getMessage(), 406);
       }
     }
     else {

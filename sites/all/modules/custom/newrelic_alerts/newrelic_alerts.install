@@ -1,0 +1,32 @@
+<?php
+/**
+ * @file
+ * newrelic_alerts.install
+ *
+ * @author andreas@sepulsa.com
+ * @since February 3rd, 2016
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function newrelic_alerts_install() {
+  // Set newrelic account id, application id, and api key variables.
+  variable_set('newrelic_alerts_acc_id', '');
+  variable_set('newrelic_alerts_app_id', '');
+  variable_set('newrelic_alerts_api_key', '');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function newrelic_alerts_uninstall() {
+  // Delete newrelic alert variables.
+  variable_del('newrelic_alerts_acc_id');
+  variable_del('newrelic_alerts_app_id');
+  variable_del('newrelic_alerts_api_key');
+}

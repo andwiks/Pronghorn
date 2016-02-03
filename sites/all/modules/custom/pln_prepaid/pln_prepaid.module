@@ -38,6 +38,48 @@ function pln_prepaid_commerce_product_type_info() {
 }
 
 /**
+ * Implements hook_entity_presave().
+ *
+ * Validate pln_prepaid line_item by inquiring to kraken.
+ *
+ * @see pln_prepaid_add_to_cart_form_validate().
+ */
+function pln_prepaid_entity_presave($entity, $type) {
+  if ($type == 'commerce_line_item' && !empty($entity->is_new) && $entity->type == 'pln_prepaid') {
+    $customer_number = $entity->field_customer_number[LANGUAGE_NONE][0]['value'];
+
+    if (empty($entity->field_customer_number) || empty($entity->field_phone_number)) {
+      throw new Exception("Missing required fields.");
+    }
+    else {
+      // Make sure only inquiry if there is no form validation.
+      $inquiry = &drupal_static('pln_prepaid_inquiry_data__' . $customer_number);
+      if (empty($inquiry) && empty($entity->data['inquiry'])) {
+        module_load_include('inc', 'kraken_api');
+
+        $data = array(
+          'customer_number' => $customer_number,
+          'product_id' => entity_metadata_wrapper('commerce_product', $entity->commerce_product[LANGUAGE_NONE][0]['product_id'])->kraken_product->value(),
+        );
+
+        $inquiry = kraken_api_call('inquire', 'POST', $data);
+
+        if (!empty($inquiry['status'])) {
+          $entity->data['inquiry'] = $inquiry;
+        }
+        elseif (!empty($inquiry['message'])) {
+          throw new Exception($inquiry['message']);
+          watchdog('pln_prepaid', '@note: <pre>!inquiry</pre>', array('@note' => $inquiry['message'], '!inquiry' => print_r($inquiry, TRUE)), WATCHDOG_ERROR);
+        }
+        else {
+          throw new Exception('Please retry');
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_node_info().
  */
 function pln_prepaid_node_info() {

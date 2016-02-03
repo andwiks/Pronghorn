@@ -1,0 +1,4 @@
+name = "New Relic Alerts"
+description = "Provide integration with New Relic alerts."
+core = "7.x"
+package = "Sepulsa"

@@ -206,6 +206,16 @@ function sepulsa_order_process_order($order_id) {
           $sepulsa_order_wrapper->phone->set($line_item_wrapper->field_phone_number->value());
           break;
 
+        case 'multifinance':
+          $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
+          $sepulsa_order_wrapper->phone->set('');
+          break;
+
+        case 'pln_prepaid':
+          $sepulsa_order_wrapper->prepaid->set($line_item_wrapper->commerce_product->value());
+          $sepulsa_order_wrapper->phone->set($line_item_wrapper->field_phone_number->value());
+          break;
+
         case 'coupon':
           $coupon_number++;
           $property = 'coupon_' . $coupon_number;

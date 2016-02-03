@@ -1,0 +1,115 @@
+<?php
+/**
+ * @file
+ * newrelic_alerts.module
+ *
+ * @author andreas@sepulsa.com
+ * @since February 3rd, 2016
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function newrelic_alerts_menu() {
+  $items = array();
+
+  // Administration page.
+  $items['admin/config/development/newrelic_alerts'] = array(
+    'title' => 'New Relic Alerts',
+    'description' => 'Administer New Relic alerts.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('newrelic_alerts_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'newrelic_alerts.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_system_site_maintenance_mode_alter().
+ */
+function newrelic_alerts_form_system_site_maintenance_mode_alter(&$form, &$form_state, $form_id) {
+  // Add submit as first function.
+  array_unshift($form['#submit'], 'newrelic_alerts_system_site_maintenance_mode_submit');
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function newrelic_alerts_system_site_maintenance_mode_submit().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function newrelic_alerts_system_site_maintenance_mode_submit($form, &$form_state) {
+  // Get current maintenance mode flag.
+  $mode = variable_get('maintenance_mode', 0);
+  // Check new relic credential.
+  $newrelic_data = array(
+    'acc_id' => variable_get('newrelic_alerts_acc_id', ''),
+    'app_id' => variable_get('newrelic_alerts_app_id', ''),
+    'api_key' => variable_get('newrelic_alerts_api_key', ''),
+  );
+  // Check if new relic data is set.
+  if (!empty($newrelic_data['acc_id'])
+    && !empty($newrelic_data['app_id'])
+    && !empty($newrelic_data['api_key'])
+  ) {
+    // Define HTTP URL target.
+    $target = 'https://api.newrelic.com/accounts/' . $newrelic_data['acc_id'] . '/applications/' . $newrelic_data['app_id'] . '/ping_targets/';
+    // Define HTTP Request option.
+    $options = array(
+      'method' => 'POST',
+      'headers' => array(
+        'NewRelic-Api-Key' => $newrelic_data['api_key'],
+      ),
+      'context' => stream_context_create(array(
+        'ssl' => array(
+          'verify_peer' => FALSE,
+          'verify_peer_name' => FALSE,
+          'SNI_enabled' => FALSE,
+        ),
+      )),
+    );
+    // Check if new input maintenance mode.
+    if (isset($form_state['values']['maintenance_mode'])
+        && !empty($form_state['values']['maintenance_mode'])
+        && empty($mode)
+    ) {
+      $target .= 'disable';
+      $result = drupal_http_request($target, $options);
+      // Log this result.
+      watchdog('newrelic_alerts', 'Disable New Relic Alert. API Result: @target <pre>@options</pre><pre>!result</pre>', array(
+        '@target' => $target,
+        '@options' => print_r($options, TRUE),
+        '!result' => print_r($result, TRUE),
+      ), WATCHDOG_INFO, l(t('NewRelic Alert'), 'admin/config/development/newrelic_alerts'));
+      // Disable New Relic alert.
+      drupal_set_message(t('New Relic Alert has been disabled while site in maintenance mode.'), 'warning');
+    }
+    elseif (!(isset($form_state['values']['maintenance_mode'])
+      && !empty($form_state['values']['maintenance_mode']))
+      && !empty($mode)
+    ) {
+      $target .= 'enable';
+      $result = drupal_http_request($target, $options);
+      // Log this result.
+      watchdog('newrelic_alerts', 'Enable New Relic Alert. API Result: @target <pre>@options</pre><pre>!result</pre>', array(
+        '@target' => $target,
+        '@options' => print_r($options, TRUE),
+        '!result' => print_r($result, TRUE),
+      ), WATCHDOG_INFO, l(t('NewRelic Alert'), 'admin/config/development/newrelic_alerts'));
+      // Enable New Relic alert.
+      drupal_set_message(t('New relic Alert has been enabled.'));
+    }
+  }
+}

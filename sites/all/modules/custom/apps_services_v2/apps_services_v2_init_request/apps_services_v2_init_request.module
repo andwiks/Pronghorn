@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_init_request_services_resources() {
+    return array(
+        'init_request' => array(
+            'actions' => array(
+                'validation_and_get_init' => array(
+                    'help' => 'Validate if user session is still active and get init data (maintenance,current version,cache status,etc)',
+                    'callback' => 'apps_services_v2_init_request_validation_and_get_init_services',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_init_request',
+                        'name' => 'apps_services_v2_init_request',
+                    ),
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'phone_number',
+                        'type' => 'int',
+                        'description' => 'user phone number',
+                        'source' => array(
+                          'data' => 'phone_number',
+                          'param' => 'phone_number',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'session',
+                        'type' => 'string',
+                        'description' => 'user session',
+                        'source' => array(
+                          'data' => 'session',
+                          'param' => 'session',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+function apps_services_v2_init_request_menu() {
+    $items['admin/config/services/apps_services_v2/apps_services_v2_init_request'] = array(
+        'title'             => 'Service Init Request V2 Configuration',
+        'description'       => 'Configure page for Service Init Request V2',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('apps_services_v2_init_request_setting_form'),
+        'access arguments'  => array('access_apps_services_v2_init_request_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'apps_services_v2_init_request.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function apps_services_v2_init_request_permission() {
+    return array(
+        'access_apps_services_v2_init_request_config' => array(
+            'title'         => t('Accessing Service Init Request V2 Configuration'),
+            'description'   => t('Accessing Service Init Request V2 Configuration.')
+        ),
+    );
+}

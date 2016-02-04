@@ -1,0 +1,6 @@
+; $Id$
+name = Apps Services v2 Init Request
+description = Service to validate user session and request certain data needed on init apps
+package = Apps Services v2
+version = 0.1
+core = 7.x

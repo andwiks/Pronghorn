@@ -16,6 +16,7 @@ function apps_services_v2_init_request_services_resources() {
                         'name' => 'apps_services_v2_init_request',
                     ),
                     'access callback' => 'services_access_menu',
+                    'documentation callback' => 'apps_services_v2_init_request_doc',
                     'args' => array(
                       array(
                         'name' => 'phone_number',
@@ -81,4 +82,48 @@ function apps_services_v2_init_request_permission() {
             'description'   => t('Accessing Service Init Request V2 Configuration.')
         ),
     );
+}
+
+/**
+ * Function apps_services_v2_init_request_doc().
+ *
+ * Documentation callback for index actions deposit.
+ */
+function apps_services_v2_init_request_doc() {
+  global $base_url;
+  $response = '
+    {
+      "phone_number": "081211111",
+      "session": "session_code_here",
+      "source": "android"
+    }
+  ';
+  $element = array(
+    '#name' => 'Init Request Apps Service',
+    '#description' => 'List all data used by apps on init (maintenance,version,etc).',
+    '#auth' => FALSE,
+    '#path' => 'init_request/validation_and_get_init',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/init_request/validation_and_get_init.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'csrf_validation' => array(
+        '#question' => '401 Unauthorized: CSRF Validation Failed',
+        '#description' => 'When drupal detect that the user already login from other site or header X-CSRF-Token is needed.',
+        '#response' => '
+        [
+          "CSRF validation failed"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
 }

@@ -111,11 +111,11 @@ function apps_services_v2_init_request_doc() {
     // Errors.
     '#errors' => array(
 	  'csrf_validation' => array(
-        '#question' => '401 Unauthorized: CSRF Validation Failed',
-        '#description' => 'When drupal detect that the user already login from other site or header X-CSRF-Token is needed.',
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
         '#response' => '
         [
-          "CSRF validation failed"
+          "Missing required argument"
         ]',
       ),
       'internal_server' => array(

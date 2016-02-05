@@ -1,0 +1,6 @@
+name = "Toggle Bank Transfer"
+description = "Quickly enable or disable Commerce Bank Transfer Payment Method"
+core = 7.x
+package = "Sepulsa"
+
+dependencies[] = sepulsa_bank_transfer

@@ -1,0 +1,30 @@
+<?php
+/**
+ * @file
+ * views_bank_transfer.install
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function views_bank_transfer_install() {
+  // Get bank transfer payment method option key list.
+  $bank_transfer_options = sepulsa_bank_transfer_get_options();
+  // Set variables.
+  variable_set('views_bank_transfer_options', $bank_transfer_options);
+  variable_set('views_bank_transfer_options_info', $bank_transfer_options);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function views_bank_transfer_uninstall() {
+  variable_del('views_bank_transfer_options');
+  variable_del('views_bank_transfer_options_info');
+}

@@ -1,0 +1,66 @@
+<?php
+/**
+ * @file
+ * views_bank_transfer.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function views_bank_transfer_menu() {
+  $items = array();
+
+  // Admin page to administer payment instance options.
+  $items['admin/commerce/config/bank_transfer/views_bank_transfer'] = array(
+    'title' => 'Views Bank Transfer',
+    'description' => 'Administer bank transfer payment instance options.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('views_bank_transfer_admin_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'views_bank_transfer.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function views_bank_transfer_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'views_bank_transfer') . '/includes/views',
+  );
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function views_bank_transfer_options_list().
+ *
+ * Provide option list for views bank transfer.
+ *
+ * @return array
+ *   Option for bank transfer option.
+ */
+function views_bank_transfer_options_list() {
+  // Get bank transfer payment options.
+  $options = variable_get('views_bank_transfer_options', sepulsa_bank_transfer_get_options());
+  // Get bank transfer payment info.
+  $infos = variable_get('views_bank_transfer_options_info', $options);
+  // Filter options.
+  $options = array_filter($options);
+  foreach ($options as $key => $option) {
+    $options[$key] = $infos[$key];
+  }
+  // Return updated payment options.
+  return $options;
+}

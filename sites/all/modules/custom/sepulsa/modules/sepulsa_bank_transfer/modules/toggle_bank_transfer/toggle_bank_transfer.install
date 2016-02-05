@@ -1,0 +1,32 @@
+<?php
+/**
+ * @file
+ * toggle_bank_transfer.install
+ *
+ * @author andreas
+ * @since January 19, 2016
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function toggle_bank_transfer_install() {
+  // Get bank transfer payment method option key list.
+  $bank_transfer_options = sepulsa_bank_transfer_get_options();
+  // Set variables.
+  variable_set('toggle_bank_transfer_options', $bank_transfer_options);
+  variable_set('toggle_bank_transfer_options_info', $bank_transfer_options);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function toggle_bank_transfer_uninstall() {
+ // Delete variables.
+ variable_del('toggle_bank_transfer_options');
+ variable_del('toggle_bank_transfer_options_info');
+}

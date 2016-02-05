@@ -1,0 +1,10 @@
+name = "Views Bank Transfer"
+description = "Provide views field and filter for order with Bank Transfer."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = sepulsa_bank_transfer
+
+; Views handlers
+files[] = includes/views/handlers/commerce_payment_handler_field_payment_instance.inc
+files[] = includes/views/handlers/commerce_payment_handler_filter_payment_instance.inc

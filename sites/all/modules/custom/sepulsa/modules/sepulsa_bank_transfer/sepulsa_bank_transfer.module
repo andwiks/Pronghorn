@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ * sepulsa_bank_transfer.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_bank_transfer_menu() {
+  // Provide menu to handle all bank transfer functionality.
+  $items['admin/commerce/config/bank_transfer'] = array(
+    'title' => 'Bank Transfer Settings',
+    'description' => 'Configure bank transfer functionalities.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+    'file path' => drupal_get_path('module', 'system'),
+    'file' => 'system.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function sepulsa_bank_transfer_get_options().
+ *
+ * @return array
+ *   List of Bank Transfer payment method option as array key.
+ */
+function sepulsa_bank_transfer_get_options() {
+  // Define bank transfer options.
+  $bank_transfer_options = &drupal_static(__FUNCTION__, array());
+  // Check for empty options.
+  if (empty($bank_transfer_options)) {
+    // Create fake order with highest permission.
+    $order = commerce_order_new(1);
+    $order->payment_methods = array();
+    entity_metadata_wrapper('commerce_order', $order)->commerce_order_total->set(array(
+      'amount' => 1, 'currency_code' => 'IDR',
+    ));
+    // Invoke rules to getting all payment methods.
+    rules_invoke_all('commerce_payment_methods', $order);
+    // Check the results.
+    foreach ($order->payment_methods as $key => $method) {
+      // Check bank_transfer prefix.
+      if (strpos($key, 'bank_transfer') === 0) {
+        // Get bank transfer payment method.
+        $bank_transfer_options[$key] = FALSE;
+      }
+    }
+  }
+  // Return it.
+  return $bank_transfer_options;
+}

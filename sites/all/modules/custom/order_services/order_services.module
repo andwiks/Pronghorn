@@ -498,6 +498,19 @@ function order_services_order($order) {
 
     // Proccess order total: remove language none (und).
     $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
+    
+    // Support for iOS pln prepaid.
+    if (isset($order->commerce_line_items) && !empty($order->commerce_line_items)) {
+      foreach ($order->commerce_line_items as $lid => $line_item) {
+        if (isset($line_item->type) && $line_item->type == 'pln_prepaid') {
+          $order->commerce_line_items[$lid]->type = 'electricity_prepaid';
+          if (isset($order->commerce_line_items[$lid]->commerce_product->type)) {
+            $order->commerce_line_items[$lid]->commerce_product->type = 'electricity_prepaid';
+          }
+        }
+      }
+    }
+    
     // Return order object.
     return $order;
   }

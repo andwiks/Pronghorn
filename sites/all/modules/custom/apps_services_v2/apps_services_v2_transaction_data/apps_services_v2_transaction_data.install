@@ -1,0 +1,45 @@
+<?php
+/**
+ * @file
+ * apps_services_v2_transaction_data.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function favorite_transaction_schema() {
+  $schema['favorite_transaction'] = array(
+    'description' => 'favorite transaction order list.',
+    'fields' => array(
+      'order_id' => array(
+        'description' => 'Commerce Order ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+      ),      
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('order_id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implements of hook_enable().
+ */
+function apps_services_v2_transaction_data_enable() {
+  // Check if table exists, if not install the schema.
+  if(db_table_exists('favorite_transaction') == FALSE) {
+    // Install schema: favorite_transaction
+    drupal_install_schema('favorite_transaction');
+  }
+}

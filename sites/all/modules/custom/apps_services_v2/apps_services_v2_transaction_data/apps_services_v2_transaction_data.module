@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_transaction_data_services_resources() {
+    return array(
+        'transaction' => array(
+            'actions' => array(
+                'favorite' => array(
+                    'help' => 'Add/Remive Favorite Order',
+                    'callback' => 'apps_services_v2_transaction_data_favorite',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_transaction_data',
+                        'name' => 'apps_services_v2_transaction_data',
+                    ),
+                    'documentation callback' => 'apps_services_v2_transaction_data_favorite_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'uid',
+                        'type' => 'int',
+                        'description' => 'user id',
+                        'source' => array(
+                          'data' => 'uid',
+                          'param' => 'uid',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'order_id',
+                        'type' => 'int',
+                        'description' => 'favorite order id',
+                        'source' => array(
+                          'data' => 'order_id',
+                          'param' => 'order_id',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+/**
+ * Function apps_services_v2_init_request_doc().
+ *
+ * Documentation callback for favorite transaction.
+ */
+function apps_services_v2_transaction_data_favorite_doc_doc() {
+  global $base_url;
+  $response = '
+    {
+      "uid": "12345",
+      "order_id": "12345"
+    }
+  ';
+  $element = array(
+    '#name' => 'Transaction Favorite Apps Service',
+    '#description' => 'Add/Remove Favorite transaction.',
+    '#auth' => FALSE,
+    '#path' => 'transaction/favorite',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/transaction/favorite.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'csrf_validation' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

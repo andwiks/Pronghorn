@@ -110,7 +110,7 @@ function apps_services_v2_init_request_doc() {
     // Resource prefix.
     // Errors.
     '#errors' => array(
-	  'csrf_validation' => array(
+	  'missing_argument' => array(
         '#question' => '401 Unauthorized : Missing required argument',
         '#description' => 'When drupal detect that the user missed some of the input required.',
         '#response' => '

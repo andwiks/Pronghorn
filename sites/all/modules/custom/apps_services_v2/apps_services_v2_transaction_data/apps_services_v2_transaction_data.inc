@@ -77,7 +77,6 @@ function apps_services_v2_transaction_home_list($size,$favorite_only){
   
   //get current active user uid
   $uid = $user->uid;
-  $uid = 43;
   
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){

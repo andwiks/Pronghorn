@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!--[if IE 8]>          <html class="ie ie8"> <![endif]-->
+<!--[if IE 9]>          <html class="ie ie9"> <![endif]-->
+<!--[if gt IE 9]><!-->  <html> <!--<![endif]-->
+<head>
+    <!-- Page Title -->
+    <title>Sepulsa</title>
+    
+    <link rel="shortcut icon" href="images/favicon.png" />
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Theme Styles -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,300italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Playfair+Display:400,400italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Dosis:300,200' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="components/owl-carousel/owl.carousel.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="components/owl-carousel/owl.transitions.css" media="screen" />
+    <!-- Magnific Popup core CSS file -->
+    <link rel="stylesheet" href="components/magnific-popup/magnific-popup.css"> 
+    
+    <!-- Main Style -->
+    <link id="main-style" rel="stylesheet" href="css/style.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/custom.css">
+
+    <!-- Updated Styles -->
+    <link rel="stylesheet" href="css/updates.css">
+    
+    <!-- Responsive Styles -->
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- CSS for IE -->
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" type="text/css" href="css/ie.css" />
+    <![endif]-->
+    
+    
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script type='text/javascript' src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+</head>
+<body class="coming-soon-page no-sticky-menu">
+    <div id="page-wrapper">
+        <section id="content">
+            <div class="container">
+                <div id="main">
+                	<div style="margin:40px auto 0; width:90%"><img src="images/logo.png"></div>
+                
+                    <hr class="color-light1 box-lg col-md-10 col-lg-9">
+                    <div class="heading-box">
+                        <h2 class="box-title">Isi Pulsa sekarang gratis!!!</h2>
+                        <p class="desc-sm">Stay in touch and we will let you know how :)</p>
+                    </div>
+                    <div class="clock-wrapper">
+                        <ul class="clock">
+                            <li class="days">00</li>
+                            <li class="sep">:</li>
+                            <li class="hours">00</li>
+                            <li class="sep">:</li>
+                            <li class="minutes">00</li>
+                            <li class="sep">:</li>
+                            <li class="seconds">00</li>
+                        </ul>
+                        <ul class="clock">
+                            <li class="days">00</li>
+                            <li class="sep">:</li>
+                            <li class="hours">00</li>
+                            <li class="sep">:</li>
+                            <li class="minutes">00</li>
+                            <li class="sep">:</li>
+                            <li class="seconds">00</li>
+                        </ul>
+                    </div>
+                    <hr class="color-light1 box-lg col-md-10 col-lg-9">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Javascript -->
+    <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="js/jquery.noconflict.js"></script>
+    <script type="text/javascript" src="js/modernizr.2.8.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.1.11.2.min.js"></script>
+    
+    <!-- Twitter Bootstrap -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+
+    <!-- Magnific Popup core JS file -->
+    <script type="text/javascript" src="components/magnific-popup/jquery.magnific-popup.min.js"></script> 
+    
+    <!-- parallax -->
+    <script type="text/javascript" src="js/jquery.stellar.min.js"></script>
+    
+    <!-- waypoint -->
+    <script type="text/javascript" src="js/waypoints.min.js"></script>
+
+    <!-- Owl Carousel -->
+    <script type="text/javascript" src="components/owl-carousel/owl.carousel.min.js"></script>
+
+    <!-- plugins -->
+    <script type="text/javascript" src="js/jquery.plugins.js"></script>
+
+    <!-- load page Javascript -->
+    <script type="text/javascript" src="js/main.js"></script>
+
+    <script type="text/javascript">
+        function cacluateLaunchTime() {
+            var launchDateStr = "2015/02/15 22:00:00"; // timezone must be UTC + 0
+            var launchDate = new Date(launchDateStr);
+            launchDate.setTime( launchDate.getTime() - launchDate.getTimezoneOffset()*60*1000 );
+            
+            var currentDate = new Date();
+            var diff = new Date(launchDate.getTime() - currentDate.getTime());
+            
+            if (diff > 0) {
+                var milliseconds, seconds, minutes, hours, days;
+                diff = Math.abs(diff);
+                diff = (diff - (milliseconds = diff % 1000)) / 1000;
+                diff = (diff - (seconds = diff % 60)) / 60;
+                diff = (diff - (minutes = diff % 60)) / 60;
+                days = (diff - (hours = diff % 24)) / 24;
+                sjq(".clock .days").html((days + "").lpad("0", 2));
+                sjq(".clock .hours").html((hours + "").lpad("0", 2));
+                sjq(".clock .minutes").html((minutes + "").lpad("0", 2));
+                sjq(".clock .seconds").html((seconds + "").lpad("0", 2));
+            }
+        }
+        cacluateLaunchTime();
+        var calcLaunchTimeInterval = setInterval(cacluateLaunchTime, 1000);
+    </script>
+</body>
+</html>

@@ -172,7 +172,7 @@ function apps_services_v2_transaction_home_list($size,$favorite_only){
   if(isset($user->mail) && !empty($user->mail)){
     $mail = explode("@", $user->mail);
     if (isset($mail[1]) && !empty($mail[1]) && strpos($mail[1], '.dummy') !== false) {
-      $return["request_email"] = "Mohon mendaftarkan email anda ke sistem kami<br />untuk mendapatkan akses ke fitur-fitur kami";
+      $return["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
     }
   }
   

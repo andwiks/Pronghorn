@@ -148,3 +148,131 @@ function apps_services_v2_transaction_home_list_doc() {
   );
   return $element;
 }
+
+/**
+ * Implements hook_views_api()
+ * set init data before views data
+ */
+function apps_services_v2_transaction_data_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module','apps_services_v2_transaction_data'). '/views',
+  );
+}
+
+/**
+ * Implements hook_views_data().
+ * put favorite data into views
+ */
+function apps_services_v2_transaction_data_views_data() {
+	$data['favorite_transaction']['table']['group'] = 'Favorite Order';
+
+  $data['favorite_transaction']['table']['base'] = array(
+		'field' => 'order_id',
+		'title' => 'Order ID',
+  );
+
+  $data['favorite_transaction']['table']['join'] = array(
+		'commerce_order' => array(
+				'left_field' => 'order_id',
+				'field' => 'order_id',
+		),
+		'users' => array(
+				'left_field' => 'uid',
+				'field' => 'uid',
+		),
+  );
+	
+	 $data ['favorite_transaction']['order_id'] = array(
+    'title' => t('Order ID'),
+    'help' => t('Order ID'),
+    // Define a relationship to the {node} table, so example_table views can
+    // add a relationship to nodes. If you want to define a relationship the
+    // other direction, use hook_views_data_alter(), or use the 'implicit' join
+    // method described above.
+    'relationship' => array(
+      'base' => 'commerce_order', // The name of the table to join with.
+      'base field' => 'order_id', // The name of the field on the joined table.
+      // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Commerce Order Relationship'),
+      'title' => t('Commerce Order Relationship'),
+      'help' => t('Relationship to commerce order table'),
+    ),
+  );
+	 
+	 $data ['favorite_transaction']['uid'] = array(
+    'title' => t('UID'),
+    'help' => t('User UID who favorited the order'),
+    'relationship' => array(
+      'base' => 'users', // The name of the table to join with.
+      'base field' => 'uid', // The name of the field on the joined table.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Users Relationship'),
+      'title' => t('Users Relationship'),
+      'help' => t('Relationship to users table'),
+    ),
+  );
+   
+  // Describe the order id column of the favorite transaction.
+  $data['favorite_transaction']['order_id'] = array(
+      'title' => t('Order Id'),
+      'help' => t('Favorite transaction order id'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'order_id', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+  
+  // Describe the uid column of the favorite transaction.
+  $data['favorite_transaction']['uid'] = array(
+      'title' => t('User Id'),
+      'help' => t('Favorite transaction user id'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'uid', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+
+  // Describe the created column of the favorite transaction.
+  $data['favorite_transaction']['created'] = array(
+      'title' => t('Created Date'),
+      'help' => t('Favorite transaction created date'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'created', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+	
+  return $data;
+}

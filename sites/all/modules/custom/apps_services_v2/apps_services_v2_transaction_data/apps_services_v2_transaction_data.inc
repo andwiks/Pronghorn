@@ -72,7 +72,7 @@ function apps_services_v2_transaction_data_favorite($order_id){
  * get the list of favorite order or latest order (maximum 5)
  * might also have product promotion data on it (currently excluded for now)
  */
-function apps_services_v2_transaction_home_list($size){
+function apps_services_v2_transaction_home_list($size,$favorite_only){
   global $user;
   
   //get current active user uid
@@ -89,7 +89,6 @@ function apps_services_v2_transaction_home_list($size){
   $favorite_order_id = array();
   
   //get favorite transaction order id from the database
-  $count_favorite_order = 0;
   $result = db_select('favorite_transaction', 'ft')
             ->fields('ft', array('order_id', 'uid', 'created'))
             ->condition('uid', $uid)
@@ -97,7 +96,6 @@ function apps_services_v2_transaction_home_list($size){
             ->execute();
   foreach ($result as $usage) {
     $favorite_order_id[] = $usage->order_id;
-    $count_favorite_order++;
   }
   
   //get order list
@@ -105,7 +103,15 @@ function apps_services_v2_transaction_home_list($size){
   //set order desc
   $order_list = array_reverse($order_list,true);
   
-  //check if favorite order already more than 5, if still less then get latest order to complement
+  //check how many favourite available in the return order list
+  $count_favorite_order = 0;
+  foreach ($order_list as $key => $value) {
+    if (in_array($key, $favorite_order_id)){
+      $count_favorite_order++;
+    }
+  }
+  
+  //check if favorite order already more than "$size", if still less then get latest order to complement
   $latest_order_list = "";
   $number_of_latest_order_needed = 0;
   if($count_favorite_order < $size){
@@ -115,27 +121,32 @@ function apps_services_v2_transaction_home_list($size){
   //loop order to get order data
   $favorite_order_container = array();
   $latest_order_container = array();
+  $count_favorite_container = 0;
   foreach ($order_list as $key => $value) {
     if (in_array($key, $favorite_order_id)){
-      //set type favorite
-      $value->type = "favorite";
-      //get favorite order value
-      $favorite_order_container[] = $value;
+      if($count_favorite_container < $size){
+        //set type favorite
+        $value->type = "favorite";
+        //get favorite order value
+        $favorite_order_container[] = $value;
+        $count_favorite_container++;
+      }
     }
-    elseif ($number_of_latest_order_needed > 0) {
+    elseif ($favorite_only == 0 && $number_of_latest_order_needed > 0) {
       //set type order
       $value->type = "order";
       //get latest order value if favorite is more than 0
       $latest_order_container[] = $value;
+      $number_of_latest_order_needed--;
     }
   }
   
   //merge favorite and latest order data into one container
   $order_container = array_merge($favorite_order_container,$latest_order_container);
-  
+
   //fill the order with latest order data as last filter, if actually no favorite order found in the current list
   $i = 0;
-  if(!count($order_container)){  
+  if($favorite_only == 0 && !count($order_container)){  
     foreach ($order_list as $key => $value) {
       if ($i < $size){
         //set type order
@@ -156,9 +167,14 @@ function apps_services_v2_transaction_home_list($size){
     $return["data"] = array();
   }
   
-  /*
-   * to do need to add email verification list
-   */
+  //check if needed to include email request
+  $return["request_email"] = "";
+  if(isset($user->mail) && !empty($user->mail)){
+    $mail = explode("@", $user->mail);
+    if (isset($mail[1]) && !empty($mail[1]) && strpos($mail[1], '.dummy') !== false) {
+      $return["request_email"] = "Mohon mendaftarkan email anda ke sistem kami<br />untuk mendapatkan akses ke fitur-fitur kami";
+    }
+  }
   
   return $return;
 }

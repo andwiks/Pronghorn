@@ -54,6 +54,18 @@ function apps_services_v2_transaction_data_services_resources() {
                         'optional' => TRUE,
                         'http_method' => 'POST',
                       ),
+                      array(
+                        'name' => 'favorite_only',
+                        'type' => 'int',
+                        'description' => 'show favorite only order list if set true',
+                        'source' => array(
+                          'data' => 'favorite_only',
+                          'param' => 'favorite_only',
+                        ),
+                        'default value' => 0,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
                     ),
                 ),
             ),

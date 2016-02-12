@@ -19,6 +19,12 @@ function kraken_api_call($entity, $method = 'GET', $data = array()) {
     ),
     'method' => $method,
     'data' => drupal_json_encode($data),
+    'context' => stream_context_create(array(
+      'ssl' => array(
+        'verify_peer' => FALSE,
+        'verify_peer_name' => FALSE,
+      ),
+    )),
   );
 
   $result = drupal_http_request($url, $options);

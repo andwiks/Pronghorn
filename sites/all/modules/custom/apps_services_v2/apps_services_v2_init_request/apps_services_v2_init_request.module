@@ -19,28 +19,6 @@ function apps_services_v2_init_request_services_resources() {
                     'documentation callback' => 'apps_services_v2_init_request_doc',
                     'args' => array(
                       array(
-                        'name' => 'phone_number',
-                        'type' => 'int',
-                        'description' => 'user phone number',
-                        'source' => array(
-                          'data' => 'phone_number',
-                          'param' => 'phone_number',
-                        ),
-                        'optional' => FALSE,
-                        'http_method' => 'POST',
-                      ),
-                      array(
-                        'name' => 'session',
-                        'type' => 'string',
-                        'description' => 'user session',
-                        'source' => array(
-                          'data' => 'session',
-                          'param' => 'session',
-                        ),
-                        'optional' => FALSE,
-                        'http_method' => 'POST',
-                      ),
-                      array(
                         'name' => 'source',
                         'type' => 'string',
                         'description' => 'the source of the request',

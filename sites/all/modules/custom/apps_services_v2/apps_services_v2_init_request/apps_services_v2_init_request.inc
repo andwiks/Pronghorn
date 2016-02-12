@@ -1,12 +1,8 @@
 <?php
 
-function apps_services_v2_init_request_validation_and_get_init_services($phone_number, $session, $source){
+function apps_services_v2_init_request_validation_and_get_init_services($source){
     $return = array();
     
-    //set validation of phone number and session here
-    //currently return 0
-    $return['validation'] = 0;
-
     //cache id
     $return["cache_id"] = variable_get("apps_services_v2_init_request_cache_id", "XcF1d");
     

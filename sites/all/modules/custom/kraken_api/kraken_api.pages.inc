@@ -91,6 +91,7 @@ function kraken_api_notification_callback() {
       $line_item->field_line_item_status[LANGUAGE_NONE][0]['value'] = $payload['status'];
       $line_item->data = $payload;
       commerce_line_item_save($line_item);
+      entity_get_controller('commerce_line_item')->resetCache(array($line_item->line_item_id));
     }
   }
 

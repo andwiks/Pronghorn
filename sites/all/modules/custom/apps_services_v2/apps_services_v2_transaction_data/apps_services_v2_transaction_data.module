@@ -96,7 +96,7 @@ function apps_services_v2_transaction_data_services_resources() {
 }
 
 /**
- * Function apps_services_v2_init_request_doc().
+ * Function apps_services_v2_transaction_data_favorite_doc().
  *
  * Documentation callback for favorite transaction.
  */
@@ -104,7 +104,8 @@ function apps_services_v2_transaction_data_favorite_doc() {
   global $base_url;
   $response = '
     {
-      "order_id": "12345"
+      "order_id" : "12345",
+      "source" : "android"
     }
   ';
   $element = array(
@@ -146,7 +147,8 @@ function apps_services_v2_transaction_home_list_doc() {
   global $base_url;
   $response = '
     {
-      "size": "10"
+      "size": "10",
+      "source" : "android"
     }
   ';
   $element = array(

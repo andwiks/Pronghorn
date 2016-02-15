@@ -3,7 +3,7 @@
 /*
  * cek if order id is user's or not
  */
-function apps_services_v2_transaction_check_if_current_active_user_owned_order($user, $order_id, $source){
+function apps_services_v2_transaction_check_if_current_active_user_owned_order($user, $order_id){
   if ($order = commerce_order_load($order_id)) {
     // Return the account's access to update the order.
     if(commerce_order_access('view', $order, $user)){
@@ -18,7 +18,7 @@ function apps_services_v2_transaction_check_if_current_active_user_owned_order($
  * process favorited past transaction of user
  * if already favorite then remove favorite
  */
-function apps_services_v2_transaction_data_favorite($order_id){
+function apps_services_v2_transaction_data_favorite($order_id, $source){
   global $user;
   
   //get user uid
@@ -30,7 +30,7 @@ function apps_services_v2_transaction_data_favorite($order_id){
   }
   
   //validate order id, check if it actually owned by active user
-  $validate_order_id = apps_services_v2_transaction_check_if_current_active_user_owned_order($order_id);
+  $validate_order_id = apps_services_v2_transaction_check_if_current_active_user_owned_order($user, $order_id);
   if(!$validate_order_id){
     return services_error('Order tidak sesuai dengan user aktif', 406);
   }
@@ -72,7 +72,7 @@ function apps_services_v2_transaction_data_favorite($order_id){
  * get the list of favorite order or latest order (maximum 5)
  * might also have product promotion data on it (currently excluded for now)
  */
-function apps_services_v2_transaction_home_list($size,$favorite_only, $source){
+function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   global $user;
   
   //get current active user uid

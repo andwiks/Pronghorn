@@ -71,8 +71,6 @@ function apps_services_v2_init_request_doc() {
   global $base_url;
   $response = '
     {
-      "phone_number": "081211111",
-      "session": "session_code_here",
       "source": "android"
     }
   ';

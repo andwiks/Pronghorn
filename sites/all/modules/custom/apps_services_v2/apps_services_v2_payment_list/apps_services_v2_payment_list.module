@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * Set Credit Option Payment List Page
+ */
+function apps_services_v2_payment_list_menu() {
+    $items['admin/config/services/apps_services_v2/apps_services_v2_payment_list_credit'] = array(
+        'title'             => 'Service Payment List Credit V2 Configuration',
+        'description'       => 'Configure page for Service Payment List Credit V2',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('apps_services_v2_payment_list_credit_setting_form'),
+        'access arguments'  => array('access_apps_services_v2_payment_list_credit_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'apps_services_v2_payment_list.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_payment_list_services_resources() {
+    return array(
+        'checkout' => array(
+            'actions' => array(
+                'payment_list' => array(
+                    'help' => 'Get Payment List',
+                    'callback' => 'apps_services_v2_payment_list_data',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_payment_list',
+                        'name' => 'apps_services_v2_payment_list',
+                    ),
+                    'documentation callback' => 'apps_services_v2_payment_list_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+/**
+ * Function apps_services_v2_payment_list_doc().
+ *
+ * Documentation callback for payment data list.
+ */
+function apps_services_v2_payment_list_doc() {
+  global $base_url;
+  $response = '
+    {
+      "source": "android"
+    }
+  ';
+  $element = array(
+    '#name' => 'Payment List Apps Service',
+    '#description' => 'Get Payment List for Apps Service.',
+    '#auth' => FALSE,
+    '#path' => 'checkout/payment_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/checkout/payment_list.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

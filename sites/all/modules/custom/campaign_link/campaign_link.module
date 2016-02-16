@@ -8,7 +8,7 @@ function campaign_link_menu(){
   $menu['admin/people/campaign_link'] = array(
     'title' => 'Campaign Link',
     'page callback' => 'campaign_link_main',
-    'access arguments' => array('administer user'),
+    'access arguments' => array('administer users'),
     'file' => 'campaign_link.admin.inc',
   );
 
@@ -22,7 +22,7 @@ function campaign_link_menu(){
     'title' => 'Add new Campaign Link',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('campaign_link_add_form'),
-    'access arguments' => array('administer user'),
+    'access arguments' => array('administer users'),
     'file' => 'campaign_link.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
@@ -31,14 +31,14 @@ function campaign_link_menu(){
     'title' => 'Campaign Link',
     'page callback' => 'campaign_link_detail',
     'page arguments' => array(3),
-    'access arguments' => array('administer user'),
+    'access arguments' => array('administer users'),
     'file' => 'campaign_link.admin.inc',
   );
   $menu['admin/people/campaign_link/%/detail/export'] = array(
     'title' => 'Campaign Link',
     'page callback' => 'campaign_link_detail_export',
     'page arguments' => array(3),
-    'access arguments' => array('administer user'),
+    'access arguments' => array('administer users'),
     'type' => MENU_CALLBACK,
     'file' => 'campaign_link.admin.inc',
   );

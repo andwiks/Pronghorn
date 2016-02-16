@@ -36,36 +36,41 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
   }
   
   $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = array();
     
-    //add or remove favorite transaction
-    //check if order_id already exist
-    $num_favorited_order = db_select('favorite_transaction', 'ft')
-    ->fields('ft')
+  //add or remove favorite transaction
+  //check if order_id already exist
+  $num_favorited_order = db_select('favorite_transaction', 'ft')
+  ->fields('ft')
+  ->condition('order_id', $order_id)
+  ->countQuery()
+  ->execute()
+  ->fetchField();
+
+  //insert data if not exist
+  if($num_favorited_order < 1){
+    db_insert('favorite_transaction')
+    ->fields(array(
+      'order_id' => $order_id,
+      'uid' => $uid,
+      'created' => REQUEST_TIME,
+    ))
+    ->execute();
+    $return["status"] = true;
+    $return["message"] = "Order difavoritkan";
+  }
+  else{
+    //delete data if exist
+    db_delete('favorite_transaction')
     ->condition('order_id', $order_id)
-    ->countQuery()
-    ->execute()
-    ->fetchField();
-    
-    //insert data if not exist
-    if($num_favorited_order < 1){
-      db_insert('favorite_transaction')
-      ->fields(array(
-        'order_id' => $order_id,
-        'uid' => $uid,
-        'created' => REQUEST_TIME,
-      ))
-      ->execute();
-      $return["message"] = "Order difavoritkan";
-    }
-    else{
-      //delete data if exist
-      db_delete('favorite_transaction')
-      ->condition('order_id', $order_id)
-      ->execute();
-      $return["message"] = "Order telah tidak difavoritkan";
-    }
-    
-    return $return;
+    ->execute();
+    $return["status"] = true;
+    $return["message"] = "Order telah tidak difavoritkan";
+  }
+
+  return $return;
 }
 
 /*
@@ -85,6 +90,9 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   
   //set variable container
   $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = array();
   $favorite_order_id = array();
   
   //get favorite transaction order id from the database
@@ -158,20 +166,22 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   }
   
   if(count($order_container)){
+    $return["status"] = true;
     $return["message"] = "Order list halaman home pengguna";
     $return["data"] = $order_container;
   }
   else{
+    $return["status"] = false;
     $return["message"] = "Order list halaman home tidak ditemukan";
     $return["data"] = array();
   }
   
   //check if needed to include email request
-  $return["request_email"] = "";
+  $return["data"]["request_email"] = "";
   if(isset($user->mail) && !empty($user->mail)){
     $mail = explode("@", $user->mail);
     if (isset($mail[1]) && !empty($mail[1]) && strpos($mail[1], '.dummy') !== false) {
-      $return["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
+      $return["data"]["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
     }
   }
   

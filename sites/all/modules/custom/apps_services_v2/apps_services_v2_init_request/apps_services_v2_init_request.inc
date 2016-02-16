@@ -20,5 +20,10 @@ function apps_services_v2_init_request_validation_and_get_init_services($source)
     //maintenance
     $return["maintenance"] = variable_get('apps_services_v2_init_request_maintenance', 0);
     
-    return $return;
+    $container = array();
+    $container["status"] = true;
+    $container["message"] = "";
+    $container["data"] = $return;
+    
+    return $container;
 }

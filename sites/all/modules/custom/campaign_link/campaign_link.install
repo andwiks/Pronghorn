@@ -1,0 +1,47 @@
+<?php
+/**
+ * @file
+ * campaign_link.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function campaign_link_schema() {
+  $schema['campaign_link'] = array(    
+    'description' => 'Storing Campaign Link id, status and promo',
+    'fields' => array(
+      'id' => array(
+        'description' => 'id',
+        'type' => 'serial',
+      ),
+      'max_use' => array(
+        'description' => 'Maximum Use',
+        'type' => 'int',
+        'default' => 1,
+      ),
+      'used' => array(
+        'description' => 'Used count',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'campaign' => array(
+        'description' => 'Campaign Name Tag',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+        'default' => '',
+      ),
+      'rules_name' => array(
+        'description' => 'Rules Name',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+    
+  return $schema;
+}

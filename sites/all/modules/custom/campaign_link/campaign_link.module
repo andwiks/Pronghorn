@@ -1,0 +1,192 @@
+<?php
+/**
+  * Implements hook_menu
+  */
+function campaign_link_menu(){
+  $menu = array();
+
+  $menu['admin/people/campaign_link'] = array(
+    'title' => 'Campaign Link',
+    'page callback' => 'campaign_link_main',
+    'access arguments' => array('administer user'),
+    'file' => 'campaign_link.admin.inc',
+  );
+
+  $menu['admin/people/campaign_link/main'] = array(
+    'title' => 'Campaign Link',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -1,
+  );
+
+  $menu['admin/people/campaign_link/add'] = array(
+    'title' => 'Add new Campaign Link',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('campaign_link_add_form'),
+    'access arguments' => array('administer user'),
+    'file' => 'campaign_link.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $menu['admin/people/campaign_link/%/detail'] = array(
+    'title' => 'Campaign Link',
+    'page callback' => 'campaign_link_detail',
+    'page arguments' => array(3),
+    'access arguments' => array('administer user'),
+    'file' => 'campaign_link.admin.inc',
+  );
+  $menu['admin/people/campaign_link/%/detail/export'] = array(
+    'title' => 'Campaign Link',
+    'page callback' => 'campaign_link_detail_export',
+    'page arguments' => array(3),
+    'access arguments' => array('administer user'),
+    'type' => MENU_CALLBACK,
+    'file' => 'campaign_link.admin.inc',
+  );
+  return $menu;
+}
+
+/**
+  * Implements hook_form_FORM_ID_alter
+  * Alter user register form to check for reffereal campaign link
+  */
+function campaign_link_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+  if(!empty($_GET['ref'])){
+    $campaign_id = alphaID($_GET['ref'],true,5);
+    $result = db_query('SELECT * FROM {campaign_link} WHERE id = :id', array(':id' => $campaign_id));
+    // Check if ID exist
+    if($result->rowCount()){
+      $campaign = $result->fetch();
+      if($campaign->used < $campaign->max_use){
+        // Valid link, safe it into session?
+        $_SESSION['campaign_link'] = $_GET['ref'];
+      } else {
+        // Already reach Maximum use
+        drupal_set_message(t('Referal ID Sudah Pernah Digunakan.'),'error',false);
+      }
+    } else {
+      // ID not found
+      drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+    }
+  }
+}
+
+/**
+  * Implements hook_user_insert
+  * Check if campaign link exist
+  */
+function campaign_link_user_insert(&$edit, $account, $category){
+  if(!empty($_SESSION['campaign_link'])){
+    $campaign_id = alphaID($_SESSION['campaign_link'],true,5);
+    $result = db_query('SELECT * FROM {campaign_link} WHERE id = :id', array(':id' => $campaign_id));
+    // Double Check here
+    // Check if ID exist
+    if($result->rowCount()){
+      $campaign = $result->fetch();
+      if($campaign->used < $campaign->max_use){
+        // Valid Session, invoke the rule
+        rules_invoke_component($campaign->rules_name,$account);
+        
+        // Mark used
+        db_update('campaign_link')
+        ->fields(array(
+          'used' => $campaign->used+1
+        ))
+        ->condition('id',$campaign_id,'=')
+        ->execute();
+        
+      } else {
+        // Already reach Maximum use
+        drupal_set_message(t('Referal ID Sudah Pernah Digunakan.'),'error',false);
+      }
+    } else {
+      // ID not found
+      drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+    }
+  }
+}
+
+/**
+ * Translates a number to a short alhanumeric version
+ *
+ * Translated any number up to 9007199254740992
+ * to a shorter version in letters e.g.:
+ * 9007199254740989 --> PpQXn7COf
+ *
+ * specifiying the second argument true, it will
+ * translate back e.g.:
+ * PpQXn7COf --> 9007199254740989
+ *
+ * If you want the alphaID to be at least 3 letter long, use the
+ * $pad_up = 3 argument
+ *
+ * @param mixed   $in   String or long input to translate
+ * @param boolean $to_num  Reverses translation when true
+ * @param mixed   $pad_up  Number or boolean padds the result up to a specified length
+ *
+ * @return mixed string or long
+ */
+function alphaID($in, $to_num = false, $pad_up = null) {
+  // Add $pass_key from drupal hash salt to make it harder to guess
+  $pass_key = drupal_get_hash_salt();
+  $out   =   '';
+  $index = 'bcdfghjklmnpqrstvwxyz0123456789BCDFGHJKLMNPQRSTVWXYZ';
+  $base  = strlen($index);
+
+  if ($pass_key !== null) {
+    // Although this function's purpose is to just make the
+    // ID short - and not so much secure,
+    // with this patch by Simon Franz (http://blog.snaky.org/)
+    // you can optionally supply a password to make it harder
+    // to calculate the corresponding numeric ID
+
+    for ($n = 0; $n < strlen($index); $n++) {
+      $i[] = substr($index, $n, 1);
+    }
+
+    $pass_hash = hash('sha256',$pass_key);
+    $pass_hash = (strlen($pass_hash) < strlen($index) ? hash('sha512', $pass_key) : $pass_hash);
+
+    for ($n = 0; $n < strlen($index); $n++) {
+      $p[] =  substr($pass_hash, $n, 1);
+    }
+
+    array_multisort($p, SORT_DESC, $i);
+    $index = implode($i);
+  }
+
+  if ($to_num) {
+    // Digital number  <<--  alphabet letter code
+    $len = strlen($in) - 1;
+
+    for ($t = $len; $t >= 0; $t--) {
+      $bcp = bcpow($base, $len - $t);
+      $out = $out + strpos($index, substr($in, $t, 1)) * $bcp;
+    }
+
+    if (is_numeric($pad_up)) {
+      $pad_up--;
+
+      if ($pad_up > 0) {
+        $out -= pow($base, $pad_up);
+      }
+    }
+  } else {
+    // Digital number  -->>  alphabet letter code
+    if (is_numeric($pad_up)) {
+      $pad_up--;
+
+      if ($pad_up > 0) {
+        $in += pow($base, $pad_up);
+      }
+    }
+
+    for ($t = ($in != 0 ? floor(log($in, $base)) : 0); $t >= 0; $t--) {
+      $bcp = bcpow($base, $t);
+      $a   = floor($in / $bcp) % $base;
+      $out = $out . substr($index, $a, 1);
+      $in  = $in - ($a * $bcp);
+    }
+  }
+
+  return $out;
+}

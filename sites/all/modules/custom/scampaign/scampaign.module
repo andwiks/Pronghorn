@@ -2,45 +2,45 @@
 /**
   * Implements hook_menu
   */
-function campaign_link_menu(){
+function scampaign_menu(){
   $menu = array();
 
-  $menu['admin/people/campaign_link'] = array(
+  $menu['admin/people/scampaign'] = array(
     'title' => 'Campaign Link',
-    'page callback' => 'campaign_link_main',
+    'page callback' => 'scampaign_main',
     'access arguments' => array('administer users'),
-    'file' => 'campaign_link.admin.inc',
+    'file' => 'scampaign.admin.inc',
   );
 
-  $menu['admin/people/campaign_link/main'] = array(
+  $menu['admin/people/scampaign/main'] = array(
     'title' => 'Campaign Link',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -1,
   );
 
-  $menu['admin/people/campaign_link/add'] = array(
+  $menu['admin/people/scampaign/add'] = array(
     'title' => 'Add new Campaign Link',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('campaign_link_add_form'),
+    'page arguments' => array('scampaign_add_form'),
     'access arguments' => array('administer users'),
-    'file' => 'campaign_link.admin.inc',
+    'file' => 'scampaign.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
 
-  $menu['admin/people/campaign_link/%/detail'] = array(
+  $menu['admin/people/scampaign/%/detail'] = array(
     'title' => 'Campaign Link',
-    'page callback' => 'campaign_link_detail',
+    'page callback' => 'scampaign_detail',
     'page arguments' => array(3),
     'access arguments' => array('administer users'),
-    'file' => 'campaign_link.admin.inc',
+    'file' => 'scampaign.admin.inc',
   );
-  $menu['admin/people/campaign_link/%/detail/export'] = array(
+  $menu['admin/people/scampaign/%/detail/export'] = array(
     'title' => 'Campaign Link',
-    'page callback' => 'campaign_link_detail_export',
+    'page callback' => 'scampaign_detail_export',
     'page arguments' => array(3),
     'access arguments' => array('administer users'),
     'type' => MENU_CALLBACK,
-    'file' => 'campaign_link.admin.inc',
+    'file' => 'scampaign.admin.inc',
   );
   return $menu;
 }
@@ -49,16 +49,16 @@ function campaign_link_menu(){
   * Implements hook_form_FORM_ID_alter
   * Alter user register form to check for reffereal campaign link
   */
-function campaign_link_form_user_register_form_alter(&$form, &$form_state, $form_id) {
+function scampaign_form_user_register_form_alter(&$form, &$form_state, $form_id) {
   if(!empty($_GET['ref'])){
     $campaign_id = alphaID($_GET['ref'],true,5);
-    $result = db_query('SELECT * FROM {campaign_link} WHERE id = :id', array(':id' => $campaign_id));
+    $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
     // Check if ID exist
     if($result->rowCount()){
       $campaign = $result->fetch();
       if($campaign->used < $campaign->max_use){
         // Valid link, safe it into session?
-        $_SESSION['campaign_link'] = $_GET['ref'];
+        $_SESSION['scampaign'] = $_GET['ref'];
       } else {
         // Already reach Maximum use
         drupal_set_message(t('Referal ID Sudah Pernah Digunakan.'),'error',false);
@@ -74,10 +74,10 @@ function campaign_link_form_user_register_form_alter(&$form, &$form_state, $form
   * Implements hook_user_insert
   * Check if campaign link exist
   */
-function campaign_link_user_insert(&$edit, $account, $category){
-  if(!empty($_SESSION['campaign_link'])){
-    $campaign_id = alphaID($_SESSION['campaign_link'],true,5);
-    $result = db_query('SELECT * FROM {campaign_link} WHERE id = :id', array(':id' => $campaign_id));
+function scampaign_user_insert(&$edit, $account, $category){
+  if(!empty($_SESSION['scampaign'])){
+    $campaign_id = alphaID($_SESSION['scampaign'],true,5);
+    $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
     // Double Check here
     // Check if ID exist
     if($result->rowCount()){
@@ -86,10 +86,14 @@ function campaign_link_user_insert(&$edit, $account, $category){
         // Valid Session, invoke the rule
         rules_invoke_component($campaign->rules_name,$account);
         
-        // Mark used
-        db_update('campaign_link')
+        // Mark used and add the email to the list
+        $emails = unserialize($campaign->email);
+
+        $emails[] = $account->mail;
+        db_update('scampaign')
         ->fields(array(
-          'used' => $campaign->used+1
+          'used' => $campaign->used+1,
+          'email' => serialize($emails)
         ))
         ->condition('id',$campaign_id,'=')
         ->execute();

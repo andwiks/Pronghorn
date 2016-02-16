@@ -1,14 +1,14 @@
 <?php
 /**
  * @file
- * campaign_link.install
+ * scampaign.install
  */
 
 /**
  * Implements hook_schema().
  */
-function campaign_link_schema() {
-  $schema['campaign_link'] = array(    
+function scampaign_schema() {
+  $schema['scampaign'] = array(    
     'description' => 'Storing Campaign Link id, status and promo',
     'fields' => array(
       'id' => array(
@@ -38,6 +38,12 @@ function campaign_link_schema() {
         'length' => 255,
         'not null' => true,
         'default' => '',
+      ),
+      'email' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+        'description' => 'A serialized array of email value.',
       ),
     ),
     'primary key' => array('id'),

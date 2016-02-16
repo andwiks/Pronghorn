@@ -2,7 +2,7 @@
 /**
   * Main form function to create the link
   */
-function campaign_link_add_form($form, &$form_state){
+function scampaign_add_form($form, &$form_state){
   $form = array();
   $form['campaign'] = array(
     '#type' => 'textfield',
@@ -44,8 +44,8 @@ function campaign_link_add_form($form, &$form_state){
 /**
   * Form validate to create links
   */
-function campaign_link_add_form_validate($form, &$form_state){
-  $result = db_query('SELECT rules_name FROM {campaign_link} WHERE campaign = :campaign',array(':campaign' => $form_state['values']['campaign']));
+function scampaign_add_form_validate($form, &$form_state){
+  $result = db_query('SELECT rules_name FROM {scampaign} WHERE campaign = :campaign',array(':campaign' => $form_state['values']['campaign']));
   
   if($result->rowCount() > 0){
     // Campaign name already exist
@@ -58,11 +58,11 @@ function campaign_link_add_form_validate($form, &$form_state){
 /**
   * Form submit to create links
   */
-function campaign_link_add_form_submit($form, &$form_state){
+function scampaign_add_form_submit($form, &$form_state){
   if($form_state['values']['unique']){
     // If unique is ticked, create unique link for each counter
     for ($i=0; $i < $form_state['values']['max_use']; $i++) { 
-      db_insert('campaign_link')
+      db_insert('scampaign')
       ->fields(array(
         'campaign' => $form_state['values']['campaign'],
         'rules_name' => $form_state['values']['rules_name'],
@@ -70,11 +70,12 @@ function campaign_link_add_form_submit($form, &$form_state){
       ->execute();
     }
   } else {
-    db_insert('campaign_link')
+    db_insert('scampaign')
     ->fields(array(
       'campaign' => $form_state['values']['campaign'],
       'rules_name' => $form_state['values']['rules_name'],
       'max_use' => $form_state['values']['max_use'],
+      'email' => serialize(array())
     ))
     ->execute();
   }
@@ -83,9 +84,9 @@ function campaign_link_add_form_submit($form, &$form_state){
 /**
   * Campaign Link Overview
   */
-function campaign_link_main(){
+function scampaign_main(){
   // Select all campaign
-  $result = db_query('SELECT * FROM {campaign_link}');
+  $result = db_query('SELECT * FROM {scampaign}');
   $arr = array();
   foreach($result as $key => $value){
     // Group into array with campaign name as key
@@ -102,7 +103,7 @@ function campaign_link_main(){
       $value['rules_name'], 
       $value['max_use'], 
       $value['used'], 
-      l('Detail','admin/people/campaign_link/'.$key.'/detail',array('attributes' => array('target'=>'_blank')))
+      l('Detail','admin/people/scampaign/'.$key.'/detail',array('attributes' => array('target'=>'_blank')))
     );
   }
   $output = theme('table',array('header' => $headers, 'rows' => $rows));
@@ -113,19 +114,22 @@ function campaign_link_main(){
   * Campaign Link Detail
   * @param string $campaign name
   */
-function campaign_link_detail($campaign){
-  $result = db_query('SELECT * FROM {campaign_link} WHERE campaign = :campaign',array(':campaign' => $campaign));
+function scampaign_detail($campaign){
+  $result = db_query('SELECT * FROM {scampaign} WHERE campaign = :campaign',array(':campaign' => $campaign));
   $arr = array();
   foreach ($result as $key => $value) {
-    $arr[] = array(
+    $row = array(
       'link' => alphaID($value->id,false,5),
       'max_use' => $value->max_use,
-      'used' => $value->used,
+      'used' => $value->used
     );
+    $emails = unserialize($value->email);
+    empty($emails) ? $row['email'] = '' : $row['email'] = implode(', ',$emails);
+    $arr[] = $row;
   }
-  $header = array('Unique Link', 'Link Count', 'Used');
+  $header = array('Unique Link', 'Link Count', 'Used','Email List');
   $output = theme('table',array('header' => $header, 'rows' => $arr));
-  $output .= l('Export Link to CSV','admin/people/campaign_link/'.$campaign.'/detail/export');
+  $output .= l('Export Link to CSV','admin/people/scampaign/'.$campaign.'/detail/export');
   return $output;
 }
 
@@ -133,8 +137,8 @@ function campaign_link_detail($campaign){
   * Campaign Link Detail Export Callback
   * @param string $campaign name
   */
-function campaign_link_detail_export($campaign){
-  $result = db_query('SELECT * FROM {campaign_link} WHERE campaign = :campaign',array(':campaign' => $campaign));
+function scampaign_detail_export($campaign){
+  $result = db_query('SELECT * FROM {scampaign} WHERE campaign = :campaign',array(':campaign' => $campaign));
   $arr = array();
   foreach ($result as $key => $value) {
     $arr[] = array(

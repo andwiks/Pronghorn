@@ -5,7 +5,7 @@
  */
 function apps_services_v2_init_request_services_resources() {
     return array(
-        'init_request' => array(
+        'init_request_v2' => array(
             'actions' => array(
                 'validation_and_get_init' => array(
                     'help' => 'Validate if user session is still active and get init data (maintenance,current version,cache status,etc)',
@@ -78,9 +78,9 @@ function apps_services_v2_init_request_doc() {
     '#name' => 'Init Request Apps Service',
     '#description' => 'List all data used by apps on init (maintenance,version,etc).',
     '#auth' => FALSE,
-    '#path' => 'init_request/validation_and_get_init',
+    '#path' => 'init_request_v2/validation_and_get_init',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/init_request/validation_and_get_init.json',
+    '#request_url' => $base_url . '/air/init_request_v2/validation_and_get_init.json',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

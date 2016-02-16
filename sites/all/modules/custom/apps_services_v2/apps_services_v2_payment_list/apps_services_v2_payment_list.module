@@ -18,11 +18,23 @@ function apps_services_v2_payment_list_menu() {
 }
 
 /**
+ * create permission
+ */
+function apps_services_v2_payment_list_permission() {
+    return array(
+        'access_apps_services_v2_payment_list_credit_config' => array(
+            'title'         => t('Accessing Service Payment List V2 Configuration'),
+            'description'   => t('Accessing Service Payment List V2 Configuration.')
+        ),
+    );
+}
+
+/**
  * Implements hook_services_resources().
  */
 function apps_services_v2_payment_list_services_resources() {
     return array(
-        'checkout' => array(
+        'checkout_v2' => array(
             'actions' => array(
                 'payment_list' => array(
                     'help' => 'Get Payment List',
@@ -48,9 +60,99 @@ function apps_services_v2_payment_list_services_resources() {
                       ),
                     ),
                 ),
+                'payment' => array(
+                    'help' => 'Update and Refresh Payment Method of Orders',
+                    'callback' => 'apps_services_v2_payment_list_checkout_payment',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_payment_list',
+                        'name' => 'apps_services_v2_payment_list',
+                    ),
+                    'documentation callback' => 'apps_services_v2_payment_list_checkout_payment_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'payment_method',
+                        'type' => 'string',
+                        'description' => 'Selected payment method',
+                        'source' => array(
+                          'data' => 'payment_method',
+                          'param' => 'payment_method',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'use_credit',
+                        'type' => 'int',
+                        'description' => 'Toggle for using credit or not',
+                        'source' => array(
+                          'data' => 'use_credit',
+                          'param' => 'use_credit',
+                        ),
+                        'default value' => 5,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
             ),
         ),
     );
+}
+
+/**
+ * Function apps_services_v2_payment_list_checkout_payment_doc().
+ *
+ * Documentation callback for checkout payment.
+ */
+function apps_services_v2_payment_list_checkout_payment_doc() {
+  global $base_url;
+  $response = '
+    {
+      "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer",
+      "source": "android"
+    }
+  ';
+  $element = array(
+    '#name' => 'Payment Checkout Refresh/Update',
+    '#description' => 'Update and Refresh Payment Method of Orders.',
+    '#auth' => FALSE,
+    '#path' => 'checkout_v2/payment_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
 }
 
 /**
@@ -69,9 +171,9 @@ function apps_services_v2_payment_list_doc() {
     '#name' => 'Payment List Apps Service',
     '#description' => 'Get Payment List for Apps Service.',
     '#auth' => FALSE,
-    '#path' => 'checkout/payment_list',
+    '#path' => 'checkout_v2/payment_list',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/checkout/payment_list.json',
+    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

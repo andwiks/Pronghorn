@@ -1,5 +1,43 @@
 <?php
 
+/*
+ * update/refresh order based on payment method
+ */
+function apps_services_v2_payment_list_checkout_payment($payment_method, $use_credit, $source){
+  global $user;
+  
+  $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = array();
+  
+  //check credit enable/disable setting
+  if(variable_get('apps_services_v2_payment_list_credit_option', 1)){
+    if($use_credit > 0 && isset($_SESSION['use_credit'])){
+      unset($_SESSION['use_credit']);
+    }
+    else{
+      $_SESSION["use_credit"] = false;
+    }
+  }
+  
+  // Get user's order.
+  $order = commerce_cart_order_load($user->uid);
+  // Check whether order can checkout.
+  if ($order !== FALSE && commerce_checkout_order_can_checkout($order)) {
+    $order->data['payment_method'] = $payment_method;
+    commerce_order_save($order);
+    
+    $return["status"] = true;
+    $return["data"] = $order;
+
+    return $return;
+  }
+
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
+}
+
 /* 
  * get payment list with credit options
  * joined version from the old payment list
@@ -74,20 +112,25 @@ function apps_services_v2_payment_list_data($source){
       $return["data"][] = $value_container[$key];
     }
     
-    //get user's credit data
-    $credit_totalamount = userpoints_get_current_points($user->uid, 'all');
-    if(isset($credit_totalamount) && !empty($credit_totalamount) && $credit_totalamount > 0){
-      $credit_formatted_totalamount = number_format($credit_totalamount,0,",",".");
+    //check credit enable/disable setting
+    if(variable_get('apps_services_v2_payment_list_credit_option', 1)){
+      //get user's credit data
+      $credit_totalamount = userpoints_get_current_points($user->uid, 'all');
+      if(isset($credit_totalamount) && !empty($credit_totalamount) && $credit_totalamount > 0){
+        $credit_formatted_totalamount = number_format($credit_totalamount,0,",",".");
 
-      //add credit choice selection from payment list
-      $credit_container = array();
-      $credit_container["payment_code"] = "use_sepulsa_credit_option";
-      $credit_container["subtitle"] = "gunakan sepulsa kredit untuk membayar";
-      $credit_container["title"] = "Sepulsa Kredit Rp " . $credit_formatted_totalamount;
-      $credit_container["credit_balance"] = $credit_totalamount;
-      
-      //add option to data container
-      $return["data"][] = $credit_container;
+        //add credit choice selection from payment list
+        $credit_container = array();
+        $credit_container["payment_code"] = "use_sepulsa_credit_option";
+        $credit_container["subtitle"] = variable_get("apps_services_v2_payment_list_credit_subtitle_text", "gunakan sepulsa kredit untuk membayar");
+        $credit_title = variable_get("apps_services_v2_payment_list_credit_title_text", "Sepulsa Kredit Rp @credit");
+        $credit_title = str_replace("@credit", $credit_formatted_totalamount, $credit_title);
+        $credit_container["title"] = $credit_title;
+        $credit_container["credit_balance"] = $credit_totalamount;
+
+        //add option to data container
+        $return["data"][] = $credit_container;
+      }
     }
     
     //return the data with value and option title in it

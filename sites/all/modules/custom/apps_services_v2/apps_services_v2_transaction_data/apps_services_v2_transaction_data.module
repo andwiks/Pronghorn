@@ -5,7 +5,7 @@
  */
 function apps_services_v2_transaction_data_services_resources() {
     return array(
-        'transaction' => array(
+        'transaction_v2' => array(
             'actions' => array(
                 'favorite' => array(
                     'help' => 'Add/Remove Favorite Order',
@@ -155,9 +155,9 @@ function apps_services_v2_transaction_home_list_doc() {
     '#name' => 'Transaction Home Page List',
     '#description' => 'Get the list of home page transaction.',
     '#auth' => FALSE,
-    '#path' => 'transaction/home_transaction_list',
+    '#path' => 'transaction_v2/home_transaction_list',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/transaction/home_transaction_list.json',
+    '#request_url' => $base_url . '/air/transaction_v2/home_transaction_list.json',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

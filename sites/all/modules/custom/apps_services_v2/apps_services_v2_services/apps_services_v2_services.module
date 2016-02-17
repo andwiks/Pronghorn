@@ -31,6 +31,42 @@ function apps_services_v2_services_services_resources() {
                       ),
                     ),
                 ),
+                'product' => array(
+                    'help' => 'List sepulsa product based on type',
+                    'callback' => 'apps_services_v2_services_sepulsa_product_index',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                    'documentation callback' => 'apps_services_v2_services_sepulsa_product_index_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'type',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'type',
+                          'param' => 'type',
+                        ),
+                        'default value' => NULL,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
             ),
         ),
     );
@@ -55,6 +91,49 @@ function apps_services_v2_services_sepulsa_operator_list_doc() {
     '#path' => 'services_v2/sepulsa',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/air/services_v2/sepulsa.json',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_sepulsa_product_index_doc().
+ *
+ * Documentation callback for sepulsa product list.
+ */
+function apps_services_v2_services_sepulsa_product_index_doc() {
+  global $base_url;
+  $response = '
+    {
+        "type": "coupon",
+        "source": "android"
+    }
+  ';
+  $element = array(
+    '#name' => 'Sepulsa Get Product List',
+    '#description' => 'Get Sepulsa Product Data based on type.',
+    '#auth' => FALSE,
+    '#path' => 'services_v2/product',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/product.json',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

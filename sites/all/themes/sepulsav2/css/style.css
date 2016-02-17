@@ -1538,6 +1538,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     border-right:2px solid #ccc;
     font-size:14px;
 }
+
 #frameBlog .content_blog .head_post .comment,
 #frameBlog .content_blog .head_post .share {border-right:none; margin-right: 0;}
 #frameBlog .content_blog .head_post .share {margin-top:0; padding-right: 0; position:relative;}
@@ -3783,4 +3784,29 @@ section.banner .bx-viewport
 section.banner .caption
 {
     top:30%;
+}
+
+
+/* update blog */
+section.sblog .caption h1{
+    font-family: "robotoregular";
+    font-size: 36px;
+    margin: 0 0 15px 0;
+}
+#frameBlog  .content p
+{
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#frameBlog .content .field-name-field-blog-image
+{
+    width: 45%;
+    float: left;
+    padding: 0 10px 10px 0;
+}
+
+#frameBlog #left_column h1{
+    font-size: 32px;
+    margin-bottom: 15px;
 }

@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * @file
+ * Implements Kredivo payment services for use with Drupal Commerce.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_commerce_payment_method_info().
+ */
+function commerce_kredivo_commerce_payment_method_info() {
+  $payment_methods = array();
+
+  $payment_methods['commerce_kredivo'] = array(
+    'base' => 'commerce_kredivo',
+    'title' => t('Kredivo Payment Gateway'),
+    'short_title' => t('Kredivo'),
+    'description' => t('Kredivo Payment Gateway Integration'),
+    'terminal' => FALSE,
+    'offsite' => TRUE,
+    'offsite_autoredirect' => TRUE,
+  );
+
+  return $payment_methods;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_kredivo_menu() {
+  $items = array();
+
+  // Define an always accessible path to receive Notification.
+  $items['commerce_kredivo/notification'] = array(
+    'page callback' => 'commerce_kredivo_notification_callback',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function commerce_kredivo_settings_form().
+ *
+ * Payment method callback: settings form.
+ *
+ * @param array $settings
+ *   Setting form array.
+ *
+ * @return array
+ *   Form array.
+ */
+function commerce_kredivo_settings_form($settings = array()) {
+  // Set example payment server url.
+  $url = url('http://dev.kredivo/com/kredivo/v1', array(
+    'absolute' => TRUE,
+    'external' => TRUE,
+  ));
+  // Payment server URL.
+  $form['url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Server URL'),
+    '#default_value' => (isset($settings['url'])) ? $settings['url'] : '',
+    '#maxlength' => 128,
+    '#description' => t('Please input full url: https:// or http://.<br />Example: @url.', array(
+      '@url' => $url,
+    )),
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => $url,
+    ),
+  );
+
+  // Payment server key.
+  $form['server_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Server Key'),
+    '#default_value' => (isset($settings['server_key'])) ? $settings['server_key'] : '',
+    '#maxlength' => 50,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'placeholder' => t('Server Key'),
+    ),
+  );
+
+  return $form;
+}

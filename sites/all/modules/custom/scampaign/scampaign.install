@@ -1,0 +1,53 @@
+<?php
+/**
+ * @file
+ * scampaign.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function scampaign_schema() {
+  $schema['scampaign'] = array(    
+    'description' => 'Storing Campaign Link id, status and promo',
+    'fields' => array(
+      'id' => array(
+        'description' => 'id',
+        'type' => 'serial',
+      ),
+      'max_use' => array(
+        'description' => 'Maximum Use',
+        'type' => 'int',
+        'default' => 1,
+      ),
+      'used' => array(
+        'description' => 'Used count',
+        'type' => 'int',
+        'default' => 0,
+      ),
+      'campaign' => array(
+        'description' => 'Campaign Name Tag',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+        'default' => '',
+      ),
+      'rules_name' => array(
+        'description' => 'Rules Name',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => true,
+        'default' => '',
+      ),
+      'email' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'serialize' => TRUE,
+        'description' => 'A serialized array of email value.',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+    
+  return $schema;
+}

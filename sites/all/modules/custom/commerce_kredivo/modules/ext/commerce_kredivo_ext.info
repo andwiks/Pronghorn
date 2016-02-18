@@ -1,0 +1,6 @@
+name = Kredivo Payment - External
+description = Implements Kredivo Payment - External.
+package = Commerce (Kredivo)
+dependencies[] = commerce_kredivo
+
+core = 7.x

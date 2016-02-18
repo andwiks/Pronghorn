@@ -1,6 +1,6 @@
 name = Kredivo Payment Gateway Indonesia
 description = Implements Kredivo payment services for use with Drupal Commerce.
-package = Commerce (payment)
+package = Commerce (Kredivo)
 dependencies[] = commerce
 dependencies[] = commerce_ui
 dependencies[] = commerce_payment

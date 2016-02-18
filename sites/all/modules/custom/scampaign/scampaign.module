@@ -51,20 +51,25 @@ function scampaign_menu(){
   */
 function scampaign_form_user_register_form_alter(&$form, &$form_state, $form_id) {
   if(!empty($_GET['ref'])){
-    $campaign_id = alphaID($_GET['ref'],true,5);
-    $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
-    // Check if ID exist
-    if($result->rowCount()){
-      $campaign = $result->fetch();
-      if($campaign->used < $campaign->max_use){
-        // Valid link, safe it into session?
-        $_SESSION['scampaign'] = $_GET['ref'];
+    $campaign_id = betaID($_GET['ref']);
+    if($campaign_id){
+      $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
+      // Check if ID exist
+      if($result->rowCount()){
+        $campaign = $result->fetch();
+        if($campaign->used < $campaign->max_use){
+          // Valid link, safe it into session?
+          $_SESSION['scampaign'] = $_GET['ref'];
+        } else {
+          // Already reach Maximum use
+          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'),'error',false);
+        }
       } else {
-        // Already reach Maximum use
-        drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'),'error',false);
+        // ID not found
+        drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
       }
     } else {
-      // ID not found
+      // ID not valid
       drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
     }
   }
@@ -76,34 +81,40 @@ function scampaign_form_user_register_form_alter(&$form, &$form_state, $form_id)
   */
 function scampaign_user_insert(&$edit, $account, $category){
   if(!empty($_SESSION['scampaign'])){
-    $campaign_id = alphaID($_SESSION['scampaign'],true,5);
-    $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
-    // Double Check here
-    // Check if ID exist
-    if($result->rowCount()){
-      $campaign = $result->fetch();
-      if($campaign->used < $campaign->max_use){
-        // Valid Session, invoke the rule
-        rules_invoke_component($campaign->rules_name,$account);
-        
-        // Mark used and add the email to the list
-        $emails = unserialize($campaign->email);
+    // Decrypt it
+    $campaign_id = betaID($_SESSION['scampaign']);
+    if($campaign_id){
+      $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
+      // Double Check here
+      // Check if ID exist
+      if($result->rowCount()){
+        $campaign = $result->fetch();
+        if($campaign->used < $campaign->max_use){
+          // Valid Session, invoke the rule
+          rules_invoke_component($campaign->rules_name,$account);
+          
+          // Mark used and add the email to the list
+          $emails = unserialize($campaign->email);
 
-        $emails[] = $account->mail;
-        db_update('scampaign')
-        ->fields(array(
-          'used' => $campaign->used+1,
-          'email' => serialize($emails)
-        ))
-        ->condition('id',$campaign_id,'=')
-        ->execute();
-        
+          $emails[] = $account->mail;
+          db_update('scampaign')
+          ->fields(array(
+            'used' => $campaign->used+1,
+            'email' => serialize($emails)
+          ))
+          ->condition('id',$campaign_id,'=')
+          ->execute();
+          
+        } else {
+          // Already reach Maximum use
+          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'),'error',false);
+        }
       } else {
-        // Already reach Maximum use
-        drupal_set_message(t('Referal ID Sudah Pernah Digunakan.'),'error',false);
+        // ID not found
+        drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
       }
     } else {
-      // ID not found
+      // ID not valid
       drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
     }
     // Unset the session for any result.
@@ -111,6 +122,28 @@ function scampaign_user_insert(&$edit, $account, $category){
   }
 }
 
+/**
+  * Stronger crypt to near ubreakable
+  */
+function betaID($in){
+  // Hardcode the pin for cosistency, must be bigger than 100k
+  $rand = '820812';
+
+  //Get the decrypted, should be [id][rand][id]
+  $normal = (alphaID($in,true,10));
+  //Remove the rand from it. Leaving [id][id]
+  $normal = str_replace($rand,'',$normal);
+  //Now devide it into 2
+  $div = strlen($normal)/2;
+  $step1 = substr($normal,0, $div);
+  $step2 = substr($normal,$div);
+  //If both [id] is the same
+  if($step1 == $step2){
+    return $step1;
+  }
+  //Return false if [id] is not the same
+  return false;
+}
 /**
  * Translates a number to a short alhanumeric version
  *

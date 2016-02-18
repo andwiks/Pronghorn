@@ -67,6 +67,55 @@ function apps_services_v2_services_services_resources() {
                       ),
                     ),
                 ),
+                'cart' => array(
+                  'help' => "Retrieve product list inside customer's shopping cart.",
+                  'callback' => 'apps_services_v2_services_resource_index',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'apps_services_v2_services_resource_index_doc',
+                  'args' => array(
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
+                'cart_add' => array(
+                  'help' => "Add the specified product to a customer's shopping cart.",
+                  'callback' => 'apps_services_v2_services_resource_add',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'apps_services_v2_services_resource_add_doc',
+                  'args' => array(
+                    array(
+                      'name' => 'product',
+                      'type' => 'array',
+                      'description' => 'The product data to be added',
+                      'source' => array(
+                        'data' => 'product',
+                        'param' => 'product'
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
             ),
         ),
     );
@@ -151,6 +200,402 @@ function apps_services_v2_services_sepulsa_product_index_doc() {
         '#question' => '500 Internal Server Error',
         '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
         '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_add().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_resource_add() {
+  global $base_url;
+  $response = '
+  {
+      "line_item_id": "172",
+      "order_id": "38",
+      "type": "mobile_prepaid",
+      "line_item_label": "SMPT50",
+      "quantity": 7,
+      "created": "1425923611",
+      "changed": 1425925943,
+      "data": [],
+      "commerce_unit_price": {
+          "amount": "51000",
+          "currency_code": "IDR",
+          "data": {
+              "components": [
+                  {
+                      "name": "base_price",
+                      "price": {
+                          "amount": "51000",
+                          "currency_code": "IDR",
+                          "data": {
+                              "components": []
+                          }
+                      },
+                      "included": true
+                  }
+              ]
+          }
+      },
+      "commerce_total": {
+          "amount": 357000,
+          "currency_code": "IDR",
+          "data": {
+              "components": [
+                  {
+                      "name": "base_price",
+                      "price": {
+                          "amount": 357000,
+                          "currency_code": "IDR",
+                          "data": {
+                              "components": []
+                          }
+                      },
+                      "included": true
+                  }
+              ]
+          }
+      },
+      "commerce_product": {
+          "revision_id": "7",
+          "sku": "SMPT50",
+          "title": "Rp 50.000",
+          "revision_uid": "14",
+          "status": "1",
+          "log": "",
+          "revision_timestamp": "1425589241",
+          "data": false,
+          "product_id": "5",
+          "type": "pulsa",
+          "language": "und",
+          "uid": "1",
+          "created": "1419919510",
+          "changed": "1425589241",
+          "commerce_price": {
+              "und": [
+                  {
+                      "amount": "51000",
+                      "currency_code": "IDR",
+                      "data": {
+                          "components": []
+                      }
+                  }
+              ]
+          },
+          "field_api_provider": {
+              "und": [
+                  {
+                      "value": "poin2000"
+                  }
+              ]
+          },
+          "field_credit_amount": {
+              "und": [
+                  {
+                      "value": "50000"
+                  }
+              ]
+          },
+          "field_package_code": {
+              "und": [
+                  {
+                      "value": "HS50"
+                  }
+              ]
+          },
+          "rdf_mapping": []
+      },
+      "commerce_display_path": "",
+      "field_phone_number": "08122545393",
+      "field_topup_status": "7",
+      "field_topup_data": [
+          ""
+      ],
+      "rdf_mapping": []
+  }
+  ';
+  $element = array(
+    '#name' => t('Cart Add Content'),
+    '#description' => t("Add new shopping cart content."),
+    '#auth' => TRUE,
+    '#path' => 'services_v2/cart_add',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/cart_add.json<br />
+    POST topup data application/json: { "source" : "android", "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } } <br />
+    POST coupon data application/json: { "source" : "android", "product": { "product_id": 11, "type": "coupon", "quantity": 1 } } <br />
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+      'missing_cart' => array(
+        '#question' => '406 Not Acceptable: Cart missing',
+        '#description' => t('Unable to get shopping cart. Check user session.'),
+        '#response' => '
+        [
+            "Cart missing"
+        ]',
+      ),
+      'product_required' => array(
+        '#question' => '406 Not Acceptable: Product is required',
+        '#description' => t('Default error message when add new content into cart. Possible invalid product id input.'),
+        '#response' => '
+        [
+            "Product is required"
+        ]',
+      ),
+      'product_not_found' => array(
+        '#question' => '406 Not Acceptable: Product not found',
+        '#description' => t('Invalid product id input. System can not recognize product based on product id input.'),
+        '#response' => '
+        [
+            "Product not found"
+        ]',
+      ),
+      'unable_to_add' => array(
+        '#question' => '406 Not Acceptable: Unable to add product',
+        '#description' => t('Unable to add content into shopping cart. Possible because unable to pass certain rules, such as product price rules.'),
+        '#response' => '
+        [
+            "Unable to add product"
+        ]',
+      ),
+      'invalid_product_fields' => array(
+        '#question' => '406 Not Acceptable: Invalid product fields',
+        '#description' => t('Product field input is invalid.'),
+        '#response' => '
+        [
+            "Invalid product fields"
+        ]',
+      ),
+      'invalid_line_item' => array(
+        '#question' => '406 Not Acceptable: Invalid Line Item',
+        '#description' => t('Unable to get order object. Check user session.'),
+        '#response' => '
+        [
+            "Invalid Line Item"
+        ]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument product',
+        '#description' => t('Required product argument: product id.'),
+        '#response' => '
+        [
+            "Missing required argument product"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_index_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_resource_index_doc() {
+  global $base_url;
+  $response = '
+  {
+      "order_number": "38",
+      "revision_id": "195",
+      "revision_uid": "0",
+      "mail": "",
+      "status": "cart",
+      "log": "Created as a shopping cart order.",
+      "revision_timestamp": "1425924512",
+      "revision_hostname": "127.0.0.1",
+      "data": {
+          "last_cart_refresh": 1425925267
+      },
+      "order_id": "38",
+      "type": "commerce_order",
+      "uid": "0",
+      "created": "1425920102",
+      "changed": "1425924512",
+      "hostname": "127.0.0.1",
+      "commerce_line_items": [
+          {
+              "line_item_id": "172",
+              "order_id": "38",
+              "type": "mobile_prepaid",
+              "line_item_label": "SMPT50",
+              "quantity": "6.00",
+              "created": "1425923611",
+              "changed": "1425924512",
+              "data": [],
+              "commerce_unit_price": {
+                  "amount": "51000",
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": "51000",
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_total": {
+                  "amount": "306000",
+                  "currency_code": "IDR",
+                  "data": {
+                      "components": [
+                          {
+                              "name": "base_price",
+                              "price": {
+                                  "amount": 306000,
+                                  "currency_code": "IDR",
+                                  "data": {
+                                      "components": []
+                                  }
+                              },
+                              "included": true
+                          }
+                      ]
+                  }
+              },
+              "commerce_product": {
+                  "revision_id": "7",
+                  "sku": "SMPT50",
+                  "title": "Rp 50.000",
+                  "revision_uid": "14",
+                  "status": "1",
+                  "log": "",
+                  "revision_timestamp": "1425589241",
+                  "data": false,
+                  "product_id": "5",
+                  "type": "pulsa",
+                  "language": "und",
+                  "uid": "1",
+                  "created": "1419919510",
+                  "changed": "1425589241",
+                  "commerce_price": {
+                      "und": [
+                          {
+                              "amount": "51000",
+                              "currency_code": "IDR",
+                              "data": {
+                                  "components": []
+                              }
+                          }
+                      ]
+                  },
+                  "field_api_provider": {
+                      "und": [
+                          {
+                              "value": "poin2000"
+                          }
+                      ]
+                  },
+                  "field_credit_amount": {
+                      "und": [
+                          {
+                              "value": "50000"
+                          }
+                      ]
+                  },
+                  "field_package_code": {
+                      "und": [
+                          {
+                              "value": "HS50"
+                          }
+                      ]
+                  },
+                  "rdf_mapping": []
+              },
+              "commerce_display_path": "",
+              "field_phone_number": "08122545393",
+              "field_topup_status": "7",
+              "field_topup_data": [
+                  ""
+              ],
+              "rdf_mapping": []
+          }
+      ],
+      "commerce_order_total": {
+          "amount": "306000",
+          "currency_code": "IDR",
+          "data": {
+              "components": [
+                  {
+                      "name": "base_price",
+                      "price": {
+                          "amount": 306000,
+                          "currency_code": "IDR",
+                          "data": []
+                      },
+                      "included": true
+                  }
+              ]
+          }
+      },
+      "commerce_customer_billing": [],
+      "rdf_mapping": []
+  }
+  ';
+  $element = array(
+    '#name' => t('Cart Index'),
+    '#description' => t("Retrieve product list inside customer's shopping cart as order information."),
+    '#auth' => TRUE,
+    '#path' => 'services_v2/cart',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/cart.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+      'missing_cart' => array(
+        '#question' => '406 Not Acceptable: Cart missing',
+        '#description' => t('Unable to get shopping cart. Check user session.'),
+        '#response' => '
+        [
+            "Cart missing"
+        ]',
+      ),
+      'invalid_order' => array(
+        '#question' => '406 Not Acceptable: Invalid Order',
+        '#description' => t('Unable to get order object. Check user session.'),
+        '#response' => '
+        [
+            "Invalid Order"
+        ]',
+      ),
+      'invalid_line_item' => array(
+        '#question' => '406 Not Acceptable: Invalid Line Item',
+        '#description' => t('Unable to get order object. Check user session.'),
+        '#response' => '
+        [
+            "Invalid Line Item"
+        ]',
       ),
     ),
   );

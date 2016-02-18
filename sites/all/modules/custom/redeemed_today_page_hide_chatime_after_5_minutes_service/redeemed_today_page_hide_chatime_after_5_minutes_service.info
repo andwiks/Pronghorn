@@ -1,0 +1,6 @@
+; $Id$
+name = Redeemed Today Page Hide Chatime After 5 Minutes
+description = If User have Chatime Voucher in Redeemed Today Page Service, Remove The Voucher if > 5 Minutes Old
+package = services
+version = 0.1
+core = 7.x

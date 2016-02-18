@@ -1,0 +1,55 @@
+<?php
+
+/*
+ * Implement Hook View Pre Render
+ * used to over ride and hide chatime voucher after 5 minutes
+ */
+function redeemed_today_page_hide_chatime_after_5_minutes_service_services_request_postprocess_alter($controller, $args, &$result) {
+  //set the hook only for user_offline_redeemed_coupon
+  if($args["display_id"] == "user_offline_redeemed_coupon"){
+    //get data from setting
+    $title_hidden = variable_get("redeemed_today_page_hide_chatime_after_5_minutes_service_title_name", "chatime");
+    $time_hidden = variable_get("redeemed_today_page_hide_chatime_after_5_minutes_service_time_minutes", "5");
+    //convert string to integer
+    $time_hidden = intval($time_hidden);
+    
+    //loop result search to search for chatime
+    foreach ($result as $index=>$value) {
+      if (strpos(strtolower($value->title), strtolower('platinum')) !== false) {
+        $redeem_data = strtotime($value->{"updated date"});
+        $redeem_data_plus_5_minutes = $redeem_data+(60*$time_hidden);
+        
+        $today_timestamp = strtotime("now");
+        if($today_timestamp >= $redeem_data_plus_5_minutes){
+          array_splice($result, $index, 1);
+        }
+      }
+    }
+  }
+}
+
+function redeemed_today_page_hide_chatime_after_5_minutes_service_menu() {
+    $items['admin/config/administration/redeemed_today_page_hide_voucher'] = array(
+        'title'             => 'Redeemed Today Page Hide Voucher Service Configuration',
+        'description'       => 'Configure page for Redeemed Today Page Hide Voucher Services',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('redeemed_today_page_hide_chatime_after_5_minutes_service_setting_form'),
+        'access arguments'  => array('access_redeemed_today_page_hide_chatime_after_5_minutes_service_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'redeemed_today_page_hide_chatime_after_5_minutes_service.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function redeemed_today_page_hide_chatime_after_5_minutes_service_permission() {
+    return array(
+        'access_redeemed_today_page_hide_chatime_after_5_minutes_service_config' => array(
+            'title'         => t('Accessing Redeemed Today Page Hide Voucher Service Configuration'),
+            'description'   => t('Accessing Redeemed Today Page Hide Voucher Service Configuration.')
+        ),
+    );
+}

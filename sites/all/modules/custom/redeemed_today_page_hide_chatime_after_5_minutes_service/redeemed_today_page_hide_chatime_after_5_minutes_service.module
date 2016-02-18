@@ -14,6 +14,7 @@ function redeemed_today_page_hide_chatime_after_5_minutes_service_services_reque
     $time_hidden = intval($time_hidden);
     
     //loop result search to search for chatime
+    $container_temp_result = array();
     foreach ($result as $index=>$value) {
       if (strpos(strtolower($value->title), strtolower($title_hidden)) !== false) {
         $redeem_data = strtotime($value->{"updated date"});
@@ -21,10 +22,17 @@ function redeemed_today_page_hide_chatime_after_5_minutes_service_services_reque
         
         $today_timestamp = strtotime("now");
         if($today_timestamp >= $redeem_data_plus_5_minutes){
-          array_splice($result, $index, 1);
+          unset($result[$index]);
         }
       }
+      
+      if(isset($result[$index]) && !empty($result[$index])){
+        $container_temp_result[] = $result[$index];
+      }
     }
+    
+    //re index the result data
+    $result = $container_temp_result;
   }
 }
 

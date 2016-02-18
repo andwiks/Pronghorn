@@ -15,7 +15,7 @@ function redeemed_today_page_hide_chatime_after_5_minutes_service_services_reque
     
     //loop result search to search for chatime
     foreach ($result as $index=>$value) {
-      if (strpos(strtolower($value->title), strtolower('platinum')) !== false) {
+      if (strpos(strtolower($value->title), strtolower($title_hidden)) !== false) {
         $redeem_data = strtotime($value->{"updated date"});
         $redeem_data_plus_5_minutes = $redeem_data+(60*$time_hidden);
         

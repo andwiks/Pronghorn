@@ -121,17 +121,122 @@ function apps_services_v2_payment_list_checkout_payment_doc() {
   global $base_url;
   $response = '
     {
-      "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer",
-      "source": "android"
+      "status": true,
+      "message": "",
+      "data": {
+        "order_number": "163693",
+        "revision_id": "694409",
+        "revision_uid": "43",
+        "mail": "ananto.sql@gmail.com",
+        "status": "cart",
+        "log": "Created as a shopping cart order.",
+        "revision_timestamp": 1455877173,
+        "revision_hostname": "::1",
+        "data": {
+          "last_cart_refresh": 1455877173,
+          "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+        },
+        "order_id": "163693",
+        "type": "commerce_order",
+        "uid": "43",
+        "created": "1452485185",
+        "changed": 1455877173,
+        "hostname": "182.253.73.224",
+        "commerce_line_items": {
+          "und": {
+            "0": {
+              "line_item_id": "662332"
+            },
+            "3": {
+              "line_item_id": "668477"
+            }
+          }
+        },
+        "commerce_order_total": {
+          "und": [
+            {
+              "amount": 200693,
+              "currency_code": "IDR",
+              "data": {
+                "components": [
+                  {
+                    "name": "base_price",
+                    "price": {
+                      "amount": 200000,
+                      "currency_code": "IDR",
+                      "data": []
+                    },
+                    "included": true
+                  },
+                  {
+                    "name": "payment_code",
+                    "price": {
+                      "amount": 693,
+                      "currency_code": "IDR",
+                      "data": []
+                    },
+                    "included": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "commerce_customer_billing": [],
+        "field_commerce_billy_cancel_date": [],
+        "field_commerce_billy_i_date": [],
+        "commerce_coupons": [],
+        "commerce_discounts": [],
+        "field_order_source": {
+          "und": [
+            {
+              "value": "Web",
+              "format": null,
+              "safe_value": "Web"
+            }
+          ]
+        },
+        "field_imei": [],
+        "field_utm_source": {
+          "und": [
+            {
+              "value": "website",
+              "format": null,
+              "safe_value": "website"
+            }
+          ]
+        },
+        "field_utm_medium": {
+          "und": [
+            {
+              "value": "campaign_page",
+              "format": null,
+              "safe_value": "campaign_page"
+            }
+          ]
+        },
+        "field_utm_campaign": {
+          "und": [
+            {
+              "value": "crazy_deal_indosat",
+              "format": null,
+              "safe_value": "crazy_deal_indosat"
+            }
+          ]
+        },
+        "field_app": [],
+        "rdf_mapping": []
+      }
     }
   ';
   $element = array(
     '#name' => 'Payment Checkout Refresh/Update',
     '#description' => 'Update and Refresh Payment Method of Orders.',
     '#auth' => FALSE,
-    '#path' => 'checkout_v2/payment_list',
+    '#path' => 'checkout_v2/payment',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json',
+    '#request_url' => $base_url . '/air/checkout_v2/payment.json<br />'
+    . 'POST data application/json: { "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer", "source": "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
@@ -150,6 +255,11 @@ function apps_services_v2_payment_list_checkout_payment_doc() {
         '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
         '#response' => '',
       ),
+      'invalid_order' => array(
+        '#question' => '406 Invalid Order',
+        '#description' => 'User does not have valid order.',
+        '#response' => '',
+      ),
     ),
   );
   return $element;
@@ -164,7 +274,154 @@ function apps_services_v2_payment_list_doc() {
   global $base_url;
   $response = '
     {
-      "source": "android"
+      "status": true,
+      "message": "",
+      "data": [
+        {
+          "method_id": "commerce_veritrans",
+          "settings": {
+            "type": "credit_card",
+            "credit_card": {
+              "card_types": {
+                "visa": "visa",
+                "mastercard": "mastercard",
+                "amex": 0,
+                "discover": 0,
+                "dc": 0,
+                "dci": 0,
+                "cb": 0,
+                "jcb": 0,
+                "maestro": 0,
+                "visaelectron": 0,
+                "laser": 0,
+                "solo": 0,
+                "switch": 0
+              },
+              "bank": "mandiri",
+              "type": "twoclick",
+              "3ds": 1,
+              "bin_promo": ""
+            },
+            "echannel": {
+              "instruction": {
+                "value": "",
+                "format": "full_"
+              }
+            },
+            "prefix": "",
+            "url": "https://api.sandbox.veritrans.co.id/v2",
+            "client_key": "VT-client-OKrCpIwqRkMEeBxC",
+            "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_commerce_veritrans",
+          "weight": 0,
+          "title": "Kartu Kredit / Debit",
+          "type": "payment_option",
+          "payment_code": "commerce_veritrans|commerce_payment_commerce_veritrans"
+        },
+        {
+          "method_id": "bank_transfer",
+          "settings": {
+            "details": {
+              "account_owner": "PT Sepulsa Teknologi Indonesia",
+              "account_number": "2063137111",
+              "account_iban": "",
+              "bank_code_appellation": "",
+              "bank_code": "",
+              "account_swift": "",
+              "account_bank": "BCA",
+              "account_branch": "Thamrin"
+            },
+            "subject_oid": 0,
+            "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_bca_bank_transfer",
+          "weight": 5,
+          "title": "BCA Bank Transfer",
+          "type": "payment_option",
+          "payment_code": "bank_transfer|commerce_payment_bca_bank_transfer"
+        },
+        {
+          "method_id": "bank_transfer",
+          "settings": {
+            "details": {
+              "account_owner": "PT Sepulsa Teknologi Indonesia",
+              "account_number": "168 0000 696482",
+              "account_iban": "",
+              "bank_code_appellation": "",
+              "bank_code": "",
+              "account_swift": "",
+              "account_bank": "Mandiri",
+              "account_branch": "Jakarta Galeria Niaga Mediterania"
+            },
+            "subject_oid": 0,
+            "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_mandiri_bank_transfer",
+          "weight": 6,
+          "title": "Mandiri Bank Transfer",
+          "type": "payment_option",
+          "payment_code": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+        },
+        {
+          "method_id": "commerce_veritrans",
+          "settings": {
+            "type": "credit_card",
+            "credit_card": {
+              "card_types": {
+                "visa": "visa",
+                "mastercard": "mastercard",
+                "amex": 0,
+                "discover": 0,
+                "dc": 0,
+                "dci": 0,
+                "cb": 0,
+                "jcb": 0,
+                "maestro": 0,
+                "visaelectron": 0,
+                "laser": 0,
+                "solo": 0,
+                "switch": 0
+              },
+              "bank": "mandiri",
+              "type": "twoclick",
+              "3ds": 1,
+              "bin_promo": "548988,542640,524125,410504,410505,451249,523026,524069,548415,466574,466573,457512,471293,522787,524495,524609,426098,426097"
+            },
+            "echannel": {
+              "instruction": {
+                "value": "",
+                "format": "full_"
+              }
+            },
+            "prefix": "",
+            "url": "https://api.veritrans.co.id/v2",
+            "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
+            "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "rules_bni_credit_card",
+          "weight": 9,
+          "title": "BNI Credit Card",
+          "type": "payment_option",
+          "payment_code": "commerce_veritrans|rules_bni_credit_card"
+        }
+      ]
     }
   ';
   $element = array(
@@ -173,7 +430,8 @@ function apps_services_v2_payment_list_doc() {
     '#auth' => FALSE,
     '#path' => 'checkout_v2/payment_list',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json',
+    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

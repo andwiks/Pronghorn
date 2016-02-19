@@ -112,9 +112,10 @@ function apps_services_v2_transaction_data_favorite_doc() {
     '#name' => 'Transaction Favorite Apps Service',
     '#description' => 'Add/Remove Favorite transaction.',
     '#auth' => FALSE,
-    '#path' => 'transaction/favorite',
+    '#path' => 'transaction_v2/favorite',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/transaction/favorite.json',
+    '#request_url' => $base_url . '/air/transaction_v2/favorite.json<br />'
+    . 'POST data application/json: { "order_id" : "12345", "source" : "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

@@ -71,7 +71,19 @@ function apps_services_v2_init_request_doc() {
   global $base_url;
   $response = '
     {
-      "source": "android"
+      "status": true,
+      "message": "",
+      "data": {
+        "cache_id": "XcF1d",
+        "android_current_version": "",
+        "android_google_play_link": "market://details?id=com.sepulsa.android",
+        "android_non_google_play_link": "https://play.google.com/store/apps/details?id=com.sepulsa.android",
+        "android_force_update": 0,
+        "ios_current_version": "",
+        "ios_link": "https://itunes.apple.com/id/app/sepulsa/id991045758?mt=8",
+        "ios_force_update": 0,
+        "maintenance": 0
+      }
     }
   ';
   $element = array(
@@ -80,7 +92,8 @@ function apps_services_v2_init_request_doc() {
     '#auth' => FALSE,
     '#path' => 'init_request_v2/validation_and_get_init',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/init_request_v2/validation_and_get_init.json',
+    '#request_url' => $base_url . '/air/init_request_v2/validation_and_get_init.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

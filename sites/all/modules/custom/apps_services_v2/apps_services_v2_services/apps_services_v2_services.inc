@@ -435,3 +435,68 @@ function apps_services_v2_services_format_order($order) {
   
   return $order;
 }
+
+/**
+ * Function apps_services_v2_services_resource_coupon_redeem().
+ *
+ * @return object
+ *   Order object.
+ */
+function apps_services_v2_services_resource_coupon_redeem($code, $source) {
+  //set return container and default value of return
+  $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = array();
+  
+  $error = '';
+  $uid = $GLOBALS['user']->uid;
+  $order = commerce_cart_order_load($uid);
+  $coupon = commerce_coupon_redeem_coupon_code($code, $order, $error);
+
+  if ($coupon) {
+    $order = commerce_order_load($order->order_id);
+    commerce_cart_order_refresh($order);
+  }
+
+  if (!$error) {
+    // If a coupon was invalidated during the cart refresh (e.g. if its
+    // discounts failed their conditions), an error message will have been
+    // set.
+    $error = &drupal_static('commerce_coupon_error_' . strtolower($code));
+  }
+
+  if (!$error) {
+    // Allow modules/rules to act when a coupon has been successfully added
+    // to the cart.
+    rules_invoke_all('commerce_coupon_applied_to_cart', $coupon, $order);
+    $return_data = array(
+      'coupon' => $coupon,
+      'offer' => entity_metadata_wrapper('commerce_coupon', $coupon)->commerce_discount_reference->get(0)->commerce_discount_offer->value(),
+    );
+    
+    $return["status"] = true;
+    $return["data"] = $return_data;
+    return $return_data;
+  }
+  else {
+    return services_error($error);
+  }
+}
+
+function apps_services_v2_services_resource_coupon_remove($coupon_id, $source) {
+  $uid = $GLOBALS['user']->uid;
+  $order = commerce_cart_order_load($uid);
+  $coupon = commerce_coupon_load($coupon_id);
+
+  commerce_coupon_remove_coupon_from_order($order, $coupon);
+  commerce_cart_order_refresh($order);
+  
+  //set return container and default value of return
+  $return = array();
+  $return["status"] = true;
+  $return["message"] = "Kode discount telah dihapus";
+  $return["data"] = array();
+
+  return $return;
+}

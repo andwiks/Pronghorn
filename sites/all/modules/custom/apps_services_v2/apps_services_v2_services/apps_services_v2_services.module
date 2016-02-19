@@ -161,6 +161,74 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
+                'coupon_redeem' => array(
+                  'help' => "Redeem coupon code.",
+                  'callback' => 'apps_services_v2_services_resource_coupon_redeem',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'commerce_coupon_services_resource_redeem_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                  'args' => array(
+                    array(
+                      'name' => 'code',
+                      'type' => 'string',
+                      'description' => 'Coupon code',
+                      'source' => array(
+                        'data' => 'code',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
+                'coupon_remove' => array(
+                  'help' => "Remove coupon code from an order.",
+                  'callback' => 'apps_services_v2_services_resource_coupon_remove',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'commerce_coupon_services_resource_remove_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                  'args' => array(
+                    array(
+                      'name' => 'coupon_id',
+                      'type' => 'string',
+                      'description' => 'Coupon id',
+                      'source' => array(
+                        'data' => 'coupon_id',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
             ),
         ),
     );

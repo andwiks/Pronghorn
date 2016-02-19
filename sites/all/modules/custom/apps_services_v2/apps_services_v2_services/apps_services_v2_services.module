@@ -229,6 +229,65 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
+                'checkout_complete' => array(
+                  'help' => "Complete checkout process.",
+                  'callback' => 'apps_services_v2_services_resource_complete',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'commerce_checkout_services_resource_complete_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                  'args' => array(
+                    array(
+                      'name' => 'order_id',
+                      'type' => 'int',
+                      'description' => 'The order id.',
+                      'source' => array(
+                        'data' => 'order_id',
+                        'param' => 'order_id',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
+                'saved_card' => array(
+                  'help' => "Complete checkout process.",
+                  'callback' => 'apps_services_v2_services_get_saved_card',
+                  'access callback' => 'user_is_logged_in',
+                  'documentation callback' => '_saved_card_resource_index_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                  'args' => array(
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
             ),
         ),
     );

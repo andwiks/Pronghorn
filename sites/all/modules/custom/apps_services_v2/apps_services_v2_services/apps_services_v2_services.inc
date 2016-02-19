@@ -217,23 +217,20 @@ function apps_services_v2_services_resource_add($product, $source) {
       $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
       // Check input fields.
       if (isset($product['fields']) && !empty($product['fields'])) {
-        // Looping for each product field.
-        foreach ((array) $product['fields'] as $field) {
-          // Looping for each field.
-          foreach ((array) $field as $field_name => $field_value) {
-            try {
-              $line_item_wrapper->$field_name->set($field_value);
-            }
-            catch (EntityMetadataWrapperException $exception) {
-              // Log this condition.
-              watchdog('commerce_cart_services', 'Set line item field with name @name.<br />Value:<pre>@value</pre> Trace:<pre>@trace</pre>', array(
-                '@name' => $field_name,
-                '@value' => print_r($field_value, TRUE),
-                '@trace' => $exception->getTraceAsString(),
-              ), WATCHDOG_ERROR, t('Cart: add'));
-              // Return service cart product field error.
-              return services_error(t('Invalid product fields'), 406);
-            }
+        // Looping for each field.
+        foreach ((array) $product['fields'] as $field_name => $field_value) {
+          try {
+            $line_item_wrapper->$field_name->set($field_value);
+          }
+          catch (EntityMetadataWrapperException $exception) {
+            // Log this condition.
+            watchdog('commerce_cart_services', 'Set line item field with name @name.<br />Value:<pre>@value</pre> Trace:<pre>@trace</pre>', array(
+              '@name' => $field_name,
+              '@value' => print_r($field_value, TRUE),
+              '@trace' => $exception->getTraceAsString(),
+            ), WATCHDOG_ERROR, t('Cart: add'));
+            // Return service cart product field error.
+            return services_error(t('Invalid product fields'), 406);
           }
         }
       }
@@ -313,23 +310,20 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
         $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
         // Check input fields.
         if (isset($product['fields']) && !empty($product['fields'])) {
-          // Looping for each product field.
-          foreach ((array) $product['fields'] as $field) {
-            // Looping for each field.
-            foreach ((array) $field as $field_name => $field_value) {
-              try {
-                $line_item_wrapper->$field_name->set($field_value);
-              }
-              catch (EntityMetadataWrapperException $exception) {
-                // Log this condition.
-                watchdog('commerce_cart_services', 'Set line item field with name @name.<br />Value:<pre>@value</pre> Trace:<pre>@trace</pre>', array(
-                  '@name' => $field_name,
-                  '@value' => print_r($field_value, TRUE),
-                  '@trace' => $exception->getTraceAsString(),
-                ), WATCHDOG_ERROR, t('Cart: add'));
-                // Return service cart product field error.
-                return services_error(t('Invalid product fields'), 406);
-              }
+          // Looping for each field.
+          foreach ((array) $product['fields'] as $field_name => $field_value) {
+            try {
+              $line_item_wrapper->$field_name->set($field_value);
+            }
+            catch (EntityMetadataWrapperException $exception) {
+              // Log this condition.
+              watchdog('commerce_cart_services', 'Set line item field with name @name.<br />Value:<pre>@value</pre> Trace:<pre>@trace</pre>', array(
+                '@name' => $field_name,
+                '@value' => print_r($field_value, TRUE),
+                '@trace' => $exception->getTraceAsString(),
+              ), WATCHDOG_ERROR, t('Cart: add'));
+              // Return service cart product field error.
+              return services_error(t('Invalid product fields'), 406);
             }
           }
         }

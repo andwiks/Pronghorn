@@ -3793,6 +3793,7 @@ section.sblog .caption h1{
     font-size: 36px;
     margin: 0 0 15px 0;
 }
+
 #frameBlog  .content p
 {
     font-size: 14px;
@@ -3810,3 +3811,32 @@ section.sblog .caption h1{
     font-size: 32px;
     margin-bottom: 15px;
 }
+
+#frameBlog  .content p.content-title
+{
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+    /* ini utk responsive youtube */
+     .videoWrapper {
+          position: relative;
+          padding-bottom: 56.25%; /* 16:9 */
+          padding-top: 25px;
+          height: 0;
+     }
+     .videoWrapper iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+     }
+
+     /* ini update utk styling tabs */
+     .field-name-field-tags .field-items div {
+           display: inline-block;
+           margin: 10px 10px 10px 0;
+           background: #ededed ;
+           padding: 5px;
+     }

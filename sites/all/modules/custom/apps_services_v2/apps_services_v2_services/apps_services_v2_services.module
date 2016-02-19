@@ -72,6 +72,11 @@ function apps_services_v2_services_services_resources() {
                   'callback' => 'apps_services_v2_services_resource_index',
                   'access callback' => 'services_access_menu',
                   'documentation callback' => 'apps_services_v2_services_resource_index_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
                   'args' => array(
                     array(
                       'name' => 'source',
@@ -91,6 +96,11 @@ function apps_services_v2_services_services_resources() {
                   'callback' => 'apps_services_v2_services_resource_add',
                   'access callback' => 'services_access_menu',
                   'documentation callback' => 'apps_services_v2_services_resource_add_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
                   'args' => array(
                     array(
                       'name' => 'product',
@@ -207,117 +217,129 @@ function apps_services_v2_services_sepulsa_product_index_doc() {
 }
 
 /**
- * Function apps_services_v2_services_resource_add().
+ * Function apps_services_v2_services_resource_add_doc().
  *
  * @return array
  *   Service documentation array.
  */
-function apps_services_v2_services_resource_add() {
+function apps_services_v2_services_resource_add_doc() {
   global $base_url;
   $response = '
   {
-      "line_item_id": "172",
-      "order_id": "38",
+    "status": true,
+    "message": "",
+    "data": {
       "type": "mobile_prepaid",
-      "line_item_label": "SMPT50",
-      "quantity": 7,
-      "created": "1425923611",
-      "changed": 1425925943,
+      "order_id": "165212",
+      "quantity": 1,
       "data": [],
-      "commerce_unit_price": {
-          "amount": "51000",
-          "currency_code": "IDR",
-          "data": {
-              "components": [
-                  {
-                      "name": "base_price",
-                      "price": {
-                          "amount": "51000",
-                          "currency_code": "IDR",
-                          "data": {
-                              "components": []
-                          }
-                      },
-                      "included": true
-                  }
-              ]
-          }
-      },
-      "commerce_total": {
-          "amount": 357000,
-          "currency_code": "IDR",
-          "data": {
-              "components": [
-                  {
-                      "name": "base_price",
-                      "price": {
-                          "amount": 357000,
-                          "currency_code": "IDR",
-                          "data": {
-                              "components": []
-                          }
-                      },
-                      "included": true
-                  }
-              ]
-          }
-      },
+      "line_item_id": "668474",
+      "line_item_label": "SMPT25",
+      "created": 1455853677,
+      "changed": 1455853677,
       "commerce_product": {
-          "revision_id": "7",
-          "sku": "SMPT50",
-          "title": "Rp 50.000",
-          "revision_uid": "14",
-          "status": "1",
-          "log": "",
-          "revision_timestamp": "1425589241",
-          "data": false,
-          "product_id": "5",
-          "type": "pulsa",
-          "language": "und",
-          "uid": "1",
-          "created": "1419919510",
-          "changed": "1425589241",
-          "commerce_price": {
-              "und": [
-                  {
-                      "amount": "51000",
-                      "currency_code": "IDR",
-                      "data": {
-                          "components": []
-                      }
-                  }
-              ]
-          },
-          "field_api_provider": {
-              "und": [
-                  {
-                      "value": "poin2000"
-                  }
-              ]
-          },
-          "field_credit_amount": {
-              "und": [
-                  {
-                      "value": "50000"
-                  }
-              ]
-          },
-          "field_package_code": {
-              "und": [
-                  {
-                      "value": "HS50"
-                  }
-              ]
-          },
-          "rdf_mapping": []
+        "revision_id": "417",
+        "sku": "SMPT25",
+        "title": "Rp 25.000",
+        "revision_uid": "13957",
+        "status": "1",
+        "log": "",
+        "revision_timestamp": "1445132516",
+        "data": false,
+        "product_id": "4",
+        "type": "pulsa",
+        "language": "und",
+        "uid": "1",
+        "created": "1419919510",
+        "changed": "1445132516",
+        "commerce_price": {
+          "und": [
+            {
+              "amount": "25000",
+              "currency_code": "IDR",
+              "data": {
+                "components": []
+              }
+            }
+          ]
+        },
+        "field_api_provider": {
+          "und": [
+            {
+              "value": "kraken"
+            }
+          ]
+        },
+        "field_credit_amount": {
+          "und": [
+            {
+              "value": "25000"
+            }
+          ]
+        },
+        "field_package_code": {
+          "und": [
+            {
+              "value": "26"
+            }
+          ]
+        },
+        "field_data_packet": {
+          "und": [
+            {
+              "value": "0"
+            }
+          ]
+        },
+        "field_deskripsi": [],
+        "rdf_mapping": []
       },
       "commerce_display_path": "",
-      "field_phone_number": "08122545393",
+      "commerce_unit_price": {
+        "amount": "25000",
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": "25000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": []
+                }
+              },
+              "included": true
+            }
+          ]
+        }
+      },
+      "field_phone_number": "0812111111",
+      "commerce_total": {
+        "amount": 25000,
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": 25000,
+                "currency_code": "IDR",
+                "data": {
+                  "components": []
+                }
+              },
+              "included": true
+            }
+          ]
+        }
+      },
       "field_topup_status": "7",
       "field_topup_data": [
-          ""
+        ""
       ],
-      "rdf_mapping": []
+      "field_line_item_status": "pending"
+    }
   }
   ';
   $element = array(
@@ -411,148 +433,76 @@ function apps_services_v2_services_resource_index_doc() {
   global $base_url;
   $response = '
   {
-      "order_number": "38",
-      "revision_id": "195",
+    "status": true,
+    "message": "",
+    "data": {
+      "order_number": "165212",
+      "revision_id": "702198",
       "revision_uid": "0",
       "mail": "",
       "status": "cart",
       "log": "Created as a shopping cart order.",
-      "revision_timestamp": "1425924512",
-      "revision_hostname": "127.0.0.1",
+      "revision_timestamp": "1455853677",
+      "revision_hostname": "::1",
       "data": {
-          "last_cart_refresh": 1425925267
+        "last_cart_refresh": 1455853814,
+        "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans"
       },
-      "order_id": "38",
+      "order_id": "165212",
       "type": "commerce_order",
       "uid": "0",
-      "created": "1425920102",
-      "changed": "1425924512",
-      "hostname": "127.0.0.1",
-      "commerce_line_items": [
+      "created": "1455853677",
+      "changed": "1455853677",
+      "hostname": "::1",
+      "commerce_line_items": {
+        "und": [
           {
-              "line_item_id": "172",
-              "order_id": "38",
-              "type": "mobile_prepaid",
-              "line_item_label": "SMPT50",
-              "quantity": "6.00",
-              "created": "1425923611",
-              "changed": "1425924512",
-              "data": [],
-              "commerce_unit_price": {
-                  "amount": "51000",
-                  "currency_code": "IDR",
-                  "data": {
-                      "components": [
-                          {
-                              "name": "base_price",
-                              "price": {
-                                  "amount": "51000",
-                                  "currency_code": "IDR",
-                                  "data": {
-                                      "components": []
-                                  }
-                              },
-                              "included": true
-                          }
-                      ]
-                  }
-              },
-              "commerce_total": {
-                  "amount": "306000",
-                  "currency_code": "IDR",
-                  "data": {
-                      "components": [
-                          {
-                              "name": "base_price",
-                              "price": {
-                                  "amount": 306000,
-                                  "currency_code": "IDR",
-                                  "data": {
-                                      "components": []
-                                  }
-                              },
-                              "included": true
-                          }
-                      ]
-                  }
-              },
-              "commerce_product": {
-                  "revision_id": "7",
-                  "sku": "SMPT50",
-                  "title": "Rp 50.000",
-                  "revision_uid": "14",
-                  "status": "1",
-                  "log": "",
-                  "revision_timestamp": "1425589241",
-                  "data": false,
-                  "product_id": "5",
-                  "type": "pulsa",
-                  "language": "und",
-                  "uid": "1",
-                  "created": "1419919510",
-                  "changed": "1425589241",
-                  "commerce_price": {
-                      "und": [
-                          {
-                              "amount": "51000",
-                              "currency_code": "IDR",
-                              "data": {
-                                  "components": []
-                              }
-                          }
-                      ]
-                  },
-                  "field_api_provider": {
-                      "und": [
-                          {
-                              "value": "poin2000"
-                          }
-                      ]
-                  },
-                  "field_credit_amount": {
-                      "und": [
-                          {
-                              "value": "50000"
-                          }
-                      ]
-                  },
-                  "field_package_code": {
-                      "und": [
-                          {
-                              "value": "HS50"
-                          }
-                      ]
-                  },
-                  "rdf_mapping": []
-              },
-              "commerce_display_path": "",
-              "field_phone_number": "08122545393",
-              "field_topup_status": "7",
-              "field_topup_data": [
-                  ""
-              ],
-              "rdf_mapping": []
+            "line_item_id": "668474"
           }
-      ],
+        ]
+      },
       "commerce_order_total": {
-          "amount": "306000",
-          "currency_code": "IDR",
-          "data": {
+        "und": [
+          {
+            "amount": 25000,
+            "currency_code": "IDR",
+            "data": {
               "components": [
-                  {
-                      "name": "base_price",
-                      "price": {
-                          "amount": 306000,
-                          "currency_code": "IDR",
-                          "data": []
-                      },
-                      "included": true
-                  }
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": 25000,
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                }
               ]
+            }
           }
+        ]
       },
       "commerce_customer_billing": [],
+      "field_commerce_billy_cancel_date": [],
+      "field_commerce_billy_i_date": [],
+      "commerce_coupons": [],
+      "commerce_discounts": [],
+      "field_order_source": {
+        "und": [
+          {
+            "value": "MWEB",
+            "format": null,
+            "safe_value": "MWEB"
+          }
+        ]
+      },
+      "field_imei": [],
+      "field_utm_source": [],
+      "field_utm_medium": [],
+      "field_utm_campaign": [],
+      "field_app": [],
       "rdf_mapping": []
+    }
   }
   ';
   $element = array(

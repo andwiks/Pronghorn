@@ -3018,8 +3018,8 @@ header .right_link .box .box_drop a:hover
 {
     float: left;
     padding: 0 13px 0 0;
-    margin: 10px 15px 0 0;
-    border-right: 2px solid #ccc;
+    margin: 10px 15px 5px 0;
+    /*border-right: 2px solid #ccc;*/
     font-size: 14px;
 }
 
@@ -3834,9 +3834,17 @@ section.sblog .caption h1{
      }
 
      /* ini update utk styling tabs */
-     .field-name-field-tags .field-items div {
+     .field-name-field-tags .field-items div.field-item {
            display: inline-block;
            margin: 10px 10px 10px 0;
            background: #ededed ;
            padding: 5px;
      }
+
+ /* perbaikan tampilan home untuk frontpage */
+ .views-field.views-field-body img {
+    float: left;
+    display: block;
+    width: 35%;
+    margin: 0 10px 10px 0;
+}

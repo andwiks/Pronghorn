@@ -262,6 +262,112 @@ function apps_services_v2_services_resource_add($product, $source) {
 }
 
 /**
+ * Function apps_services_v2_services_resource_add().
+ *
+ * @param array $product
+ *   Product data.
+ *
+ * @return mixed
+ *   Line item object, or string contain error message otherwise.
+ */
+function apps_services_v2_services_resource_add_multiple($products, $source) {
+  global $user;
+  
+  //set return container and default value of return
+  $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = array();
+
+  foreach ($products as $key => $product) {
+    // Backward compatibilty for old electricity product.
+    if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
+      $product['type'] = 'pln_prepaid';
+      $product['fields'][0]['field_customer_number'] = $product['fields'][0]['electricity_customer_number'];
+      $product['fields'][0]['field_phone_number'] = $product['fields'][0]['electricity_phone_number'];
+      unset($product['fields'][0]['electricity_customer_number']);
+      unset($product['fields'][0]['electricity_phone_number']);
+    }
+
+    // Check input product data:
+    // 1. product_id: (int) valid product id loaded by commerce_product_load.
+    // 2. type: (string) valid line item type. (optional: product).
+    // 2. quantity: (int) how many quantity need to be added (optional: 1).
+    // 3. fields: (array) key: field name, value: field value (optional: empty).
+    if (isset($product['product_id']) && !empty($product['product_id'])) {
+      // Make sure that product id input is int.
+      $product['product_id'] = intval($product['product_id']);
+      // Load commerce product.
+      $commerce_product = commerce_product_load($product['product_id']);
+      // Check whether commerce product is available.
+      if ($commerce_product !== FALSE) {
+        // Check input quantity: by default 1.
+        $quantity = (isset($product['quantity']) && !empty($product['quantity'])) ? intval($product['quantity']) : 1;
+        // Get all line item types.
+        $types = commerce_line_item_types();
+        // Check input type: by default product.
+        $line_item_type = (isset($product['type']) && isset($types[$product['type']])) ? $product['type'] : 'product';
+        // Create new line item based on product above.
+        $line_item = commerce_product_line_item_new($commerce_product, $quantity, 0, array(), $line_item_type);
+        // Get line item wrapper.
+        $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+        // Check input fields.
+        if (isset($product['fields']) && !empty($product['fields'])) {
+          // Looping for each product field.
+          foreach ((array) $product['fields'] as $field) {
+            // Looping for each field.
+            foreach ((array) $field as $field_name => $field_value) {
+              try {
+                $line_item_wrapper->$field_name->set($field_value);
+              }
+              catch (EntityMetadataWrapperException $exception) {
+                // Log this condition.
+                watchdog('commerce_cart_services', 'Set line item field with name @name.<br />Value:<pre>@value</pre> Trace:<pre>@trace</pre>', array(
+                  '@name' => $field_name,
+                  '@value' => print_r($field_value, TRUE),
+                  '@trace' => $exception->getTraceAsString(),
+                ), WATCHDOG_ERROR, t('Cart: add'));
+                // Return service cart product field error.
+                return services_error(t('Invalid product fields'), 406);
+              }
+            }
+          }
+        }
+        // Return line item object.
+        try {
+          $line_item = commerce_cart_product_add($user->uid, $line_item);
+          if ($line_item !== FALSE) {
+            $return["status"] = true;
+            $return["data"] = order_services_line_item($line_item);
+          }
+          else {
+            $return["status"] = false;
+            $return["message"] = "Gagal menambahkan produk";
+            return $return;
+          }
+        } catch (Exception $e) {
+          $return["status"] = false;
+          $return["message"] = $e->getMessage();
+          return $return;
+        }
+      }
+      else {
+        // Return service error: product not found.
+        $return["status"] = false;
+        $return["message"] = "Produk tidak diketemukan";
+        return $return;
+      }
+    }
+    // Reach this means error: probably invalid product input.
+    $return["status"] = false;
+    $return["message"] = "Mohon masukkan produk";
+    return $return;
+  }
+  
+  return $return;
+}
+
+/**
  * Function commerce_cart_services_resource_index().
  *
  * @return object
@@ -281,6 +387,8 @@ function apps_services_v2_services_resource_index($source) {
   // Check whether commerce cart can get user's shopping cart.
   if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
     // Return order object which already language compatible.
+    $order = apps_services_v2_services_format_order($order);
+    
     //set return container and default value of return
     $return["status"] = true;
     $return["data"] = $order;
@@ -289,4 +397,50 @@ function apps_services_v2_services_resource_index($source) {
 
   // Reach this means error: unable to get user's shopping cart.
   return services_error(t('Cart missing'), 406);
+}
+
+/**
+ * Function apps_services_v2_services_format_order().
+ *
+ * @return object
+ *   Order object.
+ */
+function apps_services_v2_services_format_order($order) {
+  // Get order wrapper.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Proccess order line item: remove language none (und).
+  $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
+  // Looping foreach line item.
+  foreach ((array) $order->commerce_line_items as $key => $line_item) {
+    $order->commerce_line_items[$key] = order_services_line_item($line_item);
+  }
+
+  $order->commerce_coupons = $order_wrapper->commerce_coupons->value();
+  foreach ((array) $order->commerce_coupons as &$coupon) {
+    $coupon_wrapper = entity_metadata_wrapper('commerce_coupon', $coupon);
+    $coupon->commerce_discount_reference = $coupon_wrapper->commerce_discount_reference->value();
+
+    foreach ((array) $coupon->commerce_discount_reference as &$discount) {
+      $discount_wrapper = entity_metadata_wrapper('commerce_discount', $discount);
+      $discount->commerce_discount_offer = $discount_wrapper->commerce_discount_offer->value();
+    }
+    // $order->commerce_coupons[$key] = $coupon;
+  }
+
+  // Proccess order total: remove language none (und).
+  $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
+
+  // Support for iOS pln prepaid.
+  if (isset($order->commerce_line_items) && !empty($order->commerce_line_items)) {
+    foreach ($order->commerce_line_items as $lid => $line_item) {
+      if (isset($line_item->type) && $line_item->type == 'pln_prepaid') {
+        $order->commerce_line_items[$lid]->type = 'electricity_prepaid';
+        if (isset($order->commerce_line_items[$lid]->commerce_product->type)) {
+          $order->commerce_line_items[$lid]->commerce_product->type = 'electricity_prepaid';
+        }
+      }
+    }
+  }
+  
+  return $order;
 }

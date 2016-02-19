@@ -126,6 +126,41 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
+                'cart_add_multiple' => array(
+                  'help' => "Add multiple specified product to a customer's shopping cart.",
+                  'callback' => 'apps_services_v2_services_resource_add_multiple',
+                  'access callback' => 'services_access_menu',
+                  'documentation callback' => 'apps_services_v2_services_resource_add_multiple_doc',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_services',
+                        'name' => 'apps_services_v2_services',
+                    ),
+                  'args' => array(
+                    array(
+                      'name' => 'products',
+                      'type' => 'array',
+                      'description' => 'The product data to be added',
+                      'source' => array(
+                        'data' => 'products',
+                        'param' => 'products'
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
             ),
         ),
     );
@@ -351,6 +386,213 @@ function apps_services_v2_services_resource_add_doc() {
     '#request_url' => $base_url . '/air/services_v2/cart_add.json<br />
     POST topup data application/json: { "source" : "android", "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } } <br />
     POST coupon data application/json: { "source" : "android", "product": { "product_id": 11, "type": "coupon", "quantity": 1 } } <br />
+    ',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+      'missing_cart' => array(
+        '#question' => '406 Not Acceptable: Cart missing',
+        '#description' => t('Unable to get shopping cart. Check user session.'),
+        '#response' => '
+        [
+            "Cart missing"
+        ]',
+      ),
+      'product_required' => array(
+        '#question' => '406 Not Acceptable: Product is required',
+        '#description' => t('Default error message when add new content into cart. Possible invalid product id input.'),
+        '#response' => '
+        [
+            "Product is required"
+        ]',
+      ),
+      'product_not_found' => array(
+        '#question' => '406 Not Acceptable: Product not found',
+        '#description' => t('Invalid product id input. System can not recognize product based on product id input.'),
+        '#response' => '
+        [
+            "Product not found"
+        ]',
+      ),
+      'unable_to_add' => array(
+        '#question' => '406 Not Acceptable: Unable to add product',
+        '#description' => t('Unable to add content into shopping cart. Possible because unable to pass certain rules, such as product price rules.'),
+        '#response' => '
+        [
+            "Unable to add product"
+        ]',
+      ),
+      'invalid_product_fields' => array(
+        '#question' => '406 Not Acceptable: Invalid product fields',
+        '#description' => t('Product field input is invalid.'),
+        '#response' => '
+        [
+            "Invalid product fields"
+        ]',
+      ),
+      'invalid_line_item' => array(
+        '#question' => '406 Not Acceptable: Invalid Line Item',
+        '#description' => t('Unable to get order object. Check user session.'),
+        '#response' => '
+        [
+            "Invalid Line Item"
+        ]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument product',
+        '#description' => t('Required product argument: product id.'),
+        '#response' => '
+        [
+            "Missing required argument product"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_add_multiple_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_resource_add_multiple_doc() {
+  global $base_url;
+  $response = '
+  {
+    "status": true,
+    "message": "",
+    "data": {
+      "type": "mobile_prepaid",
+      "order_id": "165212",
+      "quantity": 1,
+      "data": [],
+      "line_item_id": "668474",
+      "line_item_label": "SMPT25",
+      "created": 1455853677,
+      "changed": 1455853677,
+      "commerce_product": {
+        "revision_id": "417",
+        "sku": "SMPT25",
+        "title": "Rp 25.000",
+        "revision_uid": "13957",
+        "status": "1",
+        "log": "",
+        "revision_timestamp": "1445132516",
+        "data": false,
+        "product_id": "4",
+        "type": "pulsa",
+        "language": "und",
+        "uid": "1",
+        "created": "1419919510",
+        "changed": "1445132516",
+        "commerce_price": {
+          "und": [
+            {
+              "amount": "25000",
+              "currency_code": "IDR",
+              "data": {
+                "components": []
+              }
+            }
+          ]
+        },
+        "field_api_provider": {
+          "und": [
+            {
+              "value": "kraken"
+            }
+          ]
+        },
+        "field_credit_amount": {
+          "und": [
+            {
+              "value": "25000"
+            }
+          ]
+        },
+        "field_package_code": {
+          "und": [
+            {
+              "value": "26"
+            }
+          ]
+        },
+        "field_data_packet": {
+          "und": [
+            {
+              "value": "0"
+            }
+          ]
+        },
+        "field_deskripsi": [],
+        "rdf_mapping": []
+      },
+      "commerce_display_path": "",
+      "commerce_unit_price": {
+        "amount": "25000",
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": "25000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": []
+                }
+              },
+              "included": true
+            }
+          ]
+        }
+      },
+      "field_phone_number": "0812111111",
+      "commerce_total": {
+        "amount": 25000,
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": 25000,
+                "currency_code": "IDR",
+                "data": {
+                  "components": []
+                }
+              },
+              "included": true
+            }
+          ]
+        }
+      },
+      "field_topup_status": "7",
+      "field_topup_data": [
+        ""
+      ],
+      "field_line_item_status": "pending"
+    }
+  }
+  ';
+  $element = array(
+    '#name' => t('Cart Add Multiple Content'),
+    '#description' => t("Add multiple new shopping cart content."),
+    '#auth' => TRUE,
+    '#path' => 'services_v2/cart_add_multiple',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/cart_add_multiple.json<br />
+    POST topup data application/json: { "source" : "android", "product": [ { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] },{ "product_id": 6, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } ] } <br />
+    POST coupon data application/json: { "source" : "android", "product": [ { "product_id": 11, "type": "coupon", "quantity": 1 }, { "product_id": 11, "type": "coupon", "quantity": 1 } ] } <br />
     ',
     // Example response. E.g., a JSON array.
     '#response' => $response,

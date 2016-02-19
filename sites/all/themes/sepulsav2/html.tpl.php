@@ -51,6 +51,6 @@ $page_state = "home";
         </div>
     </footer>
   <!--end of Footer -->
+  <?php include('inc_popup.php'); ?>
   </body>
 </html>
-<?php include('inc_popup.php'); ?>

@@ -384,7 +384,7 @@ function apps_services_v2_services_resource_add_doc() {
     '#path' => 'services_v2/cart_add',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/air/services_v2/cart_add.json<br />
-    POST topup data application/json: { "source" : "android", "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } } <br />
+    POST topup data application/json: { "source" : "android", "product": { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": {"field_phone_number":"08122545393"} } } <br />
     POST coupon data application/json: { "source" : "android", "product": { "product_id": 11, "type": "coupon", "quantity": 1 } } <br />
     ',
     // Example response. E.g., a JSON array.
@@ -591,7 +591,7 @@ function apps_services_v2_services_resource_add_multiple_doc() {
     '#path' => 'services_v2/cart_add_multiple',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/air/services_v2/cart_add_multiple.json<br />
-    POST topup data application/json: { "source" : "android", "product": [ { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] },{ "product_id": 6, "type": "mobile_prepaid", "quantity": 1, "fields": [ {"field_phone_number":"08122545393"} ] } ] } <br />
+    POST topup data application/json: { "source" : "android", "product": [ { "product_id": 5, "type": "mobile_prepaid", "quantity": 1, "fields": {"field_phone_number":"08122545393"}},{ "product_id": 6, "type": "mobile_prepaid", "quantity": 1, "fields": {"field_phone_number":"08122545393"} } ] } <br />
     POST coupon data application/json: { "source" : "android", "product": [ { "product_id": 11, "type": "coupon", "quantity": 1 }, { "product_id": 11, "type": "coupon", "quantity": 1 } ] } <br />
     ',
     // Example response. E.g., a JSON array.
@@ -687,7 +687,7 @@ function apps_services_v2_services_resource_index_doc() {
       "revision_timestamp": "1455853677",
       "revision_hostname": "::1",
       "data": {
-        "last_cart_refresh": 1455853814,
+        "last_cart_refresh": 1455864890,
         "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans"
       },
       "order_id": "165212",
@@ -696,17 +696,37 @@ function apps_services_v2_services_resource_index_doc() {
       "created": "1455853677",
       "changed": "1455853677",
       "hostname": "::1",
-      "commerce_line_items": {
-        "und": [
-          {
-            "line_item_id": "668474"
-          }
-        ]
-      },
-      "commerce_order_total": {
-        "und": [
-          {
-            "amount": 25000,
+      "commerce_line_items": [
+        {
+          "line_item_id": "668474",
+          "order_id": "165212",
+          "type": "mobile_prepaid",
+          "line_item_label": "SMPT25",
+          "quantity": "1.00",
+          "created": "1455853677",
+          "changed": "1455853677",
+          "data": [],
+          "commerce_unit_price": {
+            "amount": "25000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": "25000",
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": "25000",
             "currency_code": "IDR",
             "data": {
               "components": [
@@ -715,14 +735,98 @@ function apps_services_v2_services_resource_index_doc() {
                   "price": {
                     "amount": 25000,
                     "currency_code": "IDR",
-                    "data": []
+                    "data": {
+                      "components": []
+                    }
                   },
                   "included": true
                 }
               ]
             }
-          }
-        ]
+          },
+          "commerce_product": {
+            "revision_id": "417",
+            "sku": "SMPT25",
+            "title": "Rp 25.000",
+            "revision_uid": "13957",
+            "status": "1",
+            "log": "",
+            "revision_timestamp": "1445132516",
+            "data": false,
+            "product_id": "4",
+            "type": "pulsa",
+            "language": "und",
+            "uid": "1",
+            "created": "1419919510",
+            "changed": "1445132516",
+            "commerce_price": {
+              "und": [
+                {
+                  "amount": "25000",
+                  "currency_code": "IDR",
+                  "data": {
+                    "components": []
+                  }
+                }
+              ]
+            },
+            "field_api_provider": {
+              "und": [
+                {
+                  "value": "kraken"
+                }
+              ]
+            },
+            "field_credit_amount": {
+              "und": [
+                {
+                  "value": "25000"
+                }
+              ]
+            },
+            "field_package_code": {
+              "und": [
+                {
+                  "value": "26"
+                }
+              ]
+            },
+            "field_data_packet": {
+              "und": [
+                {
+                  "value": "0"
+                }
+              ]
+            },
+            "field_deskripsi": [],
+            "rdf_mapping": []
+          },
+          "commerce_display_path": "",
+          "field_phone_number": "0812111111",
+          "field_topup_status": "7",
+          "field_topup_data": [
+            ""
+          ],
+          "field_line_item_status": "pending",
+          "rdf_mapping": []
+        }
+      ],
+      "commerce_order_total": {
+        "amount": 25000,
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": 25000,
+                "currency_code": "IDR",
+                "data": []
+              },
+              "included": true
+            }
+          ]
+        }
       },
       "commerce_customer_billing": [],
       "field_commerce_billy_cancel_date": [],

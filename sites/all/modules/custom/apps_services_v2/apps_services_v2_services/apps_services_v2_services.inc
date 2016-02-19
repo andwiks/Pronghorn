@@ -187,10 +187,10 @@ function apps_services_v2_services_resource_add($product, $source) {
   // Backward compatibilty for old electricity product.
   if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
     $product['type'] = 'pln_prepaid';
-    $product['fields'][0]['field_customer_number'] = $product['fields'][0]['electricity_customer_number'];
-    $product['fields'][0]['field_phone_number'] = $product['fields'][0]['electricity_phone_number'];
-    unset($product['fields'][0]['electricity_customer_number']);
-    unset($product['fields'][0]['electricity_phone_number']);
+    $product['fields']['field_customer_number'] = $product['fields']['electricity_customer_number'];
+    $product['fields']['field_phone_number'] = $product['fields']['electricity_phone_number'];
+    unset($product['fields']['electricity_customer_number']);
+    unset($product['fields']['electricity_phone_number']);
   }
 
   // Check input product data:
@@ -273,19 +273,19 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
-  $return["message"] = "";
+  $return["message"] = "Mohon masukkan produk";
   $return["data"] = array();
-
-  foreach ($products as $key => $product) {
+  
+  foreach ($products as $product) {
     // Backward compatibilty for old electricity product.
     if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
       $product['type'] = 'pln_prepaid';
-      $product['fields'][0]['field_customer_number'] = $product['fields'][0]['electricity_customer_number'];
-      $product['fields'][0]['field_phone_number'] = $product['fields'][0]['electricity_phone_number'];
-      unset($product['fields'][0]['electricity_customer_number']);
-      unset($product['fields'][0]['electricity_phone_number']);
+      $product['fields']['field_customer_number'] = $product['fields']['electricity_customer_number'];
+      $product['fields']['field_phone_number'] = $product['fields']['electricity_phone_number'];
+      unset($product['fields']['electricity_customer_number']);
+      unset($product['fields']['electricity_phone_number']);
     }
-
+    
     // Check input product data:
     // 1. product_id: (int) valid product id loaded by commerce_product_load.
     // 2. type: (string) valid line item type. (optional: product).
@@ -332,6 +332,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
           $line_item = commerce_cart_product_add($user->uid, $line_item);
           if ($line_item !== FALSE) {
             $return["status"] = true;
+            $return["message"] = "";
             $return["data"] = order_services_line_item($line_item);
           }
           else {
@@ -352,10 +353,6 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
         return $return;
       }
     }
-    // Reach this means error: probably invalid product input.
-    $return["status"] = false;
-    $return["message"] = "Mohon masukkan produk";
-    return $return;
   }
   
   return $return;

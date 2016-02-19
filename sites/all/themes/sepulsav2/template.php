@@ -552,6 +552,7 @@ function sepulsav2_preprocess_html(&$variables) {
     module_load_include('module', 'userpoints', 'userpoints');
     $variables['userpoints'] = userpoints_get_current_points($variables['user']->uid);
   }
+  $variables['head_title'] = preg_replace('#(^\s*\|\s*|\s*\|\s*$)#', '', $variables['head_title']);
 }
 
 /**

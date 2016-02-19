@@ -20,6 +20,9 @@ class CDNUnitTestCase extends DrupalUnitTestCase {
     $_SERVER = $alt_server;
     $this->setRequestProtocol('http');
 
+    // Enable the private:// stream wrapper.
+    $this->variableSet('file_private_path', conf_path() . '/files/private');
+
     // Pretend the CDN module is enabled; this ensures invocations of its own
     // hook implementations will work as expected.
     $cdn_module_file = drupal_get_path('module', 'cdn') . '/cdn.module';
@@ -327,6 +330,12 @@ class CDNOriginPullTestCase extends CDNUnitTestCase {
     cdn_file_url_alter($uri);
     $expected = 'http://cdn-a.com' . base_path() . variable_get('file_public_path', conf_path() . '/files') . '/' . drupal_encode_path($filename);
     $this->assertIdentical($uri, $expected, 'cdn_file_url_alter() works correctly.');
+
+    // Test that private:// file URLs are not altered.
+    $uri = "private://$filename";
+    $expected = $uri;
+    cdn_file_url_alter($uri);
+    $this->assertIdentical($uri, $expected, 'cdn_file_url_alter() excludes private:// files.');
   }
 }
 
@@ -494,8 +503,8 @@ class CDNOriginPullFarFutureTestCase extends CDNUnitTestCase {
 class CDNImageTestCase extends CDNUnitTestCase {
   public static function getInfo() {
     return array(
-      'name' => 'Image HTML altering',
-      'description' => 'Verify that image URLs inside HTML are rewritten correctly.',
+      'name' => 'Image and Download Link HTML altering',
+      'description' => 'Verify that image and anchor link URLs inside HTML are rewritten correctly.',
       'group' => 'CDN',
     );
   }
@@ -561,13 +570,70 @@ class CDNImageTestCase extends CDNUnitTestCase {
     // image) don't get their anchors modified
     $a_url = base_path() . 'node';
     $html = $template($a_url, $img_url);
-    cdn_html_alter_image_urls($html);
+    $html = cdn_post_render_html_alter($html);
     $this->assertIdentical($template($a_url, $cdn . $img_url), $html, 'Linked image HTML correctly altered (anchor unmodified).');
     // Same, but now for a link with a query string.
     $a_url = base_path() . 'node?foobar';
     $html = $template($a_url, $img_url);
-    cdn_html_alter_image_urls($html);
+    $html = cdn_post_render_html_alter($html);
     $this->assertIdentical($template($a_url, $cdn . $img_url), $html, 'Linked image HTML correctly altered (anchor unmodified, even with query strings).');
+  }
+
+  function testOtherContentLink() {
+    $cdn = 'http://cdn-a.com';
+    $this->variableSet(CDN_BASIC_MAPPING_VARIABLE, "$cdn|.png .pdf");
+    $this->variableSet(CDN_MODE_VARIABLE, CDN_MODE_BASIC);
+
+    // Image altering type 1: "just image", i.e. "<img />".
+    $template = function($url) {
+      return '<a href="' . $url . '">Download this!</a>';
+    };
+
+    // Simplest case possible.
+    $a_url = base_path() . 'foo/bar/image.png';
+    $html = $template($a_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($cdn . $a_url), $html, 'Other content link correctly altered.');
+    // Query strings should not be stripped.
+    $a_url = base_path() . 'foo/bar/image.pdf?foobar';
+    $html = $template($a_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($cdn . $a_url), $html, 'Other content link correctly altered (query string not stripped).');
+    // Edge case: a script generating an image is not (yet) supported.
+    $a_url = base_path() . 'foo/bar/image.gif';
+    $html = $template($a_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($a_url), $html, 'Other content link correctly NOT altered (extension does not map).');
+    // Edge case: a script generating an image is not (yet) supported.
+    $a_url = base_path() . 'foo/bar/showimage?formula=12345.png';
+    $html = $template($a_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($a_url), $html, 'Other content link correctly NOT altered (extension not pulled from query string).');
+  }
+
+  function testOtherContentLinkWrappingImage() {
+    $cdn = 'http://cdn-a.com';
+    $this->variableSet(CDN_BASIC_MAPPING_VARIABLE, "$cdn|.png .jpeg");
+    $this->variableSet(CDN_MODE_VARIABLE, CDN_MODE_BASIC);
+
+    // Image altering type 2: "linked image", i.e. "<a><img /></a>"..
+    $template = function($a_url, $img_url) {
+      return '<a href="' . $a_url . '"><img src="' . $img_url . '" /></a>';
+    };
+
+    // Test that images linking to a URL with an extension that matches a
+    // mapped extension, even if the extension is different than the image,
+    // are modified.
+    $a_url = base_path() . 'node.jpeg';
+    $img_url = base_path() . 'foo/bar/image.png';
+    $html = $template($a_url, $img_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($cdn . $a_url, $cdn . $img_url), $html, 'Other content link wrapping image correctly altered.');
+
+    $a_url = base_path() . 'node.gif';
+    $html = $template($a_url, $img_url);
+    $html = cdn_post_render_html_alter($html);
+    $this->assertIdentical($template($a_url, $cdn . $img_url), $html, 'Other content link wrapping correctly NOT altered (extension does not map).');
   }
 }
 

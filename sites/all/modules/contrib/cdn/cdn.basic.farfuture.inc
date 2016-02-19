@@ -164,6 +164,17 @@ function cdn_basic_farfuture_reverseproxy_test($token) {
     exit();
   }
 
+  if (function_exists('header_remove')) {
+    header_remove('Cache-Control');
+  }
+  else {
+    header("Cache-Control:");
+    header("Cache-Control:");
+  }
+  header("Cache-Control: max-age=290304000, no-transform, public");
+  header("Expires: Tue, 20 Jan 2037 04:20:42 GMT");
+  header("Last-Modified: Wed, 20 Jan 1988 04:20:42 GMT");
+
   print REQUEST_TIME . '-' . md5(rand());
   exit();
 }

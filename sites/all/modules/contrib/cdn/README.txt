@@ -189,6 +189,9 @@ A: Nothing. It only serves as a sample for using File Conveyor. It's used for
 Q: How to use different CDNs based on the domain name of an i18n site?
 A: See http://drupal.org/node/1483962#comment-5744830.
 
+Q: Why are old CDN Far Future URLs not working?
+A: Your Drupal site's private key or hash salt have changed. See
+   https://www.drupal.org/node/1844786#comment-6832244 for details.
 
 No cookies should be sent to the CDN
 ------------------------------------

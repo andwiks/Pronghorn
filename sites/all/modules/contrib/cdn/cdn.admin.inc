@@ -428,7 +428,7 @@ function cdn_admin_details_form_validate($form, &$form_state) {
     $yays = array();
     $nays = array();
     foreach ($domains as $domain) {
-      $url = 'http://' . $domain . base_path() . 'cdn/farfuture/reverse-proxy-test/' . $token;
+      $url = 'http://' . $domain . base_path() . 'cdn/farfuture/reverse-proxy-test/' . $token . '/file.txt';
       $r1 = drupal_http_request($url);
       $r2 = drupal_http_request($url);
       unset($r1->headers);

@@ -3808,9 +3808,16 @@ section.sblog .caption h1{
 
 #frameBlog .content .field-name-field-blog-image
 {
-    width: 45%;
+    width: 48%;
     float: left;
     padding: 0 10px 10px 0;
+}
+
+.field-name-field-blog-image img {
+    margin-top: 6px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: 1px #f7f7f6 solid;
 }
 
 #frameBlog #left_column h1{
@@ -3851,6 +3858,6 @@ section.sblog .caption h1{
  .views-field.views-field-body img {
     float: left;
     display: block;
-    width: 35%;
-    margin: 0 10px 10px 0;
+    width: 34%;
+    margin: 6px 10px 10px 0;
 }

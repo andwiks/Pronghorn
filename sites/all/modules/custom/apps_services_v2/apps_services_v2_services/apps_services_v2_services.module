@@ -302,7 +302,287 @@ function apps_services_v2_services_sepulsa_operator_list_doc() {
   global $base_url;
   $response = '
     {
-      "source": "android"
+      "status": true,
+      "message": "",
+      "data": [
+        {
+          "id": 22,
+          "operator": "3",
+          "prefix": [
+            "0895",
+            "0896",
+            "0897",
+            "0898",
+            "0899"
+          ],
+          "cardtype": {
+            "id": 28,
+            "type": "Three"
+          },
+          "packet": [
+            {
+              "id": "180",
+              "title": "Rp 30.000",
+              "price": "30000",
+              "desc": ""
+            },
+            {
+              "id": "33",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "34",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "operator": "Axis",
+          "prefix": [
+            "0831",
+            "0832",
+            "0838"
+          ],
+          "cardtype": {
+            "id": 10,
+            "type": "Axis"
+          },
+          "packet": [
+            {
+              "id": "14",
+              "title": "Rp 25.000",
+              "price": "25000",
+              "desc": ""
+            },
+            {
+              "id": "15",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "16",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 26,
+          "operator": "Bolt",
+          "prefix": [
+            "9991",
+            "9992",
+            "9988"
+          ],
+          "cardtype": {
+            "id": 6141,
+            "type": "Bolt"
+          },
+          "packet": [
+            {
+              "id": "176",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "177",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            },
+            {
+              "id": "182",
+              "title": "Rp 200.000",
+              "price": "200000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "operator": "Indosat",
+          "prefix": [
+            "0814",
+            "0815",
+            "0816",
+            "0855",
+            "0856",
+            "0857",
+            "0858"
+          ],
+          "cardtype": {
+            "id": 27,
+            "type": "Indosat"
+          },
+          "packet": [
+            {
+              "id": "241",
+              "title": "Paket Data 1 GB",
+              "price": "30000",
+              "desc": "<b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Harga :</b> Rp 30.000,- <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Masa Aktif :</b> 30 hari <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Kuota :</b> 1 GB"
+            },
+            {
+              "id": "243",
+              "title": "Paket Data 2 GB",
+              "price": "55000",
+              "desc": "<b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Harga :</b> Rp 55.000,- <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Masa Aktif :</b> 30 hari <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Kuota :</b> 2 GB"
+            },
+            {
+              "id": "245",
+              "title": "Paket Data 5 GB",
+              "price": "125000",
+              "desc": "<b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Harga :</b> Rp 125.000,- <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Masa Aktif :</b> 30 hari <b style=\"font-weight:bold; text-decoration: underline; text-transform: uppercase;\">Kuota :</b> 5 GB"
+            },
+            {
+              "id": "28",
+              "title": "Rp 25.000",
+              "price": "25000",
+              "desc": ""
+            },
+            {
+              "id": "29",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "30",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            },
+            {
+              "id": "257",
+              "title": "RP 150.000",
+              "price": "150000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 24,
+          "operator": "Smartfren",
+          "prefix": [
+            "0881",
+            "0882",
+            "0883",
+            "0884",
+            "0885",
+            "0886",
+            "0887",
+            "0888",
+            "0889"
+          ],
+          "cardtype": {
+            "id": 29,
+            "type": "Smartfren"
+          },
+          "packet": [
+            {
+              "id": "37",
+              "title": "Rp 25.000",
+              "price": "25000",
+              "desc": ""
+            },
+            {
+              "id": "38",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "39",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 19,
+          "operator": "Telkomsel",
+          "prefix": [
+            "0811",
+            "0812",
+            "0813",
+            "0821",
+            "0822",
+            "0823",
+            "0851",
+            "0852",
+            "0853"
+          ],
+          "cardtype": {
+            "id": 3,
+            "type": "Telkomsel"
+          },
+          "packet": [
+            {
+              "id": "4",
+              "title": "Rp 25.000",
+              "price": "25000",
+              "desc": ""
+            },
+            {
+              "id": "5",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "6",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "operator": "XL",
+          "prefix": [
+            "0817",
+            "0818",
+            "0819",
+            "0859",
+            "0877",
+            "0878",
+            "0879"
+          ],
+          "cardtype": {
+            "id": 2,
+            "type": "XL"
+          },
+          "packet": [
+            {
+              "id": "2",
+              "title": "Rp 25.000",
+              "price": "25000",
+              "desc": ""
+            },
+            {
+              "id": "12",
+              "title": "Rp 50.000",
+              "price": "50000",
+              "desc": ""
+            },
+            {
+              "id": "13",
+              "title": "Rp 100.000",
+              "price": "100000",
+              "desc": ""
+            }
+          ]
+        }
+      ]
     }
   ';
   $element = array(
@@ -311,7 +591,8 @@ function apps_services_v2_services_sepulsa_operator_list_doc() {
     '#auth' => FALSE,
     '#path' => 'services_v2/sepulsa',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/services_v2/sepulsa.json',
+    '#request_url' => $base_url . '/air/services_v2/sepulsa.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
@@ -344,8 +625,36 @@ function apps_services_v2_services_sepulsa_product_index_doc() {
   global $base_url;
   $response = '
     {
-        "type": "coupon",
-        "source": "android"
+      "status": true,
+      "message": "",
+      "data": [
+        {
+          "product_name": "electricity",
+          "product": {
+            "title": "Listrik Prabayar",
+            "id": 10258,
+            "product_type": [
+              {
+                "id": 106,
+                "name": "Rp 50.000"
+              },
+              {
+                "id": 107,
+                "name": "Rp 100.000"
+              },
+              {
+                "id": 119,
+                "name": "Rp 200.000"
+              },
+              {
+                "id": 155,
+                "name": "Rp 500.000"
+              }
+            ],
+            "quantity": 1
+          }
+        }
+      ]
     }
   ';
   $element = array(
@@ -354,7 +663,8 @@ function apps_services_v2_services_sepulsa_product_index_doc() {
     '#auth' => FALSE,
     '#path' => 'services_v2/product',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/services_v2/product.json',
+    '#request_url' => $base_url . '/air/services_v2/product.json<br />'
+    . 'POST data application/json: { "source" : "android", "type": "electricity" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.
@@ -372,6 +682,14 @@ function apps_services_v2_services_sepulsa_product_index_doc() {
         '#question' => '500 Internal Server Error',
         '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
         '#response' => '',
+      ),
+      'type_not_found' => array(
+        '#question' => '406 Not Acceptable : @type product tidak diketemukan.',
+        '#description' => 'Drupal server products with the type defined.',
+        '#response' => '
+        [
+            "@type product tidak diketemukan."
+        ]',
       ),
     ),
   );

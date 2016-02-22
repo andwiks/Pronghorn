@@ -165,7 +165,7 @@ function apps_services_v2_services_services_resources() {
                   'help' => "Redeem coupon code.",
                   'callback' => 'apps_services_v2_services_resource_coupon_redeem',
                   'access callback' => 'services_access_menu',
-                  'documentation callback' => 'commerce_coupon_services_resource_redeem_doc',
+                  'documentation callback' => 'apps_services_v2_services_resource_coupon_redeem_doc',
                   'file' => array(
                         'type' => 'inc',
                         'module' => 'apps_services_v2_services',
@@ -199,7 +199,7 @@ function apps_services_v2_services_services_resources() {
                   'help' => "Remove coupon code from an order.",
                   'callback' => 'apps_services_v2_services_resource_coupon_remove',
                   'access callback' => 'services_access_menu',
-                  'documentation callback' => 'commerce_coupon_services_resource_remove_doc',
+                  'documentation callback' => 'apps_services_v2_services_resource_coupon_remove_doc',
                   'file' => array(
                         'type' => 'inc',
                         'module' => 'apps_services_v2_services',
@@ -265,10 +265,10 @@ function apps_services_v2_services_services_resources() {
                   ),
                 ),
                 'saved_card' => array(
-                  'help' => "Complete checkout process.",
+                  'help' => "Get token from veritrans to get saved card.",
                   'callback' => 'apps_services_v2_services_get_saved_card',
                   'access callback' => 'user_is_logged_in',
-                  'documentation callback' => '_saved_card_resource_index_doc',
+                  'documentation callback' => 'apps_services_v2_services_get_saved_card_doc',
                   'file' => array(
                         'type' => 'inc',
                         'module' => 'apps_services_v2_services',
@@ -1337,6 +1337,227 @@ function apps_services_v2_services_resource_index_doc() {
         [
             "Invalid Line Item"
         ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_coupon_redeem_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_resource_coupon_redeem_doc() {
+  global $base_url;
+  $response = '
+  {
+    "status": true,
+    "message": "",
+    "data": {
+      "coupon": {
+          "coupon_id": "6",
+          "uid": "102",
+          "type": "discount_coupon",
+          "code": "GRP-aHzfYJ",
+          "bulk": "1",
+          "created": "1427435812",
+          "changed": "1434565488",
+          "status": "1",
+          "data": "s:16:\u0022s:9:\u0022s:2:\u0022N;\u0022;\u0022;\u0022;",
+          "commerce_discount_reference": {
+              "und": [
+                  {
+                      "target_id": "1"
+                  }
+              ]
+          },
+          "commerce_coupon_conditions": {
+              "und": [
+                  {
+                      "condition_name": "commerce_coupon_date_evaluate_date",
+                      "condition_settings": {
+                          "start": "2015-03-27",
+                          "end": "2015-05-01",
+                          "condition_logic_operator": null
+                      },
+                      "condition_negate": 0
+                  },
+                  {
+                      "condition_name": "commerce_coupon_usage_evaluate_usage",
+                      "condition_settings": {
+                          "max_usage": "1"
+                      },
+                      "condition_negate": 0,
+                      "condition_logic_operator": "1"
+                  }
+              ]
+          },
+          "commerce_coupon_recipient": [],
+          "rdf_mapping": []
+      },
+      "offer": {
+          "type": "fixed_amount",
+          "discount_offer_id": "29",
+          "commerce_fixed_amount": {
+              "und": [
+                  {
+                      "amount": "50000",
+                      "currency_code": "IDR",
+                      "data": {
+                          "components": []
+                      }
+                  }
+              ]
+          },
+          "rdf_mapping": []
+      }
+    }
+  }
+  ';
+  $element = array(
+    '#name' => 'Redeem coupon code',
+    '#description' => 'Redeem discount code on checkout page',
+    '#auth' => TRUE,
+    '#path' => 'services_v2/coupon_redeem',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/coupon_redeem.json<br />
+    POST data application/json: { "source" : "android", "code" : "GRP-aHzfYJ" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_coupon_remove_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_resource_coupon_remove_doc() {
+  global $base_url;
+  $response = '
+  {
+    "status": true,
+    "message": "Kode discount telah dihapus",
+    "data": []
+  }
+  ';
+  $element = array(
+    '#name' => 'Remove coupon code',
+    '#description' => 'Remove discount code on checkout page',
+    '#auth' => TRUE,
+    '#path' => 'services_v2/coupon_remove',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/coupon_remove.json<br />
+    POST data application/json: { "source" : "android", "coupon_id" : "6" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function commerce_checkout_services_resource_complete_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function commerce_checkout_services_resource_complete_doc() {
+  global $base_url;
+  $response = '
+  {
+    "status": true,
+    "message": "",
+    "data": {
+       "description" : "message_return here"
+    }
+  }
+  ';
+  $element = array(
+    '#name' => 'Complete checkout process',
+    '#description' => 'Complete Page on checkout page',
+    '#auth' => TRUE,
+    '#path' => 'services_v2/checkout_complete',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/checkout_complete.json<br />
+    POST data application/json: { "source" : "android", "order_id" : "154598" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_get_saved_card_doc().
+ *
+ * @return array
+ *   Service documentation array.
+ */
+function apps_services_v2_services_get_saved_card_doc() {
+  global $base_url;
+  $response = '
+  {
+    "status": true,
+    "message": "",
+    "data": {
+          "expired": "1745395901",
+          "first": "481111",
+          "last": "1114",
+          "order_id": "1",
+          "phone": "08888888888",
+          "token": "48111111f3ea7e-3c31-4e85-a56a-0d736cbad214",
+          "token_id": "1",
+          "uid": "1"
+      }
+  }
+  ';
+  $element = array(
+    '#name' => 'Get token from veritrans to get saved card',
+    '#description' => 'Get token from veritrans to get saved card list from veritrans',
+    '#auth' => TRUE,
+    '#path' => 'services_v2/saved_card',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/saved_card.json<br />
+    POST data application/json: { "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
       ),
     ),
   );

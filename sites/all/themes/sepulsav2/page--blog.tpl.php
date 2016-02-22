@@ -22,7 +22,8 @@ $theme_path = $base_url . '/' . path_to_theme();
     <div class="wrapper">
         
         <div id="inner" class="clearfix">
-            <div id="left_column">                               
+            <div id="left_column">
+                <?php print render($title_prefix); ?>
                 <?php if ($title): ?>
                     <?php
                       /*
@@ -32,8 +33,10 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php endif; ?>
 
                 <?php print $messages; ?>
-                <?php print render($page['content']); ?>
                 
+                <?php print render($page['content']); ?>
+
+                <?php print render($title_suffix); ?>
             </div>
             <?php if (!empty($page['sidebar_first'])): ?>
             <div id="right_column">

@@ -565,9 +565,7 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
       // Advance the customer to the next step of the checkout process.
       commerce_payment_redirect_pane_next_page($order, $log);
       $description = array();
-      $description["description"] = array(
-        'message' => str_replace("\n", ' ', $message),
-      );
+      $description["description"] = str_replace("\n", ' ', $message);
       
       $return["status"] = true;
       $return["data"] = $description;
@@ -591,9 +589,7 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
     }
 
     $description = array();
-    $description["description"] = array(
-      'message' => str_replace("\n", ' ', $message),
-    );
+    $description["description"] = str_replace("\n", ' ', $message);
 
     $return["status"] = true;
     $return["data"] = $description;

@@ -233,7 +233,7 @@ function apps_services_v2_services_services_resources() {
                   'help' => "Complete checkout process.",
                   'callback' => 'apps_services_v2_services_resource_complete',
                   'access callback' => 'services_access_menu',
-                  'documentation callback' => 'commerce_checkout_services_resource_complete_doc',
+                  'documentation callback' => 'apps_services_v2_services_resource_complete_doc',
                   'file' => array(
                         'type' => 'inc',
                         'module' => 'apps_services_v2_services',
@@ -1478,12 +1478,12 @@ function apps_services_v2_services_resource_coupon_remove_doc() {
 }
 
 /**
- * Function commerce_checkout_services_resource_complete_doc().
+ * Function apps_services_v2_services_resource_complete().
  *
  * @return array
  *   Service documentation array.
  */
-function commerce_checkout_services_resource_complete_doc() {
+function apps_services_v2_services_resource_complete() {
   global $base_url;
   $response = '
   {

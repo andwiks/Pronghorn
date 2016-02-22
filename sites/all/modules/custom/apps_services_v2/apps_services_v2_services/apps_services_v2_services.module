@@ -1478,12 +1478,12 @@ function apps_services_v2_services_resource_coupon_remove_doc() {
 }
 
 /**
- * Function apps_services_v2_services_resource_complete().
+ * Function apps_services_v2_services_resource_complete_doc().
  *
  * @return array
  *   Service documentation array.
  */
-function apps_services_v2_services_resource_complete() {
+function apps_services_v2_services_resource_complete_doc() {
   global $base_url;
   $response = '
   {

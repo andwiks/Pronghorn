@@ -1,0 +1,240 @@
+<?php
+
+/**
+ * @file
+ * bpjs_kesehatan.module
+ */
+
+/**
+ * Implements hook_commerce_cart_line_item_refresh().
+ */
+function bpjs_kesehatan_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
+  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['amount'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['amount'];
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['amount'];
+  }
+}
+
+/**
+ * Implements hook_commerce_line_item_type_info().
+ */
+function bpjs_kesehatan_commerce_line_item_type_info() {
+  $line_item_types = array();
+
+  $line_item_types['bpjs_kesehatan'] = array(
+    'type' => 'bpjs_kesehatan',
+    'name' => t('BPJS Kesehatan'),
+    'description' => t('References a BPJS Kesehatan product and displays it with the SKU as the label.'),
+    'product' => TRUE,
+    'add_form_submit_value' => t('Add product'),
+    'base' => 'commerce_product_line_item',
+  );
+
+  return $line_item_types;
+}
+
+/**
+ * Implements hook_commerce_product_calculate_sell_price_line_item_alter().
+ */
+function bpjs_kesehatan_commerce_product_calculate_sell_price_line_item_alter($line_item) {
+  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['amount'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['amount'];
+  }
+}
+
+/**
+ * Implements hook_commerce_product_type_info().
+ */
+function bpjs_kesehatan_commerce_product_type_info() {
+  $product_types = array();
+
+  $product_types['bpjs_kesehatan'] = array(
+    'type' => 'bpjs_kesehatan',
+    'name' => t('BPJS Kesehatan'),
+    'description' => t('A BPJS Keseahtan product.'),
+  );
+
+  return $product_types;
+}
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * Validate bpjs_kesehatan line_item by inquiring to kraken.
+ *
+ * @see bpjs_kesehatan_add_to_cart_form_validate()
+ */
+function bpjs_kesehatan_entity_presave($entity, $type) {
+  if ($type == 'commerce_line_item' && !empty($entity->is_new) && $entity->type == 'bpjs_kesehatan') {
+    $customer_number = $entity->field_customer_number[LANGUAGE_NONE][0]['value'];
+
+    if (empty($entity->field_customer_number) || empty($entity->field_phone_number)) {
+      throw new Exception("Missing required fields.");
+    }
+    else {
+      // Make sure only inquiry if there is no form validation.
+      $inquiry = &drupal_static('bpjs_kesehatan_inquiry_data__' . $customer_number);
+      if (empty($inquiry) && empty($entity->data['inquiry'])) {
+        module_load_include('inc', 'kraken_api');
+
+        $data = array(
+          'customer_number' => $customer_number,
+          'product_id' => entity_metadata_wrapper('commerce_product', $entity->commerce_product[LANGUAGE_NONE][0]['product_id'])->kraken_product->value(),
+        );
+
+        $inquiry = kraken_api_call('inquire', 'POST', $data);
+
+        if (!empty($inquiry['status'])) {
+          $entity->data['inquiry'] = $inquiry;
+        }
+        elseif (!empty($inquiry['message'])) {
+          watchdog('bpjs_kesehatan', '@note', array('@note' => $inquiry['message']), WATCHDOG_ERROR);
+          throw new Exception($inquiry['message']);
+        }
+        else {
+          throw new Exception('Please retry');
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_node_info().
+ */
+function bpjs_kesehatan_node_info() {
+  return array(
+    'bpjs_kesehatan' => array(
+      'name' => t('BPJS Kesehatan'),
+      'base' => 'node_content',
+      'description' => t('BPJS Kesehatan product display'),
+      'locked' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
+ */
+function bpjs_kesehatan_form_commerce_cart_add_to_cart_form_pln_prepaid_alter(&$form, &$form_state, $form_id) {
+  $form['#validate'][] = 'bpjs_kesehatan_add_to_cart_form_validate';
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function bpjs_kesehatan_preprocess_page(&$variables) {
+  if (drupal_is_front_page() && user_access('view any commerce_product entity of bundle bpjs_kesehatan')) {
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'commerce_product');
+    $query->entityCondition('bundle', 'bpjs_kesehatan');
+    $query->fieldOrderBy('commerce_price', 'amount', 'DESC');
+
+    $result = $query->execute();
+
+    if (!empty($result['commerce_product'])) {
+      $product_ids = array_keys($result['commerce_product']);
+
+      $values = array(
+        'type' => 'bpjs_kesehatan',
+        'data' => array(
+          'context' => array(
+            'product_ids' => $product_ids,
+          ),
+        ),
+      );
+      $line_item = entity_create('commerce_line_item', $values);
+
+      $variables['bpjs_kesehatan_form'] = drupal_get_form('commerce_cart_add_to_cart_form_bpjs_kesehatan', $line_item);
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function bpjs_kesehatan_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'bpjs_kesehatan') . '/includes/views',
+  );
+}
+
+function bpjs_kesehatan_add_to_cart_form_validate(&$form, &$form_state) {
+  if ($form_state['submitted']) {
+    $customer_number = $form_state['values']['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value'];
+    $inquiry = &drupal_static('bpjs_kesehatan_inquiry_data__' . $customer_number);
+
+    module_load_include('inc', 'kraken_api');
+
+    $data = array(
+      'customer_number' => $customer_number,
+      'product_id' => entity_metadata_wrapper('commerce_product', $form_state['values']['product_id'])->kraken_product->value(),
+    );
+
+    $inquiry = kraken_api_call('inquire', 'POST', $data);
+    if (!empty($inquiry)) {
+      if ($inquiry['status']) {
+        $form_state['line_item']->data['inquiry'] = $inquiry;
+      }
+      else {
+        form_set_error('inquiry', $inquiry['message']);
+      }
+    }
+    else {
+      form_set_error('inquiry', t('Please retry'));
+    }
+  }
+}
+
+function bpjs_kesehatan_payment_execute($order_wrapper) {
+  foreach ($order_wrapper->commerce_line_items as $line_item_wrapper) {
+    if ($line_item_wrapper->getBundle() == 'bpjs_kesehatan' && $line_item_wrapper->field_line_item_status->value() == 'pending') {
+      bpjs_kesehatan_payment_line_item($line_item_wrapper);
+    }
+  }
+}
+
+function bpjs_kesehatan_payment_line_item($line_item_wrapper) {
+  $data = array(
+    'customer_number' => $line_item_wrapper->field_phone_number->value(),
+    'order_id' => $line_item_wrapper->order_id->value(),
+    'product_id' => $line_item_wrapper->commerce_product->kraken_product->value(),
+  );
+
+  module_load_include('inc', 'kraken_api');
+  $response = kraken_api_call('transaction', 'POST', $data);
+
+  $status = $response['status'] ? 'success' : 'failed';
+  $line_item_wrapper->field_line_item_status->set($status);
+  $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
+
+  $line_item = $line_item_wrapper->value();
+  $line_item->data = $response;
+  entity_save('commerce_line_item', $line_item);
+}
+
+function bpjs_kesehatan_payment_period_options() {
+  return array(
+    '01' => t('January'),
+    '02' => t('February'),
+    '03' => t('March'),
+    '04' => t('April'),
+    '05' => t('May'),
+    '06' => t('June'),
+    '07' => t('July'),
+    '08' => t('August'),
+    '09' => t('September'),
+    '10' => t('October'),
+    '11' => t('November'),
+    '12' => t('December'),
+  );
+}
+
+function bpjs_kesehatan_payment_period_default_value($entity_type, $entity, $field, $instance, $langcode) {
+  return array(
+    array(
+      'value' => format_date(REQUEST_TIME, 'custom', 'm'),
+    ),
+  );
+}

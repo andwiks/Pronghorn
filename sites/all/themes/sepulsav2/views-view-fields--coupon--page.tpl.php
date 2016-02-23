@@ -34,7 +34,7 @@ if (!isset($web_link)) {
 <div class="box_voucher <?php print $fields['field_coupon_category']->content; ?>">
     <div class="image">
     	<?php if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_commerce_price[0]['raw']['amount'])) : ?>
-    		<div class="flag-coupon-gratis"><img alt="Coupon Gratis" src="" title="Coupon Gratis" /></div>
+    		<div class="flag-coupon-gratis"><img alt="Coupon Gratis" src="<?php print $base_url . '/' . path_to_theme(); ?>/images/content/flag_gratis.png" title="Coupon Gratis" /></div>
     	<?php endif; ?>
     	<img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>">
    	</div>

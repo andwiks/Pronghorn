@@ -21,7 +21,6 @@
           <div class="topup-notes">
             <ul>
               <li><?php print t('Segala bentuk informasi yang anda masukan akan kami jaga kerahasiaannya.'); ?></li>
-              <li><?php print t('Hanya bisa mengisi pulsa ke nomer dan nominal yang sama satu kali dalam sehari.'); ?></li>
             </ul>
           </div>
         </div>

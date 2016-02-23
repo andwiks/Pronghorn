@@ -55,10 +55,8 @@ function facebook_pixel_block_view($delta = '') {
 function facebook_pixel_get_value() {
   $id = intval(arg(1));
   $var = commerce_order_load($id);
-  drupal_set_message('<pre>'.print_r($var, true).'</pre>');
-  watchdog('facebook_pixel', '<pre>'.print_r($var, true).'</pre>');
-  $data['amount'] = $var->data['commerce_veritrans']['amount'];
-  $data['currency_code'] = $var->data['commerce_veritrans']['currency_code'];
+  $data['amount'] = $var->commerce_order_total['und'][0]['amount'];
+  $data['currency_code'] = $var->commerce_order_total['und'][0]['currency_code'];
   return $data;
 }
 

@@ -13,7 +13,7 @@ function apps_services_v2_services_sepulsa_operator_list($source) {
   //set default return value
   $return["status"] = false;
   $return["message"] = "Data Operator tidak ditemukan";
-  $return["data"] = array();
+  $return["data"] = null;
   
   // Set operator container data
   $data_container = array();
@@ -73,7 +73,7 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
 
   $products = &drupal_static(__FUNCTION__, array());
   
@@ -185,7 +185,7 @@ function apps_services_v2_services_resource_add($product, $source) {
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
 
   // Backward compatibilty for old electricity product.
   if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
@@ -278,7 +278,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
   $return = array();
   $return["status"] = false;
   $return["message"] = "Mohon masukkan produk";
-  $return["data"] = array();
+  $return["data"] = null;
   
   foreach ($products as $product) {
     // Backward compatibilty for old electricity product.
@@ -454,7 +454,7 @@ function apps_services_v2_services_resource_coupon_redeem($code, $source) {
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
   
   $error = '';
   $uid = $GLOBALS['user']->uid;
@@ -528,7 +528,7 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
   
   // Get user's order.
   $order = commerce_order_load($order_id);
@@ -614,7 +614,7 @@ function apps_services_v2_services_get_saved_card() {
   if($count_token < 1){
     //if empty token then return empty array
     $return["status"] = false;
-    $return["data"] = array();
+    $return["data"] = null;
   }
   else{
     //use last returned row for data returned

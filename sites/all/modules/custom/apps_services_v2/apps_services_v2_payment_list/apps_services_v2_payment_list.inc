@@ -9,7 +9,7 @@ function apps_services_v2_payment_list_checkout_payment($payment_method, $use_cr
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
   
   //check credit enable/disable setting
   if(variable_get('apps_services_v2_payment_list_credit_option', 1)){
@@ -49,7 +49,7 @@ function apps_services_v2_payment_list_data($source){
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
   
   //$user = user_load(43);
 

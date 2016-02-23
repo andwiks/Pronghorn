@@ -38,7 +38,7 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
     
   //add or remove favorite transaction
   //check if order_id already exist
@@ -92,7 +92,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
-  $return["data"] = array();
+  $return["data"] = null;
   $favorite_order_id = array();
   
   //get favorite transaction order id from the database

@@ -3861,3 +3861,23 @@ section.sblog .caption h1{
     width: 34%;
     margin: 6px 10px 10px 0;
 }
+
+/* add flag pada coupon */
+section.std_content .list_voucher .box_voucher .image
+{
+    position: relative;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis
+{
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    width: 70px;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis img
+{
+    width: auto;
+    height: auto;
+}

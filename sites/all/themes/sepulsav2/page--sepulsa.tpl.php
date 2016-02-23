@@ -23,7 +23,7 @@ $settings = variable_get('sepulsa_settings', array());
       <div class="nav_tab after_clear">
         <a href="" class="active" target="target_1">
           <span class="ico pulsa"></span>
-          <?php print t('isi pulsa & bolt'); ?>
+          <?php print t('isi pulsa'); ?>
         </a>
         <a href="" target="target_2">
           <span class="ico listrik"></span>

@@ -32,7 +32,12 @@ if (!isset($web_link)) {
 }
 ?>
 <div class="box_voucher <?php print $fields['field_coupon_category']->content; ?>">
-    <div class="image"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></div>
+    <div class="image">
+    	<?php if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_commerce_price[0]['raw']['amount'])) : ?>
+    		<div class="flag-coupon-gratis"><img alt="Coupon Gratis" src="" title="Coupon Gratis" /></div>
+    	<?php endif; ?>
+    	<img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>">
+   	</div>
     <h4><?php print $fields['title']->content; ?></h4>
     <p class="voucher-description"><?php print $fields['field_description']->content; ?>.</p>
     <a href="" class="detail">Lihat detail voucher</a>

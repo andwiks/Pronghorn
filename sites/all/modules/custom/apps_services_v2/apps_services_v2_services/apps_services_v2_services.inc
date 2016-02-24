@@ -616,11 +616,6 @@ function apps_services_v2_services_get_saved_card() {
     $return["status"] = false;
     $return["data"] = null;
   }
-  else{
-    //use last returned row for data returned
-    $count_index = $count_token - 1;
-    $return["data"] = $return["data"][$count_index];
-  }
   
   return $return;
 }

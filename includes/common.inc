@@ -875,6 +875,18 @@ function drupal_http_request($url, array $options = array()) {
       $port = isset($uri['port']) ? $uri['port'] : 443;
       $socket = 'ssl://' . $uri['host'] . ':' . $port;
       $options['headers']['Host'] = $uri['host'] . ($port != 443 ? ':' . $port : '');
+
+      // Disable SNI support as this causes issues with old versions of OpenSSL.
+      // Disable verifying peer.
+      if (empty($options['context'])) {
+        $options['context'] = stream_context_create(array(
+          'ssl' => array(
+            'SNI_enabled' => FALSE,
+            'verify_peer' => FALSE,
+            'verify_peer_name' => FALSE,
+          ),
+        ));
+      }
       break;
 
     default:

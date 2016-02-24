@@ -21,22 +21,22 @@ $settings = variable_get('sepulsa_settings', array());
   <div class="wrapper">
     <div class="home_tab">
       <div class="nav_tab after_clear">
-        <a href="" class="active" target="target_1">
+        <a href="" class="active" target="pulsa">
           <span class="ico pulsa"></span>
           <?php print t('isi pulsa'); ?>
         </a>
-        <a href="" target="target_2">
+        <a href="" target="pln">
           <span class="ico listrik"></span>
           <?php print t('token listrik'); ?>
         </a>
         <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
-          <a href="" target="target_3">
+          <a href="" target="biznet">
             <span class="ico bolt"></span>
             <?php print t('biznet wifi'); ?>
           </a>
         <?php endif; ?>
         <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
-          <a href="" target="target_4">
+          <a href="" target="multifinance">
             <span class="ico finance"></span>
             <?php print t('multifinance'); ?>
           </a>
@@ -44,7 +44,7 @@ $settings = variable_get('sepulsa_settings', array());
       </div>
 
       <div class="content_tab">
-        <div class="tab form style_1" id="target_1">
+        <div class="tab form style_1" id="pulsa">
           <?php print render($messages); ?>
           <?php print render($page['content']); ?>
 
@@ -55,7 +55,7 @@ $settings = variable_get('sepulsa_settings', array());
           </div>
         </div>
         <?php if (module_exists('pln_prepaid') && user_access('view any commerce_product entity of bundle pln_prepaid')): ?>
-          <div class="tab form style_1" id="target_2">
+          <div class="tab form style_1" id="pln">
             <?php print render($messages); ?>
             <?php print render($pln_prepaid_form); ?>
             <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
@@ -65,7 +65,7 @@ $settings = variable_get('sepulsa_settings', array());
             </div>
           </div>
         <?php elseif (module_exists('token_reload') && user_access('view any commerce_product entity of bundle electricity')): ?>
-          <div class="tab form style_1" id="target_2">
+          <div class="tab form style_1" id="pln">
             <?php print render($messages); ?>
             <?php print render($token_reload_form); ?>
             <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
@@ -76,7 +76,7 @@ $settings = variable_get('sepulsa_settings', array());
           </div>
         <?php endif; ?>
         <?php if (module_exists('biznet') && user_access('view any commerce_product entity of bundle biznet')): ?>
-          <div class="tab form style_1" id="target_3">
+          <div class="tab form style_1" id="biznet">
             <?php print render($messages); ?>
             <?php print render($biznet_form); ?>
 
@@ -88,7 +88,7 @@ $settings = variable_get('sepulsa_settings', array());
           </div>
         <?php endif; ?>
         <?php if (module_exists('multifinance') && user_access('view any commerce_product entity of bundle multifinance')): ?>
-          <div class="tab form style_1" id="target_4">
+          <div class="tab form style_1" id="multifinance">
             <?php print render($messages); ?>
             <?php print render($multifinance_form); ?>
 

@@ -411,6 +411,7 @@ section.banner .caption{
     color: #FFF;
 }
 section.banner{margin: 0 0 40px}
+section.banner .caption h1{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption h2{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption p{font-size: 20px;}
 section.banner .caption a{
@@ -3861,3 +3862,39 @@ section.sblog .caption h1{
     width: 34%;
     margin: 6px 10px 10px 0;
 }
+
+/* add flag pada coupon */
+section.std_content .list_voucher .box_voucher .image
+{
+    position: relative;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis
+{
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    width: 70px;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis img
+{
+    width: auto;
+    height: auto;
+}
+
+section.banner .bx-wrapper .bx-pager {bottom: 50px;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a {background:#d5d5d5; border:1px solid;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a:hover ,
+section.banner .bx-wrapper .bx-pager.bx-default-pager a.active {background:#feb60a}
+
+section.banner .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel.png) no-repeat;
+    width: 18px;
+    height: 30px;
+    margin-top: -16px;
+}
+section.banner .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
+section.banner .bx-wrapper a.bx-next {background-position: top left;right: -40px}
+section.banner .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
+section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}

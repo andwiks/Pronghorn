@@ -856,7 +856,7 @@ body.home header .right_link .box.lang a
 /*fixing css for main/header banner */
 section.banner {
     overflow: hidden;
-    min-height: 320px;
+    min-height: 320px !important;
     padding: 0 !important;
 }
 
@@ -865,8 +865,8 @@ section.banner img{
     position: relative;
     right: 425px;
     bottom:0;
-    max-height: 320px !important;
-    max-width: none;
+    /*max-height: 320px !important;
+    max-width: none;*/
     width: auto;
 }
 
@@ -878,3 +878,5 @@ section.banner .caption
 .topup-action {
    width: 100%;
 }
+
+section.banner .bx-wrapper .bx-pager {bottom: 15px;}

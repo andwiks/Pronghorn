@@ -385,20 +385,20 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['submit']['#attributes']['style'][] = 'float:right;';
         $form['submit']['#weight'] = 3;
 
-        $form['submit']['#states'] = array(
+        // States for submit and charge button.
+        $states = array(
           'enabled' => array(
-            'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            'form#' . $form['#id'] . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
+
+        $form['submit']['#states'] = $states;
         // Add charge state: if available.
-        if (isset($form['charge']) && !empty($form['charge'])) {
-          $form['charge']['#states'] = array(
-            'enabled' => array(
-              'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
-            ),
-          );
+        if (!empty($form['charge'])) {
+          $form['charge']['#states'] = $states;
         }
-        $form['#action'] .= '#' . $form_state['line_item']->type;
+
+        $form['#action'] .= '#' . drupal_html_id($form_state['line_item']->type);
         break;
 
       case 'pln_prepaid':

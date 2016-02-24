@@ -102,7 +102,7 @@ function homeTab() {
     //init
     var hash = window.location.hash.substr(1);
 
-    if (hash !== '' || hash === 'undefined') {
+    if (hash === '' || hash === 'undefined') {
         hash = 'pulsa';
     }
 

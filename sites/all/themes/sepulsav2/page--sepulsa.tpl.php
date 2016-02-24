@@ -42,7 +42,7 @@ $settings = variable_get('sepulsa_settings', array());
           </a>
         <?php endif; ?>
         <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
-          <a href="" target="bpjs">
+          <a href="" target="bpjs-kesehatan">
             <span class="ico finance"></span>
             <?php print t('bpjs'); ?>
           </a>
@@ -106,7 +106,7 @@ $settings = variable_get('sepulsa_settings', array());
           </div>
         <?php endif; ?>
         <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
-          <div class="tab form style_1" id="bpjs">
+          <div class="tab form style_1" id="bpjs-kesehatan">
             <?php print render($messages); ?>
             <?php print render($bpjs_kesehatan_form); ?>
 

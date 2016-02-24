@@ -68,7 +68,7 @@ function bpjs_kesehatan_entity_presave($entity, $type) {
   if ($type == 'commerce_line_item' && !empty($entity->is_new) && $entity->type == 'bpjs_kesehatan') {
     $customer_number = $entity->field_customer_number[LANGUAGE_NONE][0]['value'];
 
-    if (empty($entity->field_customer_number) || empty($entity->field_phone_number)) {
+    if (empty($entity->field_customer_number)) {
       throw new Exception("Missing required fields.");
     }
     else {
@@ -79,6 +79,7 @@ function bpjs_kesehatan_entity_presave($entity, $type) {
 
         $data = array(
           'customer_number' => $customer_number,
+          'payment_period' => $entity->payment_period[LANGUAGE_NONE][0]['value'],
           'product_id' => entity_metadata_wrapper('commerce_product', $entity->commerce_product[LANGUAGE_NONE][0]['product_id'])->kraken_product->value(),
         );
 
@@ -116,7 +117,7 @@ function bpjs_kesehatan_node_info() {
 /**
  * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
-function bpjs_kesehatan_form_commerce_cart_add_to_cart_form_pln_prepaid_alter(&$form, &$form_state, $form_id) {
+function bpjs_kesehatan_form_commerce_cart_add_to_cart_form_bpjs_kesehatan_alter(&$form, &$form_state, $form_id) {
   $form['#validate'][] = 'bpjs_kesehatan_add_to_cart_form_validate';
 }
 
@@ -169,6 +170,7 @@ function bpjs_kesehatan_add_to_cart_form_validate(&$form, &$form_state) {
 
     $data = array(
       'customer_number' => $customer_number,
+      'payment_period' => $form_state['values']['line_item_fields']['payment_period'][LANGUAGE_NONE][0]['value'],
       'product_id' => entity_metadata_wrapper('commerce_product', $form_state['values']['product_id'])->kraken_product->value(),
     );
 

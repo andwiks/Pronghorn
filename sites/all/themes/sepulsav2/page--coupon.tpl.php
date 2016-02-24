@@ -29,7 +29,7 @@ $theme_path = $base_url . '/' . path_to_theme();
             <div class="grid_promo_bank">
                 <?php print render($page['promo']); ?>
             </div>
-            <div class="atau"><span><?php print t('atau'); ?></span></div>
+            <div class="atau"><!--<span><?php print t('atau'); ?></span>--></div>
             <a href="<?php print url("checkout"); ?>" class="bt_next" ><?php print t('LANJUT KE PEMBAYARAN'); ?></a>
         </div>
         <div class="clear"></div>

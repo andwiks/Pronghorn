@@ -352,6 +352,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['#action'] .= '#pln';
         break;
 
+      case 'bpjs_kesehatan':
       case 'biznet':
       case 'multifinance':
         $form['product_id']['#attributes']['class'][] = 'input-text';
@@ -371,6 +372,10 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
           $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
           $form['description']['#suffix'] = '</div>';
           $form['description']['#weight'] = 1;
+        }
+
+        if (!empty($form['line_item_fields']['payment_period'])) {
+          $form['line_item_fields']['payment_period'][LANGUAGE_NONE]['#title_display'] = 'invisible';
         }
 
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));

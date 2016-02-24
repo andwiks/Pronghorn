@@ -41,6 +41,12 @@ $settings = variable_get('sepulsa_settings', array());
             <?php print t('multifinance'); ?>
           </a>
         <?php endif; ?>
+        <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
+          <a href="" target="bpjs">
+            <span class="ico finance"></span>
+            <?php print t('bpjs'); ?>
+          </a>
+        <?php endif; ?>
       </div>
 
       <div class="content_tab">
@@ -91,6 +97,18 @@ $settings = variable_get('sepulsa_settings', array());
           <div class="tab form style_1" id="multifinance">
             <?php print render($messages); ?>
             <?php print render($multifinance_form); ?>
+
+            <div class="topup-notes topup-notes-3<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
+                <ul>
+                  <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
+                </ul>
+            </div>
+          </div>
+        <?php endif; ?>
+        <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
+          <div class="tab form style_1" id="bpjs">
+            <?php print render($messages); ?>
+            <?php print render($bpjs_kesehatan_form); ?>
 
             <div class="topup-notes topup-notes-3<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>

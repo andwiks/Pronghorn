@@ -1,0 +1,153 @@
+<?php
+/**
+ * @file
+ * Implements Kredivo payment services for use with Drupal Commerce.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function commerce_kredivo_menu() {
+  $items = array();
+
+  // Define an always accessible path to receive Notification.
+  $items['commerce_kredivo/notification'] = array(
+    'page callback' => 'commerce_kredivo_notification_callback',
+    'page arguments' => array(),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Processes an incoming Notifications.
+ * @param $debug_
+ *   Optionally specify an signature array for debug purposes; if left empty, the signature
+ *     be pulled from the $_POST. If an signature is passed in, validation of the signature
+ *     at kredivo will be bypassed.
+ *
+ * @return
+ *   TRUE or FALSE indicating whether the signature was successfully processed or not.
+ */
+function commerce_kredivo_notification_callback($debug = array()) {
+  // Retrieve the signature from $_POST if the caller did not supply an signature array.
+  // Note that Drupal has already run stripslashes() on the contents of the
+  // $_POST array at this point, so we don't need to worry about them.
+  if (empty($debug)) {
+    $signature = $_POST['signature_key'];
+
+    // Exit now if the $_POST was empty.
+    if (empty($signature)) {
+      watchdog('commerce_kredivo', 'signature URL accessed with no POST data submitted.', array(), WATCHDOG_WARNING);
+      return FALSE;
+    }
+
+    // Prepare an array to POST back to kredivo to validate the signature.
+    $variables = array('cmd=_notify-validate');
+
+    foreach ($signature as $key => $value) {
+      $variables[] = $key . '=' . urlencode($value);
+    }
+
+    // Determine the proper kredivo server to POST to.
+    if (!empty($signature['test_signature']) && $signature['test_signature'] == 1) {
+      $host = 'https://www.sandbox.kredivo.com/cgi-bin/webscr';
+    }
+    else {
+      $host = 'https://www.kredivo.com/cgi-bin/webscr';
+    }
+
+    // Process the HTTP request to validate the signature.
+    $response = drupal_http_request($host, array('method' => 'POST', 'data' => implode('&', $variables)));
+
+    // If an error occurred during processing, log the message and exit.
+    if (property_exists($response, 'error')) {
+      watchdog('commerce_kredivo', 'Attempt to validate signature failed with error @code: @error', array('@code' => $response->code, '@error' => $response->error), WATCHDOG_ERROR);
+      return FALSE;
+    }
+
+    // If the signature was invalid, log a message and exit.
+    if ($response->data == 'INVALID') {
+      watchdog('commerce_kredivo', 'Invalid signature received and ignored.', array(), WATCHDOG_ALERT);
+      return FALSE;
+    }
+  }
+  else {
+    $signature = $debug['signature_key'];
+  }
+
+  // If the payment method specifies full signature logging, do it now.
+  if (!empty($payment_method['settings']['signature_logging']) &&
+    $payment_method['settings']['signature_logging'] == 'full_signature') {
+    if (!empty($signature['txn_id'])) {
+      watchdog('commerce_kredivo', 'Attempting to process signature @txn_id. !signature_log', array('@txn_id' => $signature['txn_id'], '!signature_log' => '<pre>' . check_plain(print_r($signature, TRUE)) . '</pre>'), WATCHDOG_NOTICE);
+    }
+    else {
+      watchdog('commerce_kredivo', 'Attempting to process an signature. !signature_log', array('!signature_log' => '<pre>' . check_plain(print_r($signature, TRUE)) . '</pre>'), WATCHDOG_NOTICE);
+    }
+  }
+
+  // Exit if the signature has already been processed.
+  if (!empty($signature['txn_id']) && $prior_signature = commerce_kredivo_signature_load($signature['txn_id'])) {
+    if ($prior_signature['payment_status'] == $signature['payment_status']) {
+      watchdog('commerce_kredivo', 'Attempted to process an signature that has already been processed with transaction ID @txn_id.', array('@txn_id' => $signature['txn_id']), WATCHDOG_NOTICE);
+      return FALSE;
+    }
+  }
+
+  // Load the order based on the signature's invoice number.
+  if (!empty($signature['invoice']) && strpos($signature['invoice'], '-') !== FALSE) {
+    list($signature['order_id'], $timestamp) = explode('-', $signature['invoice']);
+  }
+  elseif (!empty($signature['invoice'])) {
+    $signature['order_id'] = $signature['invoice'];
+  }
+  else {
+    $signature['order_id'] = 0;
+    $timestamp = 0;
+  }
+
+  if (!empty($signature['order_id'])) {
+    $order = commerce_order_load($signature['order_id']);
+  }
+  else {
+    $order = FALSE;
+  }
+
+  // Give the payment method module an opportunity to validate the receiver
+  // e-mail address and amount of the payment if possible. If a validate
+  // function exists, it is responsible for setting its own watchdog message.
+  if (!empty($payment_method)) {
+    $callback = $payment_method['base'] . '_kredivo_signature_validate';
+
+    // If a validator function existed...
+    if (function_exists($callback)) {
+      // Only exit if the function explicitly returns FALSE.
+      if ($callback($order, $payment_method, $signature) === FALSE) {
+        return FALSE;
+      }
+    }
+  }
+
+  // Give the payment method module an opportunity to process the signature.
+  if (!empty($payment_method)) {
+    $callback = $payment_method['base'] . '_kredivo_signature_process';
+
+    // If a processing function existed...
+    if (function_exists($callback)) {
+      // Skip saving if the function explicitly returns FALSE, meaning the signature
+      // wasn't actually processed.
+      if ($callback($order, $payment_method, $signature) !== FALSE) {
+        // Save the processed signature details.
+        commerce_kredivo_signature_save($signature);
+      }
+    }
+  }
+
+  // Invoke the hook here so implementations have access to the order and
+  // payment method if available and a saved signature array that includes the payment
+  // transaction ID if created in the payment method's default process callback.
+  module_invoke_all('commerce_kredivo_signature_process', $order, $payment_method, $signature);
+}

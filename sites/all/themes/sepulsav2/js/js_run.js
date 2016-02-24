@@ -23,7 +23,7 @@ $(document).ready(function () {
     });// carousel voucher vendor
 
 
-    $(".view-main-banner .slider").bxSlider({
+    $(".banner .slider").bxSlider({
         auto: true,
         mode: 'fade'
     });// carousel main banner

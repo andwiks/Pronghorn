@@ -26,7 +26,9 @@ $(document).ready(function () {
     $(".banner .slider").bxSlider({
         auto: true,
         mode: 'fade',
-        controls: false
+        controls: false,
+        speed: 1000,
+        pause: 7000
     });// carousel main banner
 
     randomTheme();// random theme at home

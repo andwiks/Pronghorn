@@ -3883,7 +3883,7 @@ section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis img
     height: auto;
 }
 
-section.banner .bx-wrapper .bx-pager {bottom: 50px;}
+section.banner .bx-wrapper .bx-pager {bottom: 70px;}
 section.banner .bx-wrapper .bx-pager.bx-default-pager a {background:#d5d5d5; border:1px solid;}
 section.banner .bx-wrapper .bx-pager.bx-default-pager a:hover ,
 section.banner .bx-wrapper .bx-pager.bx-default-pager a.active {background:#feb60a}

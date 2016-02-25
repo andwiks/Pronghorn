@@ -14,7 +14,7 @@ $page_state = "home";
 $settings = variable_get('sepulsa_settings', array());
 ?>
   <!-- middle -->
-<section class="banner" style="min-height:441px">
+<section class="banner">
 <?php print render($page['banner']); ?>
 </section>
 <section class="h_middle_top">
@@ -50,6 +50,7 @@ $settings = variable_get('sepulsa_settings', array());
 
           <div class="topup-notes<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
               <ul>
+              	<li><?php print t('Masukkan nomor telepon dengan format 08XXXXXXXX (mis. 0812345678)'); ?></li>
                 <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
               </ul>
           </div>

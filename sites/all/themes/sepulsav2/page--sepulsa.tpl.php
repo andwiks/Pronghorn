@@ -14,7 +14,7 @@ $page_state = "home";
 $settings = variable_get('sepulsa_settings', array());
 ?>
   <!-- middle -->
-<section class="banner" style="min-height:441px">
+<section class="banner">
 <?php print render($page['banner']); ?>
 </section>
 <section class="h_middle_top">

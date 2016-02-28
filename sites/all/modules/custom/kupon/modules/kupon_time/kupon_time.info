@@ -1,0 +1,5 @@
+name = "Kupon Time"
+description = "Add taken and redeem time to offline coupon."
+core = 7.x
+package = Sepulsa
+dependencies[] = kupon

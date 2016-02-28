@@ -1,0 +1,94 @@
+<?php
+/**
+ * @file
+ * kupon_time.install
+ *
+ * @author andreas@sepulsa.com
+ *
+ * Bundle: offline_owned_unique
+ * Add field_coupon_taken: datetime.
+ * Add field_coupon_redeem: datetime.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function kupon_time_install() {
+  $bundle = 'offline_owned_unique';
+  // Get list of node's property.
+  $properties = entity_get_property_info('node');
+  $coupon_properties = isset($properties['bundles'][$bundle]['properties']) ? $properties['bundles'][$bundle]['properties'] : array();
+
+  // Check field_coupon_taken: datetime.
+  if (!isset($coupon_properties['field_coupon_taken'])) {
+    // Create field: field_coupon_taken.
+    $field = array(
+      'field_name' => 'field_coupon_taken',
+      'type' => 'datetime',
+      'settings' => array(
+        'granularity' => drupal_map_assoc(array(
+          'year', 'month', 'day', 'hour', 'minute', 'second',
+        )),
+      ),
+    );
+    field_create_field($field);
+    $instance = array(
+      'field_name' => 'field_coupon_taken',
+      'entity_type' => 'node',
+      'bundle' => $bundle,
+      'label' => 'Taken Time',
+      'widget' => array(
+        'type' => 'date_text',
+      ),
+    );
+    field_create_instance($instance);
+  }
+
+  // Check field_coupon_redeem: datetime.
+  if (!isset($coupon_properties['field_coupon_redeem'])) {
+    // Create field: field_coupon_redeem.
+    $field = array(
+      'field_name' => 'field_coupon_redeem',
+      'type' => 'datetime',
+      'settings' => array(
+        'granularity' => drupal_map_assoc(array(
+          'year', 'month', 'day', 'hour', 'minute', 'second',
+        )),
+      ),
+    );
+    field_create_field($field);
+    $instance = array(
+      'field_name' => 'field_coupon_redeem',
+      'entity_type' => 'node',
+      'bundle' => $bundle,
+      'label' => 'Redeem Time',
+      'widget' => array(
+        'type' => 'date_text',
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function kupon_time_uninstall() {
+  $bundle = 'offline_owned_unique';
+  // Delete field_coupon_taken.
+  field_delete_field('field_coupon_taken');
+  $instance = array(
+    'field_name' => 'field_coupon_taken',
+    'entity_type' => 'node',
+    'bundle' => $bundle,
+  );
+  field_delete_instance($instance);
+  // Delete field_coupon _redeem.
+  field_delete_field('field_coupon_redeem');
+  $instance = array(
+    'field_name' => 'field_coupon_redeem',
+    'entity_type' => 'node',
+    'bundle' => $bundle,
+  );
+  field_delete_instance($instance);
+}

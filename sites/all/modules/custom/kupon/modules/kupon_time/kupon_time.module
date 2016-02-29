@@ -22,8 +22,10 @@ function kupon_time_node_presave($node) {
   // Only for type: offline_owned_unique.
   if (isset($node->type) && $node->type == 'offline_owned_unique') {
     // Check original uid and compare with current uid.
+    // Next uid must not admin.
     if (isset($node->original->uid) && isset($node->uid)
       && $node->original->uid != $node->uid
+      && $node->uid > 1
     ) {
       // Update field_coupon_taken time.
       $node->field_coupon_taken[$node->language][0] = array(

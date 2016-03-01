@@ -853,6 +853,23 @@ function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
     $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
   }
 
+  // Modification for coupon price button.
+  if (isset($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+    if (!empty($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+      $float_number = floatval($form_state['default_product']->commerce_price['und'][0]['amount']);
+      $button = t('Rp @price', array(
+        '@price' => number_format($float_number, 0, ',', '.'),
+      ));
+      $rebuild['submit']['#attributes']['style'][] = 'text-transform: none;';
+      $rebuild['submit']['#value'] = $button;
+      $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
+    }
+    else {
+      $rebuild['submit']['#value'] = t('Take Voucher');
+      $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
+    }
+  }
+
   $commands[] = ajax_command_replace('.commerce-cart-add-to-cart-form-' . $product_id, render($rebuild));
   $commands[] = ajax_command_prepend('.region-content', theme('status_messages'));
 

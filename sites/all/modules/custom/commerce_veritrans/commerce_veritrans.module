@@ -615,12 +615,16 @@ function commerce_veritrans_submit_form_validate_credit_card($payment_method, $p
       form_set_error($prefix . 'credit_card][code', t('Payment @type error: invalid card CVV input.', array(
         '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
         '@message' => $pane_values['error'],
+      ), array(
+        'context' => $payment_method['instance_id'],
       )));
     }
     else {
       form_set_error($prefix, t('Payment @type error: @message.', array(
         '@type' => commerce_veritrans_payment_method_types($payment_method['settings']['type']),
         '@message' => $pane_values['error'],
+      ), array(
+        'context' => $payment_method['instance_id'],
       )));
     }
     $return_value = FALSE;

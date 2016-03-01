@@ -279,6 +279,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
   $return["status"] = false;
   $return["message"] = "Mohon masukkan produk";
   $return["data"] = null;
+  $temporary_data = null;
   
   foreach ($products as $product) {
     // Backward compatibilty for old electricity product.
@@ -337,7 +338,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
           if ($line_item !== FALSE) {
             $return["status"] = true;
             $return["message"] = "";
-            $return["data"] = order_services_line_item($line_item);
+            $temporary_data = $line_item;
           }
           else {
             $return["status"] = false;
@@ -359,6 +360,9 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
     }
   }
   
+  if(!empty($temporary_data)){
+    $return["data"] = order_services_line_item($temporary_data);
+  }
   return $return;
 }
 

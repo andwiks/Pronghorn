@@ -2282,7 +2282,7 @@ section.std_content .box_voucher
 
 .voucher-description
 {
-    height: 60px;
+    height: 100%;
     overflow: hidden;
 }
 

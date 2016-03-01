@@ -39,14 +39,14 @@ if (!isset($web_link)) {
     	<img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>">
    	</div>
     <h4><?php print $fields['title']->content; ?></h4>
-    <p class="voucher-description"><?php print $fields['field_description']->content; ?>.</p>
+    <p class="voucher-description"><?php print $fields['field_description']->content; ?></p>
     <a href="" class="detail">Lihat detail voucher</a>
     <?php print $fields['field_product']->content; ?>
     <div class="data_popup">
         <div class="img"><?php print $fields['field_coupon_product_image']->content; ?></div>
         <div class="desc">
             <h3><?php print $fields['title']->content; ?></h3>
-            <h4><?php print $fields['field_description']->content; ?>.</h4>
+            <h4><?php print $fields['field_description']->content; ?></h4>
             <h5><?php print t('Terms & Conditions'); ?></h5>
             <div class="tnc_desc"><?php print $fields['field_coupon_tnc']->content; ?></div>
         </div>

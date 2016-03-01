@@ -26,8 +26,13 @@ if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_c
   $row->field_field_product[0]['rendered']['submit']['#value'] = t('Take Voucher');
   $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
 else :
-  $row->field_field_product[0]['rendered']['submit']['#value'] = t('Buy Voucher');
-  $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Buy Voucher');
+  $float_number = floatval($row->field_commerce_price[0]['raw']['amount']);
+  $button = t('Rp @price', array(
+    '@price' => number_format($float_number, 0, ',', '.'),
+  ));
+  $row->field_field_product[0]['rendered']['submit']['#attributes']['style'][] = 'text-transform: none;';
+  $row->field_field_product[0]['rendered']['submit']['#value'] = $button;
+  $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
 endif;
 ?>
 <?php print drupal_render($row->field_field_product[0]['rendered']); ?>

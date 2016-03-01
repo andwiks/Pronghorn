@@ -27,23 +27,29 @@ function facebook_pixel_block_view($delta = '') {
   $block = array();
   switch ($delta) {
     case 'facebook-pixel':
-      $url = facebook_pixel_get_value();
-      $block['content'] = array(
-        '#attached' => array(
-          'js' => array(
-            'data' => drupal_add_js("jQuery(document).ready(function () { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                          n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-                          n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-                          t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-                          document,'script','//connect.facebook.net/en_US/fbevents.js');
+      if (isset($_SESSION['facebook_pixel_order_id'])) {
+        $url = facebook_pixel_get_value();
+        $block['content'] = array(
+          '#attached' => array(
+            'css' => array(
+              'data' => drupal_add_css('.js-message {display:none}', array('type' => 'inline', 'scope' => 'header')),
+            ),
+            'js' => array(
+              'data' => drupal_add_js("jQuery(document).ready(function () { !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                            n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+                            n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+                            t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+                            document,'script','//connect.facebook.net/en_US/fbevents.js');
 
-                          fbq('init', '" . variable_get('facebook_pixel_id', '1198972743465542') . "');
-                          fbq('track', 'Purchase', {value: '" . $url['amount'] . "', currency:'" . $url['currency_code'] . "'}); });",
-                          array('type' => 'inline', 'scope' => 'header')
+                            fbq('init', '" . variable_get('facebook_pixel_id', '1198972743465542') . "');
+                            fbq('track', 'Purchase', {value: '" . $url['amount'] . "', currency:'" . $url['currency_code'] . "'}); });",
+                            array('type' => 'inline', 'scope' => 'header')
+              ),
             ),
           ),
-        ),
-      );
+        );
+        unset($_SESSION['facebook_pixel_order_id']);
+      }
       break;
   }
   return $block;

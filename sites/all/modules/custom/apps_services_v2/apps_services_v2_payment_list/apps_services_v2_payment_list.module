@@ -236,7 +236,7 @@ function apps_services_v2_payment_list_checkout_payment_doc() {
     '#path' => 'checkout_v2/payment',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/air/checkout_v2/payment.json<br />'
-    . 'POST data application/json: { "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer", "source": "android" }',
+    . 'POST data application/json: { "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer", "use_credit" : 1, "source": "android" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

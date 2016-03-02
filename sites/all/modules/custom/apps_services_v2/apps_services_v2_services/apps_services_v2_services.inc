@@ -240,6 +240,10 @@ function apps_services_v2_services_resource_add($product, $source) {
       // Return line item object.
       try {
         $line_item = commerce_cart_product_add($user->uid, $line_item);
+        // Get the order.
+	$order = commerce_cart_order_load($user->uid);
+        // Refresh it: so cart index will get new order data.
+        commerce_cart_order_refresh($order);
         if ($line_item !== FALSE) {
           $return["status"] = true;
           $return["data"] = order_services_line_item($line_item);

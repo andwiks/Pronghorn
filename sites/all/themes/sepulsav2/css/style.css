@@ -2308,6 +2308,10 @@ section.std_content .box_voucher
 {
     height:195px;
 }
+.box_voucher .data_popup .desc h4,
+#detail_voucher .box_popup .content_pop h4 {
+	margin-bottom: 40px;
+}
 
 .akun .form-actions .row
 {

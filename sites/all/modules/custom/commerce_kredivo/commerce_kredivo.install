@@ -13,7 +13,7 @@
 /**
  * Implements hook_requirements().
  */
-function commerce_veritrans_requirements($phase) {
+function commerce_kredivo_requirements($phase) {
   // Define default requirements.
   $requirements = array();
 

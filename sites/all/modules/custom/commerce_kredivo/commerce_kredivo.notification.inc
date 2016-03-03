@@ -71,7 +71,7 @@ function commerce_kredivo_notification() {
         // Define target update url: add query data.
         $url = url($payment_method['settings']['server_url'] . '/update', array(
           'query' => array(
-            'transaction_id' => $kredivo->transaction_id,
+            'tr_id' => $kredivo->transaction_id,
             'signature_key' => $kredivo->signature_key,
           ),
           'external' => TRUE,
@@ -96,6 +96,8 @@ function commerce_kredivo_notification() {
           'context' => $stream_context,
         );
 
+        // @todo: create payment transaction here with status pending.
+        // @todo: Add menu confirm.
         // Confirm the order status: tell kredivo the OK.
         $result = drupal_http_request($url, $request_option);
 

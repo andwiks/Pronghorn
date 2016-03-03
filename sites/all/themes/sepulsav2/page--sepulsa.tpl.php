@@ -14,7 +14,7 @@ $page_state = "home";
 $settings = variable_get('sepulsa_settings', array());
 ?>
   <!-- middle -->
-<section class="banner" style="min-height:441px">
+<section class="banner">
 <?php print render($page['banner']); ?>
 </section>
 <section class="h_middle_top">
@@ -23,7 +23,7 @@ $settings = variable_get('sepulsa_settings', array());
       <div class="nav_tab after_clear">
         <a href="" class="active" target="target_1">
           <span class="ico pulsa"></span>
-          <?php print t('isi pulsa & bolt'); ?>
+          <?php print t('isi pulsa'); ?>
         </a>
         <a href="" target="target_2">
           <span class="ico listrik"></span>
@@ -50,8 +50,8 @@ $settings = variable_get('sepulsa_settings', array());
 
           <div class="topup-notes<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
               <ul>
+              	<li><?php print t('Masukkan nomor telepon dengan format 08XXXXXXXX (mis. 0812345678)'); ?></li>
                 <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
-                <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
               </ul>
           </div>
         </div>
@@ -62,7 +62,6 @@ $settings = variable_get('sepulsa_settings', array());
             <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
-                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
                 </ul>
             </div>
           </div>
@@ -73,7 +72,6 @@ $settings = variable_get('sepulsa_settings', array());
             <div class="topup-notes topup-notes-2<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
-                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
                 </ul>
             </div>
           </div>
@@ -86,7 +84,6 @@ $settings = variable_get('sepulsa_settings', array());
             <div class="topup-notes topup-notes-3<?php print (isset($settings['multipaid_product']) && !empty($settings['multipaid_product'])) ? ' topup-notes-multi' : ''; ?>">
                 <ul>
                   <li><?php print t('Segala bentuk informasi yang anda masukkan akan kami jaga kerahasiaannya.'); ?></li>
-                  <li><?php print t('Hanya bisa mengisi pulsa ke nomor dan nominal yang sama satu kali dalam sehari.'); ?></li>
                 </ul>
             </div>
           </div>

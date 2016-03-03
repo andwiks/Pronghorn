@@ -411,6 +411,7 @@ section.banner .caption{
     color: #FFF;
 }
 section.banner{margin: 0 0 40px}
+section.banner .caption h1{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption h2{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption p{font-size: 20px;}
 section.banner .caption a{
@@ -539,9 +540,9 @@ section.gratis_voucher {
     max-width:1440px;
 }
 section.gratis_voucher .desc{
-	/*width: 610px;*/
-	width:580px;
-	margin: 50px 0 0 0
+    /*width: 610px;*/
+    width:580px;
+    margin: 50px 0 0 0
 }
 section.gratis_voucher .desc h2,
 section.gratis_voucher .desc h4{color:#feb60a;text-transform: uppercase;}
@@ -710,8 +711,8 @@ section.std_content .c_right .row.accordion{
     border-bottom: 1px dashed #929292;
 }
 section.std_content .c_right .row.accordion .label{
-	font-family: "robotoregular";font-size: 16px;color: #105c8c;position: relative;cursor: pointer;
-	padding-right:55px;
+    font-family: "robotoregular";font-size: 16px;color: #105c8c;position: relative;cursor: pointer;
+    padding-right:55px;
 }
 section.std_content .c_right .row.accordion .label span.ico{
     background: url(../images/material/arr_accordion.png) no-repeat center;
@@ -1538,6 +1539,7 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     border-right:2px solid #ccc;
     font-size:14px;
 }
+
 #frameBlog .content_blog .head_post .comment,
 #frameBlog .content_blog .head_post .share {border-right:none; margin-right: 0;}
 #frameBlog .content_blog .head_post .share {margin-top:0; padding-right: 0; position:relative;}
@@ -1747,8 +1749,14 @@ section.transaction .thanks_page div.facebook_twitter_share_icon{
     border-top:1px dashed #ccc;
 }
 
-
-
+/*Edit menu tabs*/
+.tabs {display: inline;}
+.tabs ul li {
+    display: inline;
+    padding: 5px;
+    margin-bottom: 5px;
+    background: #ff3030;
+}
 
 /* footer
 ----------------------------------------------------------------------------------------------*/
@@ -1789,11 +1797,11 @@ background:url(../images/material/arr_ico.png) no-repeat right 15px center;
 }
 section.h_middle_top html.js input.form-autocomplete
 {
-	background:url(../images/material/arr_ico.png) no-repeat right 15px center;
+    background:url(../images/material/arr_ico.png) no-repeat right 15px center;
 }
 
 section.h_middle_top input[type=submit], input[type=button] {
-	background: #feb60a;
+    background: #feb60a;
     border: none;
     font-size: 24px;
     padding: 9px 0px;
@@ -1801,12 +1809,12 @@ section.h_middle_top input[type=submit], input[type=button] {
     width: 200px;
     cursor: pointer;
     color: #FFF;
-	border-radius: 7px;
+    border-radius: 7px;
     -webkit-border-radius: 7px;
     -moz-border-radius: 7px;
     -ms-border-radius: 7px;
     -o-border-radius: 7px;
-	margin:5px;
+    margin:5px;
 }
 
 /* repair css */
@@ -1961,7 +1969,7 @@ table.tab-isi-pulsa tr td:first-child a
 }
 
 .topup-notes-multi {
-	width: 70%;
+    width: 70%;
 }
 
 .topup-notes ul
@@ -2274,7 +2282,7 @@ section.std_content .box_voucher
 
 .voucher-description
 {
-    height: 60px;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -2299,6 +2307,10 @@ section.std_content .box_voucher
 .box_voucher .image img
 {
     height:195px;
+}
+.box_voucher .data_popup .desc h4,
+#detail_voucher .box_popup .content_pop h4 {
+	margin-bottom: 40px;
 }
 
 .akun .form-actions .row
@@ -3017,8 +3029,8 @@ header .right_link .box .box_drop a:hover
 {
     float: left;
     padding: 0 13px 0 0;
-    margin: 10px 15px 0 0;
-    border-right: 2px solid #ccc;
+    margin: 10px 15px 5px 0;
+    /*border-right: 2px solid #ccc;*/
     font-size: 14px;
 }
 
@@ -3784,3 +3796,109 @@ section.banner .caption
 {
     top:30%;
 }
+
+
+/* update blog */
+section.sblog .caption h1{
+    font-family: "robotoregular";
+    font-size: 36px;
+    margin: 0 0 15px 0;
+}
+
+#frameBlog  .content p
+{
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#frameBlog .content .field-name-field-blog-image
+{
+    width: 48%;
+    float: left;
+    padding: 0 10px 10px 0;
+}
+
+.field-name-field-blog-image img {
+    margin-top: 6px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border: 1px #f7f7f6 solid;
+}
+
+#frameBlog #left_column h1{
+    font-size: 32px;
+    margin-bottom: 15px;
+}
+
+#frameBlog  .content p.content-title
+{
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+    /* ini utk responsive youtube */
+     .videoWrapper {
+          position: relative;
+          padding-bottom: 56.25%; /* 16:9 */
+          padding-top: 25px;
+          height: 0;
+     }
+     .videoWrapper iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+     }
+
+     /* ini update utk styling tabs */
+     .field-name-field-tags .field-items div.field-item {
+           display: inline-block;
+           margin: 10px 10px 10px 0;
+           background: #ededed ;
+           padding: 5px;
+     }
+
+ /* perbaikan tampilan home untuk frontpage */
+ .views-field.views-field-body img {
+    float: left;
+    display: block;
+    width: 34%;
+    margin: 6px 10px 10px 0;
+}
+
+/* add flag pada coupon */
+section.std_content .list_voucher .box_voucher .image
+{
+    position: relative;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis
+{
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    width: 70px;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis img
+{
+    width: auto;
+    height: auto;
+}
+
+section.banner .bx-wrapper .bx-pager {bottom: 70px;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a {background:#d5d5d5; border:1px solid;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a:hover ,
+section.banner .bx-wrapper .bx-pager.bx-default-pager a.active {background:#feb60a}
+
+section.banner .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel.png) no-repeat;
+    width: 18px;
+    height: 30px;
+    margin-top: -16px;
+}
+section.banner .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
+section.banner .bx-wrapper a.bx-next {background-position: top left;right: -40px}
+section.banner .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
+section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}

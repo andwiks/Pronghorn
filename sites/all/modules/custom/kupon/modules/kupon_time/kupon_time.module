@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ * kupon_time.module
+ *
+ * @author andreas@sepulsa.com
+ *
+ * List:
+ * * Disable edit for field_coupon_taken and field_coupon_redeem
+ * * Update field_coupon_taken when coupon node assigned to other user.
+ * * Update field_coupon_redeem when coupon node become unpublished.
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_node_presave().
+ */
+function kupon_time_node_presave($node) {
+  // Only for type: offline_owned_unique.
+  if (isset($node->type) && $node->type == 'offline_owned_unique') {
+    // Check original uid and compare with current uid.
+    // Next uid must not admin.
+    if (isset($node->original->uid) && isset($node->uid)
+      && $node->original->uid != $node->uid
+      && $node->uid > 1
+    ) {
+      // Update field_coupon_taken time.
+      $node->field_coupon_taken[$node->language][0] = array(
+        'value' => format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s', 'UTC'),
+        'timezone' => 'UTC',
+        'timezone_db' => 'UTC',
+      );
+      return $node;
+    }
+    // Check original status and compare with current status.
+    if (isset($node->original->status) && $node->original->status == 1
+      && isset($node->status) && $node->status == 0
+    ) {
+      // Update field_coupon_redeem time.
+      $node->field_coupon_redeem[$node->language][0] = array(
+        'value' => format_date(REQUEST_TIME, 'custom', 'Y-m-d H:i:s', 'UTC'),
+        'timezone' => 'UTC',
+        'timezone_db' => 'UTC',
+      );
+      return $node;
+    }
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function kupon_time_form_offline_owned_unique_node_form_alter(&$form, &$form_state, $form_id) {
+  // Check for field coupon taken: make it disable.
+  if (isset($form['field_coupon_taken'][$form['#node']->language][0])) {
+    $form['field_coupon_taken'][$form['#node']->language][0]['#disabled'] = TRUE;
+  }
+  // Check for field coupon redeem: make it disable.
+  if (isset($form['field_coupon_redeem'][$form['#node']->language][0])) {
+    $form['field_coupon_redeem'][$form['#node']->language][0]['#disabled'] = TRUE;
+  }
+}

@@ -22,6 +22,15 @@ $(document).ready(function () {
         mode: 'fade'
     });// carousel voucher vendor
 
+
+    $(".banner .slider").bxSlider({
+        auto: true,
+        mode: 'fade',
+        controls: false,
+        speed: 1000,
+        pause: 7000
+    });// carousel main banner
+
     randomTheme();// random theme at home
     homeTab(); //tab switch at home
     kreditTab(); //tab switch at home

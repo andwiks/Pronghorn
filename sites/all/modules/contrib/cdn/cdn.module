@@ -46,6 +46,10 @@ function cdn_file_url_alter(&$original_uri) {
       if (!in_array($scheme, $local_schemes)) {
         return;
       }
+      // Explicitly exclude the local private:// stream wrapper.
+      elseif ($scheme === 'private') {
+        return;
+      }
 
       // Attempt to get an external URL using the appropriate wrapper.
       if ($wrapper = file_stream_wrapper_get_instance_by_uri($original_uri)) {
@@ -127,7 +131,7 @@ function cdn_file_url_alter(&$original_uri) {
     // The file is available from multiple servers; pick a server randomly
     // (yet consistently: this uses consistent hashing!), so that each server
     // will serve approximately the same number of files.
-    elseif (count($servers > 1)) {
+    elseif (count($servers) > 1) {
       $filename = basename($servers[0]['url']);
       $unique_file_id = hexdec(substr(md5($filename), 0, 5));
       $choice = $unique_file_id % count($servers);
@@ -243,6 +247,56 @@ function cdn_element_info_alter(&$type) {
 }
 
 /**
+ * Implements hook_css_alter().
+ *
+ * Ensure that CDN-blacklisted CSS files are not aggregated, so that the CSS
+ * aggregates can still be served from the CDN.
+ */
+function cdn_css_alter(&$css) {
+  if (!cdn_status_is_enabled()) {
+    return;
+  }
+
+  foreach (array_keys($css) as $key) {
+    // Skip $type = 'inline'.
+    if (is_numeric($key)) {
+      continue;
+    }
+    // Handle $type = 'file' and 'external'.
+    elseif (!cdn_check_file($key)) {
+      $javascript[$key]['preprocess'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Implements hook_js_alter().
+ *
+ * Ensure that CDN-blacklisted JS files are not aggregated, so that the JS
+ * aggregates can still be served from the CDN.
+ */
+function cdn_js_alter(&$javascript) {
+  if (!cdn_status_is_enabled()) {
+    return;
+  }
+
+  foreach (array_keys($javascript) as $key) {
+    // Skip $type = 'inline'.
+    if (is_numeric($key)) {
+      continue;
+    }
+    // Skip $type = 'setttings'.
+    elseif ($key === 'settings') {
+      continue;
+    }
+    // Handle $type = 'file' and 'external'.
+    elseif (!cdn_check_file($key)) {
+      $javascript[$key]['preprocess'] = FALSE;
+    }
+  }
+}
+
+/**
  * Implements hook_menu().
  */
 function cdn_menu() {
@@ -296,7 +350,7 @@ function cdn_menu() {
   );
 
   // Origin Pull mode's Far Future expiration support.
-  $items['cdn/farfuture/%/%/%menu_tail'] = array(
+  $items['cdn/farfuture/%/%/%/%menu_tail'] = array(
     'title'            => 'Download a far futured file',
     'access callback'  => TRUE,
     'page callback'    => 'cdn_basic_farfuture_download',
@@ -659,7 +713,7 @@ function cdn_get_domains() {
   $domains = array();
 
   // Origin Pull mode domains.
-  if (variable_get(CDN_MODE_VARIABLE, FALSE) == CDN_MODE_BASIC) {
+  if (variable_get(CDN_MODE_VARIABLE, CDN_MODE_BASIC) == CDN_MODE_BASIC) {
     cdn_load_include('basic');
     $mapping = cdn_basic_get_mapping();
     $lines = preg_split("/[\n\r]+/", $mapping, -1, PREG_SPLIT_NO_EMPTY);
@@ -687,7 +741,7 @@ function cdn_get_domains() {
     }
   }
   // File Conveyor mode domains.
-  elseif (variable_get(CDN_MODE_VARIABLE, FALSE) == CDN_MODE_ADVANCED) {
+  elseif (variable_get(CDN_MODE_VARIABLE, CDN_MODE_BASIC) == CDN_MODE_ADVANCED) {
     cdn_load_include('advanced');
     $db = _cdn_advanced_get_db_connection();
 
@@ -878,6 +932,7 @@ function cdn_load_include($basename) {
 function cdn_post_render_html_alter($html, $elements = array()) {
   cdn_load_include('fallback');
   cdn_html_alter_image_urls($html);
+  cdn_html_alter_anchor_urls($html);
   return $html;
 }
 

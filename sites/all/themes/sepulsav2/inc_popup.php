@@ -37,8 +37,8 @@
             </p>
             </div>
             <div class="nav_pop">
-                <a href="" class="prev"><</a> 
-                <a href="" class="next">></a> 
+                <a href="" class="prev">&lt;</a>
+                <a href="" class="next">&gt;</a>
             </div>
         </div>
     </div>

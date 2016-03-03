@@ -1,0 +1,40 @@
+<?php
+/**
+ * @file
+ * commerce_kredivo.install
+ *
+ * @author andre4s_y
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function commerce_veritrans_requirements($phase) {
+  // Define default requirements.
+  $requirements = array();
+
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  // Check on installation phase.
+  if ($phase == 'install') {
+    // Get enabled currencies.
+    $currencies = commerce_currency_get_code(TRUE);
+    // This payment only usable for indonesia currency: IDR.
+    if (!isset($currencies['IDR'])) {
+      $requirements['kredivo_currency'] = array(
+        'title' => $t('currency setting'),
+        'value' => implode(', ', $currencies),
+        'description' => $t('Kredivo payment gateway only supports Indonesia (IDN) currency: IDR.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+
+  // Return requirements.
+  return $requirements;
+}

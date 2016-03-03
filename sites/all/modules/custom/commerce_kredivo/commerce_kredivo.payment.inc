@@ -361,7 +361,10 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     // Decode the string.
     $kredivo = json_decode($result->data);
     // Validate kredivo checkout data.
-    if (!empty($kredivo) && isset($kredivo->status) && $kredivo->status == 'OK'
+    // Kredivo: status => 'success'.
+    if (!empty($kredivo)
+      && isset($kredivo->status) && $kredivo->status == 'success'
+      && isset($kredivo->code) && $kredivo->code == 200
       && isset($kredivo->redirect_url) && valid_url($kredivo->redirect_url, TRUE)
     ) {
       // @todo: check if there is message returned from kredivo.

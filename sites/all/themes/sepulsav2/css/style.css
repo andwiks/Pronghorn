@@ -2851,10 +2851,16 @@ section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_a
     font-family: "robotomedium";
 }
 
+.entity-commerce-order .field-name-commerce-order-total div.field-items {
+	margin-bottom: -10px;
+}
+
 .entity-commerce-order .field-name-commerce-order-total .amount
 {
-    float: right;
-    padding-right: 30px;
+    display: block;
+    margin-bottom: 10px;
+    margin-top: -14px;
+    text-align: right;
 }
 
 .entity-commerce-order .field-name-commerce-customer-billing, .entity-commerce-order .field-name-field-commerce-billy-i-date, .entity-commerce-order .field-name-field-order-source

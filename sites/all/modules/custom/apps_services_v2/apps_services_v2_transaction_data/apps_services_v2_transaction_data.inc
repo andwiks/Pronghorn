@@ -74,6 +74,164 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
 }
 
 /*
+ * change the format of order listing
+ */
+function apps_services_v2_transaction_change_format_order($order_container){
+  //change return value of order container
+  $selected_returned_value = array();
+  foreach($order_container as $order){
+    $temp_array_data = array();
+    $temp_array_data["order_id"] = $order->order_id;
+    $temp_array_data["mail"] = $order->mail;
+    $temp_array_data["status"] = $order->status;
+    $temp_array_data["created"] = $order->created;
+    $temp_array_data["amount"] = $order->commerce_order_total['amount'];
+    $temp_array_data["currency_code"] = $order->commerce_order_total['currency_code'];
+    $temp_array_data["response"] = $order;
+    $temp_array_data["product_id"] = $order->commerce_line_items[0]->commerce_product->product_id;
+    
+    //get type order based on many case
+    if(isset($order->commerce_line_items[0]->type) && !empty($order->commerce_line_items[0]->type)){
+      $temp_array_data["type"] = $order->commerce_line_items[0]->type;
+    }
+    elseif(isset($order->commerce_line_items->type) && !empty($order->commerce_line_items->type)){
+      $temp_array_data["type"] = $order->commerce_line_items->type;
+    }
+    
+    //get phone number order based on many case
+    if(isset($order->commerce_line_items[0]->field_phone_number) && !empty($order->commerce_line_items[0]->field_phone_number)){
+      $temp_array_data["field_phone_number"] = $order->commerce_line_items[0]->field_phone_number;
+    }
+    elseif(isset($order->commerce_line_items->field_phone_number) && !empty($order->commerce_line_items->field_phone_number)){
+      $temp_array_data["field_phone_number"] = $order->commerce_line_items->field_phone_number;
+    }
+    else{
+      $temp_array_data["field_phone_number"] = null;
+    }
+    
+    //get electricity customer number order based on many case
+    if(isset($order->commerce_line_items[0]->electricity_customer_number) && !empty($order->commerce_line_items[0]->electricity_customer_number)){
+      $temp_array_data["electricity_customer_number"] = $order->commerce_line_items[0]->electricity_customer_number;
+    }
+    elseif(isset($order->commerce_line_items->electricity_customer_number) && !empty($order->commerce_line_items->electricity_customer_number)){
+      $temp_array_data["electricity_customer_number"] = $order->commerce_line_items->electricity_customer_number;
+    }
+    else{
+      $temp_array_data["electricity_customer_number"] = null;
+    }
+    
+    //get electricity phone number
+    if(isset($order->commerce_line_items[0]->electricity_phone_number) && !empty($order->commerce_line_items[0]->electricity_phone_number)){
+      $temp_array_data["electricity_phone_number"] = $order->commerce_line_items[0]->electricity_customer_number;
+    }
+    elseif(isset($order->commerce_line_items->electricity_phone_number) && !empty($order->commerce_line_items->electricity_phone_number)){
+      $temp_array_data["electricity_phone_number"] = $order->commerce_line_items->electricity_phone_number;
+    }
+    else{
+      $temp_array_data["electricity_phone_number"] = null;
+    }
+    
+    //set favorite based on list data
+    if(isset($order->type) && !empty($order->type) && $order->type == "favorite"){
+      $temp_array_data["favorite"] = true;
+    }
+    elseif(isset($order->type) && !empty($order->type) && $order->type == "order"){
+      $temp_array_data["favorite"] = false;
+    }
+    else{
+      $temp_array_data["favorite"] = false;
+    }
+    
+    $temp_array_data["revision_timestamp"] = $order->revision_timestamp;
+    
+    $selected_returned_value[] = $temp_array_data;
+  }
+  
+  return $selected_returned_value;
+}
+
+/*
+ * get the list of order history
+ */
+function apps_services_v2_transaction_history_list($page, $size, $source){
+  global $user;
+  
+  //get current active user uid
+  $uid = $user->uid;
+  
+  //do not allow user anonymous to enter the service
+  if(!isset($uid) || empty($uid)){
+    return services_error('Harap login terlebih dahulu', 406);
+  }
+  
+  //set variable container
+  $return = array();
+  $return["status"] = false;
+  $return["message"] = "";
+  $return["data"] = null;
+  $favorite_order_id = array();
+  
+  //get favorite transaction order id from the database
+  $result = db_select('favorite_transaction', 'ft')
+            ->fields('ft', array('order_id', 'uid', 'created'))
+            ->condition('uid', $uid)
+            ->orderBy('created', 'DESC')
+            ->execute();
+  foreach ($result as $usage) {
+    $favorite_order_id[] = $usage->order_id;
+  }
+  
+  //get order list
+  $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));
+  //set order desc
+  $order_list = array_reverse($order_list,true);
+  
+  $start = ($page-1) * $size;
+  $stop = $start + $size;
+  
+  //loop order to get order data
+  $favorite_order_container = array();
+  $latest_order_container = array();
+  $i = 1;
+  foreach ($order_list as $key => $value) {
+    if($i > $start && $i <= $stop){
+      if (in_array($key, $favorite_order_id)){
+          //set type favorite
+          $value->type = "favorite";
+          //get favorite order value
+          $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
+      }
+      else {
+        //set type order
+        $value->type = "order";
+        //get latest order value if favorite is more than 0
+        $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
+      }
+    }
+    $i++;
+  }
+  
+  //merge favorite and latest order data into one container
+  $order_container = array_merge($favorite_order_container,$latest_order_container);
+
+  //change the returned format
+  $order_container = apps_services_v2_transaction_change_format_order($order_container);
+  
+  if(count($order_container)){
+    $return["status"] = true;
+    $return["message"] = "Order list history pengguna";
+    $return["data"] = $order_container;
+  }
+  else{
+    $return["status"] = false;
+    $return["message"] = "Order list tidak ditemukan";
+    $return["data"] = null;
+  }
+  
+  return $return;
+}
+
+/*
  * get the list of favorite order or latest order (maximum 5)
  * might also have product promotion data on it (currently excluded for now)
  */
@@ -119,7 +277,6 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   }
   
   //check if favorite order already more than "$size", if still less then get latest order to complement
-  $latest_order_list = "";
   $number_of_latest_order_needed = 0;
   if($count_favorite_order < $size){
     $number_of_latest_order_needed = $size - $count_favorite_order;
@@ -165,6 +322,9 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
     }
   }
   
+  //change the returned format
+  $order_container = apps_services_v2_transaction_change_format_order($order_container);
+  
   if(count($order_container)){
     $return["status"] = true;
     $return["message"] = "Order list halaman home pengguna";
@@ -187,7 +347,6 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   
   return $return;
 }
-
 
 function apps_services_v2_transaction_format_order_home($order) {
   // Get order wrapper.

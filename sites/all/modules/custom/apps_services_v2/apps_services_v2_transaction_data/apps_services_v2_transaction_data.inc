@@ -135,7 +135,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
         //set type favorite
         $value->type = "favorite";
         //get favorite order value
-        $favorite_order_container[] = $value;
+        $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
         $count_favorite_container++;
       }
     }
@@ -143,7 +143,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
       //set type order
       $value->type = "order";
       //get latest order value if favorite is more than 0
-      $latest_order_container[] = $value;
+      $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
       $number_of_latest_order_needed--;
     }
   }
@@ -159,7 +159,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
         //set type order
         $value->type = "order";
         //get latest order value
-        $order_container[] = $value;
+        $order_container[] = apps_services_v2_transaction_format_order_home($value);
         $i++;
       }
     }
@@ -186,4 +186,36 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   }
   
   return $return;
+}
+
+
+function apps_services_v2_transaction_format_order_home($order) {
+  // Get order wrapper.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Proccess order line item: remove language none (und).
+  $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
+  // Looping foreach line item.
+  foreach ((array) $order->commerce_line_items as $key => $line_item) {
+    $order->commerce_line_items[$key] = order_services_line_item($line_item);
+  }
+
+  // Proccess order total: remove language none (und).
+  $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
+
+  // Support for iOS pln prepaid.
+  if (isset($order->commerce_line_items) && !empty($order->commerce_line_items)) {
+    foreach ($order->commerce_line_items as $lid => $line_item) {
+      if (isset($line_item->type) && $line_item->type == 'pln_prepaid') {
+        $order->commerce_line_items[$lid]->type = 'electricity_prepaid';
+        if (isset($order->commerce_line_items[$lid]->commerce_product->type)) {
+          $order->commerce_line_items[$lid]->commerce_product->type = 'electricity_prepaid';
+        }
+      }
+  elseif(isset($line_item->type) && ($line_item->type == 'coupon' || $line_item->type == 'userpoints' || $line_item->type == 'fee')){
+        unset($order->commerce_line_items[$lid]);
+      }
+    }
+  }
+  
+  return $order;
 }

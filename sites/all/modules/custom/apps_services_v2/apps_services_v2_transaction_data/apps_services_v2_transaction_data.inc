@@ -173,15 +173,15 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   else{
     $return["status"] = false;
     $return["message"] = "Order list halaman home tidak ditemukan";
-    $return["data"] = array();
+    $return["data"] = null;
   }
   
   //check if needed to include email request
-  $return["data"]["request_email"] = "";
+  $return["request_email"] = "";
   if(isset($user->mail) && !empty($user->mail)){
     $mail = explode("@", $user->mail);
     if (isset($mail[1]) && !empty($mail[1]) && strpos($mail[1], '.dummy') !== false) {
-      $return["data"]["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
+      $return["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
     }
   }
   

@@ -2726,6 +2726,7 @@ button[disabled=disabled]
 {
     background: none !important;
     background-image: url(../images/material/trash_ico.png) !important;
+    background-repeat: no-repeat !important;
 }
 
 section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {

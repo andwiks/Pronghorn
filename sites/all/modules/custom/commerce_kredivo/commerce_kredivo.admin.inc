@@ -119,6 +119,8 @@ function commerce_kredivo_cancel_form_submit($form, &$form_state) {
     $stream_context = stream_context_create(array(
       'ssl' => array(
         'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
+        'verify_peer' => FALSE,
+        'verify_host' => FALSE,
       ),
     ));
   }
@@ -296,6 +298,8 @@ function commerce_kredivo_confirm_form_submit($form, &$form_state) {
     $stream_context = stream_context_create(array(
       'ssl' => array(
         'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
+        'verify_peer' => FALSE,
+        'verify_host' => FALSE,
       ),
     ));
   }

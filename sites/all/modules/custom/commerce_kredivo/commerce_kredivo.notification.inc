@@ -87,6 +87,8 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
           $stream_context = stream_context_create(array(
             'ssl' => array(
               'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
+              'verify_peer' => FALSE,
+              'verify_host' => FALSE,
             ),
           ));
         }

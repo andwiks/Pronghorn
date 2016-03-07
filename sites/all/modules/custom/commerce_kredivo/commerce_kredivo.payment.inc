@@ -356,6 +356,8 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     $stream_context = stream_context_create(array(
       'ssl' => array(
         'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
+        'verify_peer' => FALSE,
+        'verify_host' => FALSE,
       ),
     ));
   }

@@ -181,8 +181,12 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
     $favorite_order_id[] = $usage->order_id;
   }
   
+  //set allowed order status list
+  $allowed_cart_status = array("pending", "processing", "invoiced", "completed");
+  
   //get order list
   $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));
+  
   //set order desc
   $order_list = array_reverse($order_list,true);
   
@@ -193,22 +197,26 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
   $favorite_order_container = array();
   $latest_order_container = array();
   $i = 1;
+  
   foreach ($order_list as $key => $value) {
-    if($i > $start && $i <= $stop){
-      if (in_array($key, $favorite_order_id)){
-          //set type favorite
-          $value->type = "favorite";
-          //get favorite order value
-          $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
+    //include only allowed status order
+    if(isset($value->status) && in_array($value->status, $allowed_cart_status)){
+      if($i > $start && $i <= $stop){
+        if (in_array($key, $favorite_order_id)){
+            //set type favorite
+            $value->type = "favorite";
+            //get favorite order value
+            $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
+        }
+        else {
+          //set type order
+          $value->type = "order";
+          //get latest order value if favorite is more than 0
+          $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
+        }
       }
-      else {
-        //set type order
-        $value->type = "order";
-        //get latest order value if favorite is more than 0
-        $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
-      }
+      $i++;
     }
-    $i++;
   }
   
   //merge favorite and latest order data into one container
@@ -268,6 +276,9 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   //set order desc
   $order_list = array_reverse($order_list,true);
   
+  //set allowed order status list
+  $allowed_cart_status = array("pending", "processing", "invoiced", "completed");
+  
   //check how many favourite available in the return order list
   $count_favorite_order = 0;
   foreach ($order_list as $key => $value) {
@@ -287,21 +298,24 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   $latest_order_container = array();
   $count_favorite_container = 0;
   foreach ($order_list as $key => $value) {
-    if (in_array($key, $favorite_order_id)){
-      if($count_favorite_container < $size){
-        //set type favorite
-        $value->type = "favorite";
-        //get favorite order value
-        $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
-        $count_favorite_container++;
+    //include only allowed status order
+    if(isset($value->status) && in_array($value->status, $allowed_cart_status)){
+      if (in_array($key, $favorite_order_id)){
+        if($count_favorite_container < $size){
+          //set type favorite
+          $value->type = "favorite";
+          //get favorite order value
+          $favorite_order_container[] = apps_services_v2_transaction_format_order_home($value);
+          $count_favorite_container++;
+        }
       }
-    }
-    elseif ($favorite_only == 0 && $number_of_latest_order_needed > 0) {
-      //set type order
-      $value->type = "order";
-      //get latest order value if favorite is more than 0
-      $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
-      $number_of_latest_order_needed--;
+      elseif ($favorite_only == 0 && $number_of_latest_order_needed > 0) {
+        //set type order
+        $value->type = "order";
+        //get latest order value if favorite is more than 0
+        $latest_order_container[] = apps_services_v2_transaction_format_order_home($value);
+        $number_of_latest_order_needed--;
+      }
     }
   }
   
@@ -312,12 +326,15 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   $i = 0;
   if($favorite_only == 0 && !count($order_container)){  
     foreach ($order_list as $key => $value) {
-      if ($i < $size){
-        //set type order
-        $value->type = "order";
-        //get latest order value
-        $order_container[] = apps_services_v2_transaction_format_order_home($value);
-        $i++;
+      //include only allowed status order
+      if(isset($value->status) && in_array($value->status, $allowed_cart_status)){
+        if ($i < $size){
+          //set type order
+          $value->type = "order";
+          //get latest order value
+          $order_container[] = apps_services_v2_transaction_format_order_home($value);
+          $i++;
+        }
       }
     }
   }

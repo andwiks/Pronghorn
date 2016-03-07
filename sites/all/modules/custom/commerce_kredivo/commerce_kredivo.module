@@ -38,8 +38,9 @@ function commerce_kredivo_menu() {
   $items = array();
 
   // Define an always accessible path to receive push notification.
-  $items['commerce_kredivo/notification'] = array(
+  $items['commerce_kredivo/notification/%commerce_order/%commerce_payment_transaction'] = array(
     'page callback' => 'commerce_kredivo_notification',
+    'page arguments' => array(2, 3),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
     'file' => 'commerce_kredivo.notification.inc',

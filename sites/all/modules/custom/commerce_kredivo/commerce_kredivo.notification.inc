@@ -12,8 +12,13 @@
 
 /**
  * Function commerce_kredivo_notification().
+ *
+ * @param object $order
+ *   Order object.
+ * @param object $transaction
+ *   Payment transaction object.
  */
-function commerce_kredivo_notification() {
+function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
   // Log this condition.
   $input = array();
   // Check input: GET.
@@ -27,8 +32,10 @@ function commerce_kredivo_notification() {
   }
 
   // Log this condition.
-  watchdog('commerce_kredivo', 'Kredivo Push Notification Data. <pre>Input: @input</pre>', array(
+  watchdog('commerce_kredivo', 'Kredivo Push Notification Data. <pre>Input: @input</pre><pre>Order: @order</pre><pre>Transaction: @transaction</pre>', array(
     '@input' => print_r($input, TRUE),
+    '@order' => print_r($order, TRUE),
+    '@transaction' => print_r($transaction, TRUE),
   ), WATCHDOG_INFO);
 
   // Check input post from Kredivo.
@@ -40,14 +47,8 @@ function commerce_kredivo_notification() {
       && isset($kredivo->transaction_id) && isset($kredivo->transaction_status)
       && isset($kredivo->transaction_time) && isset($kredivo->order_id)
       && isset($kredivo->amount) && isset($kredivo->signature_key)
+      && isset($order->order_id) && isset($transaction->transaction_id)
     ) {
-      // Get order id: remove prefix if available.
-      $order_id = preg_replace('#\D#', '', $kredivo->order_id);
-      $order_id = intval($order_id);
-
-      // Load order object.
-      $order = commerce_order_load($order_id);
-
       // Check if payment is really using Kredivo.
       if (isset($order->data['payment_method']) && strpos($order->data['payment_method'], 'kredivo') !== FALSE) {
         // Save the confirm data.
@@ -96,14 +97,13 @@ function commerce_kredivo_notification() {
           'context' => $stream_context,
         );
 
-        // @todo: create payment transaction here with status pending.
         // @todo: Add menu confirm.
         // Confirm the order status: tell kredivo the OK.
         $result = drupal_http_request($url, $request_option);
 
         // Log the result.
         watchdog('commerce_kredivo', 'Kredivo confirm order status result for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
-          '@oid' => print_r($order->order_id, TRUE),
+          '@oid' => $order->order_id,
           '@result' => print_r($result, TRUE),
           '@order' => print_r($order, TRUE),
           '@pm' => print_r($payment_method, TRUE),
@@ -123,13 +123,6 @@ function commerce_kredivo_notification() {
             && isset($confirm->transaction_time) && isset($confirm->order_id)
             && isset($confirm->amount) && isset($confirm->fraud_status)
           ) {
-            // Get order id: remove prefix if available.
-            $order_id = preg_replace('#\D#', '', $confirm->order_id);
-            $order_id = intval($order_id);
-
-            // Reload order object.
-            $order = commerce_order_load($order_id);
-
             // Save the confirm data.
             $order->data['commerce_kredivo']['confirm'][] = $confirm;
 
@@ -154,49 +147,31 @@ function commerce_kredivo_notification() {
                 break;
             }
 
-            // Check previous payment pending if any.
-            $query = new EntityFieldQuery();
-            $query->entityCondition('entity_type', 'commerce_payment_transaction')
-            ->propertyCondition('order_id', $order->order_id, '=')
-            ->propertyOrderBy('revision_id', 'DESC')
-            ->propertyCondition('remote_id', $confirm->transaction_id)
-            ->propertyCondition('amount', intval($confirm->amount), '=')
-            ->range(0, 1);
-            $result = $query->execute();
-            if (isset($result['commerce_payment_transaction']) && !empty($result['commerce_payment_transaction'])) {
-              // Load previous payment transaction.
-              $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
-              // There is possibility from settlement, status gone to cancel.
-              if ($transaction->status == COMMERCE_PAYMENT_STATUS_SUCCESS
-                && $status == COMMERCE_PAYMENT_STATUS_FAILURE
-              ) {
-                // Log this condition as error.
-                watchdog('commerce_kredivo', 'Kredivo order settlement fo failure for order @oid. <pre>Confirm: @confirm</pre><pre>Transaction: @transaction</pre><pre>Order: @order</pre>', array(
-                  '@oid' => $order->order_id,
-                  '@confirm' => print_r($confirm, TRUE),
-                  '@transaction' => print_r($transaction, TRUE),
-                  '@order' => print_r($order, TRUE),
-                ), WATCHDOG_ERROR, l(t('View Order @oid Revisions', array(
-                  '@oid' => print_r($order->order_id, TRUE),
-                )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
-              }
+            // There is possibility from settlement, status gone to cancel.
+            if ($transaction->status == COMMERCE_PAYMENT_STATUS_SUCCESS
+              && $status == COMMERCE_PAYMENT_STATUS_FAILURE
+            ) {
+              // Log this condition as error.
+              watchdog('commerce_kredivo', 'Kredivo order settlement fo failure for order @oid. <pre>Confirm: @confirm</pre><pre>Transaction: @transaction</pre><pre>Order: @order</pre>', array(
+                '@oid' => $order->order_id,
+                '@confirm' => print_r($confirm, TRUE),
+                '@transaction' => print_r($transaction, TRUE),
+                '@order' => print_r($order, TRUE),
+              ), WATCHDOG_ERROR, l(t('View Order @oid Revisions', array(
+                '@oid' => $order->order_id,
+              )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
             }
-            else {
-              // Create new payment transaction.
-              $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
-              $transaction->instance_id = $payment_method['instance_id'];
-              $transaction->remote_id = $confirm->transaction_id;
-              $transaction->amount = intval($confirm->amount);
-              $transaction->currency_code = 'IDR';
-            }
+            $transaction->remote_id = $confirm->transaction_id;
             $transaction->remote_status = $status;
+            $transaction->amount = intval($confirm->amount);
             $transaction->status = $status;
-            $transaction->message = 'Payment Data: <br />!data';
+            $transaction->message = '!status. Payment Data: <br />!data';
             $payment_data = '';
             foreach ((array) $confirm as $key => $data) {
               $payment_data[] = str_replace('_', ' ', $key) . ' = ' . $data;
             }
             $transaction->message_variables = array(
+              '!status' => $confirm->transaction_status,
               '!data' => implode('<br />', $payment_data),
             );
             // Save payment transaction.
@@ -204,12 +179,12 @@ function commerce_kredivo_notification() {
 
             // Log the result.
             watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
-              '@oid' => print_r($order->order_id, TRUE),
+              '@oid' => $order->order_id,
               '@transaction' => print_r($transaction, TRUE),
               '@order' => print_r($order, TRUE),
               '@pm' => print_r($payment_method, TRUE),
             ), WATCHDOG_INFO, l(t('View Order @oid Revisions', array(
-              '@oid' => print_r($order->order_id, TRUE),
+              '@oid' => $order->order_id,
             )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
           }
         }

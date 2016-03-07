@@ -277,6 +277,8 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
 
   // Get order wrapper.
   $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Define order total.
+  $order_total = (int) $order_wrapper->commerce_order_total->amount->value();
 
   // Generate item string: Nama_Item,harga_satuan,Qty,SubTotal;
   $items = array();
@@ -293,10 +295,11 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
       $unit_price['amount'] = commerce_currency_convert($unit_price['amount'], $unit_price['currency_code'], 'IDR');
     }
     // Get item name: by default is line item label (SKU).
-    $item_name = $line_item->line_item_label;
+    $item_name = commerce_line_item_title($line_item);
+    $item_name = (empty($item_name)) ? $line_item->line_item_label : $item_name;
     // Define item.
     $item = array(
-      'product_sku' => $line_item->line_item_id,
+      'product_sku' => $line_item->line_item_label,
       'product_name' => $item_name,
       'product_price' => (int) $unit_price['amount'],
       'quantity' => (int) $line_item->quantity,
@@ -305,6 +308,18 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     $items[] = $item;
   }
 
+  // Create new payment transaction.
+  $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
+  $transaction->instance_id = $payment_method['instance_id'];
+  // Zero-ed remote id: still have no id yet.
+  $transaction->remote_id = 0;
+  $transaction->remote_status = COMMERCE_PAYMENT_STATUS_PENDING;
+  $transaction->amount = $order_total;
+  $transaction->currency_code = 'IDR';
+  $transaction->status = COMMERCE_PAYMENT_STATUS_PENDING;
+  $transaction->message = 'Checkout';
+  commerce_payment_transaction_save($transaction);
+
   // Request checkout URL here: before redirect to checkout url.
   // Define request data.
   $data = array(
@@ -312,9 +327,9 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     'order_id' => preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id,
     'user_email' => $order->mail,
     'user_phone' => isset($order->data['customer_phone']) ? $order->data['customer_phone'] : '',
-    'amount' => (int) $order_wrapper->commerce_order_total->amount->value(),
+    'amount' => $order_total,
     'items' => $items,
-    'push_uri' => url('commerce_kredivo/notification', array('absolute' => TRUE)),
+    'push_uri' => url('commerce_kredivo/notification/' . $order->order_id . '/' . $transaction->transaction_id, array('absolute' => TRUE)),
     'back_to_store_uri' => url('checkout/' . $order->order_id . '/payment/return/' . $order->data['payment_redirect_key'], array('absolute' => TRUE)),
   );
   // Define stream context: for https only.
@@ -350,8 +365,12 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
   // Log this result.
   watchdog('commerce_kredivo', 'Kredivo request checkout URL result for debug: <pre>@result</pre>', array(
     '@result' => print_r($result, TRUE),
-  ), WATCHDOG_DEBUG);
+  ), WATCHDOG_DEBUG, l(t('View Order @oid Revisions', array(
+    '@oid' => $order->order_id,
+  )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
 
+  // Define checkout message.
+  $checkout_message = '';
   // Check the result: suppose to be json string.
   // 1. Must have 200 http code.
   // 2. Must have data.
@@ -367,17 +386,31 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
       && isset($kredivo->code) && $kredivo->code == 200
       && isset($kredivo->redirect_url) && valid_url($kredivo->redirect_url, TRUE)
     ) {
-      // @todo: check if there is message returned from kredivo.
-      // @todo: create transaction here?
+      // Check if there is message returned from kredivo.
+      if (isset($kredivo->message)) {
+        $checkout_message = $kredivo->message;
+      }
+      // Set checkout url inside order data.
       $order->data['checkout_url'] = $kredivo->redirect_url;
+      // Return true: continue to redirect form.
       return TRUE;
     }
   }
 
-  // Other condition will result to redirect back to payment selection.
-  drupal_set_message(t('@payment currently unavailable.', array(
-    '@payment' => ucfirst($payment_method['title']),
-  )), 'error');
+  // Show message to customer.
+  if (!empty($checkout_message)) {
+    // Redirect back to payment selection with checkout message.
+    drupal_set_message(t('@payment currently unavailable: @reason.', array(
+      '@payment' => ucfirst($payment_method['title']),
+      '@reason' => $checkout_message,
+    )), 'error');
+  }
+  else {
+    // Other condition will result to redirect back to payment selection.
+    drupal_set_message(t('@payment currently unavailable.', array(
+      '@payment' => ucfirst($payment_method['title']),
+    )), 'error');
+  }
 
   return FALSE;
 }
@@ -411,11 +444,11 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
   // Target url for checkout is not available.
   // Log this condition: customer should not come to this section.
   watchdog('commerce_kredivo', 'Order @oid redirect to checkout URL failed: missing checkout URL. <pre>Order: @order</pre><pre>Payment Method: @pm</pre>', array(
-    '@oid' => print_r($order->order_id, TRUE),
+    '@oid' => $order->order_id,
     '@order' => print_r($order, TRUE),
     '@pm' => print_r($payment_method, TRUE),
   ), WATCHDOG_NOTICE, l(t('View Order @oid Revisions', array(
-    '@oid' => print_r($order->order_id, TRUE),
+    '@oid' => $order->order_id,
   )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
   // Show an error message to customer.
   drupal_set_message(t('Redirect to @payment Checkout failed. Please try again or contact an administrator to resolve the issue.', array(
@@ -499,13 +532,19 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
 
   // Log this condition.
   watchdog('commerce_kredivo', 'Customer order @oid returned from Kredivo. <pre>Input: @input</pre><pre>Order: @order</pre><pre>Payment Method: @pm</pre>', array(
-    '@oid' => print_r($order->order_id, TRUE),
+    '@oid' => $order->order_id,
     '@input' => print_r($input, TRUE),
     '@order' => print_r($order, TRUE),
     '@pm' => print_r($payment_method, TRUE),
   ), WATCHDOG_INFO, l(t('View Order @oid Revisions', array(
-    '@oid' => print_r($order->order_id, TRUE),
+    '@oid' => $order->order_id,
   )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
-  // Notify customer that kredivo is processing the order.
-  drupal_set_message(t('Your payment request has been submitted.'), 'warning');
+
+  // Check whether order has paid.
+  if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])
+    && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
+  )) {
+    // Notify customer that kredivo is processing the order.
+    drupal_set_message(t('Your payment request has been submitted.'), 'warning');
+  }
 }

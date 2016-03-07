@@ -172,8 +172,12 @@ function commerce_kredivo_cancel_form_submit($form, &$form_state) {
       && isset($kredivo->transaction_time) && isset($kredivo->order_id)
       && isset($kredivo->amount)
     ) {
+      // Change success flag.
       $success = TRUE;
+      // Show message to admin.
       drupal_set_message(t('Cancel operation has been submitted.'));
+      // Redirect to payment page.
+      $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/payment';
     }
   }
   // Check if unable to do cancel operation.
@@ -396,6 +400,8 @@ function commerce_kredivo_confirm_form_submit($form, &$form_state) {
       drupal_set_message(t('Confirm operation has been submitted.'));
       // Change success flag.
       $success = TRUE;
+      // Redirect to payment page.
+      $form_state['redirect'] = 'admin/commerce/orders/' . $order->order_id . '/payment';
     }
   }
   // Check if unable to do cancel operation.

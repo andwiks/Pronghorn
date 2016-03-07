@@ -86,6 +86,7 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
         ) {
           $stream_context = stream_context_create(array(
             'ssl' => array(
+              'SNI_enabled' => FALSE,
               'verify_peer' => FALSE,
               'verify_host' => FALSE,
             ),

@@ -340,6 +340,7 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
   ) {
     $stream_context = stream_context_create(array(
       'ssl' => array(
+        'SNI_enabled' => FALSE,
         'verify_peer' => FALSE,
         'verify_host' => FALSE,
       ),

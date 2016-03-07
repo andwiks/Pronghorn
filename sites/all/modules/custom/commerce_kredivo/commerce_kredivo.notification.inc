@@ -97,7 +97,6 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
           'context' => $stream_context,
         );
 
-        // @todo: Add menu confirm.
         // Confirm the order status: tell kredivo the OK.
         $result = drupal_http_request($url, $request_option);
 

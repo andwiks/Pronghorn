@@ -16,13 +16,12 @@
 function commerce_kredivo_commerce_payment_method_info() {
   $payment_methods = array();
 
-  // @todo: check whether terminal is possible.
   $payment_methods['commerce_kredivo'] = array(
     'base' => 'commerce_kredivo',
     'title' => t('Kredivo Payment Gateway'),
     'short_title' => t('Kredivo'),
     'description' => t('Kredivo Payment Gateway Integration'),
-    'terminal' => FALSE,
+    'terminal' => TRUE,
     'offsite' => TRUE,
     'offsite_autoredirect' => TRUE,
     'file' => 'commerce_kredivo.payment.inc',
@@ -46,5 +45,66 @@ function commerce_kredivo_menu() {
     'file' => 'commerce_kredivo.notification.inc',
   );
 
+  // Add a menu item for cancel transaction.
+  $items['admin/commerce/orders/%commerce_order/payment/%commerce_payment_transaction/kredivo-cancel'] = array(
+    'title' => 'Cancel Kredivo',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('commerce_kredivo_cancel_form', 3, 5),
+    'access callback' => 'commerce_kredivo_transaction_cancel_access',
+    'access arguments' => array(3, 5),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'context' => MENU_CONTEXT_INLINE,
+    'file' => 'commerce_kredivo.admin.inc',
+  );
+
   return $items;
+}
+
+/**
+ * Implements hook_menu_contextual_links_alter().
+ */
+function commerce_kredivo_menu_contextual_links_alter(&$links, $router_item, $root_path) {
+  // Check for payment transaction approve|cancel links.
+  if (isset($links['commerce-payment-transaction-kredivo-cancel'])) {
+    // Get order object.
+    $order = $router_item['page_arguments'][0];
+    // Get payment transaction.
+    $transaction = $router_item['page_arguments'][1];
+    // 1. Check payment kredivo.
+    // 2. Check transaction status: pending.
+    // 3. Check payment remote id: not zero.
+    // 4. Check payment expiration time.
+    // @todo: check requirement no. 4.
+    if (!(isset($transaction->payment_method)
+      && $transaction->payment_method == 'commerce_kredivo'
+      &&  $transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
+      && !empty($transaction->remote_id)
+    )) {
+      unset($links['commerce-payment-transaction-kredivo-cancel']);
+    }
+  }
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function commerce_kredivo_transaction_cancel_access().
+ *
+ * @param object $order
+ *   Order object.
+ * @param object $transaction
+ *   Payment transaction object.
+ */
+function commerce_kredivo_transaction_cancel_access($order, $transaction = NULL) {
+  $access = commerce_payment_transaction_access('update', $transaction);
+  if ($access && $transaction) {
+    if (isset($transaction->payment_method)
+      && $transaction->payment_method != 'commerce_kredivo'
+    ) {
+      $access = FALSE;
+    }
+  }
+  return $access;
 }

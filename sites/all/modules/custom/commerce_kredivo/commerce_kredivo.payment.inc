@@ -308,18 +308,33 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     $items[] = $item;
   }
 
-  // Create new payment transaction.
-  $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
-  $transaction->instance_id = $payment_method['instance_id'];
-  // Zero-ed remote id: still have no id yet.
-  $transaction->remote_id = 0;
-  $transaction->remote_status = COMMERCE_PAYMENT_STATUS_PENDING;
-  $transaction->amount = $order_total;
-  $transaction->currency_code = 'IDR';
-  $transaction->status = COMMERCE_PAYMENT_STATUS_PENDING;
-  $transaction->message = 'Checkout';
-  commerce_payment_transaction_save($transaction);
-
+  // Check previous payment pending if any.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'commerce_payment_transaction')
+    ->propertyCondition('order_id', $order->order_id, '=')
+    ->propertyOrderBy('revision_id', 'DESC')
+    ->propertyCondition('remote_id', '0')
+    ->propertyCondition('remote_status', COMMERCE_PAYMENT_STATUS_PENDING)
+    ->propertyCondition('amount', $order_total, '=')
+    ->range(0, 1);
+  $result = $query->execute();
+  if (isset($result['commerce_payment_transaction']) && !empty($result['commerce_payment_transaction'])) {
+    // Load previous payment transaction.
+    $transaction = commerce_payment_transaction_load(key($result['commerce_payment_transaction']));
+  }
+  else {
+    // Create new payment transaction.
+    $transaction = commerce_payment_transaction_new($payment_method['method_id'], $order->order_id);
+    $transaction->instance_id = $payment_method['instance_id'];
+    // Zero-ed remote id: still have no id yet.
+    $transaction->remote_id = 0;
+    $transaction->remote_status = COMMERCE_PAYMENT_STATUS_PENDING;
+    $transaction->amount = $order_total;
+    $transaction->currency_code = 'IDR';
+    $transaction->status = COMMERCE_PAYMENT_STATUS_PENDING;
+    $transaction->message = 'Checkout';
+    commerce_payment_transaction_save($transaction);
+  }
   // Request checkout URL here: before redirect to checkout url.
   // Define request data.
   $data = array(
@@ -364,8 +379,10 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
   $result = drupal_http_request($payment_method['settings']['server_url'] . '/get_checkout_url', $request_option);
 
   // Log this result.
-  watchdog('commerce_kredivo', 'Kredivo request checkout URL result for debug: <pre>@result</pre>', array(
+  watchdog('commerce_kredivo', 'Kredivo request checkout URL result for debug: <pre>@result</pre><pre>@pm</pre><pre>@request</pre>', array(
     '@result' => print_r($result, TRUE),
+    '@pm' => print_r($payment_method, TRUE),
+    '@request' => print_r($request_option, TRUE),
   ), WATCHDOG_DEBUG, l(t('View Order @oid Revisions', array(
     '@oid' => $order->order_id,
   )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));

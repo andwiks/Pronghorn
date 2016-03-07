@@ -80,8 +80,8 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
 
         // Define stream context: for https only.
         $stream_context = array();
-        if (isset($payment_method['settings']['debug']['verify_https'])
-          && !empty($payment_method['settings']['debug']['verify_https'])
+        if (isset($payment_method['settings']['debug']['disable_verify_https'])
+          && !empty($payment_method['settings']['debug']['disable_verify_https'])
           && strpos($payment_method['settings']['server_url'], 'https') === 0
         ) {
           $stream_context = stream_context_create(array(

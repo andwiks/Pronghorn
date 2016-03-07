@@ -100,7 +100,7 @@ function commerce_kredivo_settings_form($settings = array()) {
   $form['debug']['disable_verify_https'] = array(
     '#type' => 'checkbox',
     '#title' => t('Disable HTTPS verify peer.'),
-    '#default_value' => (isset($settings['debug']['verify_https'])) ? $settings['debug']['verify_https'] : FALSE,
+    '#default_value' => (isset($settings['debug']['disable_verify_https'])) ? $settings['debug']['disable_verify_https'] : FALSE,
     '#description' => t('At development environment, HTTPS may be a problem.'),
   );
   $form['debug']['request_timeout'] = array(
@@ -349,8 +349,8 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
   );
   // Define stream context: for https only.
   $stream_context = array();
-  if (isset($payment_method['settings']['debug']['verify_https'])
-    && !empty($payment_method['settings']['debug']['verify_https'])
+  if (isset($payment_method['settings']['debug']['disable_verify_https'])
+    && !empty($payment_method['settings']['debug']['disable_verify_https'])
     && strpos($payment_method['settings']['server_url'], 'https') === 0
   ) {
     $stream_context = stream_context_create(array(

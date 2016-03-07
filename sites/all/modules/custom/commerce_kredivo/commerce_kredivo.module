@@ -52,7 +52,7 @@ function commerce_kredivo_menu() {
     'page arguments' => array('commerce_kredivo_confirm_form', 3, 5),
     'access callback' => 'commerce_kredivo_transaction_access',
     'access arguments' => array(3, 5),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'file' => 'commerce_kredivo.admin.inc',
   );
@@ -64,7 +64,7 @@ function commerce_kredivo_menu() {
     'page arguments' => array('commerce_kredivo_cancel_form', 3, 5),
     'access callback' => 'commerce_kredivo_transaction_access',
     'access arguments' => array(3, 5),
-    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'type' => MENU_LOCAL_TASK,
     'context' => MENU_CONTEXT_INLINE,
     'file' => 'commerce_kredivo.admin.inc',
   );
@@ -98,7 +98,7 @@ function commerce_kredivo_menu_contextual_links_alter(&$links, $router_item, $ro
     }
     if (!(isset($transaction->payment_method)
       && $transaction->payment_method == 'commerce_kredivo'
-      &&  $transaction->status == COMMERCE_PAYMENT_STATUS_SUCCESS
+      && $transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
     )) {
       unset($links['commerce-payment-transaction-kredivo-confirm']);
     }

@@ -83,7 +83,7 @@ function apps_services_v2_transaction_change_format_order($order_container){
     $temp_array_data = array();
     $temp_array_data["order_id"] = $order->order_id;
     $temp_array_data["mail"] = $order->mail;
-    $temp_array_data["status"] = $order->status;
+    $temp_array_data["order_status"] = $order->status;
     $temp_array_data["created"] = $order->created;
     $temp_array_data["amount"] = $order->commerce_order_total['amount'];
     $temp_array_data["currency_code"] = $order->commerce_order_total['currency_code'];

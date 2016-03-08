@@ -128,3 +128,78 @@ function commerce_kredivo_transaction_access($order, $transaction = NULL) {
   }
   return $access;
 }
+
+/**
+ * Function commerce_kredivo_api().
+ *
+ * @param string $data
+ *   Payment data.
+ * @param array $settings
+ *   Payment API settings.
+ *
+ * @return array
+ *   With key: result(json string), error, info.
+ */
+function commerce_kredivo_api($data, $settings) {
+  // Define return value.
+  $return = array(
+    'result' => '',
+    'error' => '',
+    'info' => '',
+  );
+
+  // Sanitize server url.
+  $settings['server_url'] = preg_replace('#\/$#', '', $settings['server_url']);
+  // Define target url.
+  $target_url = $settings['server_url'] . '/' . $settings['url'];
+  // Check if method is GET.
+  if ($settings['method'] == 'GET') {
+    $target_url .= (strpos($target_url, '?') === FALSE) ? '?' . $data : '&' . $data;
+  }
+
+  // Initiate cURL.
+  $ch = curl_init();
+  curl_setopt($ch, CURLOPT_URL, $target_url);
+  // Check request method.
+  if ($settings['method'] == 'POST') {
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+      'Content-Type: application/json',
+      'Accept: application/json',
+    ));
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+  }
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+  curl_setopt($ch, CURLOPT_TIMEOUT, $settings['debug']['request_timeout']);
+  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
+  // Check if url target is https.
+  if (strpos($settings['server_url'], 'https') === 0) {
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $settings['debug']['disable_verify_https']);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $settings['debug']['disable_verify_https']);
+  }
+  // Execute cURL.
+  $return['result'] = curl_exec($ch);
+  // Get cURL info.
+  $return['info'] = curl_getinfo($ch);
+  // Get cURL error.
+  $return['error'] = curl_error($ch);
+
+  // Close cURL resource, and free up system resources.
+  curl_close($ch);
+
+  // Check debug mode.
+  if (!empty($settings['debug']['debug_mode'])) {
+    // Log this condition, everything get log as debug.
+    watchdog('commerce_kredivo', 'Kredivo Send API to @url. Debug <pre>Result: !result</pre><pre>Data: @data</pre><pre>Settings: @settings</pre>', array(
+      '@url' => $settings['url'],
+      '!result' => print_r($return, TRUE),
+      '@data' => print_r($data, TRUE),
+      '@settings' => print_r($settings, TRUE),
+    ), WATCHDOG_DEBUG, l(t('Kredivo API: @op', array(
+      '@op' => $settings['url'],
+    )), request_path()));
+  }
+
+  // Return it.
+  return $return;
+}

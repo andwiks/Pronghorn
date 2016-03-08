@@ -36,7 +36,7 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
     '@input' => print_r($input, TRUE),
     '@order' => print_r($order, TRUE),
     '@transaction' => print_r($transaction, TRUE),
-  ), WATCHDOG_INFO);
+  ), WATCHDOG_INFO, 'Kredivo Push Notification');
 
   // Check input post from Kredivo.
   if (isset($input['post']) && !empty($input['post'])) {
@@ -56,67 +56,40 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
         // Save order data.
         commerce_order_save($order);
 
-        // Save this push notification data inside order.
-        watchdog('commerce_kredivo', 'Kredivo Push Notification Debug <pre>Input: @input</pre><pre>Kredivo: @kredivo</pre><pre>Order: @order</pre>', array(
-          '@input' => print_r($input, TRUE),
-          '@kredivo' => print_r($kredivo, TRUE),
-          '@order' => print_r($order, TRUE),
-        ), WATCHDOG_DEBUG);
-
         // Load payment method data.
         $payment_method = commerce_payment_method_instance_load($order->data['payment_method']);
 
-        // Sanitize $payment_method['settings']['server_url'].
-        $payment_method['settings']['server_url'] = preg_replace('#\/$#', '', $payment_method['settings']['server_url']);
-
-        // Define target update url: add query data.
-        $url = url($payment_method['settings']['server_url'] . '/update', array(
-          'query' => array(
-            'tr_id' => $kredivo->transaction_id,
-            'signature_key' => $kredivo->signature_key,
-          ),
-          'external' => TRUE,
-        ));
-
-        // Define stream context: for https only.
-        $stream_context = array();
-        if (isset($payment_method['settings']['debug']['disable_verify_https'])
-          && !empty($payment_method['settings']['debug']['disable_verify_https'])
-          && strpos($payment_method['settings']['server_url'], 'https') === 0
-        ) {
-          $stream_context = stream_context_create(array(
-            'ssl' => array(
-              'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
-              'verify_peer' => FALSE,
-              'verify_host' => FALSE,
-            ),
-          ));
+        // Check debug mode.
+        if (!empty($payment_method['settings']['debug']['debug_mode'])) {
+          // Save this push notification data inside order.
+          watchdog('commerce_kredivo', 'Kredivo Push Notification Debug <pre>Input: @input</pre><pre>Kredivo: @kredivo</pre><pre>Order: @order</pre>', array(
+            '@input' => print_r($input, TRUE),
+            '@kredivo' => print_r($kredivo, TRUE),
+            '@order' => print_r($order, TRUE),
+          ), WATCHDOG_DEBUG, l(t('View Order @oid Revisions', array(
+            '@oid' => $order->order_id,
+          )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
         }
-        // Build request option.
-        $request_option = array(
-          'timeout' => (isset($payment_method['settings']['debug']['request_timeout']) && !empty($payment_method['settings']['debug']['request_timeout'])) ? (float) $payment_method['settings']['debug']['request_timeout'] : 30.0,
-          'context' => $stream_context,
+
+        // Define data to update.
+        $data = array(
+          'tr_id' => $kredivo->transaction_id,
+          'signature_key' => $kredivo->signature_key,
         );
+        $data = drupal_http_build_query($data);
+
+        // Build request option.
+        $request_option = $payment_method['settings'];
+        $request_option['method'] = 'GET';
+        $request_option['url'] = 'update';
 
         // Confirm the order status: tell kredivo the OK.
-        $result = drupal_http_request($url, $request_option);
-
-        // Log the result.
-        watchdog('commerce_kredivo', 'Kredivo confirm order status result for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
-          '@oid' => $order->order_id,
-          '@result' => print_r($result, TRUE),
-          '@order' => print_r($order, TRUE),
-          '@pm' => print_r($payment_method, TRUE),
-        ), WATCHDOG_INFO);
+        $result = commerce_kredivo_api($data, $request_option);
 
         // Check the result: suppose to be json string.
-        // 1. Must have 200 http code.
-        // 2. Must have data.
-        if (isset($result->code) && $result->code == 200
-          && isset($result->data) && !empty($result->data)
-        ) {
+        if (isset($result['result']) && !empty($result['result'])) {
           // Decode the string.
-          $confirm = json_decode($result->data);
+          $confirm = json_decode($result['result']);
           // Validate kredivo checkout data.
           if (!empty($confirm) && isset($confirm->status) && $confirm->status == 'OK'
             && isset($confirm->transaction_id) && isset($confirm->transaction_status)

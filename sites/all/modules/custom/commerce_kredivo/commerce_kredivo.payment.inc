@@ -96,6 +96,13 @@ function commerce_kredivo_settings_form($settings = array()) {
     '#type' => 'fieldset',
     '#title' => t('Debug Options'),
   );
+  // Debug mode?
+  $form['debug']['debug_mode'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Debug Mode'),
+    '#default_value' => (isset($settings['debug']['debug_mode'])) ? $settings['debug']['debug_mode'] : FALSE,
+    '#description' => t('Produce more log for debug.'),
+  );
   // Ask to verify server?
   $form['debug']['disable_verify_https'] = array(
     '#type' => 'checkbox',
@@ -347,56 +354,23 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     'push_uri' => url('commerce_kredivo/notification/' . $order->order_id . '/' . $transaction->transaction_id, array('absolute' => TRUE)),
     'back_to_store_uri' => url('checkout/' . $order->order_id . '/payment/return/' . $order->data['payment_redirect_key'], array('absolute' => TRUE)),
   );
-  // Define stream context: for https only.
-  $stream_context = array();
-  if (isset($payment_method['settings']['debug']['disable_verify_https'])
-    && !empty($payment_method['settings']['debug']['disable_verify_https'])
-    && strpos($payment_method['settings']['server_url'], 'https') === 0
-  ) {
-    $stream_context = stream_context_create(array(
-      'ssl' => array(
-        'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
-        'verify_peer' => FALSE,
-        'verify_host' => FALSE,
-      ),
-    ));
-  }
-  // Build request option.
-  $request_option = array(
-    'headers' => array(
-      'Content-Type' => 'application/json',
-      'Accept' => 'application/json',
-    ),
-    'method' => 'POST',
-    'max_redirects' => 0,
-    'timeout' => (isset($payment_method['settings']['debug']['request_timeout']) && !empty($payment_method['settings']['debug']['request_timeout'])) ? (float) $payment_method['settings']['debug']['request_timeout'] : 30.0,
-    'data' => (!empty($data)) ? json_encode($data) : '',
-    'context' => $stream_context,
-  );
-  // Sanitize $payment_method['settings']['server_url'].
-  $payment_method['settings']['server_url'] = preg_replace('#\/$#', '', $payment_method['settings']['server_url']);
-  // Do http request for checkout url.
-  $result = drupal_http_request($payment_method['settings']['server_url'] . '/get_checkout_url', $request_option);
+  // Encode the data with json.
+  $data = json_encode($data);
 
-  // Log this result.
-  watchdog('commerce_kredivo', 'Kredivo request checkout URL result for debug: <pre>@result</pre><pre>@pm</pre><pre>@request</pre>', array(
-    '@result' => print_r($result, TRUE),
-    '@pm' => print_r($payment_method, TRUE),
-    '@request' => print_r($request_option, TRUE),
-  ), WATCHDOG_DEBUG, l(t('View Order @oid Revisions', array(
-    '@oid' => $order->order_id,
-  )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
+  // Build request option.
+  $request_option = $payment_method['settings'];
+  $request_option['method'] = 'POST';
+  $request_option['url'] = 'get_checkout_url';
+
+  // Do http request for checkout url.
+  $result = commerce_kredivo_api($data, $request_option);
 
   // Define checkout message.
   $checkout_message = '';
   // Check the result: suppose to be json string.
-  // 1. Must have 200 http code.
-  // 2. Must have data.
-  if (isset($result->code) && $result->code == 200
-    && isset($result->data) && !empty($result->data)
-  ) {
+  if (isset($result['result']) && !empty($result['result'])) {
     // Decode the string.
-    $kredivo = json_decode($result->data);
+    $kredivo = json_decode($result['result']);
     // Validate kredivo checkout data.
     // Kredivo: status => 'success'.
     if (!empty($kredivo)
@@ -413,6 +387,11 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
       // Return true: continue to redirect form.
       return TRUE;
     }
+  }
+
+  // Check for result error.
+  if (empty($checkout_message) && !empty($result['error'])) {
+    $checkout_message = $result['error'];
   }
 
   // Show message to customer.

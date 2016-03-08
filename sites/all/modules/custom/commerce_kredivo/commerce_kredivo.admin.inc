@@ -110,60 +110,29 @@ function commerce_kredivo_cancel_form_validate($form, &$form_state) {
 function commerce_kredivo_cancel_form_submit($form, &$form_state) {
   $order = $form_state['order'];
   $payment_method = $form_state['payment_method'];
-  // Define stream context: for https only.
-  $stream_context = array();
-  if (isset($payment_method['settings']['debug']['disable_verify_https'])
-    && !empty($payment_method['settings']['debug']['disable_verify_https'])
-    && strpos($payment_method['settings']['server_url'], 'https') === 0
-  ) {
-    $stream_context = stream_context_create(array(
-      'ssl' => array(
-        'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
-        'verify_peer' => FALSE,
-        'verify_host' => FALSE,
-      ),
-    ));
-  }
+
   // Define cancel data.
   $data = array(
     'server_key' => $payment_method['settings']['server_key'],
     'order_id' => preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id,
     'transaction_id' => $form_state['values']['transaction_id'],
   );
-  // Build request option.
-  $request_option = array(
-    'headers' => array(
-      'Content-Type' => 'application/json',
-      'Accept' => 'application/json',
-    ),
-    'method' => 'POST',
-    'max_redirects' => 0,
-    'timeout' => (isset($payment_method['settings']['debug']['request_timeout']) && !empty($payment_method['settings']['debug']['request_timeout'])) ? (float) $payment_method['settings']['debug']['request_timeout'] : 30.0,
-    'data' => (!empty($data)) ? json_encode($data) : '',
-    'context' => $stream_context,
-  );
-  // Sanitize $payment_method['settings']['server_url'].
-  $payment_method['settings']['server_url'] = preg_replace('#\/$#', '', $payment_method['settings']['server_url']);
-  // Do http request for checkout url.
-  $result = drupal_http_request($payment_method['settings']['server_url'] . '/cancel', $request_option);
+  $data = json_encode($data);
 
-  // Log this result.
-  watchdog('commerce_kredivo', 'Kredivo request cancel transaction result for debug: <pre>@result</pre>', array(
-    '@result' => print_r($result, TRUE),
-  ), WATCHDOG_DEBUG, l(t('View Order @oid Revisions', array(
-    '@oid' => $order->order_id,
-  )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
+  // Build request option.
+  $request_option = $payment_method['settings'];
+  $request_option['method'] = 'POST';
+  $request_option['url'] = 'cancel';
+
+  // Do http request for cancel transaction.
+  $result = commerce_kredivo_api($data, $request_option);
 
   // Define default success flag.
   $success = FALSE;
   // Check the result: suppose to be json string.
-  // 1. Must have 200 http code.
-  // 2. Must have data.
-  if (isset($result->code) && $result->code == 200
-    && isset($result->data) && !empty($result->data)
-  ) {
+  if (isset($result['result']) && !empty($result['result'])) {
     // Decode the string.
-    $kredivo = json_decode($result->data);
+    $kredivo = json_decode($result['result']);
     // Validate kredivo checkout data.
     // Kredivo: status => 'success'.
     if (!empty($kredivo)
@@ -280,54 +249,24 @@ function commerce_kredivo_confirm_form_submit($form, &$form_state) {
   $transaction = $form_state['transaction'];
   $success = FALSE;
 
-  // Define target update url: add query data.
-  $url = url($payment_method['settings']['server_url'] . '/update', array(
-    'query' => array(
-      'tr_id' => $form_state['values']['transaction_id'],
-      'signature_key' => $form_state['values']['signature_key'],
-    ),
-    'external' => TRUE,
-  ));
-
-  // Define stream context: for https only.
-  $stream_context = array();
-  if (isset($payment_method['settings']['debug']['disable_verify_https'])
-    && !empty($payment_method['settings']['debug']['disable_verify_https'])
-    && strpos($payment_method['settings']['server_url'], 'https') === 0
-  ) {
-    $stream_context = stream_context_create(array(
-      'ssl' => array(
-        'local_cert' => drupal_get_path('module', 'commerce_kredivo') . '/cacert.pem',
-        'verify_peer' => FALSE,
-        'verify_host' => FALSE,
-      ),
-    ));
-  }
-  // Build request option.
-  $request_option = array(
-    'timeout' => (isset($payment_method['settings']['debug']['request_timeout']) && !empty($payment_method['settings']['debug']['request_timeout'])) ? (float) $payment_method['settings']['debug']['request_timeout'] : 30.0,
-    'context' => $stream_context,
+  // Define data to update.
+  $data = array(
+    'tr_id' => $form_state['values']['transaction_id'],
+    'signature_key' => $form_state['values']['signature_key'],
   );
+  $data = drupal_http_build_query($data);
+  // Build request option.
+  $request_option = $payment_method['settings'];
+  $request_option['method'] = 'GET';
+  $request_option['url'] = 'update';
 
   // Confirm the order status: tell kredivo the OK.
-  $result = drupal_http_request($url, $request_option);
-
-  // Log the result.
-  watchdog('commerce_kredivo', 'Kredivo confirm order status result for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
-    '@oid' => $order->order_id,
-    '@result' => print_r($result, TRUE),
-    '@order' => print_r($order, TRUE),
-    '@pm' => print_r($payment_method, TRUE),
-  ), WATCHDOG_INFO);
+  $result = commerce_kredivo_api($data, $request_option);
 
   // Check the result: suppose to be json string.
-  // 1. Must have 200 http code.
-  // 2. Must have data.
-  if (isset($result->code) && $result->code == 200
-    && isset($result->data) && !empty($result->data)
-  ) {
+  if (isset($result['result']) && !empty($result['result'])) {
     // Decode the string.
-    $confirm = json_decode($result->data);
+    $confirm = json_decode($result['result']);
     // Validate kredivo checkout data.
     if (!empty($confirm) && isset($confirm->status) && $confirm->status == 'OK'
       && isset($confirm->transaction_id) && isset($confirm->transaction_status)

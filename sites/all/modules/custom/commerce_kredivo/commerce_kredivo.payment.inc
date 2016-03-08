@@ -434,6 +434,12 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
   if (isset($order->data['checkout_url'])) {
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
+    // Add submit button.
+    $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Kredivo Checkout'),
+      '#weight' => 10,
+    );
     // Return the form.
     return $form;
   }

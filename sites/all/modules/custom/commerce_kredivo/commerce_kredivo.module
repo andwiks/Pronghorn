@@ -18,9 +18,9 @@ function commerce_kredivo_commerce_payment_method_info() {
 
   $payment_methods['commerce_kredivo'] = array(
     'base' => 'commerce_kredivo',
-    'title' => t('Kredivo Payment Gateway'),
+    'title' => t('Buy Now, Pay Later with Kredivo'),
     'short_title' => t('Kredivo'),
-    'description' => t('Kredivo Payment Gateway Integration'),
+    'description' => t('Buy Now, Pay Later with Kredivo'),
     'terminal' => TRUE,
     'offsite' => TRUE,
     'offsite_autoredirect' => TRUE,

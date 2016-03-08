@@ -437,7 +437,7 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Add submit button.
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Kredivo Checkout'),
+      '#value' => t('Buy Now, Pay Later with Kredivo'),
       '#weight' => 10,
     );
     // Return the form.

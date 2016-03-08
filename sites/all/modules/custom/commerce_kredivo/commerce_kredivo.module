@@ -175,7 +175,6 @@ function commerce_kredivo_api($data, $settings) {
   // Check if url target is https.
   if (strpos($settings['server_url'], 'https') === 0) {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $settings['debug']['disable_verify_https']);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $settings['debug']['disable_verify_https']);
   }
   // Execute cURL.
   $return['result'] = curl_exec($ch);

@@ -13,6 +13,7 @@
  * * Ask customer phone number at checkout.
  *
  * @todo: check for all t function, need to add context.
+ * @todo: check discount line item name.
  */
 
 /**
@@ -391,6 +392,8 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
       }
       // Set checkout url inside order data.
       $order->data['checkout_url'] = $kredivo->redirect_url;
+      // Set transaction id inside order data.
+      $order->data['transaction_id'] = $transaction->transaction_id;
       // Return true: continue to redirect form.
       return TRUE;
     }
@@ -554,11 +557,91 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
   if (isset($input['get']['tr_id']) && !empty($input['get']['tr_id'])
     && isset($input['get']['tr_status']) && !empty($input['get']['tr_status'])
     && isset($input['get']['sign_key']) && !empty($input['get']['sign_key'])
+    && isset($order->data['transaction_id'])
   ) {
     // Save the confirm data.
     $order->data['commerce_kredivo']['redirect'] = $input['get'];
     // Save order data.
     commerce_order_save($order);
+
+    // Define data to update.
+    $data = array(
+      'tr_id' => $input['get']['tr_id'],
+      'signature_key' => $input['get']['sign_key'],
+    );
+    $data = drupal_http_build_query($data);
+
+    // Build request option.
+    $request_option = $payment_method['settings'];
+    $request_option['method'] = 'GET';
+    $request_option['url'] = 'update';
+
+    // Confirm the order status: tell kredivo the OK.
+    $result = commerce_kredivo_api($data, $request_option);
+
+    // Check the result: suppose to be json string.
+    if (isset($result['result']) && !empty($result['result'])) {
+      // Decode the string.
+      $confirm = json_decode($result['result']);
+      // Validate kredivo checkout data.
+      if (!empty($confirm) && isset($confirm->status) && $confirm->status == 'OK'
+        && isset($confirm->transaction_id) && isset($confirm->transaction_status)
+        && isset($confirm->transaction_time) && isset($confirm->order_id)
+        && isset($confirm->amount) && isset($confirm->fraud_status)
+      ) {
+        // Save the confirm data.
+        $order->data['commerce_kredivo']['confirm'][] = $confirm;
+
+        // Save order data.
+        commerce_order_save($order);
+
+        // Define payment transaction status.
+        $confirm->transaction_status = strtolower($confirm->transaction_status);
+        switch ($confirm->transaction_status) {
+          case 'settlement':
+            $status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+            break;
+
+          case 'pending':
+            $status = COMMERCE_PAYMENT_STATUS_PENDING;
+            break;
+
+          case 'deny':
+          case 'cancel':
+          default:
+            $status = COMMERCE_PAYMENT_STATUS_FAILURE;
+            break;
+        }
+
+        // Load transaction.
+        $transaction = commerce_payment_transaction_load($order->data['transaction_id']);
+        $transaction->remote_id = $confirm->transaction_id;
+        $transaction->remote_status = $status;
+        $transaction->amount = intval($confirm->amount);
+        $transaction->status = $status;
+        $transaction->message = '!status. Payment Data: <br />!data';
+        $payment_data = '';
+        foreach ((array) $confirm as $key => $data) {
+          $payment_data[] = str_replace('_', ' ', $key) . ' = ' . $data;
+        }
+        $transaction->message_variables = array(
+          '!status' => $confirm->transaction_status,
+          '!data' => implode('<br />', $payment_data),
+        );
+        // Save payment transaction.
+        commerce_payment_transaction_save($transaction);
+
+        // Log the result.
+        watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
+          '@oid' => $order->order_id,
+          '@transaction' => print_r($transaction, TRUE),
+          '@order' => print_r($order, TRUE),
+          '@pm' => print_r($payment_method, TRUE),
+        ), WATCHDOG_INFO, l(t('View Order @oid Revisions', array(
+          '@oid' => $order->order_id,
+        )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
+      }
+    }
   }
 
   // Check whether order has paid.

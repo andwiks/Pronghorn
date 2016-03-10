@@ -49,7 +49,6 @@ function offline_coupon_services_resources() {
 
 function offline_coupon_resource_redeem($code, $voucher_id) {
   global $user;
-  return $user;
   // get voucher node
   $voucher = entity_metadata_wrapper('node', $voucher_id);
   if ($voucher) {

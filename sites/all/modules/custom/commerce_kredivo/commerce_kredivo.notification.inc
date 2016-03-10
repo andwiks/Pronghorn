@@ -163,6 +163,13 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
         }
       }
     }
+    else {
+      // Log it: json error.
+      watchdog('commerce_kredivo', 'Kredivo Push Notification Error with message: @message. <pre>@input</pre>', array(
+        '@message' => json_last_error_msg(),
+        '@input' => print_r($input, TRUE),
+      ), WATCHDOG_ERROR);
+    }
   }
 
   // For every request, return just json "OK".

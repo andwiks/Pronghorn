@@ -543,6 +543,20 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
     $input['post'] = $input_post;
   }
 
+  // Decode token if available.
+  if (isset($input['get']['token']) && !empty($input['get']['token'])) {
+    $input_data = base64_decode($input['get']['token']);
+    // Explode using &
+    $input_data = explode('&', $input_data);
+    // Looping foreach input data.
+    foreach ($input_data as $datum) {
+      $valid_input = explode('=', $datum);
+      if (isset($valid_input[0]) && isset($valid_input[1])) {
+        $input['get'][$valid_input[0]] = $valid_input[1];
+      }
+    }
+  }
+
   // Log this condition.
   watchdog('commerce_kredivo', 'Customer order @oid returned from Kredivo. <pre>Input: @input</pre><pre>Order: @order</pre><pre>Payment Method: @pm</pre>', array(
     '@oid' => $order->order_id,
@@ -649,6 +663,6 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
     && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
   )) {
     // Notify customer that kredivo is processing the order.
-    drupal_set_message(t('Your payment request has been submitted.'), 'warning');
+    drupal_set_message(t('Your payment request has been submitted.'));
   }
 }

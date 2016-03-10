@@ -151,8 +151,9 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
             commerce_payment_transaction_save($transaction);
 
             // Log the result.
-            watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
+            watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Transaction: @transaction</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
               '@oid' => $order->order_id,
+              '@result' => print_r($result, TRUE),
               '@transaction' => print_r($transaction, TRUE),
               '@order' => print_r($order, TRUE),
               '@pm' => print_r($payment_method, TRUE),
@@ -162,6 +163,13 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
           }
         }
       }
+    }
+    else {
+      // Log it: json error.
+      watchdog('commerce_kredivo', 'Kredivo Push Notification Error with message: @message. <pre>@input</pre>', array(
+        '@message' => json_last_error_msg(),
+        '@input' => print_r($input, TRUE),
+      ), WATCHDOG_ERROR);
     }
   }
 

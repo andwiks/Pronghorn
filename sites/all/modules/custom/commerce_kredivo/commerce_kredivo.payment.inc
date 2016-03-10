@@ -543,6 +543,20 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
     $input['post'] = $input_post;
   }
 
+  // Decode token if available.
+  if (isset($input['get']['token']) && !empty($input['get']['token'])) {
+    $input_data = base64_decode($input['get']['token']);
+    // Explode using &
+    $input_data = explode('&', $input_data);
+    // Looping foreach input data.
+    foreach ($input_data as $datum) {
+      $valid_input = explode('=', $datum);
+      if (isset($valid_input[0]) && isset($valid_input[1])) {
+        $input['get'][$valid_input[0]] = $valid_input[1];
+      }
+    }
+  }
+
   // Log this condition.
   watchdog('commerce_kredivo', 'Customer order @oid returned from Kredivo. <pre>Input: @input</pre><pre>Order: @order</pre><pre>Payment Method: @pm</pre>', array(
     '@oid' => $order->order_id,
@@ -632,8 +646,9 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
         commerce_payment_transaction_save($transaction);
 
         // Log the result.
-        watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
+        watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Transaction: @transaction</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
           '@oid' => $order->order_id,
+          '@result' => print_r($result, TRUE),
           '@transaction' => print_r($transaction, TRUE),
           '@order' => print_r($order, TRUE),
           '@pm' => print_r($payment_method, TRUE),
@@ -644,11 +659,20 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
     }
   }
 
-  // Check whether order has paid.
-  if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])
-    && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
-  )) {
-    // Notify customer that kredivo is processing the order.
-    drupal_set_message(t('Your payment request has been submitted.'), 'warning');
+  // Check if there is confirm transaction from kredivo with negative status.
+  if (isset($confirm->transaction_status) && in_array($confirm->transaction_status, array('cancel', 'deny'))) {
+    commerce_order_status_update($order, 'canceled', FALSE, NULL, t('Kredivo payment status @status.', array(
+      '@status' => $confirm->transaction_status,
+    )));
+    drupal_set_mesage(t('Your payment request has been canceled.'), 'error');
+  }
+  else {
+    // Check whether order has paid.
+    if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])
+      && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
+    )) {
+      // Notify customer that kredivo is processing the order.
+      drupal_set_message(t('Your payment request has been submitted.'));
+    }
   }
 }

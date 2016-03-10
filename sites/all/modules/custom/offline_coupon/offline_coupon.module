@@ -49,6 +49,7 @@ function offline_coupon_services_resources() {
 
 function offline_coupon_resource_redeem($code, $voucher_id) {
   global $user;
+  
   // get voucher node
   $voucher = entity_metadata_wrapper('node', $voucher_id);
   if ($voucher) {
@@ -61,6 +62,7 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
     if ($voucher->author->getIdentifier() == $user->uid &&
         $voucher->status->value() == 1) {
       $v_code = array_map('trim',explode(",", $voucher_code));
+      return $code;
       if (!in_array(strtoupper($code), $v_code)) {
         return services_error(t('Invalid merchant code'), 406);
       }

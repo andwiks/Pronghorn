@@ -1,5 +1,64 @@
 <?php
 
+/**
+ * Function apps_services_v2_payment_list_format_order().
+ * add some addtional data to order
+ *
+ * @return object
+ *   Order object.
+ */
+function apps_services_v2_payment_list_format_order($order) {
+  // Get order wrapper.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Proccess order line item: remove language none (und).
+  $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
+  // Looping foreach line item.
+  foreach ((array) $order->commerce_line_items as $key => $line_item) {
+    $data_temp = order_services_line_item($line_item);
+    $data_temp->id = $key;
+    $order->commerce_line_items[] = $data_temp;
+  }
+
+  $order->commerce_coupons = $order_wrapper->commerce_coupons->value();
+  foreach ((array) $order->commerce_coupons as &$coupon) {
+    $coupon_wrapper = entity_metadata_wrapper('commerce_coupon', $coupon);
+    $coupon->commerce_discount_reference = $coupon_wrapper->commerce_discount_reference->value();
+
+    foreach ((array) $coupon->commerce_discount_reference as &$discount) {
+      $discount_wrapper = entity_metadata_wrapper('commerce_discount', $discount);
+      $discount->commerce_discount_offer = $discount_wrapper->commerce_discount_offer->value();
+    }
+    // $order->commerce_coupons[$key] = $coupon;
+  }
+
+  // Proccess order total: remove language none (und).
+  $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
+
+  // Support for iOS pln prepaid.
+  $flag_array_changed = 0;
+  if (isset($order->commerce_line_items) && !empty($order->commerce_line_items)) {
+    foreach ($order->commerce_line_items as $lid => $line_item) {
+      if (isset($line_item->type) && $line_item->type == 'pln_prepaid') {
+        $flag_array_changed = 1;
+        $order->commerce_line_items[$lid]->type = 'electricity_prepaid';
+        if (isset($order->commerce_line_items[$lid]->commerce_product->type)) {
+          $order->commerce_line_items[$lid]->commerce_product->type = 'electricity_prepaid';
+        }
+      }
+    }
+  }
+  
+  if($flag_array_changed){
+    $data_temp_commerce_line_items = array();
+    foreach ($order->commerce_line_items as $lid => $line_item) {
+      $data_temp_commerce_line_items[] = $line_item;
+    }
+    $order->commerce_line_items = $data_temp_commerce_line_items;
+  }
+  
+  return $order;
+}
+
 /*
  * update/refresh order based on payment method
  */
@@ -29,7 +88,7 @@ function apps_services_v2_payment_list_checkout_payment($payment_method, $use_cr
     commerce_order_save($order);
     
     $return["status"] = true;
-    $return["data"] = $order;
+    $return["data"] = apps_services_v2_payment_list_format_order($order);
 
     return $return;
   }

@@ -374,7 +374,7 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     // Validate kredivo checkout data.
     // Kredivo: status => 'success'.
     if (!empty($kredivo)
-      && isset($kredivo->status) && $kredivo->status == 'success'
+      && isset($kredivo->status) && $kredivo->status == 'OK'
       && isset($kredivo->code) && $kredivo->code == 200
       && isset($kredivo->redirect_url) && valid_url($kredivo->redirect_url, TRUE)
     ) {

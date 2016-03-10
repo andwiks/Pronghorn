@@ -438,11 +438,9 @@ function apps_services_v2_services_format_order($order) {
   $order->commerce_order_total = $order_wrapper->commerce_order_total->value();
 
   // Support for iOS pln prepaid.
-  $flag_array_changed = 0;
   if (isset($order->commerce_line_items) && !empty($order->commerce_line_items)) {
     foreach ($order->commerce_line_items as $lid => $line_item) {
       if (isset($line_item->type) && $line_item->type == 'pln_prepaid') {
-        $flag_array_changed = 1;
         $order->commerce_line_items[$lid]->type = 'electricity_prepaid';
         if (isset($order->commerce_line_items[$lid]->commerce_product->type)) {
           $order->commerce_line_items[$lid]->commerce_product->type = 'electricity_prepaid';
@@ -451,13 +449,12 @@ function apps_services_v2_services_format_order($order) {
     }
   }
   
-  if($flag_array_changed){
-    $data_temp_commerce_line_items = array();
-    foreach ($order->commerce_line_items as $lid => $line_item) {
-      $data_temp_commerce_line_items[] = $line_item;
-    }
-    $order->commerce_line_items = $data_temp_commerce_line_items;
+  //change line item format to default array
+  $data_temp_commerce_line_items = array();
+  foreach ($order->commerce_line_items as $lid => $line_item) {
+    $data_temp_commerce_line_items[] = $line_item;
   }
+  $order->commerce_line_items = $data_temp_commerce_line_items;
   
   return $order;
 }

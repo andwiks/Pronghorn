@@ -853,20 +853,27 @@ function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
     $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
   }
 
+  // Try to get stock.
+  $stock = FALSE;
+  if (isset($form_state['default_product']->commerce_stock['und'][0]['value'])) {
+    $stock = intval($form_state['default_product']->commerce_stock['und'][0]['value']);
+  }
   // Modification for coupon price button.
-  if (isset($form_state['default_product']->commerce_price['und'][0]['amount'])) {
-    if (!empty($form_state['default_product']->commerce_price['und'][0]['amount'])) {
-      $float_number = floatval($form_state['default_product']->commerce_price['und'][0]['amount']);
-      $button = t('Rp @price', array(
-        '@price' => number_format($float_number, 0, ',', '.'),
-      ));
-      $rebuild['submit']['#attributes']['style'][] = 'text-transform: none;';
-      $rebuild['submit']['#value'] = $button;
-      $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
-    }
-    else {
-      $rebuild['submit']['#value'] = t('Take Voucher');
-      $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
+  if ($stock > 0 || $stock === FALSE) {
+    if (isset($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+      if (!empty($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+        $float_number = floatval($form_state['default_product']->commerce_price['und'][0]['amount']);
+        $button = t('Rp @price', array(
+          '@price' => number_format($float_number, 0, ',', '.'),
+        ));
+        $rebuild['submit']['#attributes']['style'][] = 'text-transform: none;';
+        $rebuild['submit']['#value'] = $button;
+        $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
+      }
+      else {
+        $rebuild['submit']['#value'] = t('Take Voucher');
+        $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
+      }
     }
   }
 

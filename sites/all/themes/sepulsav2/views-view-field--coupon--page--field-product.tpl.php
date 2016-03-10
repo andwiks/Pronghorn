@@ -22,17 +22,30 @@
  * regardless of any changes in the aliasing that might happen if
  * the view is modified.
  */
-if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_commerce_price[0]['raw']['amount'])) :
-  $row->field_field_product[0]['rendered']['submit']['#value'] = t('Take Voucher');
-  $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
-else :
-  $float_number = floatval($row->field_commerce_price[0]['raw']['amount']);
-  $button = t('Rp @price', array(
-    '@price' => number_format($float_number, 0, ',', '.'),
-  ));
-  $row->field_field_product[0]['rendered']['submit']['#attributes']['style'][] = 'text-transform: none;';
-  $row->field_field_product[0]['rendered']['submit']['#value'] = $button;
-  $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
+// Check stock first.
+try {
+  if (isset($row->_field_data['commerce_product_field_data_field_product_product_id']['entity'])) :
+    $entity = $row->_field_data['commerce_product_field_data_field_product_product_id']['entity'];
+    $wrapper = entity_metadata_wrapper('commerce_product', $entity);
+    $stock = $wrapper->commerce_stock->value();
+  endif;
+}
+catch (Exception $e) {
+  $stock = FALSE;
+}
+// Only if has stock or unable to get stock.
+if ($stock > 0 || $stock === FALSE) :
+  if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_commerce_price[0]['raw']['amount'])) :
+    $row->field_field_product[0]['rendered']['submit']['#value'] = t('Take Voucher');
+    $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
+  else :
+    $float_number = floatval($row->field_commerce_price[0]['raw']['amount']);
+    $button = t('Rp @price', array(
+      '@price' => number_format($float_number, 0, ',', '.'),
+    ));
+    $row->field_field_product[0]['rendered']['submit']['#attributes']['style'][] = 'text-transform: none;';
+    $row->field_field_product[0]['rendered']['submit']['#value'] = $button;
+    $row->field_field_product[0]['rendered']['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
+  endif;
 endif;
-?>
-<?php print drupal_render($row->field_field_product[0]['rendered']); ?>
+print drupal_render($row->field_field_product[0]['rendered']); ?>

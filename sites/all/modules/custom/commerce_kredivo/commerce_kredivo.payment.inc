@@ -343,10 +343,17 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     commerce_payment_transaction_save($transaction);
   }
   // Request checkout URL here: before redirect to checkout url.
+  // Define kredivo order id.
+  if (isset($payment_method['settings']['order_prefix']) && !empty($payment_method['settings']['order_prefix'])) {
+    $kredivo_order_id = preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id;
+  }
+  else {
+    $kredivo_order_id = $order->order_id;
+  }
   // Define request data.
   $data = array(
     'server_key' => $payment_method['settings']['server_key'],
-    'order_id' => preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id,
+    'order_id' => $kredivo_order_id,
     'user_email' => $order->mail,
     'user_phone' => isset($order->data['customer_phone']) ? $order->data['customer_phone'] : '',
     'amount' => $order_total,
@@ -542,6 +549,17 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
   ), WATCHDOG_INFO, l(t('View Order @oid Revisions', array(
     '@oid' => $order->order_id,
   )), 'admin/commerce/orders/' . $order->order_id . '/revisions'));
+
+  // Check if there is settlement status.
+  if (isset($input['get']['tr_id']) && !empty($input['get']['tr_id'])
+    && isset($input['get']['tr_status']) && !empty($input['get']['tr_status'])
+    && isset($input['get']['sign_key']) && !empty($input['get']['sign_key'])
+  ) {
+    // Save the confirm data.
+    $order->data['commerce_kredivo']['redirect'] = $input['get'];
+    // Save order data.
+    commerce_order_save($order);
+  }
 
   // Check whether order has paid.
   if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])

@@ -109,8 +109,6 @@ function apps_services_v2_payment_list_data($source){
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
-  
-  //$user = user_load(43);
 
   // Get user's order: do not care the result, only to satisfy drupal get form.
   $order = commerce_cart_order_load($user->uid);
@@ -166,6 +164,16 @@ function apps_services_v2_payment_list_data($source){
       }
       $value_container[$key]["type"] = "payment_option";
       $value_container[$key]["payment_code"] = $key;
+      
+      //set field value into null if data is empty
+      foreach($value_container[$key] as $field_name=>$field_value){
+        if(is_array($value_container[$key][$field_name]) && count($value_container[$key]["settings"]) < 1){
+          $value_container[$key][$field_name] = null;
+        }
+        elseif(isset($value_container[$key][$field_name]) && empty (($value_container[$key][$field_name]))){
+          $value_container[$key][$field_name] = null;
+        }
+      }
       
       //add to array payment
       $return["data"][] = $value_container[$key];

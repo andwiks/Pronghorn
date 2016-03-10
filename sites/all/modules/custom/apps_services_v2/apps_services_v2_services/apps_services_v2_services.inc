@@ -452,6 +452,15 @@ function apps_services_v2_services_format_order($order) {
   //change line item format to default array
   $data_temp_commerce_line_items = array();
   foreach ($order->commerce_line_items as $lid => $line_item) {
+    //set field value into null if data is empty
+    foreach($line_item as $field_name=>$field_value){
+      if(is_array($line_item->$field_name) && count($line_item->$field_name) < 1){
+        $line_item->$field_name = null;
+      }
+      elseif(isset($line_item->$field_name) && empty ($line_item->$field_name)){
+        $line_item->$field_name = null;
+      }
+    }
     $data_temp_commerce_line_items[] = $line_item;
   }
   $order->commerce_line_items = $data_temp_commerce_line_items;

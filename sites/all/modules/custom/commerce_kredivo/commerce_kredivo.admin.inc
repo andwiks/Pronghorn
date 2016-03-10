@@ -111,10 +111,17 @@ function commerce_kredivo_cancel_form_submit($form, &$form_state) {
   $order = $form_state['order'];
   $payment_method = $form_state['payment_method'];
 
+  // Define kredivo order id.
+  if (isset($payment_method['settings']['order_prefix']) && !empty($payment_method['settings']['order_prefix'])) {
+    $kredivo_order_id = preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id;
+  }
+  else {
+    $kredivo_order_id = $order->order_id;
+  }
   // Define cancel data.
   $data = array(
     'server_key' => $payment_method['settings']['server_key'],
-    'order_id' => preg_replace('#[^a-zA-Z]#', '', $payment_method['settings']['order_prefix']) . '-' . $order->order_id,
+    'order_id' => $kredivo_order_id,
     'transaction_id' => $form_state['values']['transaction_id'],
   );
   $data = json_encode($data);

@@ -658,11 +658,20 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
     }
   }
 
-  // Check whether order has paid.
-  if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])
-    && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
-  )) {
-    // Notify customer that kredivo is processing the order.
-    drupal_set_message(t('Your payment request has been submitted.'));
+  // Check if there is confirm transaction from kredivo with negative status.
+  if (isset($confirm->transaction_status) && in_array($confirm->transaction_status, array('cancel', 'deny'))) {
+    commerce_order_status_update($order, 'canceled', FALSE, NULL, t('Kredivo payment status @status.', array(
+      '@status' => $confirm->transaction_status,
+    )));
+    drupal_set_mesage(t('Your payment request has been canceled.'), 'error');
+  }
+  else {
+    // Check whether order has paid.
+    if (!(isset($order->data['commerce_payment_order_paid_in_full_invoked'])
+      && !empty($order->data['commerce_payment_order_paid_in_full_invoked'])
+    )) {
+      // Notify customer that kredivo is processing the order.
+      drupal_set_message(t('Your payment request has been submitted.'));
+    }
   }
 }

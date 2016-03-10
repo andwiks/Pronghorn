@@ -416,11 +416,13 @@ function apps_services_v2_services_format_order($order) {
   // Proccess order line item: remove language none (und).
   $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
   // Looping foreach line item.
+  $temp_commerce_line_items = array();
   foreach ((array) $order->commerce_line_items as $key => $line_item) {
     $data_temp = order_services_line_item($line_item);
     $data_temp->id = $key;
-    $order->commerce_line_items[] = $data_temp;
+    $temp_commerce_line_items[] = $data_temp;
   }
+  $order->commerce_line_items = $temp_commerce_line_items;
 
   $order->commerce_coupons = $order_wrapper->commerce_coupons->value();
   foreach ((array) $order->commerce_coupons as &$coupon) {

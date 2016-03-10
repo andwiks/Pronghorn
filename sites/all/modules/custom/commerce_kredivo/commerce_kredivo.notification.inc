@@ -165,6 +165,6 @@ function commerce_kredivo_notification($order = NULL, $transaction = NULL) {
     }
   }
 
-  // For every request, return just "OK".
-  exit('OK');
+  // For every request, return just json "OK".
+  exit('{"status":"OK"}');
 }

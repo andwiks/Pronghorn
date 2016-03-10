@@ -646,8 +646,9 @@ function commerce_kredivo_redirect_form_submit($order, $payment_method) {
         commerce_payment_transaction_save($transaction);
 
         // Log the result.
-        watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
+        watchdog('commerce_kredivo', 'Kredivo update payment transaction for order @oid. <pre>Result: @result</pre><pre>Transaction: @transaction</pre><pre>Order: @order</pre><pre>Payment: @pm</pre>', array(
           '@oid' => $order->order_id,
+          '@result' => print_r($result, TRUE),
           '@transaction' => print_r($transaction, TRUE),
           '@order' => print_r($order, TRUE),
           '@pm' => print_r($payment_method, TRUE),

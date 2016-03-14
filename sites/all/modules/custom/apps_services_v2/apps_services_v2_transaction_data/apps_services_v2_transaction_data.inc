@@ -120,6 +120,14 @@ function apps_services_v2_transaction_change_format_order($order_container){
       $temp_array_data["electricity_customer_number"] = null;
     }
     
+    //if the one exist is field_customer_number use it for electricity_customer_number
+    if(isset($order->commerce_line_items[0]->field_customer_number) && !empty($order->commerce_line_items[0]->field_customer_number)){
+      $temp_array_data["electricity_customer_number"] = $order->commerce_line_items[0]->field_customer_number;
+    }
+    elseif(isset($order->commerce_line_items->field_customer_number) && !empty($order->commerce_line_items->field_customer_number)){
+      $temp_array_data["electricity_customer_number"] = $order->commerce_line_items->field_customer_number;
+    }
+    
     //get electricity phone number
     if(isset($order->commerce_line_items[0]->electricity_phone_number) && !empty($order->commerce_line_items[0]->electricity_phone_number)){
       $temp_array_data["electricity_phone_number"] = $order->commerce_line_items[0]->electricity_customer_number;
@@ -128,7 +136,12 @@ function apps_services_v2_transaction_change_format_order($order_container){
       $temp_array_data["electricity_phone_number"] = $order->commerce_line_items->electricity_phone_number;
     }
     else{
-      $temp_array_data["electricity_phone_number"] = null;
+      if($temp_array_data["type"] == "electricity_prepaid"){
+        $temp_array_data["electricity_phone_number"] = $temp_array_data["field_phone_number"];
+      }
+      else{
+        $temp_array_data["electricity_phone_number"] = null;
+      }
     }
     
     //set favorite based on list data

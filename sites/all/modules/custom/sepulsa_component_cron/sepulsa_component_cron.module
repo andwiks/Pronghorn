@@ -7,18 +7,42 @@ function sepulsa_component_cron_menu() {
   $items['admin/commerce/config/scc'] = array(
     'title'            => t('Component Cron'),
     'description'      => t('Component Cron'),
-    'page callback'    => 'sepulsa_component_cron_delete_shopping_cart',
-    'access arguments' => array('content access'),
+    'page callback'    => 'sepulsa_component_cron_order_payment_failed',
+    'access arguments' => array('administer users'),
     'type'             => MENU_NORMAL_ITEM,
   );
   return $items;
 }
 /* implement hook_cron */
 function sepulsa_component_cron_cron() {
-  sepulsa_component_cron_delete_shopping_cart();
+  sepulsa_component_cron_order_payment_failed();
 }
 
 function sepulsa_component_cron_delete_shopping_cart() {
-  rules_invoke_component('rules_delete_shopping_cart');
+  global $user;
+
+  rules_invoke_component('rules_delete_shopping_cart', $user);
+
   watchdog('sepulsa_component_cron', 'execute rules_delete_shopping_cart');
+}
+
+/* select and delete order that in shopping cart more than 10 minutes */
+function sepulsa_component_cron_order_payment_failed() {
+  //get all order that still in shopping cart or checkout that the payment is padding or failed
+  $query = "SELECT commerce_order.order_id AS order_id
+  FROM
+  {commerce_order} commerce_order
+  LEFT JOIN {users} users_commerce_order ON commerce_order.uid = users_commerce_order.uid
+  LEFT JOIN {commerce_payment_transaction} commerce_payment_transaction_commerce_order ON commerce_order.order_id = commerce_payment_transaction_commerce_order.order_id
+  WHERE (( (commerce_order.status IN  ('cart', 'checkout_checkout', 'checkout_review', 'checkout_payment', 'checkout_complete')) AND (commerce_payment_transaction_commerce_order.status IN  ('pending', 'failure')) AND (users_commerce_order.access < " . strtodate('-10 minutes') . ") AND (commerce_order.mail IS NOT NULL ) AND (users_commerce_order.uid != '0') ))
+  GROUP BY order_id
+  ORDER BY order_id DESC
+  LIMIT 5 OFFSET 0";
+
+  $result = db_query($query);
+  $result = $result->fetchAll();
+  foreach ($result as $record) {
+    //delete order by order_id
+    commerce_order_delete($record->order_id);
+  }
 }

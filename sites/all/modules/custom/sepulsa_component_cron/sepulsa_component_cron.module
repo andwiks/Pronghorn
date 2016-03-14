@@ -1,6 +1,24 @@
 <?php
 
+/* implement hook_menu(). */
+function sepulsa_component_cron_menu() {
+  $items = array();
+
+  $items['admin/commerce/config/scc'] = array(
+    'title'            => t('Component Cron'),
+    'description'      => t('Component Cron'),
+    'page callback'    => 'sepulsa_component_cron_delete_shopping_cart',
+    'access arguments' => array('content access'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
 /* implement hook_cron */
-function sepulsa_component_cron() {
+function sepulsa_component_cron_cron() {
+  sepulsa_component_cron_delete_shopping_cart();
+}
+
+function sepulsa_component_cron_delete_shopping_cart() {
   rules_invoke_component('rules_delete_shopping_cart');
+  watchdog('sepulsa_component_cron', 'execute rules_delete_shopping_cart');
 }

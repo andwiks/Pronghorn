@@ -185,7 +185,7 @@ Khusus pengguna <strong>Android</strong> dengan penghasilan <strong>minimal 3 ju
 </p>
 <p>
 Berikut cara pembayaran dengan Kredivo:
-<ol style="list-style: decimal; margin-left: 13px;">
+<ol style="list-style: decimal; margin-left: 13px; line-height: 1.5em;">
 <li>Anda akan di arahkan ke halaman Checkout Kredivo dengan rincian pembelian Anda di Sepulsa.com.</li>
 <li>Jika nominal transaksi telah sesuai silahkan Login untuk melanjutkan transaksi.</li>
 <li>Login dengan cara masukkan <strong>No.Handphone yang terdaftar</strong> pada kolom yang tersedia.</li>
@@ -193,6 +193,7 @@ Berikut cara pembayaran dengan Kredivo:
 <li>Sistem akan mengirimkan kode OTP ke <strong>No.Handphone yang terdaftar</strong>, lalu masukkan kedalam kolom yang tersedia, lalu klik tombol &quot;<strong>Confirm OTP</strong>&quot;.</li>
 <li>Transaksi selesai, cek kembali status transaksi Anda di akun Sepulsa pada halaman &quot;<strong>Order Transaksi</strong>&quot;.</li>
 </ol>
+<br /><br />
 Cara mendaftar akun Krevido, ' . l(t('klik di sini'), 'metode-pembayaran-kredivo', array('attributes' => array('target'=>'_blank'))) . '.
 </p>
 ';
@@ -475,7 +476,7 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     $sepulsa_redirect_description = '
 <div style="margin: 15px auto; text-align: justify; width: 600px; line-height: 1.5em; font-size: 14px;">
 <div>
-<strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong>
+<span style="font-size: 16px;"><strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong></span>
 <ul style="list-style: square; margin-left: 13px;">
 <li>Silahkan klik Tombol &quot;<strong>OK, Lanjutkan</strong>&quot; jika Anda ingin melanjutkan transaksi dengan menggunakan Kredivo.</li>
 <li>Atau klik Tombol &quot;<strong>Cancel</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>

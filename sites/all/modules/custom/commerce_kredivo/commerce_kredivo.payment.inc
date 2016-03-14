@@ -183,7 +183,7 @@ Dengan opsi pembayaran baru Kredivo, Anda sekarang dapat membeli produk di Sepul
 Untuk melanjutkan pembayaran dengan Kredivo, pastikan Anda telah memiliki akun Kredivo yang bisa digunakan untuk transaksi. Cara mendaftar akun Krevido, ' . l(t('klik di sini'), 'faq') . '.<br /><br />
 <div>
 Berikut cara pembayaran dengan Kredivo:
-<ol>
+<ol style="list-style: decimal; margin-left: 13px;">
 <li>Anda akan di arahkan ke halaman Checkout Kredivo dengan rincian pembelian Anda di Sepulsa.com.</li>
 <li>Jika nominal transaksi telah sesuai silahkan Login untuk melanjutkan transaksi.</li>
 <li>Login dengan cara masukkan <strong>No.Handphone yang terdaftar</strong> pada kolom yang tersedia.</li>
@@ -470,6 +470,7 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
     $sepulsa_redirect_description = '
+<div style="margin: 10px auto; text-align: justify; width: 600px;">
 <div>
 &quot;<strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong>&quot;
 <ul>
@@ -477,16 +478,16 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
 <li>Atau klik Tombol &quot;<strong>Cancel</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>
 </ul>
 </div>
-<div>
+<div style="margin-top: 10px;">
 Kredivo menawarkan angsuran pembiayaan yang transparan dan sederhana untuk pembelian online Anda hanya dalam beberapa klik:
-<ol>
+<ol style="list-style: decimal; margin-left: 13px;">
 <li>Pilih opsi pembayaran Kredivo pada halaman checkout merchant dan login ke akun Anda. Tinjau rincian transaksi dan konfirmasi pembelian. Selesai!</li>
 <li>Jika Anda bukan pelanggan Kredivo, download aplikasi dan luangkan beberapa menit untuk melalui proses persetujuan. Dibutuhkan tidak lebih dari 2‐3 menit! Ketika Anda disetujui, Anda perlu untuk meng‐upload beberapa dokumen dasar KYC dan kami akan mengaktifkan akun Anda dalam waktu tidak lebih dari 24 jam dari penerimaan dokumen, setelah itu Anda dapat menggunakan Kredivo segera.</li>
 </ol>
 </div>
-<div>
+<div style="margin-top: 10px;">
 <strong>Apa yang diperlukan untuk memiliki akun Kredivo?</strong>
-<ol>
+<ol style="list-style: decimal; margin-left: 13px;">
 <li>Warga Negara Indonesia</li>
 <li>Berusia minimal 18 tahun</li>
 <li>Memiliki rekening bank</li>
@@ -494,6 +495,7 @@ Kredivo menawarkan angsuran pembiayaan yang transparan dan sederhana untuk pembe
 <li>Memberikan nomor ponsel Indonesia yang valid</li>
 <li>Memberikan nama lengkap Anda, tanggal lahir, informasi basic akun Facebook, dan nomor KTP Anda untuk membantu kami memverifikasi identitas Anda.</li>
 </ol>
+</div>
 </div>
 ';
     // Add redirect description.

@@ -514,7 +514,6 @@ Kredivo menawarkan angsuran pembiayaan yang transparan dan sederhana untuk pembe
       '#value' => t('OK, Lanjutkan'),
       '#weight' => 10,
     );
-    global $base_url;
     // Add cancel button.
     $form['cancel'] = array(
       '#prefix' => '&nbsp;',

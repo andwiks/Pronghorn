@@ -481,7 +481,7 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
 <span style="font-size: 16px;"><strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong></span>
 <ul style="list-style: square; margin-left: 13px;">
 <li>Silahkan klik Tombol &quot;<strong>OK, Lanjutkan</strong>&quot; jika Anda ingin melanjutkan transaksi dengan menggunakan Kredivo.</li>
-<li>Atau klik Tombol &quot;<strong>Cancel</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>
+<li>Atau klik Tombol &quot;<strong>Batalkan</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>
 </ul>
 </div>
 <div style="margin-top: 10px;">

@@ -471,6 +471,8 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
 function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_method) {
   // Check if checkout redirect target url is available.
   if (isset($order->data['checkout_url'])) {
+    // Add css: to remove checkout help message.
+    drupal_add_css('.checkout-help {display:none;}', 'inline');
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
     $sepulsa_redirect_description = '

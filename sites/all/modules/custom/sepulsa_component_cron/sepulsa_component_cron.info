@@ -4,4 +4,3 @@ core = "7.x"
 package = "Sepulsa"
 
 dependencies[] = rules
-dependencies[] = cron

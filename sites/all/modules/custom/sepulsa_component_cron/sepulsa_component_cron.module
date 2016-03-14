@@ -15,7 +15,7 @@ function sepulsa_component_cron_menu() {
 }
 /* implement hook_cron */
 function sepulsa_component_cron_cron() {
-  sepulsa_component_cron_order_payment_failed();
+  sepulsa_component_cron_delete_shopping_cart();
 }
 
 function sepulsa_component_cron_delete_shopping_cart() {

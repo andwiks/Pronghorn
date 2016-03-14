@@ -262,7 +262,12 @@ function kupon_views_query_alter(&$view, &$query) {
   if ($view->name == 'coupon' && ($view->current_display == 'page' || $view->current_display == 'coupon')) {
     //getting total price on cart
     global $user;
-    $order = commerce_cart_order_load($user->uid);
+    if($_GET["test"]){
+      $order = commerce_cart_order_load($user->uid);
+      var_dump($user);
+      var_dump($order);
+      exit;
+    }
     if (empty($order->commerce_line_items)) {
       //don't allow access coupon page if cart empty
       //drupal_goto("<front>");

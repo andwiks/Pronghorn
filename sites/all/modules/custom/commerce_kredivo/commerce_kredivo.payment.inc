@@ -178,10 +178,12 @@ function commerce_kredivo_submit_form($payment_method, $pane_values, $checkout_p
     // Give kredivo description below payment method option.
     // @todo: create settingable.
     $sepulsa_kredivo_desc = '
-&quot;<strong>Beli sekarang, bayar nanti dengan Kredivo</strong>&quot;<br /><br />
-Dengan opsi pembayaran baru Kredivo, Anda sekarang dapat membeli produk di Sepulsa dan <strong>membayar dalam 30 hari, tanpa biaya tambahan</strong>. Ambil kesempatan ini segera dan mulai berbelanja sekarang!<br /><br />
-Untuk melanjutkan pembayaran dengan Kredivo, pastikan Anda telah memiliki akun Kredivo yang bisa digunakan untuk transaksi. Cara mendaftar akun Krevido, ' . l(t('klik di sini'), 'faq') . '.<br /><br />
-<div>
+
+<span style="font-size: 14px; font-weight: bolder;"><strong>Beli sekarang, bayar nanti dengan Kredivo</strong></span><br /><br />
+<p>
+Khusus pengguna <strong>Android</strong> dengan penghasilan <strong>minimal 3 juta perbulan</strong>, Anda sekarang dapat membeli produk di Sepulsa dan <strong>membayar dalam 30 hari, tanpa biaya tambahan dengan Kredivo</strong>. Ambil kesempatan ini segera dan mulai berbelanja sekarang!
+</p>
+<p>
 Berikut cara pembayaran dengan Kredivo:
 <ol style="list-style: decimal; margin-left: 13px;">
 <li>Anda akan di arahkan ke halaman Checkout Kredivo dengan rincian pembelian Anda di Sepulsa.com.</li>
@@ -191,7 +193,8 @@ Berikut cara pembayaran dengan Kredivo:
 <li>Sistem akan mengirimkan kode OTP ke <strong>No.Handphone yang terdaftar</strong>, lalu masukkan kedalam kolom yang tersedia, lalu klik tombol &quot;<strong>Confirm OTP</strong>&quot;.</li>
 <li>Transaksi selesai, cek kembali status transaksi Anda di akun Sepulsa pada halaman &quot;<strong>Order Transaksi</strong>&quot;.</li>
 </ol>
-</div>
+Cara mendaftar akun Krevido, ' . l(t('klik di sini'), 'metode-pembayaran-kredivo', array('attributes' => array('target'=>'_blank'))) . '.
+</p>
 ';
 
     // Give kredivo description.
@@ -470,9 +473,9 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
     $sepulsa_redirect_description = '
-<div style="margin: 10px auto; text-align: justify; width: 600px;">
+<div style="margin: 15px auto; text-align: justify; width: 600px; line-height: 1.5em; font-size: 14px;">
 <div>
-&quot;<strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong>&quot;
+<strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong>
 <ul style="list-style: square; margin-left: 13px;">
 <li>Silahkan klik Tombol &quot;<strong>OK, Lanjutkan</strong>&quot; jika Anda ingin melanjutkan transaksi dengan menggunakan Kredivo.</li>
 <li>Atau klik Tombol &quot;<strong>Cancel</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>

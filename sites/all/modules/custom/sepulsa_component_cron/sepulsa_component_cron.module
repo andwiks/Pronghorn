@@ -1,0 +1,6 @@
+<?php
+
+/* implement hook_cron */
+function sepulsa_component_cron() {
+  rules_invoke_component('rules_delete_shopping_cart');
+}

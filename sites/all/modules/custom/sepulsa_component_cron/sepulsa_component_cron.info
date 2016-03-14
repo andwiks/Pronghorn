@@ -1,0 +1,7 @@
+name = "Sepulsa Component Cron"
+description = "Accomodate component cron."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = rules
+dependencies[] = cron

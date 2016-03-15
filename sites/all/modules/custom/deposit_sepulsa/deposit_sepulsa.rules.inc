@@ -58,8 +58,11 @@ function topup_credit_deposit_action($order, $user, $category) {
       if ($line_item->type == 'deposit_sepulsa') {
         $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
         $line_item_price = $line_item_wrapper->commerce_unit_price->value();
-        if (isset($line_item_price['amount']) && !empty($line_item_price['amount'])) {
-          $amount += intval($line_item_price['amount']);
+        if (isset($line_item_price['data']) && !empty($line_item_price['data'])
+          && isset($line_item_price['data']['components'][0]['price']['amount'])
+          && !empty($line_item_price['data']['components'][0]['price']['amount'])
+        ) {
+          $amount += intval($line_item_price['data']['components'][0]['price']['amount']);
         }
       }
     }

@@ -369,7 +369,7 @@ function commerce_checkout_form_submit($form, &$form_state) {
       $order = commerce_order_status_update($order, 'checkout_' . $checkout_page['next_page'], FALSE, NULL, t('Customer continued to the next checkout page via a submit button.'));
 
       // If it happens to be the complete page, process completion now.
-      if ($checkout_page['next_page'] == 'complete' || $checkout_page['next_page'] == 'checkout_complete') {
+      if ($checkout_page['next_page'] == 'complete') {
         commerce_checkout_complete($order);
       }
 

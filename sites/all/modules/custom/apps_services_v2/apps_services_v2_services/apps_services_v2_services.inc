@@ -600,6 +600,19 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
       
       return $return;
     }
+    elseif(isset($payment_method["method_id"]) && $payment_method["method_id"] == "payment_commerce_2"){
+      $log = t('Customer do free order from service_v2 complete checkout.');
+      
+      // Advance the customer to the next step of the checkout process.
+      commerce_payment_redirect_pane_next_page($order, $log);
+      $description = array();
+      $description["description"] = str_replace("\n", ' ', $message);
+      
+      $return["status"] = true;
+      $return["data"] = $description;
+      
+      return $return;
+    }
 
     if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form')) {
       // Generate a key to use in the return URL from the redirected service if it

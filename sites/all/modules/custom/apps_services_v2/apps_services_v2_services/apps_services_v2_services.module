@@ -229,7 +229,7 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
-                'checkout_complete' => array(
+                'complete' => array(
                   'help' => "Complete checkout process.",
                   'callback' => 'apps_services_v2_services_resource_complete',
                   'access callback' => 'services_access_menu',

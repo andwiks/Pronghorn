@@ -550,24 +550,80 @@ function apps_services_v2_services_resource_coupon_remove($coupon_id, $source) {
  *   TRUE if success, error message otherwise.
  */
 function apps_services_v2_services_resource_complete($order_id, $source) {
+  global $user;
+  
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
   
-  $return_value = commerce_checkout_services_resource_complete($order_id);
-  
-  if(isset($return_value["message"]) && !empty($return_value["message"])){
+  // Get user's order.
+  $order = commerce_order_load($order_id);
+  // Check whether order can checkout.
+  if ($order !== FALSE
+    && commerce_checkout_order_can_checkout($order)
+    && $user->uid == $order->uid
+  ) {
+    $checkout_services_complete = &drupal_static(__FUNCTION__);
+    $checkout_services_complete = TRUE;
+
+    // Menandai order ini dibuat dari apps
+    $order->field_order_source[LANGUAGE_NONE][0]['value'] = 'apps';
+    commerce_order_save($order);
+
+    if (!empty($order->data ['payment_method'])) {
+      $payment_method = commerce_payment_method_instance_load($order->data ['payment_method']);
+    }
+    else {
+      $payment_method = FALSE;
+    }
+
+    $message = sepulsa_checkout_completion_message_message($order, 'services');
+
+    // If the payment method doesn't exist or does not require a redirect...
+    if (!$payment_method || !$payment_method ['offsite']) {
+      if (!$payment_method) {
+        $log = t('Customer skipped the Payment page because no payment was required.');
+      }
+      else {
+        $log = t('Customer skipped the Payment page because payment was already submitted.');
+      }
+
+      // Advance the customer to the next step of the checkout process.
+      commerce_payment_redirect_pane_next_page($order, $log);
+      $description = array();
+      $description["description"] = str_replace("\n", ' ', $message);
+      
+      $return["status"] = true;
+      $return["data"] = $description;
+      
+      return $return;
+    }
+
+    if ($callback = commerce_payment_method_callback($payment_method, 'redirect_form')) {
+      // Generate a key to use in the return URL from the redirected service if it
+      // does not already exist.
+      if (empty($order->data ['payment_redirect_key'])) {
+        $order->data ['payment_redirect_key'] = drupal_hash_base64(time());
+        commerce_order_save($order);
+      }
+
+      $form = drupal_get_form($callback, $order, $payment_method);
+    }
+    else {
+      // Alert the administrator that the module does not provide a required form.
+      drupal_set_message(t('The %title payment method indicates it is offsite but does not define the necessary form to process the redirect.', array('%title' => $payment_method ['title'])), 'error');
+    }
+
     $description = array();
-    $description["description"] = $return_value[];
+    $description["description"] = str_replace("\n", ' ', $message);
 
     $return["status"] = true;
     $return["data"] = $description;
-
+    
     return $return;
   }
-  
   // Reach this means error: invalid order.
   return services_error(t('Invalid order'), 406);
 }

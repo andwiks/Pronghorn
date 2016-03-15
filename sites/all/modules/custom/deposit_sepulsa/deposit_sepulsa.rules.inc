@@ -15,7 +15,7 @@
 function deposit_sepulsa_rules_action_info() {
   $actions = array(
     'topup_credit_deposit_action' => array(
-      'label' => t('Topup Credit Deposit'), 
+      'label' => t('Topup Credit Deposit'),
       'group' => t('Sepulsa'),
       'parameter' => array(
         'order' => array(
@@ -36,7 +36,7 @@ function deposit_sepulsa_rules_action_info() {
       ),
     ),
   );
-  
+
   return $actions;
 }
 
@@ -44,10 +44,41 @@ function deposit_sepulsa_rules_action_info() {
  * The action function for 'topup_credit_deposit'.
  */
 function topup_credit_deposit_action($order, $user, $category) {
-  $amount = $order->commerce_order_total[LANGUAGE_NONE][0]['amount'];
-  $queue = DrupalQueue::get('topup_credit_deposit');
-  $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order' => $order);
-  $queue->createItem($queue_item);
+  // Define default amount.
+  $amount = 0;
+  // Bundle using try and catch.
+  try {
+    // Get order wrapper.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Get order line items.
+    $line_items = $order_wrapper->commerce_line_items->value();
+    // Looping for each line item.
+    foreach ($line_items as $line_item) {
+      // Only if type: deposit_sepulsa.
+      if ($line_item->type == 'deposit_sepulsa') {
+        $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+        $line_item_total = $line_item_wrapper->commerce_total->value();
+        if (isset($line_item_total['amount']) && !empty($line_item_total['amount'])) {
+          $amount += intval($line_item_total['amount']);
+        }
+      }
+    }
+  }
+  catch (Exception $e) {
+    // Log it as watchdog error.
+    watchdog('deposit_sepulsa', 'Unable to get valid deposit pulsa amount. Debug: <pre>Error: @error</pre><pre>Order: @order</pre><pre>User: @user</pre>', array(
+      '@error' => $e->getTraceAsString(),
+      '@order' => print_r($order, TRUE),
+      '@user' => print_r($user, TRUE),
+    ), WATCHDOG_ERROR);
+  }
+
+  // Only queue it if amount is not empty.
+  if (!empty($amount)) {
+    $queue = DrupalQueue::get('topup_credit_deposit');
+    $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order' => $order);
+    $queue->createItem($queue_item);
+  }
 }
 
 function deposit_sepulsa_userpoint_category_options() {
@@ -57,6 +88,6 @@ function deposit_sepulsa_userpoint_category_options() {
     foreach ($terms as $category) {
         $list[$category->tid] = $category->name;
     }
- 
+
     return $list;
 }

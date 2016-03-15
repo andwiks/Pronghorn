@@ -174,6 +174,34 @@ function commerce_kredivo_submit_form($payment_method, $pane_values, $checkout_p
         '#description' => t('Input your phone number.'),
       );
     }
+
+    // Give kredivo description below payment method option.
+    // @todo: create settingable.
+    $sepulsa_kredivo_desc = '
+
+<span style="font-size: 14px; font-weight: bolder;"><strong>Beli sekarang, bayar nanti dengan Kredivo</strong></span><br /><br />
+<p>
+Khusus pengguna <strong>Android</strong> dengan penghasilan <strong>minimal 3 juta perbulan</strong>, Anda sekarang dapat membeli produk di Sepulsa dan <strong>membayar dalam 30 hari, tanpa biaya tambahan dengan Kredivo</strong>. Ambil kesempatan ini segera dan mulai berbelanja sekarang!
+</p>
+<p>
+Berikut cara pembayaran dengan Kredivo:
+<ol style="list-style: decimal; margin-left: 13px; line-height: 1.5em;">
+<li>Anda akan di arahkan ke halaman Checkout Kredivo dengan rincian pembelian Anda di Sepulsa.com.</li>
+<li>Jika nominal transaksi telah sesuai silahkan Login untuk melanjutkan transaksi.</li>
+<li>Login dengan cara masukkan <strong>No.Handphone yang terdaftar</strong> pada kolom yang tersedia.</li>
+<li>Masukkan PIN Anda pada kolom yang tersedia, lalu klik tombol &quot;<strong>Masuk</strong>&quot;.</li>
+<li>Sistem akan mengirimkan kode OTP ke <strong>No.Handphone yang terdaftar</strong>, lalu masukkan kedalam kolom yang tersedia, lalu klik tombol &quot;<strong>Confirm OTP</strong>&quot;.</li>
+<li>Transaksi selesai, cek kembali status transaksi Anda di akun Sepulsa pada halaman &quot;<strong>Order Transaksi</strong>&quot;.</li>
+</ol>
+<br /><br />
+Cara mendaftar akun Krevido, ' . l(t('klik di sini'), 'metode-pembayaran-kredivo', array('attributes' => array('target'=>'_blank'))) . '.
+</p>
+';
+
+    // Give kredivo description.
+    $form['kredivo']['desc'] = array(
+      '#markup' => $sepulsa_kredivo_desc,
+    );
   }
   else {
     // Show payment is not configured for user.
@@ -360,6 +388,7 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
     'amount' => $order_total,
     'items' => $items,
     'push_uri' => url('commerce_kredivo/notification/' . $order->order_id . '/' . $transaction->transaction_id, array('absolute' => TRUE)),
+    'user_cancel_uri' => url('checkout/' . $order->order_id . '/payment/back/' . $order->data['payment_redirect_key'], array('absolute' => TRUE)),
     'back_to_store_uri' => url('checkout/' . $order->order_id . '/payment/return/' . $order->data['payment_redirect_key'], array('absolute' => TRUE)),
   );
   // Encode the data with json.
@@ -442,13 +471,58 @@ function commerce_kredivo_submit_form_submit($payment_method, $pane_form, $pane_
 function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_method) {
   // Check if checkout redirect target url is available.
   if (isset($order->data['checkout_url'])) {
+    // Add css: to remove checkout help message.
+    drupal_add_css('.checkout-help {display:none;}', 'inline');
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
+    $sepulsa_redirect_description = '
+<div style="margin: 15px auto; text-align: justify; width: 600px; line-height: 1.5em; font-size: 14px;">
+<div>
+<span style="font-size: 16px;"><strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong></span>
+<ul style="list-style: square; margin-left: 13px;">
+<li>Silahkan klik Tombol &quot;<strong>OK, Lanjutkan</strong>&quot; jika Anda ingin melanjutkan transaksi dengan menggunakan Kredivo.</li>
+<li>Atau klik Tombol &quot;<strong>Batalkan</strong>&quot;, untuk kembali ke halaman &quot;Metode Pembayaran&quot; untuk memilih opsi pembayaran lainnya.</ul>
+</ul>
+</div>
+<div style="margin-top: 10px;">
+Kredivo menawarkan angsuran pembiayaan yang transparan dan sederhana untuk pembelian online Anda hanya dalam beberapa klik:
+<ol style="list-style: decimal; margin-left: 13px;">
+<li>Pilih opsi pembayaran Kredivo pada halaman checkout merchant dan login ke akun Anda. Tinjau rincian transaksi dan konfirmasi pembelian. Selesai!</li>
+<li>Jika Anda bukan pelanggan Kredivo, download aplikasi dan luangkan beberapa menit untuk melalui proses persetujuan. Dibutuhkan tidak lebih dari 2‐3 menit! Ketika Anda disetujui, Anda perlu untuk meng‐upload beberapa dokumen dasar KYC dan kami akan mengaktifkan akun Anda dalam waktu tidak lebih dari 24 jam dari penerimaan dokumen, setelah itu Anda dapat menggunakan Kredivo segera.</li>
+</ol>
+</div>
+<div style="margin-top: 10px;">
+<strong>Apa yang diperlukan untuk memiliki akun Kredivo?</strong>
+<ol style="list-style: decimal; margin-left: 13px;">
+<li>Warga Negara Indonesia</li>
+<li>Berusia minimal 18 tahun</li>
+<li>Memiliki rekening bank</li>
+<li>Memiliki penghasilan minimal Rp 3 juta per bulan (baik karyawan maupun wiraswasta)</li>
+<li>Memberikan nomor ponsel Indonesia yang valid</li>
+<li>Memberikan nama lengkap Anda, tanggal lahir, informasi basic akun Facebook, dan nomor KTP Anda untuk membantu kami memverifikasi identitas Anda.</li>
+</ol>
+</div>
+</div>
+';
+    // Add redirect description.
+    $form['description'] = array(
+      '#markup' => $sepulsa_redirect_description,
+    );
     // Add submit button.
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('Buy Now, Pay Later with Kredivo'),
+      '#value' => t('OK, Lanjutkan'),
       '#weight' => 10,
+    );
+    // Add cancel button.
+    $form['cancel'] = array(
+      '#prefix' => '&nbsp;',
+      '#type' => 'submit',
+      '#value' => t('Cancel'),
+      '#weight' => 11,
+      '#attributes' => array(
+        'onclick' => array('window.location.href = "' . base_path() . 'checkout/' . $order->order_id . '/payment/back/' . $order->data['payment_redirect_key'] . '"; return false;'),
+      ),
     );
     // Return the form.
     return $form;
@@ -492,14 +566,28 @@ function commerce_kredivo_redirect_form_back($order, $payment_method) {
 
   // Remove the payment information from the order data array.
   unset($order->data['payment_method']);
+  unset($order->data['payment_redirect_key']);
   unset($order->data['checkout_url']);
+
+  // Remove payment transaction: if pending.
+  if (isset($order->data['transaction_id']) && !empty($order->data['transaction_id'])) {
+    // Load transaction.
+    $transaction = commerce_payment_transaction_load($order->data['transaction_id']);
+    // Check transaction data.
+    if ($transaction->status == COMMERCE_PAYMENT_STATUS_PENDING
+      && $transaction->remote_id == 0
+      && $transaction->remote_status == COMMERCE_PAYMENT_STATUS_PENDING
+    ) {
+      commerce_payment_transaction_delete($order->data['transaction_id']);
+    }
+  }
 
   // Send them back to the shopping cart page instead of the previous page in
   // the checkout process.
   commerce_order_status_update($order, 'cart', FALSE, NULL, t('Customer canceled using @payment.', array(
     '@payment' => ucfirst($payment_method['title']),
   )));
-  drupal_goto('cart');
+  drupal_goto('checkout/' . $order->order_id);
 }
 
 /**

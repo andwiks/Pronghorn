@@ -18,12 +18,12 @@ function commerce_kredivo_commerce_payment_method_info() {
 
   $payment_methods['commerce_kredivo'] = array(
     'base' => 'commerce_kredivo',
-    'title' => t('Buy Now, Pay Later with Kredivo'),
+    'title' => t('Kredivo'),
     'short_title' => t('Kredivo'),
     'description' => t('Buy Now, Pay Later with Kredivo'),
     'terminal' => TRUE,
     'offsite' => TRUE,
-    'offsite_autoredirect' => TRUE,
+    'offsite_autoredirect' => FALSE,
     'file' => 'commerce_kredivo.payment.inc',
   );
 

@@ -229,41 +229,6 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
-                'complete' => array(
-                  'help' => "Complete checkout process.",
-                  'callback' => 'apps_services_v2_services_resource_complete',
-                  'access callback' => 'services_access_menu',
-                  'documentation callback' => 'apps_services_v2_services_resource_complete_doc',
-                  'file' => array(
-                        'type' => 'inc',
-                        'module' => 'apps_services_v2_services',
-                        'name' => 'apps_services_v2_services',
-                    ),
-                  'args' => array(
-                    array(
-                      'name' => 'order_id',
-                      'type' => 'int',
-                      'description' => 'The order id.',
-                      'source' => array(
-                        'data' => 'order_id',
-                        'param' => 'order_id',
-                      ),
-                      'optional' => FALSE,
-                      'http_method' => 'POST',
-                    ),
-                    array(
-                      'name' => 'source',
-                      'type' => 'string',
-                      'description' => 'the source of the request',
-                      'source' => array(
-                        'data' => 'source',
-                        'param' => 'source',
-                      ),
-                      'optional' => FALSE,
-                      'http_method' => 'POST',
-                    ),
-                  ),
-                ),
                 'saved_card' => array(
                   'help' => "Get token from veritrans to get saved card.",
                   'callback' => 'apps_services_v2_services_get_saved_card',
@@ -1541,46 +1506,6 @@ function apps_services_v2_services_resource_coupon_remove_doc() {
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/air/services_v2/coupon_remove.json<br />
     POST data application/json: { "source" : "android", "coupon_id" : "6" }',
-    // Example response. E.g., a JSON array.
-    '#response' => $response,
-    // Resource prefix.
-    // Errors.
-    '#errors' => array(
-      'internal_server' => array(
-        '#question' => '500 Internal Server Error',
-        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
-        '#response' => '',
-      ),
-    ),
-  );
-  return $element;
-}
-
-/**
- * Function apps_services_v2_services_resource_complete_doc().
- *
- * @return array
- *   Service documentation array.
- */
-function apps_services_v2_services_resource_complete_doc() {
-  global $base_url;
-  $response = '
-  {
-    "status": true,
-    "message": "",
-    "data": {
-       "description" : "message_return here"
-    }
-  }
-  ';
-  $element = array(
-    '#name' => 'Complete checkout process',
-    '#description' => 'Complete Page on checkout page',
-    '#auth' => TRUE,
-    '#path' => 'services_v2/checkout_complete',
-    // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/air/services_v2/checkout_complete.json<br />
-    POST data application/json: { "source" : "android", "order_id" : "154598" }',
     // Example response. E.g., a JSON array.
     '#response' => $response,
     // Resource prefix.

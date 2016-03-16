@@ -208,6 +208,34 @@ function commerce_veritrans_settings_form($settings = array()) {
       ),
     ),
   );
+
+  // Provide Bank Transfer field.
+  $form['bank_transfer'] = array(
+    '#tree' => TRUE,
+    '#type' => 'fieldset',
+    '#title' => t('Virtual Account Options'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][type]"]' => array('value' => 'bank_transfer'),
+      ),
+    ),
+  );
+
+  // Get supported payment method types.
+  $virtual_account_bank = commerce_veritrans_payment_virtual_account_bank();
+  // Acquiring Bank.
+  $form['bank_transfer']['bank'] = array(
+    '#type' => 'select',
+    '#title' => t('Bank'),
+    '#options' => $virtual_account_bank,
+    '#default_value' => (isset($settings['bank_transfer']['bank'])) ? $settings['bank_transfer']['bank'] : array('permata'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="parameter[payment_method][settings][payment_method][settings][type]"]' => array('value' => 'bank_transfer'),
+      ),
+    ),
+  );
+
   // @todo: add phone number fields.
   // a. from commerce_customer_address. (addressfield_phone)
   // b. from commerce_line_item. (line item custom product)
@@ -911,13 +939,20 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
     call_user_func_array($submission, $args);
   }
 
-  // Add billing information.
-  if (!empty($billing)) {
-    $transaction_data['customer_details']['billing_address'] = $billing;
+  // Check if $payment_type = bank_transfer
+  if ($payment_type == 'bank_transfer') {
+    $transaction_data['bank_transfer']['bank'] = $payment_method['settings']['bank_transfer']['bank'];
+    unset($transaction_data['item_details']);
   }
-  // Add shipping information.
-  if (!empty($shipping)) {
-    $transaction_data['customer_details']['billing_address'] = $shipping;
+  else {    
+    // Add billing information.
+    if (!empty($billing)) {
+      $transaction_data['customer_details']['billing_address'] = $billing;
+    }
+    // Add shipping information.
+    if (!empty($shipping)) {
+      $transaction_data['customer_details']['billing_address'] = $shipping;
+    }
   }
 
   // Define API endpoint settings.
@@ -1335,6 +1370,26 @@ function commerce_veritrans_payment_method_types($key = '') {
     'telkomsel_cash' => t('T-Cash'),
     'xl_tunai' => t('XL Tunai'),
     'echannel' => t('Mandiri Bill Payment'),
+  );
+  return (!empty($key) && isset($payment_method[$key])) ? $payment_method[$key] : $payment_method;
+}
+
+/**
+ * Function commerce_veritrans_payment_virtual_account_bank().
+ *
+ * Returns a set of virtual account bank.
+ *
+ * @param string $key
+ *   Optional payment method key.
+ *
+ * @return array
+ *   Payment method array.
+ */
+function commerce_veritrans_payment_virtual_account_bank($key = '') {
+  // Define payment method type available at Veritrans.
+  $payment_method = array(
+    'permata' => t('Permata Bank'),
+    'bca' => t('BCA'),
   );
   return (!empty($key) && isset($payment_method[$key])) ? $payment_method[$key] : $payment_method;
 }

@@ -322,6 +322,16 @@ function commerce_veritrans_settings_form($settings = array()) {
     '#description' => t('System will send this prefix together with order id.'),
   );
 
+  // HTTP request timeout.
+  $form['timeout'] = array(
+    '#type' => 'textfield',
+    '#title' => t('HTTP Request Time Out'),
+    '#default_value' => (isset($settings['timeout'])) ? $settings['timeout'] : 30.0,
+    '#size' => 5,
+    '#maxlength' => 5,
+    '#description' => t('Please insert value in second'),
+  );
+
   // Set example payment server url.
   $url = url('https://api.sandbox.veritrans.co.id/v2', array(
     'absolute' => TRUE,
@@ -959,7 +969,7 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   $settings = array(
     'url' => $payment_method['settings']['url'],
     'server_key' => $payment_method['settings']['server_key'],
-    'timeout' => 30.0,
+    'timeout' => $payment_method['settings']['timeout'],
     'op' => 'charge',
   );
   // Do payment API.
@@ -1590,6 +1600,7 @@ function commerce_veritrans_payment_query_operation($order, $transaction) {
       'op' => 'status',
       'server_key' => $payment_method['settings']['server_key'],
       'method' => 'GET',
+      'timeout' => $payment_method['settings']['timeout'],
     );
 
     // Do veritrans API: setatus.

@@ -660,8 +660,9 @@ function sepulsav2_preprocess_views_view_table(&$variables) {
       }
 
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-      $line_items = $order_wrapper->commerce_line_items;
-      $variables['order_total'] = commerce_line_items_total($line_items);
+      $order_total = $order_wrapper->commerce_order_total->value();
+      // Total paymant at coupon page is only base price.
+      $variables['order_total'] = $order_total['data']['components'][0]['price'];
       break;
   }
 }

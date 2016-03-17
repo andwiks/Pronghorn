@@ -199,6 +199,31 @@ function commerce_veritrans_menu_contextual_links_alter(&$links, $router_item, $
 }
 
 /**
+ * Implements hook_token_info().
+ */
+function commerce_veritrans_token_info() {
+  $info['tokens']['commerce-order']['veritrans-virtual-account'] = array(
+    'name' => t('Veritrans Virtual Account'),
+    'description' => t('Veritrans Virtual Account Data'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function commerce_veritrans_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $node = $data['commerce-order'];
+    if (isset($tokens['veritrans-virtual-account'])) {
+      $replacements[$tokens['veritrans-virtual-account']] = $node->data['commerce_veritrans']['response']->permata_va_number;
+    }
+  }
+  return $replacements;
+}
+
+/**
  * Callback Functions.
  */
 

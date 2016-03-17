@@ -156,7 +156,7 @@ function commerce_veritrans_payment_approve_form_submit($form, &$form_state) {
     $settings = array(
       'url' => $payment_method['settings']['url'] . '/' . $payment_method['settings']['prefix'] . $order->order_id,
       'server_key' => $payment_method['settings']['server_key'],
-      'timeout' => $payment_method['settings']['timeout'],
+      'timeout' => (isset($payment_method['settings']['timeout'])) ? $payment_method['settings']['timeout'] : 30.0,
       'op' => 'approve',
     );
     // Call payment api.
@@ -389,7 +389,7 @@ function commerce_veritrans_payment_cancel_form_submit($form, &$form_state) {
       'url' => $payment_method['settings']['url'] . '/' . $payment_method['settings']['prefix'] . $order->order_id,
       'server_key' => $payment_method['settings']['server_key'],
       'op' => 'cancel',
-      'timeout' => $payment_method['settings']['timeout'],
+      'timeout' => (isset($payment_method['settings']['timeout'])) ? $payment_method['settings']['timeout'] : 30.0,
     );
     // Call payment api.
     $payment = commerce_veritrans_api('', $settings);

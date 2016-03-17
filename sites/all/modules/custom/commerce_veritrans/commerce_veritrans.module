@@ -131,6 +131,37 @@ function commerce_veritrans_menu() {
 }
 
 /**
+ * Implements hook_cron().
+ */
+function commerce_veritrans_cron() {
+  $queue = DrupalQueue::get('commerce_veritrans_query_update');
+  $result = db_select('commerce_payment_transaction', 'co')->extend('PagerDefault');
+  $result->fields('co');
+  $result->condition('co.status', 'pending');
+  $result->condition('co.payment_method', 'commerce_veritrans');
+  $result->condition('co.instance_id', 'commerce_veritrans|rules_virtual_account_permata_bank');
+  $result->limit(15);
+  $result->orderBy('co.transaction_id', 'DESC');
+  $query = $result->execute();
+
+  foreach ($query as $key) {
+    $queue->createItem($key);
+  }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function commerce_veritrans_cron_queue_info() {
+  $queues = array();
+  $queues['commerce_veritrans_query_update'] = array(
+    'worker callback' => 'commerce_veritrans_run_query_update',
+    'time' => 60,
+  );
+  return $queues;
+}
+
+/**
  * Implements hook_menu_contextual_links_alter().
  */
 function commerce_veritrans_menu_contextual_links_alter(&$links, $router_item, $root_path) {
@@ -170,6 +201,67 @@ function commerce_veritrans_menu_contextual_links_alter(&$links, $router_item, $
 /**
  * Callback Functions.
  */
+
+/**
+ * Function commerce_veritrans_run_query_update().
+ *
+ * @param object trans.
+ */
+function commerce_veritrans_run_query_update($trans) {
+  // Get object order.
+  $order = commerce_order_load($trans->order_id);
+  // Get transaction id.
+  $transaction_id = $trans->transaction_id;
+  $transaction = commerce_payment_transaction_load($transaction_id);
+
+  // Call commerce_veritrans_query_operation.
+  $payment = commerce_veritrans_payment_query_operation($order, $transaction);
+  // Check payment result.
+  if ($payment !== FALSE) {
+    // Only for update operation.
+    // Get order balance.
+    $balance = commerce_payment_order_balance($order);
+    // Check payment data.
+    if (isset($balance['amount']) && isset($payment->status_code)
+      && isset($payment->transaction_status)
+    ) {
+      // Case: Order balance > 0 but transaction capture (200).
+      if ($balance['amount'] > 0
+        && $payment->status_code == '200'
+        && (($payment->payment_type == 'credit_card' && $payment->transaction_status == 'capture') || ($payment->payment_type == 'bank_transfer' && $payment->transaction_status == 'settlement'))
+      ) {
+        $transaction = commerce_payment_transaction_load($transaction_id);
+        $transaction->status = COMMERCE_PAYMENT_STATUS_SUCCESS;
+        $transaction->message = 'Payment Data: <br />!data';
+        $payment_data = '';
+        foreach ((array) $payment as $key =>$data) {
+          $payment_data[] = str_replace('_', ' ', $key) . ' = ' . ((is_array($data)) ? '<ul><li>' . implode('</li><li>', $data) . '</li></ul>' : $data);
+        }
+        $transaction->message_variables = array(
+          '!data' => implode('<br />', $payment_data),
+        );
+        commerce_payment_transaction_save($transaction);
+      }
+      // Case: Order balance <= 0 but transaction cancel (200).
+      if ($balance['amount'] <= 0
+        && $payment->status_code == '200'
+        && $payment->transaction_status == 'cancel'
+      ) {
+        $transaction = commerce_payment_transaction_load($transaction_id);
+        $transaction->status = COMMERCE_PAYMENT_STATUS_FAILURE;
+        $transaction->message = 'Payment Data: <br />!data';
+        $payment_data = '';
+        foreach ((array) $payment as $key =>$data) {
+          $payment_data[] = str_replace('_', ' ', $key) . ' = ' . ((is_array($data)) ? '<ul><li>' . implode('</li><li>', $data) . '</li></ul>' : $data);
+        }
+        $transaction->message_variables = array(
+          '!data' => implode('<br />', $payment_data),
+        );
+        commerce_payment_transaction_save($transaction);
+      }
+    }
+  }
+}
 
 /**
  * Function commerce_veritrans_settings_form().
@@ -936,7 +1028,7 @@ function commerce_veritrans_submit_form_submit($payment_method, $pane_form, $pan
   $settings = array(
     'url' => $payment_method['settings']['url'],
     'server_key' => $payment_method['settings']['server_key'],
-    'timeout' => $payment_method['settings']['timeout'],
+    'timeout' => (isset($payment_method['settings']['timeout'])) ? $payment_method['settings']['timeout'] : 30.0,
     'op' => 'charge',
   );
   // Do payment API.
@@ -1567,7 +1659,7 @@ function commerce_veritrans_payment_query_operation($order, $transaction) {
       'op' => 'status',
       'server_key' => $payment_method['settings']['server_key'],
       'method' => 'GET',
-      'timeout' => $payment_method['settings']['timeout'],
+      'timeout' => (isset($payment_method['settings']['timeout'])) ? $payment_method['settings']['timeout'] : 30.0,
     );
 
     // Do veritrans API: setatus.

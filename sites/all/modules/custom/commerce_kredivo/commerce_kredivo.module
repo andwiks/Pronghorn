@@ -656,7 +656,7 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
     $sepulsa_redirect_description = '
-<div style="margin: 15px auto; text-align: justify; width: 80%; line-height: 1.5em; font-size: 14px;">
+<div style="margin: 15px auto; text-align: center; width: 80%; line-height: 1.5em; font-size: 14px;">
 <div>
 <span style="font-size: 20px;"><strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong></span>
 </div>

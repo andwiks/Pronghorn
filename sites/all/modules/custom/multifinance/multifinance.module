@@ -29,6 +29,9 @@ function multifinance_commerce_cart_line_item_refresh($line_item, $order_wrapper
   if ($line_item->type == 'multifinance' && !empty($line_item->data['inquiry']['jumlah_tagihan'])) {
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['jumlah_tagihan'];
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['jumlah_tagihan'];
+
+    module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
+    commerce_fees_apply($order_wrapper, 'admin_fee', $line_item->data['inquiry']['admin_fee'], 'IDR');
   }
 }
 

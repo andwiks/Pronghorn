@@ -1,0 +1,143 @@
+<?php
+/**
+ * @file
+ * sepulsa_newsletter.module
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Impelements hook_menu().
+ */
+function sepulsa_newsletter_menu() {
+
+  // Administration pages.
+  $items['admin/config/people/mailchimp-config'] = array(
+    'title' => 'Mailchimp Configuration',
+    'description' => 'Mailchimp Configuration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_newsletter_form'),
+    'access arguments' => array('access administration pages'),
+  );
+
+  $items['test/print'] = array(
+      'page callback' => 'sepulsa_newsletter_printquery',
+      'access callback' => TRUE
+    );
+
+  return $items;
+}
+
+function sepulsa_newsletter_printquery(){
+  echo "<pre>";
+  $settings = array(
+  		'method' => 'POST',
+  		'op' => 'members',
+  		'email' => 'test@sepulsa.com',
+  		'status' => 'subscribed',
+  	);
+  sepulsa_newsletter_mailchimp_api($settings);
+  print_r($result);
+}
+
+/**
+ * Function sepulsa_newsletter_form().
+ */
+function sepulsa_newsletter_form($form, &$form_state) {
+
+  $form['sepulsa_newsletter_api_url'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Mailchimp API URL ?',
+    '#size' => 200,
+    '#maxlength' => 200,
+    '#default_value' => variable_get('sepulsa_newsletter_api_url', 'https://us12.api.mailchimp.com/3.0/lists'),
+    '#required' => TRUE,
+  );
+
+  $form['sepulsa_newsletter_id_member'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Mailchimp ID Member ?',
+    '#size' => 200,
+    '#maxlength' => 200,
+    '#default_value' => variable_get('sepulsa_newsletter_id_member', 'a38de08c0b'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_api().
+ *
+ * @param
+ * $settings -> array (method, op, email, status)
+ */
+function sepulsa_newsletter_mailchimp_api($settings){
+	// Untuk Edit subscribed / unsubscribed.
+
+  // URL API, us12 adalah key terakhir sebelum - di API KEY.
+  $url = variable_get('sepulsa_newsletter_api_url', 'https://us12.api.mailchimp.com/3.0/lists');
+
+  // ID List Member test : https://us12.admin.mailchimp.com/lists/members/?id=172306#p:1-s:10.
+  // ID List Member prof : https://us12.admin.mailchimp.com/lists/members/?id=193961#p:1-s:10.
+  $id = variable_get('sepulsa_newsletter_id_member', 'a38de08c0b');
+
+  // Operation untuk mengambil list member.
+  $op = $settings['op'];
+
+  // MD5 Email yang akan di ganti. 
+  $email = md5($settings['email']);
+
+  $data = array(
+  		'email_address' => $settings['email'],
+  		'status' => $settings['status'],
+  	);
+
+  // Define option for http request.
+  $http_options = array(
+  	// Define Method.
+    'method' => $settings['method'],
+    'headers' => array(	
+      'Content-Type' =>  'application/json',
+      'Accept' => 'application/json',
+      // Define username:apikey.
+      'Authorization' => 'Basic ' . base64_encode("sepulsanews:0cf0d5df56cc65702c6c5a7d404ac244-us12"),
+      ),
+    // Define Data.
+    'data' => json_encode($data),
+    );
+  if ($settings['method'] == 'POST') {
+  	$result = drupal_http_request($url . '/' . $id . '/' . $op, $http_options);
+  } 
+  elseif ($settings['method'] == 'PUT') {
+  	$result = drupal_http_request($url . '/' . $id . '/' . $op . '/' . $email, $http_options);
+  }
+  else {
+  	unset($http_options['data']);
+  	$result = drupal_http_request($url . '/' . $id . '/' . $op . '/' . $email, $http_options);
+  }
+
+  // print_r($result);
+  return $result;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sepulsa_newsletter_form_user_profile_form_alter(&$form, &$form_state) {
+  $form['field_subscribe_newsletter'] = array (
+	  '#type' => 'checkbox',
+	  '#title' => t ('Subscribe Newsletter'),
+	);
+}
+
+/* implement hook_user_presave() */
+function sepulsa_newsletter_user_presave(&$edit, $account, $category) {
+  if (isset($account->is_new) && !empty($account->is_new)) {
+    watchdog('Insert Newsletter', '<pre> edit : @edit, account : @account, category : @category </pre>', 
+    		array('@edit' => print_r($edit, true), '@account' => print_r($account, true), '@category' => print_r($category, true)));
+  } else {
+  	watchdog('Update Newsletter', '<pre> edit : @edit, account : @account, category : @category </pre>', 
+    		array('@edit' => print_r($edit, true), '@account' => print_r($account, true), '@category' => print_r($category, true)));
+  }
+}

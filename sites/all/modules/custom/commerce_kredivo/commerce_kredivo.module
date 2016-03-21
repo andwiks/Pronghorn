@@ -231,7 +231,7 @@ function commerce_kredivo_settings_form($settings = array()) {
   );
 
   // Set example payment server url.
-  $url = url('http://dev.kredivo/com/kredivo/v1', array(
+  $url = url('http://dev.kredivo.com/kredivo/v1', array(
     'absolute' => TRUE,
     'external' => TRUE,
   ));
@@ -656,12 +656,15 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Set checkout redirect target url.
     $form['#action'] = $order->data['checkout_url'];
     $sepulsa_redirect_description = '
-<div style="margin: 15px auto; text-align: center; width: 80%; line-height: 1.5em; font-size: 14px;">
-<div>
-<span style="font-size: 20px;"><strong>Pastikan telah memiliki Akun Kredivo yang bisa dipakai untuk transaksi</strong></span>
-</div>
-</div>
-';
+      <div style="margin: 15px auto; text-align: center; width: 80%; line-height: 2.0em; font-size: 14px;">
+        <div>
+          <span style="font-size: 20px; font-weight: bolder;">Kredivo hanya dapat digunakan di Android.</span>
+          <br>
+          <span style="font-size: 16px;">Apakah Anda menggunakan perangkat Android?</span>
+          <br>
+          <span></span>
+        </div>
+      </div>';
     // Add redirect description.
     $form['description'] = array(
       '#markup' => $sepulsa_redirect_description,
@@ -669,18 +672,72 @@ function commerce_kredivo_redirect_form($form, &$form_state, $order, $payment_me
     // Add submit button.
     $form['submit'] = array(
       '#type' => 'submit',
-      '#value' => t('OK, Lanjutkan'),
+      '#value' => t('Ya, Saya pengguna Android'),
       '#weight' => 10,
+      '#attached' => array(
+        'css' => array(
+          array(
+            'data' => '
+              #edit-submit {
+                background: #129d4a;
+                border: none;
+                font-size: 16px;
+                padding: 9px 25px;
+                height: 50px;
+                cursor: pointer;
+                color: #FFF;
+                border-radius: 7px;
+                -webkit-border-radius: 7px;
+                -moz-border-radius: 7px;
+                -ms-border-radius: 7px;
+                -o-border-radius: 7px;
+                margin: 5px;
+                text-transform: uppercase;}',
+            'type' => 'inline',
+          ),
+        ),
+      ),
     );
     // Add cancel button.
     $form['cancel'] = array(
       '#prefix' => '&nbsp;',
       '#type' => 'submit',
-      '#value' => t('Cancel'),
+      '#value' => t('Pilih metode pembayaran lain'),
       '#weight' => 11,
       '#attributes' => array(
         'onclick' => array('window.location.href = "' . base_path() . 'checkout/' . $order->order_id . '/payment/back/' . $order->data['payment_redirect_key'] . '"; return false;'),
       ),
+      '#attached' => array(
+        'css' => array(
+          array(
+            'data' => '
+                #commerce-kredivo-redirect-form #edit-cancel {
+                  background: #c72127 !important;
+                  border: none;
+                  font-size: 16px;
+                  padding: 9px 15px;
+                  height: 50px;
+                  cursor: pointer;
+                  color: #FFF;
+                  border-radius: 7px;
+                  -webkit-border-radius: 7px;
+                  -moz-border-radius: 7px;
+                  -ms-border-radius: 7px;
+                  -o-border-radius: 7px;
+                  margin: 5px;
+                  text-transform: uppercase;}',
+            'type' => 'inline',
+          ),
+        ),
+      ),
+    );
+    $sepulsa_kredivo_info = '
+      <div style="font-size: 12px; margin-top: 12px;">Ingin tahu lebih lanjut tentang kredivo? <a href="http://sepulsa.com/kredivo" target="_blank">Klik di sini</a>.</div>
+      </div>';
+    // Add redirect description.
+    $form['info'] = array(
+      '#markup' => $sepulsa_kredivo_info,
+      '#weight' => 12,
     );
     // Return the form.
     return $form;

@@ -115,13 +115,16 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       $form['account']['#title'] = NULL;
       $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
-      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
+      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong> 1. '.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
+      $secondno = "2. ";
+    } else {
+      $secondno = "";
     }
 
     $form['commerce_payment']['#title'] = NULL;
     $form['commerce_payment']['#prefix'] = '<div id="commerce-payment-ajax-wrapper">';
-    $form['commerce_payment']['#prefix'] .= '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#prefix'] .= '<h4><strong>'. $secondno . t('Payment Options').'</strong></h4>';
     $form['commerce_payment']['#suffix'] = '</div>';
 
     $form['commerce_payment']['payment_method']['#process'] = array('form_process_radios', 'sepulsav2_process_radios_payment_method');

@@ -4,17 +4,14 @@
  * Implementation of hook_install().
  */
 function sepulsa_newsletter_install() {
-  // Get all properties of commerce_product entity.
-  $properties = entity_get_all_property_info('user');
 
   // Check field product additional packing.
-  if (!isset($properties['field_subscribe_newsletter'])) {
-    // Create field: field_product_additional_packing.
-    // @see https://www.drupal.org/node/1339968.
+  if (!field_info_field('field_newsletter_subscribers')) {
     $field = array(
-      'field_name' => 'field_subscribe_newsletter',
+      'field_name' => 'field_newsletter_subscribers',
       'description' => 'Flag Subscriber Mailchimp Newsletter.',
       'type' => 'list_boolean',
+      'module' => 'user',
       'cardinality' => 1,
       'settings' => array(
         'allowed_values' => array(
@@ -24,21 +21,19 @@ function sepulsa_newsletter_install() {
       ),
     );
     field_create_field($field);
-    // Create an instance and attach it to the commerce product entity.
+
     $instance = array(
-      'field_name' => 'field_subscribe_newsletter',
+      'field_name' => 'field_newsletter_subscribers',
       'label' => 'Subscribe Newsletter',
       'entity_type' => 'user',
       'bundle' => 'user',
       'widget' => array(
         'type' => 'options_onoff',
         'settings' => array('display_label' => 1),
-        'weight' => 1,
       ),
       'settings' => array(
         'user_register_form' => 1,
-        // 'user_edit_form' => 1,
-        // 'user_profile_form' => 1,
+        'user_profile_form' => 1,
       ),
     );
     field_create_instance($instance);
@@ -50,24 +45,11 @@ function sepulsa_newsletter_install() {
  */
 function sepulsa_newsletter_uninstall() {
   // Check if our field is not already created.
-  if (field_info_field('field_subscribe_newsletter')) {
-    // Delete the instance on the bundle.
+  if (field_info_field('field_newsletter_subscribers')) {
     $instance = array(
-      'field_name' => 'field_subscribe_newsletter',
-      'description' => 'Flag Subscriber Mailchimp Newsletter.',
-      'label' => 'Subscribe Newsletter',
+      'field_name' => 'field_newsletter_subscribers',
       'entity_type' => 'user',
       'bundle' => 'user',
-      'widget' => array(
-        'type' => 'options_onoff',
-        'settings' => array('display_label' => 1),
-        'weight' => 1,
-      ),
-      'settings' => array(
-        'user_register_form' => 1,
-        // 'user_edit_form' => 1,
-        // 'user_profile_form' => 1,
-      ),
     );
     field_delete_instance($instance);
   }

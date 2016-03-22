@@ -73,13 +73,12 @@ function sepulsa_newsletter_form($form, &$form_state) {
  * $settings -> array (method, op, email, status)
  */
 function sepulsa_newsletter_mailchimp_api($settings){
-	// Untuk Edit subscribed / unsubscribed.
-
+  // Untuk Edit subscribed / unsubscribed.
   // URL API, us12 adalah key terakhir sebelum - di API KEY.
   $url = variable_get('sepulsa_newsletter_api_url', 'https://us12.api.mailchimp.com/3.0/lists');
 
-  // ID List Member test : https://us12.admin.mailchimp.com/lists/members/?id=172306#p:1-s:10.
-  // ID List Member prof : https://us12.admin.mailchimp.com/lists/members/?id=193961#p:1-s:10.
+  // ID List Member test : a38de08c0b.
+  // ID List Member prod : 2ae89eac82.
   $id = variable_get('sepulsa_newsletter_id_member', 'a38de08c0b');
 
   // Operation untuk mengambil list member.
@@ -121,23 +120,34 @@ function sepulsa_newsletter_mailchimp_api($settings){
   return $result;
 }
 
-/**
- * Implements hook_form_FORM_ID_alter().
- */
-function sepulsa_newsletter_form_user_profile_form_alter(&$form, &$form_state) {
-  $form['field_subscribe_newsletter'] = array (
-	  '#type' => 'checkbox',
-	  '#title' => t ('Subscribe Newsletter'),
-	);
-}
-
 /* implement hook_user_presave() */
 function sepulsa_newsletter_user_presave(&$edit, $account, $category) {
+    // watchdog('status Newsletter', '<pre> edit : @edit, account : @account, category : @category, </pre>', 
+    // 		array('@edit' => print_r($edit, true), '@account' => print_r($account, true), '@category' => print_r($category, true)));
+  $result = 'HTTP request not sent';
+  if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
+	$status = 'subscribed';
+  }
+  else {
+	$status = 'unsubscribed';
+  }
   if (isset($account->is_new) && !empty($account->is_new)) {
-    watchdog('Insert Newsletter', '<pre> edit : @edit, account : @account, category : @category </pre>', 
-    		array('@edit' => print_r($edit, true), '@account' => print_r($account, true), '@category' => print_r($category, true)));
+    $settings = array(
+  	  'method' => 'POST',
+  	  'op' => 'members',
+  	  'email' => $edit['mail'],
+  	  'status' => $status,
+  	);
+    $result = sepulsa_newsletter_mailchimp_api($settings);
+    watchdog('Insert Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, true)));
   } else {
-  	watchdog('Update Newsletter', '<pre> edit : @edit, account : @account, category : @category </pre>', 
-    		array('@edit' => print_r($edit, true), '@account' => print_r($account, true), '@category' => print_r($category, true)));
+    $settings = array(
+  	  'method' => 'PUT',
+  	  'op' => 'members',
+  	  'email' => $edit['mail'],
+  	  'status' => $status,
+  	);
+    $result = sepulsa_newsletter_mailchimp_api($settings);
+    watchdog('Update Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, true)));
   }
 }

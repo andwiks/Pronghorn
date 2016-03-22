@@ -1,8 +1,15 @@
 <?php
 /**
-  * Implements hook_menu
-  */
-function scampaign_menu(){
+ * @file
+ * scampaign.module
+ *
+ * @author roy
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function scampaign_menu() {
   $menu = array();
 
   $menu['admin/people/scampaign'] = array(
@@ -28,94 +35,127 @@ function scampaign_menu(){
   );
 
   $menu['admin/people/scampaign/%/detail'] = array(
-    'title' => 'Campaign Link',
+    'title' => 'Campaign Detail',
     'page callback' => 'scampaign_detail',
     'page arguments' => array(3),
     'access arguments' => array('administer users'),
     'file' => 'scampaign.admin.inc',
   );
-  $menu['admin/people/scampaign/%/detail/export'] = array(
-    'title' => 'Campaign Link',
+  $menu['admin/people/scampaign/%/export'] = array(
+    'title' => 'Campaign Export',
     'page callback' => 'scampaign_detail_export',
     'page arguments' => array(3),
     'access arguments' => array('administer users'),
     'type' => MENU_CALLBACK,
     'file' => 'scampaign.admin.inc',
   );
+  $menu['admin/people/scampaign/%/delete'] = array(
+    'title' => 'Campaign Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('scampaign_delete_form', 3),
+    'access arguments' => array('administer users'),
+    'file' => 'scampaign.admin.inc',
+  );
+
+  $menu['rc/%'] = array(
+    'title' => 'Sepulsa Campaign',
+    'page callback' => 'scampaign_redirect',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
   return $menu;
 }
 
 /**
-  * Implements hook_form_FORM_ID_alter
-  * Alter user register form to check for reffereal campaign link
-  */
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Alter user register form to check for reffereal campaign link.
+ */
 function scampaign_form_user_register_form_alter(&$form, &$form_state, $form_id) {
-  if(!empty($_GET['ref'])){
+  // Check if there is input reference.
+  if (isset($_GET['ref']) && !empty($_GET['ref'])
+    && preg_match('#^[a-z0-9]+$#i', $_GET['ref'])
+  ) {
     $campaign_id = betaID($_GET['ref']);
-    if($campaign_id){
+    if ($campaign_id) {
       $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
-      // Check if ID exist
-      if($result->rowCount()){
+      // Check if ID exist.
+      if ($result->rowCount()) {
         $campaign = $result->fetch();
-        if($campaign->used < $campaign->max_use){
+        if ($campaign->used < $campaign->max_use) {
           // Valid link, safe it into session?
           $_SESSION['scampaign'] = $_GET['ref'];
-        } else {
-          // Already reach Maximum use
-          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'),'error',false);
+          // Notification to customer.
+          // @todo: need to get this from rules value.
+          drupal_set_message(t('Dengan mendaftarkan email anda pada Sepulsa, anda akan mendapatkan Sepulsa kredit sebesar Rp. 20.000,-.'), 'status', FALSE);
         }
-      } else {
-        // ID not found
-        drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+        else {
+          // Already reach Maximum use.
+          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'), 'error', FALSE);
+        }
       }
-    } else {
-      // ID not valid
-      drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+      else {
+        // ID not found.
+        drupal_set_message(t('Referal ID Tidak Ditemukan.'), 'error', FALSE);
+      }
+    }
+    else {
+      // ID not valid.
+      drupal_set_message(t('Referal ID Tidak Ditemukan.'), 'error', FALSE);
     }
   }
 }
 
 /**
-  * Implements hook_user_insert
-  * Check if campaign link exist
-  */
-function scampaign_user_insert(&$edit, $account, $category){
-  if(!empty($_SESSION['scampaign'])){
-    // Decrypt it
+ * Implements hook_user_insert().
+ *
+ * Check if campaign link exist.
+ */
+function scampaign_user_insert(&$edit, $account, $category) {
+  if (isset($_SESSION['scampaign']) && !empty($_SESSION['scampaign'])) {
+    // Decrypt it.
     $campaign_id = betaID($_SESSION['scampaign']);
-    if($campaign_id){
+    if ($campaign_id) {
       $result = db_query('SELECT * FROM {scampaign} WHERE id = :id', array(':id' => $campaign_id));
-      // Double Check here
-      // Check if ID exist
-      if($result->rowCount()){
+      // Double Check here.
+      // Check if ID exist.
+      if ($result->rowCount()) {
         $campaign = $result->fetch();
-        if($campaign->used < $campaign->max_use){
-          // Valid Session, invoke the rule
-          rules_invoke_component($campaign->rules_name,$account);
-          
-          // Mark used and add the email to the list
+        if ($campaign->used < $campaign->max_use) {
+          // Valid Session, invoke the rule.
+          rules_invoke_component($campaign->rules_name, $account);
+
+          // Mark used and add the email to the list.
           $emails = unserialize($campaign->email);
 
           $emails[] = $account->mail;
           db_update('scampaign')
-          ->fields(array(
-            'used' => $campaign->used+1,
-            'email' => serialize($emails)
-          ))
-          ->condition('id',$campaign_id,'=')
+            ->fields(array(
+              'used' => $campaign->used + 1,
+              'email' => serialize($emails),
+            ))
+          ->condition('id', $campaign_id, '=')
           ->execute();
-          
-        } else {
-          // Already reach Maximum use
-          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'),'error',false);
+          // Notification to customer.
+          drupal_get_messages('status');
+          // @todo: need to get this from rules value.
+          drupal_set_message(t('Sepulsa kredit sebesar Rp 20.000,- akan dikreditkan setelah Anda melakukan verifikasi via email.'), 'status', FALSE);
         }
-      } else {
-        // ID not found
-        drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+        else {
+          // Already reach Maximum use.
+          drupal_set_message(t('Link ini sudah pernah dipakai, anda tidak akan mendapatkan benefit apa-apa jika melakukan registrasi.'), 'error', FALSE);
+        }
       }
-    } else {
-      // ID not valid
-      drupal_set_message(t('Referal ID Tidak Ditemukan.'),'error',false);
+      else {
+        // ID not found.
+        drupal_set_message(t('Referal ID Tidak Ditemukan.'), 'error', FALSE);
+      }
+    }
+    else {
+      // ID not valid.
+      drupal_set_message(t('Referal ID Tidak Ditemukan.'), 'error', FALSE);
     }
     // Unset the session for any result.
     unset($_SESSION['scampaign']);
@@ -123,29 +163,54 @@ function scampaign_user_insert(&$edit, $account, $category){
 }
 
 /**
-  * Stronger crypt to near ubreakable
-  */
-function betaID($in){
-  // Hardcode the pin for cosistency, must be bigger than 100k
+ * Function scampaign_redirect().
+ *
+ * @param string $code
+ *   Sepulsa campaign code.
+ */
+function scampaign_redirect($code = NULL) {
+  if (!empty($code)) {
+    // Redirect to register page.
+    drupal_goto('user/register', array(
+      'query' => array(
+        'ref' => $code,
+      ),
+    ));
+  }
+  // Other condition: not found.
+  drupal_not_found();
+}
+
+/**
+ * Function betaID().
+ *
+ * Stronger crypt to near ubreakable
+ *
+ * @param string $in
+ *   Input string.
+ */
+function betaID($in) {
+  // Hardcode the pin for cosistency, must be bigger than 100k.
   $rand = '820812';
 
-  //Get the decrypted, should be [id][rand][id]
-  $normal = (alphaID($in,true,10));
-  //Remove the rand from it. Leaving [id][id]
-  $normal = str_replace($rand,'',$normal);
-  //Now devide it into 2
-  $div = strlen($normal)/2;
-  $step1 = substr($normal,0, $div);
-  $step2 = substr($normal,$div);
-  //If both [id] is the same
-  if($step1 == $step2){
+  // Get the decrypted, should be [id][rand][id].
+  $normal = (alphaID($in, TRUE, 10));
+  // Remove the rand from it. Leaving [id][id].
+  $normal = str_replace($rand, '', $normal);
+  // Now devide it into 2.
+  $div = strlen($normal) / 2;
+  $step1 = substr($normal, 0, $div);
+  $step2 = substr($normal, $div);
+  // If both [id] is the same.
+  if ($step1 == $step2) {
     return $step1;
   }
-  //Return false if [id] is not the same
-  return false;
+  // Return false if [id] is not the same.
+  return FALSE;
 }
+
 /**
- * Translates a number to a short alhanumeric version
+ * Translates a number to a short alhanumeric version.
  *
  * Translated any number up to 9007199254740992
  * to a shorter version in letters e.g.:
@@ -158,35 +223,39 @@ function betaID($in){
  * If you want the alphaID to be at least 3 letter long, use the
  * $pad_up = 3 argument
  *
- * @param mixed   $in   String or long input to translate
- * @param boolean $to_num  Reverses translation when true
- * @param mixed   $pad_up  Number or boolean padds the result up to a specified length
+ * @param mixed $in
+ *   String or long input to translate
+ * @param bool $to_num
+ *   Reverses translation when true
+ * @param mixed $pad_up
+ *   Number or boolean padds the result up to a specified length
  *
- * @return mixed string or long
+ * @return mixed
+ *   string or long
  */
-function alphaID($in, $to_num = false, $pad_up = null) {
-  // Add $pass_key from drupal hash salt to make it harder to guess
+function alphaID($in, $to_num = FALSE, $pad_up = NULL) {
+  // Add $pass_key from drupal hash salt to make it harder to guess.
   $pass_key = drupal_get_hash_salt();
-  $out   =   '';
+  $out = '';
   $index = 'bcdfghjklmnpqrstvwxyz0123456789BCDFGHJKLMNPQRSTVWXYZ';
   $base  = strlen($index);
 
-  if ($pass_key !== null) {
+  if ($pass_key !== NULL) {
     // Although this function's purpose is to just make the
     // ID short - and not so much secure,
     // with this patch by Simon Franz (http://blog.snaky.org/)
     // you can optionally supply a password to make it harder
-    // to calculate the corresponding numeric ID
+    // to calculate the corresponding numeric ID.
 
     for ($n = 0; $n < strlen($index); $n++) {
       $i[] = substr($index, $n, 1);
     }
 
-    $pass_hash = hash('sha256',$pass_key);
+    $pass_hash = hash('sha256', $pass_key);
     $pass_hash = (strlen($pass_hash) < strlen($index) ? hash('sha512', $pass_key) : $pass_hash);
 
     for ($n = 0; $n < strlen($index); $n++) {
-      $p[] =  substr($pass_hash, $n, 1);
+      $p[] = substr($pass_hash, $n, 1);
     }
 
     array_multisort($p, SORT_DESC, $i);
@@ -194,7 +263,7 @@ function alphaID($in, $to_num = false, $pad_up = null) {
   }
 
   if ($to_num) {
-    // Digital number  <<--  alphabet letter code
+    // Digital number  <<--  alphabet letter code.
     $len = strlen($in) - 1;
 
     for ($t = $len; $t >= 0; $t--) {
@@ -209,8 +278,9 @@ function alphaID($in, $to_num = false, $pad_up = null) {
         $out -= pow($base, $pad_up);
       }
     }
-  } else {
-    // Digital number  -->>  alphabet letter code
+  }
+  else {
+    // Digital number  -->>  alphabet letter code.
     if (is_numeric($pad_up)) {
       $pad_up--;
 

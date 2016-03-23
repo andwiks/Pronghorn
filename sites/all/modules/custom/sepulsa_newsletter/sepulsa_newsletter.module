@@ -25,6 +25,14 @@ function sepulsa_newsletter_menu() {
     'access callback' => TRUE,
   );
 
+  $items['admin/config/people/mailchimp-upload'] = array(
+    'title' => 'Mailchimp Import',
+    'description' => 'Import Subscriber / Unsubscriber in Mailchimp.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_newsletter_import_form'),
+    'access arguments' => array('access administration pages'),
+  );
+
   return $items;
 }
 
@@ -220,30 +228,113 @@ function sepulsa_newsletter_mailchimp_api($settings) {
  */
 function sepulsa_newsletter_user_presave(&$edit, $account, $category) {
   $result = 'HTTP request not sent';
-  if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
-    $status = 'subscribed';
+  if (isset($edit['field_newsletter_subscribers']) && !empty($edit['field_newsletter_subscribers'])) {
+    if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
+      $status = 'subscribed';
+    }
+    else {
+      $status = 'unsubscribed';
+    }
+    if (isset($account->is_new) && !empty($account->is_new)) {
+      $settings = array(
+        'method' => 'POST',
+        'op' => 'members',
+        'email' => $edit['mail'],
+        'status' => $status,
+      );
+      $result = sepulsa_newsletter_mailchimp_api($settings);
+      watchdog('Insert Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
+    }
+    else {
+      $settings = array(
+        'method' => 'PUT',
+        'op' => 'members',
+        'email' => $edit['mail'],
+        'status' => $status,
+      );
+      $result = sepulsa_newsletter_mailchimp_api($settings);
+      watchdog('Update Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
+    }
+  }
+}
+
+/**
+ * Function sepulsa_newsletter_import_form().
+ */
+function sepulsa_newsletter_import_form() {
+  $form['#attributes']['enctype'] = "multipart/form-data";
+  $form['csv_upload'] = array(
+    '#type' => 'file',
+    '#title' => t('CSV File from Mailchimp'),
+    '#size' => 40,
+    '#description' => t('Import Subscriber / Unsubscriber in Mailchimp.'),
+  );
+  $form['flag_subscriber'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Mailchimp Subscriber ?'),
+    '#description' => t('Check if you want to import subscribed user in mailchimp.'),
+    '#default_value' => 0,
+    '#return_value' => 1,
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#title' => 'Submit',
+    '#value' => 'Submit',
+  );
+
+  return $form;
+}
+
+/**
+ * Function sepulsa_newsletter_import_form_validate().
+ */
+function sepulsa_newsletter_import_form_validate($form, &$form_state) {
+  $validators = array('file_validate_extensions' => array('csv'));
+  $file = file_save_upload('csv_upload', $validators);
+  // Check file uploaded OK.
+  if (!$file) {
+    form_set_error('csv_upload', t('A file must be uploaded'));
+  }
+  elseif ($file->filemime != 'text/csv') {
+    form_set_error('csv_upload', t('The file must be of CSV type only.'));
   }
   else {
-    $status = 'unsubscribed';
+    // Set files to form_state, to process when form is submitted.
+    $form_state['values']['csv_upload'] = $file;
   }
-  if (isset($account->is_new) && !empty($account->is_new)) {
-    $settings = array(
-      'method' => 'POST',
-      'op' => 'members',
-      'email' => $edit['mail'],
-      'status' => $status,
-    );
-    $result = sepulsa_newsletter_mailchimp_api($settings);
-    watchdog('Insert Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
+}
+
+/**
+ * Function sepulsa_newsletter_import_form_submit().
+ */
+function sepulsa_newsletter_import_form_submit($form, &$form_state) {
+  $filepath = $form_state['values']['csv_upload']->destination;
+  $handle = @fopen($filepath, "r");
+  $report_watchdog = array();
+  $i = 0;
+  while ($row = fgetcsv($handle, 1000, ',')) {
+    if ($i != 0) {
+      $result = db_select('users', 'u');
+      $result->fields('u', array('uid'));
+      $result->condition('u.mail', $row[0]);
+      $result_fix = $result->execute()->fetchAssoc();
+
+      if (isset($result_fix) && !empty($result_fix)) {
+        $user = user_load($result_fix['uid']);
+        $user->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'] = $form_state['values']['flag_subscriber'];
+        user_save($user);
+        $report_watchdog[$i] = $row[0] . ' field_newsletter_subscribers change to ' . $form_state['values']['flag_subscriber'];
+      }
+      else {
+        $report_watchdog[$i] = $row[0] . ' Not Found !';
+      }
+      $i++;
+    }
+    else {
+      $i++;
+    }
   }
-  else {
-    $settings = array(
-      'method' => 'PUT',
-      'op' => 'members',
-      'email' => $edit['mail'],
-      'status' => $status,
-    );
-    $result = sepulsa_newsletter_mailchimp_api($settings);
-    watchdog('Update Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
-  }
+
+  watchdog('Mailchimp Import', 'data : <pre> @report_watchdog </pre>',
+    array('@report_watchdog' => print_r($report_watchdog, TRUE)));
 }

@@ -285,7 +285,10 @@ function scampaign_detail($campaign) {
   foreach ($result as $key => $value) {
     $crypt = $value->id . $rand . $value->id;
     $crypt = alphaID($crypt, FALSE, 10);
-    if (!isset($keys['code']) || isset($keys['code']) && !empty($keys['code']) && $keys['code'] == $crypt) {
+    if (!isset($keys['code'])
+      || (isset($keys['code']) && empty($keys['code']))
+      || (isset($keys['code']) && !empty($keys['code']) && $keys['code'] == $crypt)
+    ) {
       $row = array(
         'id' => $value->id,
         'link' => $crypt,

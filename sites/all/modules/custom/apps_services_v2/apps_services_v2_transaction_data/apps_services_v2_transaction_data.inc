@@ -76,7 +76,7 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
 /*
  * change the format of order listing
  */
-function apps_services_v2_transaction_change_format_order($order_container){
+function apps_services_v2_transaction_change_format_order($order_container, $type=null){
   //change return value of order container
   $selected_returned_value = array();
   foreach($order_container as $order){
@@ -85,7 +85,13 @@ function apps_services_v2_transaction_change_format_order($order_container){
     $temp_array_data["mail"] = $order->mail;
     $temp_array_data["order_status"] = $order->status;
     $temp_array_data["created"] = $order->created;
-    $temp_array_data["amount"] = $order->commerce_order_total['amount'];
+    //if accessed from home listing use first product price instead
+    if($type == "home" && isset($order->commerce_line_items[0]->commerce_product->commerce_price["und"][0]["amount"]) && $order->commerce_line_items[0]->commerce_product->commerce_price["und"][0]["amount"] > 0){
+      $temp_array_data["amount"] = $order->commerce_line_items[0]->commerce_product->commerce_price["und"][0]["amount"];
+    }
+    else{
+      $temp_array_data["amount"] = $order->commerce_order_total['amount'];
+    }
     $temp_array_data["currency_code"] = $order->commerce_order_total['currency_code'];
     $temp_array_data["response"] = $order;
     $temp_array_data["product_id"] = $order->commerce_line_items[0]->commerce_product->product_id;
@@ -353,7 +359,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   }
   
   //change the returned format
-  $order_container = apps_services_v2_transaction_change_format_order($order_container);
+  $order_container = apps_services_v2_transaction_change_format_order($order_container,"home");
   
   if(count($order_container)){
     $return["status"] = true;

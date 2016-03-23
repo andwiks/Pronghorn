@@ -2,14 +2,6 @@
 
 function apps_services_v2_init_request_setting_form($node, $form_state) {
     
-    $form['apps_services_v2_init_request_cache_id'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Cache Id'),
-        '#default_value' => variable_get("apps_services_v2_init_request_cache_id", "XcF1d"),
-        '#required' => TRUE,
-        '#description' => 'Current active Cache Id',
-    );
-    
     $form['android'] = array(
         '#type' => 'fieldset',
         '#title' => t('Android'),

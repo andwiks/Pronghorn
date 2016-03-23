@@ -4,7 +4,7 @@ function apps_services_v2_init_request_validation_and_get_init_services($source)
     $return = array();
     
     //cache id
-    $return["cache_id"] = variable_get("apps_services_v2_init_request_cache_id", "XcF1d");
+    $return["cache_id"] = variable_get('css_js_query_string', '0');
     
     //android
     $return["android_current_version"] = variable_get("apps_services_v2_init_request_android_current_version", "");

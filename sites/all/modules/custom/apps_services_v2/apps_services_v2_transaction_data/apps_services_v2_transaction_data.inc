@@ -77,6 +77,17 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
  * change the format of order listing
  */
 function apps_services_v2_transaction_change_format_order($order_container, $type=null){
+  
+  //get all available operator data
+  $operator = sepulsa_get_all_operator_data();
+  //reorganize the returned operator for easy process
+  $operator_array = array();
+  foreach($operator as $data_operator){
+    foreach($data_operator["prefix"] as $prefix){
+      $operator_array[$prefix] = $data_operator["operator"];
+    }
+  }
+  
   //change return value of order container
   $selected_returned_value = array();
   foreach($order_container as $order){
@@ -149,6 +160,26 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
       else{
         $temp_array_data["electricity_phone_number"] = null;
       }
+    }
+    
+    //add operator returned value based on phone number
+    if(isset($temp_array_data["type"]) && $temp_array_data["type"] == "mobile_prepaid"){
+      $first_4_digit = substr($temp_array_data["field_phone_number"], 0, 4);
+      if(isset($operator_array[$first_4_digit]) && !empty($operator_array[$first_4_digit])){
+        $temp_array_data["operator_title"] = $operator_array[$first_4_digit];
+      }
+      else{
+        $temp_array_data["operator_title"] = "Pulsa Prabayar";
+      }
+    }
+    elseif(isset($temp_array_data["type"]) && ($temp_array_data["type"] == "electricity_prepaid" || $temp_array_data["type"] == "pln_prepaid")){
+      $temp_array_data["operator_title"] = "Listrik Prabayar";
+    }
+    elseif(isset($temp_array_data["type"]) && $temp_array_data["type"] == "deposit_sepulsa"){
+      $temp_array_data["operator_title"] = "Deposit Kredit";
+    }
+    else{
+      $temp_array_data["operator_title"] = "Transaksi Sepulsa";
     }
     
     //set favorite based on list data

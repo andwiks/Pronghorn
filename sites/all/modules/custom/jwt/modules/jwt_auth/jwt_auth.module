@@ -1,0 +1,88 @@
+<?php
+/**
+ * @file
+ * jwt_auth.module
+ *
+ * @author andreas@sepulsa.com
+ *
+ * @see https://auth0.com/blog/2014/12/02/using-json-web-tokens-as-api-keys/
+ * @see https://github.com/lcobucci/jwt
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_authentication_info().
+ */
+function jwt_auth_services_authentication_info() {
+  return array(
+    'title' => t('JWT Authentication'),
+    'description' => t('Use JSON Web Tokens to secure API authorization'),
+    'authenticate_call' => '_jwt_auth_authenticate_call',
+    'security_settings' => '_jwt_auth_security_settings',
+    'controller_settings' => '_jwt_auth_controller_settings',
+    'file' => 'jwt_auth.inc',
+  );
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function jwt_auth_claims().
+ *
+ * Get JWT claim data from jwt authentication.
+ *
+ * @param array $claims
+ *   Claims data.
+ *
+ * @return array
+ *   JWT Claims.
+ */
+function jwt_auth_claims($claims = array()) {
+  $data = &drupal_static(__FUNCTION__, array());
+
+  if (!empty($claims)) {
+    $data = $claims;
+  }
+
+  return $data;
+}
+
+/**
+ * Function jwt_auth_scope().
+ *
+ * Get current authentication scope.
+ *
+ * @param array $method
+ *   Method argument from authenticate call callback.
+ *
+ * @return array
+ *   Current service scope key and name.
+ */
+function jwt_auth_scope($method = array()) {
+  // Define current scope.
+  $scope = &drupal_static(__FUNCTION__, array());
+  // Check static scope variable.
+  if (empty($scope) && !empty($method)) {
+    // Get current scope resource key.
+    $scope_key = arg(1);
+    // Remove unnecessary extension name.
+    $scope_key = preg_replace('#\..*$#', '', $scope_key);
+    // Get all services resources.
+    $resources = services_get_resources();
+    // Looping for each resource.
+    foreach ($resources[$scope_key] as $class => $data) {
+      foreach ($data as $scope_value => $controller) {
+        // Match current method callback with controller callback.
+        if ($controller['callback'] == $method['callback']) {
+          $scope[$scope_key][$scope_value] = $scope_value;
+        }
+      }
+    }
+  }
+  return $scope;
+}

@@ -1,0 +1,4 @@
+name = Zenziva
+description = Zenziva SMS Gateway
+core = 7.x
+configure = admin/config/services/zenziva

@@ -1,0 +1,8 @@
+name = "JWT Authentication"
+description = "Provides JSON Web Tokens authentication for the services module."
+core = 7.x
+package = "Sepulsa"
+php = 5.6
+dependencies[] = jwt
+dependencies[] = services
+dependencies[] = rules

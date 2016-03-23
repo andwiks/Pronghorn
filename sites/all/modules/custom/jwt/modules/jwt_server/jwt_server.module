@@ -1,0 +1,212 @@
+<?php
+/**
+ * @file
+ * jwt_server.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * JWT Server config menu path.
+ * @var string
+ */
+define('JWT_SERVER_CONFIG_MENU_PATH', 'admin/config/services/jwt/server');
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function jwt_server_menu() {
+  $items = array();
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH] = array(
+    'title' => 'Server',
+    'description' => 'JWT Server page',
+    'page callback' => 'jwt_server_list',
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/add'] = array(
+    'title' => 'Add',
+    'description' => 'Add JWT Server page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_server_form'),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/%jwt_server'] = array(
+    'title' => 'Edit',
+    'description' => 'Edit JWT server page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_server_form', 5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/%jwt_server/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete JWT server page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_server_delete_form', 5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/%jwt_server/enable'] = array(
+    'title' => 'Enable',
+    'description' => 'Enable JWT server configuration',
+    'page callback' => 'jwt_server_enable',
+    'page arguments' => array(5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+  );
+
+  $items[JWT_SERVER_CONFIG_MENU_PATH . '/%jwt_server/disable'] = array(
+    'title' => 'Disable',
+    'description' => 'Disable JWT server configuration',
+    'page callback' => 'jwt_server_disable',
+    'page arguments' => array(5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_server.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function jwt_server_entity_info() {
+  $info['jwt_server'] = array(
+    // A human readable label to identify our entity.
+    'label' => t('JWT Server'),
+    // The controller for our Entity: use Entity API controller.
+    'controller class' => 'EntityAPIController',
+    // The table for this entity defined in hook_schema()
+    'base table' => 'jwt_server',
+    // Make use the class' label() and uri() implementation by default.
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    // IF fieldable == FALSE, we can't attach fields.
+    'fieldable' => FALSE,
+    // entity_keys tells the controller what database fields are used for key
+    // functions. It is not required if we don't have bundles or revisions.
+    // Here we do not support a revision, so that entity key is omitted.
+    'entity keys' => array(
+      // The 'id' (basic_id here) is the unique id.
+      'id' => 'sid',
+      'label' => 'label',
+    ),
+    'access callback' => 'jwt_server_access',
+    'bundles' => array(
+      'jwt_server' => array(
+        'label' => t('JWT Server'),
+        'admin' => array(
+          'path' => JWT_SERVER_CONFIG_MENU_PATH,
+          'access arguments' => array('administer jwt'),
+        ),
+      ),
+    ),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_load().
+ */
+function jwt_server_load($server) {
+  // Validate Client ID.
+  $server = intval($server);
+  // Get data from static variables.
+  $config = &drupal_static(__FUNCTION__ . '_' . $server);
+  // Check the config data.
+  if (!isset($config)) {
+    // Load jwt config from cache.
+    if ($cache = cache_get('jwt:server:' . $server)) {
+      $config = $cache->data;
+    }
+    else {
+      // Get jwt server config by id.
+      $entity = entity_load('jwt_server', array($server));
+      if (isset($entity[$server]) && !empty($entity[$server])) {
+        $config = $entity[$server];
+        cache_set('jwt:server:' . $server, $config, 'cache');
+      }
+    }
+  }
+  // Check whether can get config data.
+  return is_object($config) && !empty($config) ? $config : FALSE;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function jwt_server_load_by_name().
+ *
+ * @param string $name
+ *   JWT config machine name.
+ *
+ * @return mixed
+ *   JWT config object or FALSE if not found.
+ */
+function jwt_server_load_by_name($name) {
+  // Search for jwt server config name.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'jwt_server')
+  ->propertyCondition('name', $name);
+  $result = $query->execute();
+  // Check the result.
+  if (!empty($result)) {
+    return jwt_server_load(key($result['jwt_server']));
+  }
+  // Other condition return FALSE.
+  return FALSE;
+}
+
+/**
+ * Function jwt_server_access().
+ *
+ * @param string $op
+ *   Entity operation.
+ * @param object $entity
+ *   Entity data.
+ * @param string $account
+ *   Supposed to be user object.
+ * @param string $entity_type
+ *   Entity type.
+ *
+ * @return bool
+ *   Allow access or not.
+ */
+function jwt_server_access($op, $entity = NULL, $account = NULL, $entity_type = '') {
+  // @todo: check user roles.
+  return TRUE;
+}
+
+/**
+ * Function jwt_server_get_active().
+ *
+ * @return array
+ *   List of active jwt server configuration.
+ */
+function jwt_server_get_active() {
+  return db_select('jwt_server', 'js')
+    ->fields('js', array('sid', 'name'))
+    ->condition('active', 0, '>')
+    ->execute()
+    ->fetchAll();
+}

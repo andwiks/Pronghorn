@@ -1,7 +1,15 @@
 <?php
+/**
+ * @file
+ * sepulsa_newsletter.install
+ *
+ * @author nuraizatif
+ *
+ * @todo: add field info to user entity
+ */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function sepulsa_newsletter_install() {
 
@@ -41,7 +49,7 @@ function sepulsa_newsletter_install() {
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function sepulsa_newsletter_uninstall() {
   // Check if our field is not already created.

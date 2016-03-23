@@ -1,0 +1,479 @@
+<?php
+/**
+ * @file
+ * jwt.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * List of JWT algorithm which use HMAC, need secret key.
+ * @var array
+ */
+const JWT_HMAC = array('HS256', 'HS384', 'HS512');
+
+/**
+ * JWT config menu path.
+ * @var string
+ */
+define('JWT_CONFIG_MENU_PATH', 'admin/config/services/jwt/config');
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_libraries_info().
+ */
+function jwt_libraries_info() {
+  // Create function variable to get composer for xautoload.
+  $xautoload = function($adapter) {
+    $adapter->composerJson('composer.json');
+  };
+  $libraries['jwt-3.1'] = array(
+    'name' => 'JWT Library',
+    'version' => '3.1',
+    'vendor url' => 'https://github.com/lcobucci/jwt',
+    'download url' => 'https://github.com/lcobucci/jwt/archive/3.1.zip',
+    'files' => array(
+      'php' => array('src/Builder.php'),
+    ),
+    'xautoload' => $xautoload,
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function jwt_menu() {
+  $items = array();
+
+  // Default JWT menu.
+  $items['admin/config/services/jwt'] = array(
+    'title' => 'JWT',
+    'description' => 'Configure JSON Web Token.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  // JWT Tester page.
+  $items['admin/config/services/jwt/tester'] = array(
+    'title' => 'Tester',
+    'description' => 'JWT Tester page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_tester_verify_form'),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.pages.inc',
+  );
+  // JWT Tester verify page.
+  $items['admin/config/services/jwt/tester/verify'] = array(
+    'title' => 'Verify',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  // JWT Configuration page.
+  $items[JWT_CONFIG_MENU_PATH] = array(
+    'title' => 'Algorithm Config',
+    'description' => 'Manage JWT algorithm configurations.',
+    'page callback' => 'jwt_configs_list',
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // List of JWT configuration.
+  $items[JWT_CONFIG_MENU_PATH . '/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  // Add JWT configuration.
+  $items[JWT_CONFIG_MENU_PATH . '/add'] = array(
+    'title' => 'Add',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_config_form'),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.admin.inc',
+    'type' => MENU_LOCAL_ACTION,
+  );
+  // Edit JWT configuration.
+  $items[JWT_CONFIG_MENU_PATH . '/edit/%jwt_config'] = array(
+    'title' => 'Edit',
+    'title callback' => 'jwt_config_edit_title',
+    'title arguments' => array(6),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_config_form', 6),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.admin.inc',
+  );
+  // Delete JWT configuration.
+  $items[JWT_CONFIG_MENU_PATH . '/delete/%jwt_config'] = array(
+    'title' => 'Delete JWT configuration',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_config_delete_confirm', 6),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.admin.inc',
+  );
+
+  // JWT Settings page.
+  $items['admin/config/services/jwt/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Configure default behavior of JWT.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_settings'),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt.admin.inc',
+    'weight' => 5,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function jwt_entity_info() {
+  $info['jwt_config'] = array(
+    // A human readable label to identify our entity.
+    'label' => t('JWT Config'),
+    // The controller for our Entity: use Entity API controller.
+    'controller class' => 'EntityAPIController',
+    // The table for this entity defined in hook_schema()
+    'base table' => 'jwt_config',
+    // Make use the class' label() and uri() implementation by default.
+    'label callback' => 'jwt_config_label',
+    'uri callback' => 'entity_class_uri',
+    // IF fieldable == FALSE, we can't attach fields.
+    'fieldable' => FALSE,
+    // entity_keys tells the controller what database fields are used for key
+    // functions. It is not required if we don't have bundles or revisions.
+    // Here we do not support a revision, so that entity key is omitted.
+    'entity keys' => array(
+      // The 'id' (basic_id here) is the unique id.
+      'id' => 'cid',
+      'label' => 'label',
+    ),
+    'access callback' => 'jwt_config_access',
+    'bundles' => array(
+      'jwt_config' => array(
+        'label' => t('JWT Config'),
+        'admin' => array(
+          'path' => JWT_CONFIG_MENU_PATH,
+          'access arguments' => array('administer jwt'),
+        ),
+      ),
+    ),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function jwt_permission() {
+  return array(
+    'administer jwt' => array(
+      'title' => t('Administer JWT settings'),
+      'description' => 'Change jwt settings.',
+    ),
+  );
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Implements hook_load().
+ */
+function jwt_config_load($cid) {
+  // Validate Config ID.
+  $cid = intval($cid);
+  // Get data from static variables.
+  $config = &drupal_static(__FUNCTION__ . '_' . $cid);
+  // Check the config data.
+  if (!isset($config)) {
+    // Load jwt config from cache.
+    if ($cache = cache_get('jwt:config:' . $cid)) {
+      $config = $cache->data;
+    }
+    else {
+      // Get jwt config by id.
+      $entity = entity_load('jwt_config', array($cid));
+      if (isset($entity[$cid]) && !empty($entity[$cid])) {
+        $config = $entity[$cid];
+        cache_set('jwt:config:' . $cid, $config, 'cache');
+      }
+    }
+  }
+  // Check whether can get config data.
+  return is_object($config) && !empty($config) ? $config : FALSE;
+}
+
+/**
+ * Function jwt_config_load_by_name().
+ *
+ * @param string $name
+ *   JWT config machine name.
+ *
+ * @return mixed
+ *   JWT config object or FALSE if not found.
+ */
+function jwt_config_load_by_name($name) {
+  // Search for jwt config name.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'jwt_config')
+    ->propertyCondition('name', $name);
+  $result = $query->execute();
+  // Check the result.
+  if (!empty($result)) {
+    return jwt_config_load(key($result['jwt_config']));
+  }
+  // Other condition return FALSE.
+  return FALSE;
+}
+
+/**
+ * Title callback for the configuration edit page.
+ *
+ * @param string $config
+ *   The machine-readable name of the configuration being edited.
+ *
+ * @return string
+ *   The human-friendly label of the requested configuration.
+ */
+function jwt_config_edit_title($config) {
+  return t('Edit') . ' ' . (isset($config->label) ? $config->label : t('JWT configuration'));
+}
+
+/**
+ * Function jwt_config_access().
+ *
+ * @param string $op
+ *   Entity operation.
+ * @param object $entity
+ *   Entity data.
+ * @param string $account
+ *   Supposed to be user object.
+ * @param string $entity_type
+ *   Entity type.
+ *
+ * @return bool
+ *   Allow access or not.
+ */
+function jwt_config_access($op, $entity = NULL, $account = NULL, $entity_type = '') {
+  // @todo: check user roles.
+  return TRUE;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function jwt_get_enabled_config().
+ *
+ * @return array
+ *   List of enabled jwt config.
+ */
+function jwt_get_enabled_config() {
+  // Get options from static.
+  $options = &drupal_static(__FUNCTION__);
+  // Check if static not available.
+  if (!isset($options)) {
+    if ($cache = cache_get('jwt:configs')) {
+      $options = $cache->data;
+    }
+    else {
+      // Query to get enabled jwt config.
+      $query = db_select('jwt_config', 'jc');
+      $query->fields('jc', array('cid', 'label', 'alg'))
+        ->condition('enabled', 1);
+      $result = $query->execute()->fetchAll();
+      // Looping for each result.
+      foreach ($result as $config) {
+        $options[$config->cid] = t('@label (@alg)', array(
+          '@label' => $config->label,
+          '@alg' => $config->alg,
+        ));
+      }
+      // Set cache: jwt:configs.
+      cache_set('jwt:configs', $options, 'cache');
+    }
+  }
+  // Return available options.
+  return $options;
+}
+
+/**
+ * Function jwt_get_signer().
+ *
+ * @param string $alg
+ *   JWT algorithm type.
+ *
+ * @return mixed
+ *   Signer object or FALSE if failed.
+ */
+function jwt_get_signer($alg) {
+  // Load jwt library.
+  if (($library = libraries_load('jwt-3.1')) && !empty($library['loaded'])) {
+    // Get signer.
+    switch ($alg) {
+      case 'HS384':
+        $signer = new Lcobucci\JWT\Signer\Hmac\Sha384();
+        break;
+
+      case 'HS512':
+        $signer = new Lcobucci\JWT\Signer\Hmac\Sha512();
+        break;
+
+      case 'RS256':
+        $signer = new Lcobucci\JWT\Signer\Rsa\Sha256();
+        break;
+
+      case 'RS384':
+        $signer = new Lcobucci\JWT\Signer\Rsa\Sha384();
+        break;
+
+      case 'RS512':
+        $signer = new Lcobucci\JWT\Signer\Rsa\Sha512();
+        break;
+
+      case 'ES256':
+        $signer = new Lcobucci\JWT\Signer\Ecdsa\Sha256();
+        break;
+
+      case 'ES384':
+        $signer = new Lcobucci\JWT\Signer\Ecdsa\Sha384();
+        break;
+
+      case 'ES512':
+        $signer = new Lcobucci\JWT\Signer\Ecdsa\Sha512();
+        break;
+
+      case 'HS256':
+      default:
+        $signer = new Lcobucci\JWT\Signer\Hmac\Sha256();
+        break;
+    }
+    // Return signer object.
+    return $signer;
+  }
+  // Other condition, return FALSE.
+  return FALSE;
+}
+
+/**
+ * Function jwt_verify().
+ *
+ * @param string $token
+ *   JWT Token.
+ * @param int|string|object $config
+ *   JWT Config ID or JWT Config machine name or JWT object.
+ *
+ * @return mixed
+ *   Array of JWT claims or FALSE if invalid signature.
+ */
+function jwt_verify($token, $config) {
+  // Load jwt library.
+  if (($library = libraries_load('jwt-3.1')) && !empty($library['loaded'])) {
+    // Check whether config is jwt object.
+    if (!is_object($config)) {
+      // Load JWT config: based on input integer or string machine name.
+      $config = is_numeric($config) ? jwt_config_load($config) : jwt_config_load_by_name($config);
+    }
+    // Check config load.
+    if (isset($config->alg) && isset($config->public_key)
+      && isset($config->enabled) && $config->enabled > 0
+    ) {
+      try {
+        // Check whether algorithm using hmac.
+        $key = in_array($config->alg, JWT_HMAC) ? $config->public_key : new Lcobucci\JWT\Signer\Key($config->public_key);
+        // Get signer.
+        $signer = jwt_get_signer($config->alg);
+        // Load parser.
+        $parser = new Lcobucci\JWT\Parser();
+        // Parse JWT.
+        $token = $parser->parse($token);
+        // Verify token.
+        if ($token->verify($signer, $key) === TRUE) {
+          // Return token claims.
+          return $token->getClaims();
+        }
+      }
+      catch (Exception $e) {
+        // Log this condition.
+        watchdog('jwt', 'JWT Verify token @token error: @error <pre>Debug: @debug</pre><pre>Config: @config</pre>', array(
+          '@token' => $token,
+          '@error' => $e->getMessage(),
+          '@debug' => $e->getTraceAsString(),
+          '@config' => print_r($config, TRUE),
+        ), WATCHDOG_ERROR);
+      }
+    }
+  }
+  // Other condition: return FALSE.
+  return FALSE;
+}
+
+/**
+ * Function jwt_sign().
+ *
+ * @param array $data
+ *   Array key and value which will be encoded and signed.
+ * @param int|string|object $config
+ *   JWT Config ID or JWT Config machine name or JWT config object.
+ *
+ * @return mixed
+ *   JWT string or FALSE if failed.
+ */
+function jwt_sign($data, $config) {
+  // Load jwt library.
+  if (($library = libraries_load('jwt-3.1')) && !empty($library['loaded'])) {
+    // Check whether config is jwt object.
+    if (!is_object($config)) {
+      // Load JWT config: based on input integer or string machine name.
+      $config = is_numeric($config) ? jwt_config_load($config) : jwt_config_load_by_name($config);
+    }
+    // Check config load.
+    if (isset($config->alg) && isset($config->private_key)
+      && isset($config->enabled) && $config->enabled > 0
+    ) {
+      try {
+        // Check whether algorithm using hmac.
+        $key = in_array($config->alg, JWT_HMAC) ? $config->private_key : new Lcobucci\JWT\Signer\Key($config->private_key);
+
+        // Get signer.
+        $signer = jwt_get_signer($config->alg);
+        // Get token builder.
+        $builder = new Lcobucci\JWT\Builder();
+        // Looping foreach datum.
+        foreach ($data as $claim => $value) {
+          if (!empty($value)) {
+            $builder->set($claim, $value);
+          }
+        }
+        // Sign it using signer and private key.
+        $builder->sign($signer, $key);
+        // Get token.
+        $token = $builder->getToken();
+        // Return token as string.
+        return $token->__toString();
+      }
+      catch (Exception $e) {
+        // Log this condition.
+        watchdog('jwt', 'JWT Sign error: @error <pre>Data: @data</pre><pre>Debug: @debug</pre><pre>Config: @config</pre>', array(
+          '@error' => $e->getMessage(),
+          '@data' => print_r($data, TRUE),
+          '@debug' => $e->getTraceAsString(),
+          '@config' => print_r($config, TRUE),
+        ), WATCHDOG_ERROR);
+      }
+    }
+  }
+  // Other condition: return FALSE.
+  return FALSE;
+}

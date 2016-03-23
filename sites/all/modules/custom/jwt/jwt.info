@@ -1,0 +1,8 @@
+name = "JWT Integration"
+description = "Provides JSON Web Tokens integration for other modules."
+core = 7.x
+package = "Sepulsa"
+php = 5.6
+configure = "admin/config/services/jwt/settings"
+dependencies[] = libraries
+dependencies[] = xautoload

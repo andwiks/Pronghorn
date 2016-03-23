@@ -20,12 +20,59 @@ function sepulsa_newsletter_menu() {
     'access arguments' => array('access administration pages'),
   );
 
+  $items['newsletter/webhook_mailchimp'] = array(
+      'page callback' => 'sepulsa_webhook_mailchimp',
+      'access callback' => TRUE
+    );
+
   $items['test/print'] = array(
       'page callback' => 'sepulsa_newsletter_printquery',
       'access callback' => TRUE
     );
 
   return $items;
+}
+
+function sepulsa_webhook_mailchimp(){
+	// print_r($_GET);
+	// echo $_GET['key'];
+	$sepulsa_key = 'dev19isokenoproblemooo!';
+	if ( !isset($_GET['key']) ){
+		// echo "gada pass";die();
+	    watchdog('Mailchimp Webhook', 'No security key specified, ignoring request'); 
+	} elseif ($_GET['key'] != $sepulsa_key) {
+		// echo "pass salah";die();
+		watchdog('Mailchimp Webhook', 'Security key specified, but not correct, wanted: @sepulsa_key but received : @received', array('@sepulsa_key' => $sepulsa_key, '@received' => $_GET['key']));
+	} else {
+		// echo "goo";die();
+	    //process the request
+	    watchdog('Mailchimp Webhook', 'Processing a @type request...', array('@type' => $_POST['type']));
+	    switch($_POST['type']){
+	        case 'subscribe'  : subscribe($_POST['data']);   break;
+	        case 'unsubscribe': unsubscribe($_POST['data']); break;
+	        case 'cleaned'    : cleaned($_POST['data']);     break;
+	        case 'upemail'    : upemail($_POST['data']);     break;
+	        case 'profile'    : profile($_POST['data']);     break;
+	        default:
+	    	watchdog('Mailchimp Webhook', '@type request ignored', array('@type' => $_POST['type']));
+	    }
+	}
+}
+
+function subscribe($data){
+	watchdog('Mailchimp Webhook', '@email just subscribed!', array('@email' => $data['email']));
+}
+function unsubscribe($data){
+	watchdog('Mailchimp Webhook', '@email just unsubscribed!', array('@email' => $data['email']));
+}
+function cleaned($data){
+	watchdog('Mailchimp Webhook', '@email was cleaned from your list!', array('@email' => $data['email']));
+}
+function upemail($data){
+	watchdog('Mailchimp Webhook', '@email changed their email address to @new_email !', array('@email' => $data['old_email'], '@new_email' => $data['new_email']));
+}
+function profile($data){
+	watchdog('Mailchimp Webhook', '@email updated their profile!', array('@email' => $data['email']));
 }
 
 function sepulsa_newsletter_printquery(){

@@ -28,6 +28,21 @@ function jwt_auth_services_authentication_info() {
 }
 
 /**
+ * Implements hook_boot().
+ */
+function jwt_auth_boot() {
+  // Check if request has HTTP_AUTHORIZATION.
+  if (isset($_SERVER['HTTP_AUTHORIZATION'])
+    && preg_match('#^Bearer\s+(.+)$#i', $_SERVER['HTTP_AUTHORIZATION'])
+  ) {
+    // Disable page cache.
+    global $conf;
+    $conf['cache'] = FALSE;
+    drupal_page_is_cacheable(FALSE);
+  }
+}
+
+/**
  * Public Functions.
  */
 

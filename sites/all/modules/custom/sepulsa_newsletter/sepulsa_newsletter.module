@@ -10,6 +10,15 @@
  * Impelements hook_menu().
  */
 function sepulsa_newsletter_menu() {
+  // Administration pages.
+  $items['admin/reports/mailchimp'] = array(
+    'title' => 'Mailchimp',
+    'description' => 'Mailchimp Newsletter',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
 
   // Administration pages.
   $items['admin/config/people/mailchimp-config'] = array(
@@ -82,6 +91,16 @@ function sepulsa_webhook_mailchimp() {
         watchdog('Mailchimp Webhook', '@type request ignored', array('@type' => $_POST['type']));
     }
   }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function sepulsa_newsletter_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'sepulsa_newsletter') . '/includes/views',
+  );
 }
 
 /**
@@ -265,7 +284,7 @@ function sepulsa_newsletter_import_form() {
   $form['#attributes']['enctype'] = "multipart/form-data";
   $form['csv_upload'] = array(
     '#type' => 'file',
-    '#title' => t('CSV File from Mailchimp'),
+    '#title' => t('CSV File from Mailchimp. (Please split CSV to 1000 record)'),
     '#size' => 40,
     '#description' => t('Import Subscriber / Unsubscriber in Mailchimp.'),
   );
@@ -308,11 +327,14 @@ function sepulsa_newsletter_import_form_validate($form, &$form_state) {
  * Function sepulsa_newsletter_import_form_submit().
  */
 function sepulsa_newsletter_import_form_submit($form, &$form_state) {
+  // Get temp destination file.
   $filepath = $form_state['values']['csv_upload']->destination;
+  // Open file.
   $handle = @fopen($filepath, "r");
   $report_watchdog = array();
   $i = 0;
-  while ($row = fgetcsv($handle, 1000, ',')) {
+  // Loop CSV file (1000 first record exclude header).
+  while ($row = fgetcsv($handle, 1001, ',')) {
     if ($i != 0) {
       $result = db_select('users', 'u');
       $result->fields('u', array('uid'));

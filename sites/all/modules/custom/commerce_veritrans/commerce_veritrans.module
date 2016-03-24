@@ -58,10 +58,10 @@ function commerce_veritrans_form_commerce_checkout_form_checkout_alter(&$form, &
   }
 
   $payments = array();
-  $type = (isset($method['settings']['type']) && !empty($method['settings']['type'])) ? $method['settings']['type'] : '';
   if (!empty($form['commerce_payment']['payment_methods']['#value'])) {
     foreach ($form['commerce_payment']['payment_methods']['#value'] as $name => $method) {
-      if ($method['method_id'] == 'commerce_veritrans' && $type == 'credit_card') {
+      $type = (isset($method['settings']['type']) && !empty($method['settings']['type'])) ? $method['settings']['type'] : '';
+      if ($method['method_id'] == 'commerce_veritrans' && $type == 'credit_card'  ) {
         $payments[] = $name;
       }
     }

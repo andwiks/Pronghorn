@@ -247,13 +247,46 @@ function sepulsa_newsletter_mailchimp_api($settings) {
  */
 function sepulsa_newsletter_user_presave(&$edit, $account, $category) {
   $result = 'HTTP request not sent';
-  if (isset($edit['field_newsletter_subscribers']) && !empty($edit['field_newsletter_subscribers'])) {
-    if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
+  if (!isset($edit['flag_newsletter_subscriber'])) {
+    if (isset($edit['field_newsletter_subscribers']) && !empty($edit['field_newsletter_subscribers'])) {
+      if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
+        $status = 'subscribed';
+      }
+      else {
+        $status = 'unsubscribed';
+      }
+      if (isset($account->is_new) && !empty($account->is_new)) {
+        $settings = array(
+          'method' => 'POST',
+          'op' => 'members',
+          'email' => $edit['mail'],
+          'status' => $status,
+        );
+        $result = sepulsa_newsletter_mailchimp_api($settings);
+        watchdog('Insert Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
+      }
+      else {
+        $settings = array(
+          'method' => 'PUT',
+          'op' => 'members',
+          'email' => $edit['mail'],
+          'status' => $status,
+        );
+        $result = sepulsa_newsletter_mailchimp_api($settings);
+        watchdog('Update Newsletter', '<pre> result : @result, </pre>', array('@result' => print_r($result, TRUE)));
+      }
+    }
+  }
+  else {
+    if ($edit['flag_newsletter_subscriber'] == 1) {
       $status = 'subscribed';
+      $edit['field_newsletter_subscribers']['und'][0]['value'] = 1;
     }
     else {
       $status = 'unsubscribed';
+      $edit['field_newsletter_subscribers']['und'][0]['value'] = 0;;
     }
+
     if (isset($account->is_new) && !empty($account->is_new)) {
       $settings = array(
         'method' => 'POST',
@@ -359,4 +392,28 @@ function sepulsa_newsletter_import_form_submit($form, &$form_state) {
 
   watchdog('Mailchimp Import', 'data : <pre> @report_watchdog </pre>',
     array('@report_watchdog' => print_r($report_watchdog, TRUE)));
+}
+
+/**
+ * Implements hook_field_attach_form(). 
+ */
+function sepulsa_newsletter_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // Add a checkbox allowing a given field to be emptied.
+  // See hook_field_attach_submit() for the corresponding processing code.
+
+  $default_value = (isset($form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'])
+    && !empty($form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'])) ?
+  $form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'] : 0;
+
+  if ($entity_type == 'user') {
+    if ($form_state['build_info']['form_id'] == 'user_profile_form'
+      && !isset($form_state['build_info']['files'])) {
+      $form['flag_newsletter_subscriber'] = array(
+        '#type' => 'checkbox',
+        '#title' => "Newsletter Subscriber",
+        '#default_value' => $default_value,
+        '#return_value' => 1,
+      );
+    }
+  }
 }

@@ -295,16 +295,25 @@ function deposit_sepulsa_cron_queue_info() {
 }
 
 function topup_credit_deposit($item) {
-  $params = array (
-	'uid' => $item['uid'],
-	'points' => $item['amount'],
-	'tid' => $item['tid'],
-	'description' => 'Credit Deposit'
-  );
-  userpoints_userpointsapi($params);
-  // update order to completed
-  commerce_order_status_update($item['order'], 'completed');
-  watchdog('topup_credit_deposit', 'Topup Credit Deposit <br /><pre>'.print_r($item, true).'</pre>');
+  $order = commerce_order_load($item['order_id']);
+
+  // Only process pending order.
+  $statuses = commerce_order_statuses(array('state' => 'pending'));
+  if (in_array($order->status, array_keys($statuses))) {
+    $params = array (
+      'uid' => $item['uid'],
+      'points' => $item['amount'],
+      'tid' => $item['tid'],
+      'description' => 'Credit Deposit',
+      'entity_id' => $item['order_id'],
+      'entity_type' => 'commerce_order',
+    );
+
+    userpoints_userpointsapi($params);
+    // update order to completed
+    commerce_order_status_update($order, 'completed');
+    watchdog('topup_credit_deposit', 'Topup Credit Deposit <br /><pre>'.print_r($item, TRUE).'</pre>');
+  }
 }
 
 function _deposit_sepulsa_get_deposit_product(){

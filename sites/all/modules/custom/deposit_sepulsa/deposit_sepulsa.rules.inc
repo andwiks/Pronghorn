@@ -79,7 +79,7 @@ function topup_credit_deposit_action($order, $user, $category) {
   // Only queue it if amount is not empty.
   if (!empty($amount)) {
     $queue = DrupalQueue::get('topup_credit_deposit');
-    $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order' => $order);
+    $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order_id' => $order->order_id);
     $queue->createItem($queue_item);
   }
 }

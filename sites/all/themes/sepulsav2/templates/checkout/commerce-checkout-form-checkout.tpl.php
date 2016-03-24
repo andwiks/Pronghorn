@@ -5,7 +5,24 @@
 		  <?php print render($form['cart_contents']); ?>
 
 		  <?php print render($form['commerce_coupon']); ?>
-		  <div class="coupon-description"><?php print t('Enter your coupon code here.'); ?></div>
+		  <div class="coupon-description">
+            <?php print t('Enter your coupon code here.'); ?>
+            <?php
+              $order_id = arg(1);
+              $order_id = intval($order_id);
+              if (user_is_anonymous()) :
+                print t('You can use coupon code only if you !login.', array(
+                  '!login' => l(t('login'), 'user/login', array(
+                    'query' => array(
+                      'destination' => !empty($order_id) ? 'checkout/' . $order_id : 'checkout',
+                    ),
+                  )),
+                ));
+              endif;
+            ?>
+		  	<br />
+		  	<?php print t('Let it empty if you do not have promo code.'); ?>
+		  </div>
 
 <?php
 if (isset($_COOKIE[REFERRAL_COOKIE])) :

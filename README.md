@@ -1,8 +1,8 @@
-#################### pronghorn #####################
+#################### pronghorn ###############################################################
 Full Installation for Drupal system at sepulsa.com
-
-####################################################
-3 Branch here,
+More info, please visit and contribute in http://wiki.sepulsa.co.id/index.php/System/Pronghorn
+##############################################################################################
+3 Main Branch here,
 
 - Dev >> Default master branch for initialization development, Please use this branch for development or build new features on Sepulsa.
 - Stg >> You know the mean lah..

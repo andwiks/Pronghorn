@@ -32,16 +32,21 @@ if (!isset($web_link)) {
 }
 ?>
 <div class="box_voucher <?php print $fields['field_coupon_category']->content; ?>">
-    <div class="image"><img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>"></div>
+    <div class="image">
+    	<?php if (isset($row->field_commerce_price[0]['raw']['amount']) && empty($row->field_commerce_price[0]['raw']['amount'])) : ?>
+    		<!--<div class="flag-coupon-gratis"><img alt="Coupon Gratis" src="<?php print $base_url . '/' . path_to_theme(); ?>/images/content/flag_gratis.png" title="Coupon Gratis" /></div>-->
+    	<?php endif; ?>
+    	<img alt="" src="<?php print $fields['field_coupon_product_image']->content; ?>">
+   	</div>
     <h4><?php print $fields['title']->content; ?></h4>
-    <p class="voucher-description"><?php print $fields['field_description']->content; ?>.</p>
+    <p class="voucher-description"><?php print $fields['field_description']->content; ?></p>
     <a href="" class="detail">Lihat detail voucher</a>
     <?php print $fields['field_product']->content; ?>
     <div class="data_popup">
         <div class="img"><?php print $fields['field_coupon_product_image']->content; ?></div>
         <div class="desc">
             <h3><?php print $fields['title']->content; ?></h3>
-            <h4><?php print $fields['field_description']->content; ?>.</h4>
+            <h4><?php print $fields['field_description']->content; ?></h4>
             <h5><?php print t('Terms & Conditions'); ?></h5>
             <div class="tnc_desc"><?php print $fields['field_coupon_tnc']->content; ?></div>
         </div>

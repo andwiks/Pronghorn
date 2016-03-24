@@ -115,13 +115,16 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       $form['account']['#title'] = NULL;
       $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
-      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
+      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong> 1. '.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
+      $secondno = "2. ";
+    } else {
+      $secondno = "";
     }
 
     $form['commerce_payment']['#title'] = NULL;
     $form['commerce_payment']['#prefix'] = '<div id="commerce-payment-ajax-wrapper">';
-    $form['commerce_payment']['#prefix'] .= '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#prefix'] .= '<h4><strong>'. $secondno . t('Payment Options').'</strong></h4>';
     $form['commerce_payment']['#suffix'] = '</div>';
 
     $form['commerce_payment']['payment_method']['#process'] = array('form_process_radios', 'sepulsav2_process_radios_payment_method');
@@ -665,8 +668,9 @@ function sepulsav2_preprocess_views_view_table(&$variables) {
       }
 
       $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
-      $line_items = $order_wrapper->commerce_line_items;
-      $variables['order_total'] = commerce_line_items_total($line_items);
+      $order_total = $order_wrapper->commerce_order_total->value();
+      // Total paymant at coupon page is only base price.
+      $variables['order_total'] = $order_total['data']['components'][0]['price'];
       break;
   }
 }
@@ -856,6 +860,30 @@ function sepulsav2_commerce_add_to_cart_form_ajax_submit($form, $form_state) {
     );
     $commands[] = ajax_command_invoke('#node-' . $node_id, 'addClass', array('hidden coupon-' . $product_id));
     $commands[] = ajax_command_replace('.cart-contents', theme('commerce_cart_block', $variables));
+  }
+
+  // Try to get stock.
+  $stock = FALSE;
+  if (isset($form_state['default_product']->commerce_stock['und'][0]['value'])) {
+    $stock = intval($form_state['default_product']->commerce_stock['und'][0]['value']);
+  }
+  // Modification for coupon price button.
+  if ($stock > 0 || $stock === FALSE) {
+    if (isset($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+      if (!empty($form_state['default_product']->commerce_price['und'][0]['amount'])) {
+        $float_number = floatval($form_state['default_product']->commerce_price['und'][0]['amount']);
+        $button = t('Rp @price', array(
+          '@price' => number_format($float_number, 0, ',', '.'),
+        ));
+        $rebuild['submit']['#attributes']['style'][] = 'text-transform: none;';
+        $rebuild['submit']['#value'] = $button;
+        $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = $button;
+      }
+      else {
+        $rebuild['submit']['#value'] = t('Take Voucher');
+        $rebuild['submit']['#attached']['js'][0]['data']['ajax']['edit-submit']['submit']['_triggering_element_value'] = t('Take Voucher');
+      }
+    }
   }
 
   $commands[] = ajax_command_replace('.commerce-cart-add-to-cart-form-' . $product_id, render($rebuild));

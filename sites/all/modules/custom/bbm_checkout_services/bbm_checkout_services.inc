@@ -55,7 +55,8 @@ function bbm_checkout_order_services($data){
     $data["container_customer_details"] = explode(",", $data["custom_field1"]);
     $data["name"] = $data["container_customer_details"][0];
     $data["email"] = $data["container_customer_details"][1];
-    $data["phone_number"] = $data["container_customer_details"][2];
+    $data["phone_number"] = $data["custom_field3"];
+    
     $product_container = array();
     $data["container_product"] = explode(",", $data["custom_field2"]);
     if(isset($data["container_product"][0]) && !empty($data["container_product"][0] && isset($data["phone_number"]) && !empty($data["phone_number"]))){

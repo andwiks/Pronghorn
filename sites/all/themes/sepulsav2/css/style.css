@@ -411,6 +411,7 @@ section.banner .caption{
     color: #FFF;
 }
 section.banner{margin: 0 0 40px}
+section.banner .caption h1{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption h2{font-family: "robotoregular";font-size: 36px;margin: 0 0 15px 0;}
 section.banner .caption p{font-size: 20px;}
 section.banner .caption a{
@@ -2281,7 +2282,7 @@ section.std_content .box_voucher
 
 .voucher-description
 {
-    height: 60px;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -2306,6 +2307,10 @@ section.std_content .box_voucher
 .box_voucher .image img
 {
     height:195px;
+}
+.box_voucher .data_popup .desc h4,
+#detail_voucher .box_popup .content_pop h4 {
+	margin-bottom: 40px;
 }
 
 .akun .form-actions .row
@@ -2478,6 +2483,7 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     padding: 10px 15px;
     color: #fff;
     margin-bottom: 5px;
+    height: 100%;
 }
 
 #webform-client-form-4907 .form-item {
@@ -2721,6 +2727,7 @@ button[disabled=disabled]
 {
     background: none !important;
     background-image: url(../images/material/trash_ico.png) !important;
+    background-repeat: no-repeat !important;
 }
 
 section.std_content .voucher .c_right .grid_promo_bank .bt_toogle {
@@ -2846,10 +2853,16 @@ section.std_content .akun .grid_akun thead th, section.std_content .akun .grid_a
     font-family: "robotomedium";
 }
 
+.entity-commerce-order .field-name-commerce-order-total div.field-items {
+	margin-bottom: -10px;
+}
+
 .entity-commerce-order .field-name-commerce-order-total .amount
 {
-    float: right;
-    padding-right: 30px;
+    display: block;
+    margin-bottom: 10px;
+    margin-top: -14px;
+    text-align: right;
 }
 
 .entity-commerce-order .field-name-commerce-customer-billing, .entity-commerce-order .field-name-field-commerce-billy-i-date, .entity-commerce-order .field-name-field-order-source
@@ -3138,6 +3151,19 @@ section.std_content .akun .c_right .form-actions input[type=button]:hover
 {
     background: #105c8c;
     color: #FFF;
+}
+
+.payment-redirect-form {
+	text-align: center;
+}
+.payment-redirect-form .checkout-help {
+	width: 100%;
+    font-weight: bold;
+    font-size: 16px;
+    margin-top: 20px;
+}
+.payment-redirect-form .form-submit {
+    margin-top: 12px;
 }
 
 #commerce-checkout-coupon-ajax-wrapper table tr td,
@@ -3861,3 +3887,39 @@ section.sblog .caption h1{
     width: 34%;
     margin: 6px 10px 10px 0;
 }
+
+/* add flag pada coupon */
+section.std_content .list_voucher .box_voucher .image
+{
+    position: relative;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis
+{
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    width: 70px;
+}
+
+section.std_content .list_voucher .box_voucher .image .flag-coupon-gratis img
+{
+    width: auto;
+    height: auto;
+}
+
+section.banner .bx-wrapper .bx-pager {bottom: 70px;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a {background:#d5d5d5; border:1px solid;}
+section.banner .bx-wrapper .bx-pager.bx-default-pager a:hover ,
+section.banner .bx-wrapper .bx-pager.bx-default-pager a.active {background:#feb60a}
+
+section.banner .bx-wrapper .bx-controls-direction a {
+    background: url(../images/material/arr_carousel.png) no-repeat;
+    width: 18px;
+    height: 30px;
+    margin-top: -16px;
+}
+section.banner .bx-wrapper a.bx-prev {background-position: bottom left;left: -40px}
+section.banner .bx-wrapper a.bx-next {background-position: top left;right: -40px}
+section.banner .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
+section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}

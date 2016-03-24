@@ -29,7 +29,7 @@ $theme_path = $base_url . '/' . path_to_theme();
             <div class="grid_promo_bank">
                 <?php print render($page['promo']); ?>
             </div>
-            <div class="atau"><span><?php print t('atau'); ?></span></div>
+            <div class="atau"><!--<span><?php print t('atau'); ?></span>--></div>
             <a href="<?php print url("checkout"); ?>" class="bt_next" ><?php print t('LANJUT KE PEMBAYARAN'); ?></a>
         </div>
         <div class="clear"></div>
@@ -40,7 +40,8 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php print t('Kamu bisa memilih 3 Voucher yang kamu suka.'); ?>
                 <span class="border"></span>
             </h5>
-            <div class="filter after_clear">
+            <div class="filter after_clear" style="border-bottom:0px; margin:0px;">
+                <!--
                 <div class="row">
                     <label><?php print t('Filter :'); ?></label>
                     <div class="input">
@@ -56,6 +57,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                         </select>
                     </div>
                 </div>
+                -->
             </div>
         </div>
 

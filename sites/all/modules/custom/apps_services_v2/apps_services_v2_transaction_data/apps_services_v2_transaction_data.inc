@@ -177,7 +177,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
       $temp_array_data["operator_title"] = "Listrik Prabayar";
     }
     elseif(isset($temp_array_data["type"]) && $temp_array_data["type"] == "deposit_sepulsa"){
-      $temp_array_data["operator_title"] = "Deposit Kredit";
+      $temp_array_data["operator_title"] = "Deposit Sepulsa";
     }
     else{
       $temp_array_data["operator_title"] = "Transaksi Sepulsa";

@@ -9,9 +9,12 @@
  * Implements hook_commerce_cart_line_item_refresh().
  */
 function bpjs_kesehatan_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
-  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['amount'])) {
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['amount'];
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['amount'];
+  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['premi'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['premi'];
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['premi'];
+
+    module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
+    commerce_fees_apply($order_wrapper, 'admin_fee', $line_item->data['inquiry']['admin_charge'], 'IDR');
   }
 }
 
@@ -37,8 +40,8 @@ function bpjs_kesehatan_commerce_line_item_type_info() {
  * Implements hook_commerce_product_calculate_sell_price_line_item_alter().
  */
 function bpjs_kesehatan_commerce_product_calculate_sell_price_line_item_alter($line_item) {
-  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['amount'])) {
-    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['amount'];
+  if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['premi'])) {
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['premi'];
   }
 }
 

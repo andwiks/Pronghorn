@@ -103,6 +103,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     else{
       $temp_array_data["amount"] = $order->commerce_order_total['amount'];
     }
+    $temp_array_data["product_amount"] = $order->commerce_line_items[0]->commerce_product->commerce_price["und"][0]["amount"];
     $temp_array_data["currency_code"] = $order->commerce_order_total['currency_code'];
     $temp_array_data["response"] = $order;
     $temp_array_data["product_id"] = $order->commerce_line_items[0]->commerce_product->product_id;

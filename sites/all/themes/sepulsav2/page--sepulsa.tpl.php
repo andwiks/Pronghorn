@@ -43,8 +43,8 @@ $settings = variable_get('sepulsa_settings', array());
         <?php endif; ?>
         <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
           <a href="" target="bpjs-kesehatan">
-            <span class="ico finance"></span>
-            <?php print t('bpjs'); ?>
+            <span class="ico bpjs"></span>
+            <?php print t('bayar bpjs'); ?>
           </a>
         <?php endif; ?>
       </div>

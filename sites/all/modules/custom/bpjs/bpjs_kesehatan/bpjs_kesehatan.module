@@ -202,9 +202,10 @@ function bpjs_kesehatan_payment_execute($order_wrapper) {
 
 function bpjs_kesehatan_payment_line_item($line_item_wrapper) {
   $data = array(
-    'customer_number' => $line_item_wrapper->field_phone_number->value(),
+    'customer_number' => $line_item_wrapper->field_customer_number->value(),
     'order_id' => $line_item_wrapper->order_id->value(),
     'product_id' => $line_item_wrapper->commerce_product->kraken_product->value(),
+    'payment_period' => $line_item_wrapper->payment_period->value(),
   );
 
   module_load_include('inc', 'kraken_api');

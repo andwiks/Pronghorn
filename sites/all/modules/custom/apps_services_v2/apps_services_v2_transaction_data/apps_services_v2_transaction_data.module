@@ -219,9 +219,10 @@ function apps_services_v2_transaction_home_list_doc() {
       {
         "order_id": "154598",
         "mail": "ananto.sql@gmail.com",
-        "status": "invoiced",
+        "order_status": "invoiced",
         "created": "1451718356",
-        "amount": "23000",
+        "amount": "50000",
+        "product_amount": "50000",
         "currency_code": "IDR",
         "response": {
           "order_number": "201601-655",
@@ -454,15 +455,17 @@ function apps_services_v2_transaction_home_list_doc() {
           "rdf_mapping": []
         },
         "product_id": "176",
+        "title": "Rp 50.000",
         "type": "mobile_prepaid",
         "field_phone_number": "9991289663",
         "electricity_customer_number": null,
         "electricity_phone_number": null,
+        "operator_title": "Bolt",
         "favorite": true,
         "revision_timestamp": "1451718488"
       }
     ],
-    "request_email": ""
+    "credit_balance": 100
   }
   ';
   $element = array(
@@ -511,9 +514,10 @@ function apps_services_v2_transaction_history_list_doc() {
       {
         "order_id": "154598",
         "mail": "ananto.sql@gmail.com",
-        "status": "invoiced",
+        "order_status": "invoiced",
         "created": "1451718356",
         "amount": "23000",
+        "product_amount": "50000",
         "currency_code": "IDR",
         "response": {
           "order_number": "201601-655",
@@ -746,10 +750,12 @@ function apps_services_v2_transaction_history_list_doc() {
           "rdf_mapping": []
         },
         "product_id": "176",
+        "title": "Rp 50.000",
         "type": "mobile_prepaid",
         "field_phone_number": "9991289663",
         "electricity_customer_number": null,
         "electricity_phone_number": null,
+        "operator_title": "Bolt",
         "favorite": true,
         "revision_timestamp": "1451718488"
       }

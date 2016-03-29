@@ -195,21 +195,17 @@ function apps_services_v2_payment_list_data($source){
     if(variable_get('apps_services_v2_payment_list_credit_option', 1)){
       //get user's credit data
       $credit_totalamount = userpoints_get_current_points($user->uid, 'all');
-      if(isset($credit_totalamount) && !empty($credit_totalamount) && $credit_totalamount > 0){
-        $credit_formatted_totalamount = number_format($credit_totalamount,0,",",".");
+      $credit_formatted_totalamount = number_format($credit_totalamount,0,",",".");
 
-        //add credit choice selection from payment list
-        $credit_container = array();
-        $credit_container["payment_code"] = "use_sepulsa_credit_option";
-        $credit_container["subtitle"] = variable_get("apps_services_v2_payment_list_credit_subtitle_text", "gunakan sepulsa kredit untuk membayar");
-        $credit_title = variable_get("apps_services_v2_payment_list_credit_title_text", "Sepulsa Kredit Rp @credit");
-        $credit_title = str_replace("@credit", $credit_formatted_totalamount, $credit_title);
-        $credit_container["title"] = $credit_title;
-        $credit_container["credit_balance"] = $credit_totalamount;
+      //add credit choice selection from payment list
+      $credit_container = array();
+      $credit_container["payment_code"] = "use_sepulsa_credit_option";
+      $credit_container["amount"] = $credit_totalamount;
+      $credit_container["formatted_amount"] = $credit_formatted_totalamount;
+      $credit_container["currency_code"] = commerce_default_currency();
 
-        //add option to data container
-        $return["data"][] = $credit_container;
-      }
+      //add option to data container
+      $return["data"][] = $credit_container;
     }
     
     //return the data with value and option title in it

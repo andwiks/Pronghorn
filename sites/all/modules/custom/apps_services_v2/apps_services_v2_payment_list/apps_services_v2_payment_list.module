@@ -482,155 +482,161 @@ function apps_services_v2_payment_list_doc() {
   global $base_url;
   $response = '
     {
-      "status": true,
-      "message": "",
-      "data": [
-        {
-          "method_id": "commerce_veritrans",
-          "settings": {
-            "type": "credit_card",
-            "credit_card": {
-              "card_types": {
-                "visa": "visa",
-                "mastercard": "mastercard",
-                "amex": 0,
-                "discover": 0,
-                "dc": 0,
-                "dci": 0,
-                "cb": 0,
-                "jcb": 0,
-                "maestro": 0,
-                "visaelectron": 0,
-                "laser": 0,
-                "solo": 0,
-                "switch": 0
-              },
-              "bank": "mandiri",
-              "type": "twoclick",
-              "3ds": 1,
-              "bin_promo": ""
+    "status": true,
+    "message": "",
+    "data": [
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "credit_card",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
             },
-            "echannel": {
-              "instruction": {
-                "value": "",
-                "format": "full_"
-              }
-            },
-            "prefix": "",
-            "url": "https://api.sandbox.veritrans.co.id/v2",
-            "client_key": "VT-client-OKrCpIwqRkMEeBxC",
-            "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
-            "sepulsa_campaign": {
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": ""
+          },
+          "echannel": {
+            "instruction": {
               "value": "",
               "format": "full_"
             }
           },
-          "rule_name": "commerce_payment_commerce_veritrans",
-          "weight": 0,
-          "title": "Kartu Kredit / Debit",
-          "type": "payment_option",
-          "payment_code": "commerce_veritrans|commerce_payment_commerce_veritrans"
+          "prefix": "",
+          "url": "https://api.sandbox.veritrans.co.id/v2",
+          "client_key": "VT-client-OKrCpIwqRkMEeBxC",
+          "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
         },
-        {
-          "method_id": "bank_transfer",
-          "settings": {
-            "details": {
-              "account_owner": "PT Sepulsa Teknologi Indonesia",
-              "account_number": "2063137111",
-              "account_iban": "",
-              "bank_code_appellation": "",
-              "bank_code": "",
-              "account_swift": "",
-              "account_bank": "BCA",
-              "account_branch": "Thamrin"
-            },
-            "subject_oid": 0,
-            "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
-            "sepulsa_campaign": {
-              "value": "",
-              "format": "full_"
-            }
+        "rule_name": "commerce_payment_commerce_veritrans",
+        "weight": null,
+        "title": "Kartu Kredit / Debit",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|commerce_payment_commerce_veritrans"
+      },
+      {
+        "method_id": "bank_transfer",
+        "settings": {
+          "details": {
+            "account_owner": "PT Sepulsa Teknologi Indonesia",
+            "account_number": "2063137111",
+            "account_iban": "",
+            "bank_code_appellation": "",
+            "bank_code": "",
+            "account_swift": "",
+            "account_bank": "BCA",
+            "account_branch": "Thamrin"
           },
-          "rule_name": "commerce_payment_bca_bank_transfer",
-          "weight": 5,
-          "title": "BCA Bank Transfer",
-          "type": "payment_option",
-          "payment_code": "bank_transfer|commerce_payment_bca_bank_transfer"
+          "subject_oid": 0,
+          "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
         },
-        {
-          "method_id": "bank_transfer",
-          "settings": {
-            "details": {
-              "account_owner": "PT Sepulsa Teknologi Indonesia",
-              "account_number": "168 0000 696482",
-              "account_iban": "",
-              "bank_code_appellation": "",
-              "bank_code": "",
-              "account_swift": "",
-              "account_bank": "Mandiri",
-              "account_branch": "Jakarta Galeria Niaga Mediterania"
-            },
-            "subject_oid": 0,
-            "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
-            "sepulsa_campaign": {
-              "value": "",
-              "format": "full_"
-            }
+        "rule_name": "commerce_payment_bca_bank_transfer",
+        "weight": 5,
+        "title": "BCA Bank Transfer",
+        "type": "payment_option",
+        "payment_code": "bank_transfer|commerce_payment_bca_bank_transfer"
+      },
+      {
+        "method_id": "bank_transfer",
+        "settings": {
+          "details": {
+            "account_owner": "PT Sepulsa Teknologi Indonesia",
+            "account_number": "168 0000 696482",
+            "account_iban": "",
+            "bank_code_appellation": "",
+            "bank_code": "",
+            "account_swift": "",
+            "account_bank": "Mandiri",
+            "account_branch": "Jakarta Galeria Niaga Mediterania"
           },
-          "rule_name": "commerce_payment_mandiri_bank_transfer",
-          "weight": 6,
-          "title": "Mandiri Bank Transfer",
-          "type": "payment_option",
-          "payment_code": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+          "subject_oid": 0,
+          "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
         },
-        {
-          "method_id": "commerce_veritrans",
-          "settings": {
-            "type": "credit_card",
-            "credit_card": {
-              "card_types": {
-                "visa": "visa",
-                "mastercard": "mastercard",
-                "amex": 0,
-                "discover": 0,
-                "dc": 0,
-                "dci": 0,
-                "cb": 0,
-                "jcb": 0,
-                "maestro": 0,
-                "visaelectron": 0,
-                "laser": 0,
-                "solo": 0,
-                "switch": 0
-              },
-              "bank": "mandiri",
-              "type": "twoclick",
-              "3ds": 1,
-              "bin_promo": "548988,542640,524125,410504,410505,451249,523026,524069,548415,466574,466573,457512,471293,522787,524495,524609,426098,426097"
+        "rule_name": "commerce_payment_mandiri_bank_transfer",
+        "weight": 6,
+        "title": "Mandiri Bank Transfer",
+        "type": "payment_option",
+        "payment_code": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+      },
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "credit_card",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
             },
-            "echannel": {
-              "instruction": {
-                "value": "",
-                "format": "full_"
-              }
-            },
-            "prefix": "",
-            "url": "https://api.veritrans.co.id/v2",
-            "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
-            "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
-            "sepulsa_campaign": {
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": "548988,542640,524125,410504,410505,451249,523026,524069,548415,466574,466573,457512,471293,522787,524495,524609,426098,426097"
+          },
+          "echannel": {
+            "instruction": {
               "value": "",
               "format": "full_"
             }
           },
-          "rule_name": "rules_bni_credit_card",
-          "weight": 9,
-          "title": "BNI Credit Card",
-          "type": "payment_option",
-          "payment_code": "commerce_veritrans|rules_bni_credit_card"
-        }
-      ]
-    }
+          "prefix": "",
+          "url": "https://api.veritrans.co.id/v2",
+          "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
+          "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "rules_bni_credit_card",
+        "weight": 9,
+        "title": "BNI Credit Card",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|rules_bni_credit_card"
+      },
+      {
+        "payment_code": "use_sepulsa_credit_option",
+        "amount": 100,
+        "formatted_amount": "100",
+        "currency_code": "IDR"
+      }
+    ]
+  }
   ';
   $element = array(
     '#name' => 'Payment List Apps Service',

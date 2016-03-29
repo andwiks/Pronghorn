@@ -222,25 +222,25 @@ function bpjs_kesehatan_payment_line_item($line_item_wrapper) {
 
 function bpjs_kesehatan_payment_period_options() {
   return array(
-    '01' => t('January'),
-    '02' => t('February'),
-    '03' => t('March'),
-    '04' => t('April'),
-    '05' => t('May'),
-    '06' => t('June'),
-    '07' => t('July'),
-    '08' => t('August'),
-    '09' => t('September'),
-    '10' => t('October'),
-    '11' => t('November'),
-    '12' => t('December'),
+    '01' => 1,
+    '02' => 2,
+    '03' => 3,
+    '04' => 4,
+    '05' => 5,
+    '06' => 6,
+    '07' => 7,
+    '08' => 8,
+    '09' => 9,
+    '10' => 10,
+    '11' => 11,
+    '12' => 12,
   );
 }
 
 function bpjs_kesehatan_payment_period_default_value($entity_type, $entity, $field, $instance, $langcode) {
   return array(
     array(
-      'value' => format_date(REQUEST_TIME, 'custom', 'm'),
+      'value' => '01',
     ),
   );
 }

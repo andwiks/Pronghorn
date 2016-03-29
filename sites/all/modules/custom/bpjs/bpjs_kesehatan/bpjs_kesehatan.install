@@ -44,10 +44,7 @@ function bpjs_kesehatan_install() {
       'bundle' => 'bpjs_kesehatan',
       'label' => $t('Payment Period'),
       'required' => TRUE,
-      'default_value_function' => 'bpjs_kesehatan_payment_period_default_value',
-      'commerce_cart_settings' => array(
-        'field_access' => TRUE,
-      ),
+      'default_value' => array(array('value' => '01')),
     ),
     'field_line_item_status' => array(
       'field_name' => 'field_line_item_status',

@@ -12,108 +12,94 @@
 function check_transaction_menu() {
   $items = array();
 
-  $items['test/check'] = array(
+  $items['transaction/check'] = array(
     'title' => 'Check Transaction',
     'description' => 'Check Transaction',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('check_transaction_form'),
-    'access callback' => TRUE
+    'access callback' => TRUE,
   );
 
-  $items['test/result'] = array(
+  $items['transaction/result'] = array(
     'title' => 'Details Transaction',
     'description' => 'Details Transaction',
-    'page callback' => 'test_result',
-    'access callback' => TRUE
+    'page callback' => 'check_transaction_result',
+    'access callback' => TRUE,
   );
+
   return $items;
 }
 
-function test_result() {
-	// echo "yes";
-	// print_r($_REQUEST);die();
-	$details_order = commerce_order_load($_REQUEST['order_id']);
-	$details_line_item = commerce_line_item_load($details_order->commerce_line_items[LANGUAGE_NONE][0]['line_item_id']);
-	$details_product = commerce_product_load($details_line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
-
-	$table = "<table>
+/**
+ * Function check_transaction_result().
+ *
+ * Show the details transaction.
+ */
+function check_transaction_result() {
+  $details_order = commerce_order_load($_REQUEST['order_id']);
+  $details_line_item = commerce_line_item_load($details_order->commerce_line_items[LANGUAGE_NONE][0]['line_item_id']);
+  $details_product = commerce_product_load($details_line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
+  $table = "<table style='font-size:200%;'>
 				<tr>
-					<td><b>Order Id</b></td>
+					<td><b>ORDER ID</b></td>
 					<td width='50px'><center>:</center></td>
-					<td>".$details_order->order_id."</td>
+					<td>" . $details_order->order_id . "</td>
 				</tr>
 				<tr>
-					<td><b>Product</b></td>
+					<td><b>PRODUCT</b></td>
 					<td width='50px'><center>:</center></td>
-					<td>".$details_product->sku."</td>
+					<td>" . $details_product->sku . "</td>
 				</tr>
 				<tr>
-					<td><b>Harga</b></td>
+					<td><b>HARGA</b></td>
 					<td width='50px'><center>:</center></td>
-					<td>".$details_product->title."</td>
+					<td>" . $details_product->title . "</td>
 				</tr>
 				<tr>
-					<td><b>Status</b></td>
+					<td><b>STATUS</b></td>
 					<td width='50px'><center>:</center></td>
-					<td>".$details_order->status."</td>
+					<td>" . $details_order->status . "</td>
 				</tr>
 			</table>";
-	return $table;
+
+  return $table;
 }
 
+/**
+ * Function check_transaction_form.
+ */
 function check_transaction_form() {
-$form['order_id'] = array(
-    '#type' => 'textfield', //you can find a list of available types in the form api
+  $form['order_id'] = array(
+    '#type' => 'textfield',
     '#title' => 'Order ID',
     '#size' => 20,
     '#maxlength' => 20,
-    '#required' => TRUE, //make this field required 
+    '#required' => TRUE,
   );
 
   $form['submit_button'] = array(
     '#type' => 'submit',
     '#value' => t('Check Transaction'),
   );
-  
   return $form;
 }
 
+/**
+ * Function check_transaction_form_validate.
+ */
 function check_transaction_form_validate($form, &$form_state) {
 }
 
+/**
+ * Function check_transaction_form_submit.
+ */
 function check_transaction_form_submit($form, &$form_state) {
-	// echo "<pre>";
-	$details_order = commerce_order_load($form_state['values']['order_id']);
-	if (isset($details_order) && !empty($details_order)) {
-		// $details_line_item = commerce_line_item_load($details_order->commerce_line_items[LANGUAGE_NONE][0]['line_item_id']);
-		// $details_product = commerce_product_load($details_line_item->commerce_product[LANGUAGE_NONE][0]['product_id']);
-
-		// $table = "<table>
-		// 			<tr>
-		// 				<td>Order Id</td>
-		// 				<td>:</td>
-		// 				<td>".$details_order->order_id."</td>
-		// 			</tr>
-		// 			<tr>
-		// 				<td>Product</td>
-		// 				<td>:</td>
-		// 				<td>".$details_product->sku."</td>
-		// 			</tr>
-		// 			<tr>
-		// 				<td>Harga</td>
-		// 				<td>:</td>
-		// 				<td>".$details_product->title."</td>
-		// 			</tr>
-		// 			<tr>
-		// 				<td>Status</td>
-		// 				<td>:</td>
-		// 				<td>".$details_order->status."</td>
-		// 			</tr>
-		// 		</table>";
-		// drupal_set_message($table, 'status');
-		$options = array('query' => array('order_id' => $details_order->order_id));
-		drupal_goto('test/result', $options);
-	} else {
-		drupal_set_message(t('Order Not Found'), 'error');
-	}
+  $details_order = commerce_order_load($form_state['values']['order_id']);
+  if (isset($details_order) && !empty($details_order)) {
+    $options = array('query' => array('order_id' => $details_order->order_id));
+    drupal_goto('transaction/result', $options);
+  }
+  else {
+    drupal_set_message(t('Order Not Found'), 'error');
+  }
 }

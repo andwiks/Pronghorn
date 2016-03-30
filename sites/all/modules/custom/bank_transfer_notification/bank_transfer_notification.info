@@ -1,0 +1,5 @@
+name = "Bank Transfer Notification"
+description = "Send email to notify user who order with bank transfer."
+core = "7.x"
+version = "7.x-1.0"
+dependencies[] = "rules"

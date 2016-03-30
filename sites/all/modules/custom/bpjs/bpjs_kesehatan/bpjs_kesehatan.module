@@ -251,17 +251,7 @@ function bpjs_kesehatan_preprocess_page(&$variables) {
     if (!empty($result['commerce_product'])) {
       $product_ids = array_keys($result['commerce_product']);
 
-      $values = array(
-        'type' => 'bpjs_kesehatan',
-        'data' => array(
-          'context' => array(
-            'product_ids' => $product_ids,
-          ),
-        ),
-      );
-      $line_item = entity_create('commerce_line_item', $values);
-
-      $variables['bpjs_kesehatan_form'] = drupal_get_form('commerce_cart_add_to_cart_form_bpjs_kesehatan', $line_item);
+      $variables['bpjs_kesehatan_form'] = drupal_get_form('bpjs_kesehatan_form', $product_ids);
     }
   }
 }

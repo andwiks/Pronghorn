@@ -46,69 +46,6 @@ function sepulsa_services_alter_services_request_postprocess_alter($controller, 
 }
 
 /**
- * Implements hook_rest_server_execute_errors_alter().
- */
-function sepulsa_services_alter_rest_server_execute_errors_alter(&$error, $controller, $arguments) {
-  // Get setting to alter endpoints.
-  $settings = variable_get('sepulsa_services_alter_endpoints', array());
-  // Get current service endpoint name.
-  $endpoint_name = services_get_server_info('endpoint');
-  // Load service endpoint data.
-  $endpoint = services_endpoint_load($endpoint_name);
-  // Only for specific endpoint name.
-  if (isset($endpoint->name)
-    && isset($settings[$endpoint->name])
-    && !empty($settings[$endpoint->name])
-  ) {
-    // Check if already altered.
-    if (!(is_array($error['body_data'])
-      && array_key_exists('status', $error['body_data'])
-      && array_key_exists('message', $error['body_data'])
-      && array_key_exists('data', $error['body_data'])
-    )) {
-      // Change result structure.
-      $error['body_data'] = array(
-        'status' => FALSE,
-        'message' => $error['body_data'],
-        'data' => NULL,
-      );
-    }
-    // Get setting for alter error.
-    $setting_error = variable_get('sepulsa_services_alter_error', array());
-    // Check to alter handle error default.
-    if (isset($error['code'])
-      && isset($setting_error[$error['code']])
-      && !empty($setting_error[$error['code']])
-    ) {
-      // Give header status.
-      drupal_add_http_header('Status', strip_tags(str_replace(PHP_EOL, '', $error['header_message'])));
-      // Get content type parsers.
-      if (isset($endpoint->server_settings['formatters'])) {
-        // Get all server formatters.
-        $formatters = rest_server_response_formatters();
-        // Get current formatter.
-        $formatter = array_filter($endpoint->server_settings['formatters']);
-        $formatter = key($formatter);
-        $formatter_class = $formatters[$formatter]['formatter class'];
-        // Check for formatter class.
-        $output = new $formatter_class();
-        // Set http header for content type.
-        drupal_add_http_header('Content-Type', $formatters[$formatter]['mime types'][0]);
-        // Output render result.
-        echo $output->render($error['body_data']);
-      }
-      else {
-        // By default: return application/json.
-        drupal_add_http_header('Content-Type', 'application/json');
-        // Outputing string of body_data.
-        echo json_encode($error['body_data']);
-      }
-      exit;
-    }
-  }
-}
-
-/**
  * Implements hook_menu().
  */
 function sepulsa_services_alter_menu() {

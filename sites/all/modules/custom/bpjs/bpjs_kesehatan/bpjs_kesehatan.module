@@ -161,6 +161,7 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
         // Add remove button.
         $form['line_items'][$delta]['remove'] = array(
           '#type' => 'button',
+          '#button_type' => 'button',
           '#value' => t('Remove'),
           '#delta' => $delta,
           '#name' => 'line_items[' . $delta . '][remove]',
@@ -185,15 +186,19 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
     );
   }
 
+  $form['actions'] = array('#type' => 'actions');
   $form['actions']['new'] = array(
     '#type' => 'button',
     '#value' => t('Add new'),
     '#new' => TRUE,
   );
-
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Add to cart'),
+  );
+  $form['actions']['pay'] = array(
+    '#type' => 'submit',
+    '#value' => t('Pay'),
   );
 
   return $form;

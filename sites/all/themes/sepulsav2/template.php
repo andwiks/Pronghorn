@@ -267,6 +267,18 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for bpjs_kesehatan_form().
+ */
+function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id) {
+  $form['#action'] .= '#bpjs-kesehatan';
+
+  foreach (element_children($form['line_items']) as $child) {
+    $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';
+    $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+  }
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for views_form_commerce_cart_block_popup().
  */
 function sepulsav2_form_views_form_commerce_cart_block_popup_alter(&$form, &$form_state, $form_id) {
@@ -805,6 +817,11 @@ function sepulsav2_status_messages($variables) {
  */
 function sepulsav2_theme($existing, $type, $theme, $path) {
   return array(
+    'bpjs_kesehatan_form' => array(
+      'render element' => 'form',
+      'path' => $path . '/templates/form',
+      'template' => 'bpjs-kesehatan-form',
+    ),
     'commerce_checkout_form_checkout' => array(
       'render element' => 'form',
       'path' => $path . '/templates/checkout',

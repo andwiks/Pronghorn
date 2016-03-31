@@ -281,6 +281,9 @@ function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id
     $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';
     $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
   }
+
+  $form['actions']['submit']['#attributes']['style'] = 'float:right';
+  $form['actions']['charge']['#attributes']['style'] = 'float:right';
 }
 
 /**

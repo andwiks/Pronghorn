@@ -15,13 +15,8 @@
 
   <div class="form-actions form-wrapper" id="edit-actions">
     <?php print render($form['actions']['new']); ?>
-
-    <div style="float:right">
-      <?php print render($form['actions']['charge']); ?>
-    </div>
-    <div style="float:right">
-      <?php print render($form['actions']['submit']); ?>
-    </div>
+    <?php print render($form['actions']['charge']); ?>
+    <?php print render($form['actions']['submit']); ?>
   </div>
 
   <?php print drupal_render_children($form); ?>

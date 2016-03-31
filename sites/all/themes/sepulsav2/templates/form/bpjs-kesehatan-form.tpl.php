@@ -1,7 +1,6 @@
 <div class="form-bpjs">
   <div class="form-field">
-    <label>Nomor Telepon</label>
-    <input type="text"></input>
+    <?php print render($form['field_phone_number']); ?>
    </div>
 
   <div class="form-field">
@@ -13,6 +12,17 @@
       <?php print render($form['line_items'][$child]); ?>
     </div>
   <?php endforeach; ?>
+
+  <div class="form-actions form-wrapper" id="edit-actions">
+    <?php print render($form['actions']['new']); ?>
+
+    <div style="float:right">
+      <?php print render($form['actions']['charge']); ?>
+    </div>
+    <div style="float:right">
+      <?php print render($form['actions']['submit']); ?>
+    </div>
+  </div>
 
   <?php print drupal_render_children($form); ?>
 </div>

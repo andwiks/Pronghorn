@@ -234,7 +234,7 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
   }
   
   //set allowed order status list
-  $allowed_cart_status = array("pending", "processing", "invoiced", "completed");
+  $allowed_cart_status = array("pending", "processing", "invoiced", "completed", "canceled");
   
   //get order list
   $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));

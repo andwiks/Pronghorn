@@ -198,7 +198,7 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
   $form['actions'] = array('#type' => 'actions');
   $form['actions']['new'] = array(
     '#type' => 'button',
-    '#value' => t('Add new'),
+    '#value' => t('Add new', array(), array('context' => __FUNCTION__)),
     '#new' => TRUE,
     '#ajax' => array(
       'callback' => 'bpjs_kesehatan_form_ajax',

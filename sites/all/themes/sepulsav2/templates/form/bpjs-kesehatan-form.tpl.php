@@ -4,7 +4,7 @@
    </div>
 
   <div class="form-field">
-    <label><?php print t('Customer Number'); ?></label>
+    <label><?php print t('Customer Number', array(), array('context' => 'bpjs_kesehatan_form')); ?></label>
   </div>
 
   <?php foreach (element_children($form['line_items']) as $child): ?>

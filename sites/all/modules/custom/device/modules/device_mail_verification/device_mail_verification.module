@@ -1,0 +1,120 @@
+<?php
+/**
+ * @file
+ * device_mail_verification.module
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Implements hook_menu()
+ */
+function device_mail_verification_menu() {
+  $items = array(
+    'device_mail/verification/%' => array(
+      'page callback' => '_device_mail_verification_link_confirm',
+      'page arguments' => array(2),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+    ),
+    'device_mail/test_send' => array(
+      'page callback' => 'test_send',
+      'access arguments' => TRUE,
+    ),
+  );
+  return $items;
+}
+
+function test_send() {
+  $mail = _device_mail_verification_send_verification_link('nuraizatif@gmail.com');
+  if ($mail) {
+  	echo $mail;
+  } else {
+  	echo "kaga";
+  }
+}
+
+/**
+ * Implements hook_mail()
+ */
+function device_mail_verification_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'verify':
+      $langcode = $message['language'];
+      $message['subject'] = t("Verification of your mail at !site", array('!site' => variable_get('site_name')), array('langcode' => $langcode));
+      $message['body'][] = t("Please click on the following link to confirm this email address at !site.", array('!site' => variable_get('site_name')), array('langcode' => $langcode));
+      $message['body'][] = url(
+        'device_mail/verification/' . $params['hash'],
+        array(
+          'absolute' => TRUE,
+        )
+      );
+      break;
+  }
+}
+
+/**
+ * Function _device_mail_verification_link_confirm()
+ *
+ * @param $hash.
+ * hash from email.
+ */
+function _device_mail_verification_link_confirm($hash = NULL) {
+  // Di sini akan ada merge user.
+  $confirm_status = FALSE;
+  if ($hash == 'BwvIh-9Yvm9jgGifgndOsn91o-akLl9w_RNsiCKMu8k') {
+  	echo "bener";
+  }
+  else {
+  	echo "salah weee";
+  }
+}
+
+/**
+ * Send out verification link.
+ */
+function _device_mail_verification_send_verification_link($mail = NULL) {
+  if (!$mail) {
+    return FALSE;
+  }
+  $hash = drupal_hash_base64(drupal_get_hash_salt() . drupal_random_bytes(16) . $mail);
+  $lang = language_default('language');
+  $send = drupal_mail(
+    'device_mail_verification',
+    'verify',
+    $mail,
+    $lang,
+    array(
+      'hash' => $hash,
+    )
+  );
+  return ($send == TRUE) ? $hash : FALSE;
+}
+
+/**
+ * Function device_mail_verification_send_verification().
+ */
+function device_mail_verification_send_verification($mail = '') {
+	// Validate mail.
+  if (valid_email_address($mail)) {
+    // Validate device session.
+    $session = device_services_default_session_auth('mail');
+    if ($session !== FALSE) {
+      // Check mail has already registered.
+      $user = user_load_by_mail($mail);
+      if ($user === FALSE) {
+        // Send email verification.
+        $device_wrapper = entity_metadata_wrapper('device', $session['device']->did);
+        $device_wrapper->device_mail->set($mail);
+        $device_wrapper->save();
+        // Return true.
+        return TRUE;
+      }
+      else {
+        return services_error(t('Email has already registered.'), 406);
+      }
+    }
+  }
+  // Other condition.
+  return services_error(t('Invalid mail request.'), 406);
+}

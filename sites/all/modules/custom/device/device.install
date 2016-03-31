@@ -78,6 +78,11 @@ function device_schema() {
         'default' => 0,
         'description' => 'Drupal user ID.',
       ),
+      'push_id' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'ID Push Notification ( GCM / APN )',
+      ),
       'data' => array(
         'type' => 'blob',
         'not null' => FALSE,
@@ -220,49 +225,6 @@ function device_install() {
     'suffix' => '',
     'after' => '',
   ));
-}
-
-/**
- * Implements hook_enable().
- */
-function device_enable() {
-  // Get all properties of device entity.
-  $properties = entity_get_all_property_info('device');
-
-  // Check field device mail.
-  if (!isset($properties['device_mail'])) {
-    // Create field: device_mail.
-    $field = array(
-      'entity_types' => array('device'),
-      'field_name' => 'device_mail',
-      'type' => 'email',
-      'cardinality' => 1,
-      'description' => 'Device email address.',
-    );
-    field_create_field($field);
-    // Create an instance and attach it to the commerce product entity.
-    $instance = array(
-      'field_name' => 'device_mail',
-      'entity_type' => 'device',
-      'description' => 'Device email address.',
-      'bundle' => 'device',
-      'label' => 'Device Email',
-      'widget' => array(
-        'settings' => array(
-          'size' => 254,
-        ),
-      ),
-      'email_field_verification_container' => array(
-        'email_field_verification_timeout' => EMAIL_FIELD_VERIFICATION_TIMEOUT_24H,
-        'email_field_verification_timeout_response' => EMAIL_FIELD_VERIFICATION_RESPONSE_EMPTY,
-        'email_field_verification_require_verification' => TRUE,
-        'email_field_verification_publish_confirmed' => FALSE,
-        'email_field_verification_timeout_custom' => '',
-        'email_field_verification_resend_verification' => FALSE,
-      ),
-    );
-    field_create_instance($instance);
-  }
 }
 
 /**

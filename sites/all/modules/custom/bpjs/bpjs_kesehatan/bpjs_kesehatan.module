@@ -129,6 +129,11 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
 
   $instances = field_info_instances('commerce_line_item', 'bpjs_kesehatan');
 
+  $form['field_phone_number'] = array(
+    '#type' => 'textfield',
+    '#title' => $instances['field_phone_number']['label'],
+  );
+
   $values = array(
     'type' => 'bpjs_kesehatan',
   );
@@ -234,6 +239,7 @@ function bpjs_kesehatan_form_validate($form, &$form_state) {
           form_set_error('inquiry', t('Please retry'));
         }
 
+        $form_state['line_items'][$delta]->field_phone_number[LANGUAGE_NONE][0]['value'] = $value['field_phone_number'];
         $form_state['line_items'][$delta]->field_customer_number[LANGUAGE_NONE][0]['value'] = $value['field_customer_number'];
         $form_state['line_items'][$delta]->payment_period[LANGUAGE_NONE][0]['value'] = $form_state['values']['payment_period'];
       }

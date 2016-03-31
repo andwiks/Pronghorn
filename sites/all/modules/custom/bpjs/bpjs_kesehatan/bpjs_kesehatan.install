@@ -28,6 +28,16 @@ function bpjs_kesehatan_install() {
       'bundle' => 'bpjs_kesehatan',
       'label' => $t('Transaction ID'),
     ),
+    'field_phone_number' => array(
+      'field_name' => 'field_phone_number',
+      'entity_type' => 'commerce_line_item',
+      'bundle' => 'bpjs_kesehatan',
+      'label' => $t('Phone Number'),
+      'required' => TRUE,
+      'commerce_cart_settings' => array(
+        'field_access' => TRUE,
+      ),
+    ),
     'field_customer_number' => array(
       'field_name' => 'field_customer_number',
       'entity_type' => 'commerce_line_item',

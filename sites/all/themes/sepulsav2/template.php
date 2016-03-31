@@ -271,6 +271,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
  */
 function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id) {
   $form['#action'] .= '#bpjs-kesehatan';
+  $form['#attached']['css'][] = path_to_theme() . '/css/bpjs-kesehatan.css';
 
   foreach (element_children($form['line_items']) as $child) {
     $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';

@@ -1,4 +1,3 @@
-<?php kpr($variables); ?>
 <div class="form-bpjs">
   <div class="form-field">
     <label>Nomor Telepon</label>

@@ -48,11 +48,6 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   text-indent: -9999px;
 }
 
-section.h_middle_top .form-bpjs .form-actions input#edit-submit,
-section.h_middle_top .form-bpjs .form-actions input#edit-pay {
-  float: right;
-}
-
 #bpjs-kesehatan .topup-notes {
   width: 100%;
   margin-top: 15px;

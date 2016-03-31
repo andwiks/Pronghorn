@@ -270,7 +270,11 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
  * Implements hook_form_FORM_ID_alter() for bpjs_kesehatan_form().
  */
 function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id) {
-  $form['#action'] .= '#bpjs-kesehatan';
+  $action = drupal_parse_url($form['#action']);
+  if (empty($action['fragment'])) {
+    $form['#action'] .= '#bpjs-kesehatan';
+  }
+
   $form['#attached']['css'][] = path_to_theme() . '/css/bpjs-kesehatan.css';
 
   foreach (element_children($form['line_items']) as $child) {

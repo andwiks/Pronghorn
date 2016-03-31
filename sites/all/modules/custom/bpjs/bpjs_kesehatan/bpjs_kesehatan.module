@@ -42,6 +42,7 @@ function bpjs_kesehatan_commerce_line_item_type_info() {
 function bpjs_kesehatan_commerce_product_calculate_sell_price_line_item_alter($line_item) {
   if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['premi'])) {
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['premi'];
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['premi'];
   }
 }
 
@@ -125,6 +126,9 @@ function bpjs_kesehatan_form_commerce_cart_add_to_cart_form_bpjs_kesehatan_alter
 }
 
 function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
+  $form['#prefix'] = '<div id="bpjs-kesehatan-form-wrapper">';
+  $form['#suffix'] = '</div>';
+
   $form['line_items'] = array('#tree' => TRUE);
 
   $instances = field_info_instances('commerce_line_item', 'bpjs_kesehatan');
@@ -147,12 +151,8 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
     $form_state['line_items'][] = entity_create('commerce_line_item', $values);
   }
   // Remove button.
-  if (!empty($form_state['input'])) {
-    foreach ($form_state['input']['line_items'] as $delta => $line_item) {
-      if (!empty($line_item['remove'])) {
-        $form_state['line_items'][$delta] = FALSE;
-      }
-    }
+  if (!empty($form_state['triggering_element']['#remove'])) {
+    unset($form_state['line_items'][$form_state['triggering_element']['#delta']]);
   }
 
   foreach ($form_state['line_items'] as $delta => $line_item) {
@@ -171,6 +171,10 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
           '#delta' => $delta,
           '#name' => 'line_items[' . $delta . '][remove]',
           '#remove' => TRUE,
+          '#ajax' => array(
+            'callback' => 'bpjs_kesehatan_form_ajax',
+            'wrapper' => 'bpjs-kesehatan-form-wrapper',
+          ),
         );
       }
       else {
@@ -196,14 +200,18 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
     '#type' => 'button',
     '#value' => t('Add new'),
     '#new' => TRUE,
+    '#ajax' => array(
+      'callback' => 'bpjs_kesehatan_form_ajax',
+      'wrapper' => 'bpjs-kesehatan-form-wrapper',
+    ),
   );
   $form['actions']['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Add to cart'),
   );
-  $form['actions']['pay'] = array(
+  $form['actions']['charge'] = array(
     '#type' => 'submit',
-    '#value' => t('Pay'),
+    '#value' => t('Pay Now'),
   );
 
   return $form;
@@ -289,6 +297,10 @@ function bpjs_kesehatan_form_validate($form, &$form_state) {
       }
     }
   }
+}
+
+function bpjs_kesehatan_form_ajax($form, $form_state) {
+  return $form;
 }
 
 /**

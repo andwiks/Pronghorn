@@ -1,6 +1,7 @@
 section.h_middle_top .form-bpjs .form-field {
   clear: both;
   margin-bottom: 15px;
+  position: relative;
 }
 
 section.h_middle_top .form-bpjs .form-field label {
@@ -16,6 +17,7 @@ section.h_middle_top .form-bpjs .form-field:after {
 }
 
 section.h_middle_top .form-bpjs .form-field input[type=text] {
+  /*
   width: 90% !important;
   float: left;
   padding: 10px;
@@ -31,9 +33,11 @@ section.h_middle_top .form-bpjs .form-field input[type=text] {
   -ms-border-radius: 7px;
   -o-border-radius: 7px;
   color: #717171 !important;
+  */
 }
 
 section.h_middle_top .form-bpjs .form-field input.remove {
+  /*
   float: left;
   width: 9%;
   margin: 0;
@@ -46,9 +50,54 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   -ms-border-radius: 7px;
   -o-border-radius: 7px;
   text-indent: -9999px;
+  */
+
+  font-size: 22px;
+  line-height: 22px;
+
+  width: 46px;
+  height: 46px;
+  position: absolute;
+  top: 11px;
+  right: 14px;
+  margin: 0;
+  margin-left: 1%;
+  background: #c72127;
+  color: #fff;
+  border: 2px solid #c72127;
+  border-radius: 46px;
+  -webkit-border-radius: 46px;
+  -moz-border-radius: 46px;
+  -ms-border-radius: 46px;
+  -o-border-radius: 46px;
 }
 
 #bpjs-kesehatan .topup-notes {
-  width: 100%;
-  margin-top: 15px;
+  /*width: 100%;
+  margin-top: 15px;*/
+}
+
+section.h_middle_top .form-bpjs .form-field input[type=text] {
+  background: none !important;
+}
+
+section.h_middle_top .form-bpjs .form-field input.edit-new {
+  font-size: 22px;
+  line-height: 22px;
+
+  width: 46px;
+  height: 46px;
+  position: absolute;
+  top: 11px;
+  right: 14px;
+  margin: 0;
+  margin-left: 1%;
+  background: #129d4a;
+  color: #fff;
+  border: 2px solid #129d4a;
+  border-radius: 46px;
+  -webkit-border-radius: 46px;
+  -moz-border-radius: 46px;
+  -ms-border-radius: 46px;
+  -o-border-radius: 46px;
 }

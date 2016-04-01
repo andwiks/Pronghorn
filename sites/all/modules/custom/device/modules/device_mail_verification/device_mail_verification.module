@@ -26,12 +26,26 @@ function device_mail_verification_menu() {
 }
 
 function test_send() {
-  $mail = _device_mail_verification_send_verification_link('nuraizatif@gmail.com');
-  if ($mail) {
-  	echo $mail;
-  } else {
-  	echo "kaga";
-  }
+  // $mail = _device_mail_verification_send_verification_link('nuraizatif@gmail.com');
+  // if ($mail) {
+  // 	echo $mail;
+  // } else {
+  // 	echo "kaga";
+  // }
+  // print_r(time());
+  // echo "<br>";
+  // print_r(date("d-m-y H:i:s", time()));
+  echo "<pre>";
+  // $user = user_load_by_mail('akuramdan@yahoo.com');
+  $mail_result = db_select('commerce_order', 'co')
+    ->fields('co', array('order_id'))
+    ->condition('uid', 1, '=')
+    ->execute();
+
+  // foreach ($mail_result as $result) {
+  //   echo $result->order_id."<br>";
+  // }
+  // print_r($mail_result->fetchAllAssoc());
 }
 
 /**
@@ -62,12 +76,126 @@ function device_mail_verification_mail($key, &$message, $params) {
 function _device_mail_verification_link_confirm($hash = NULL) {
   // Di sini akan ada merge user.
   $confirm_status = FALSE;
-  if ($hash == 'BwvIh-9Yvm9jgGifgndOsn91o-akLl9w_RNsiCKMu8k') {
-  	echo "bener";
+
+  $mail_result = db_select('device_mail_verification', 'e')
+    ->fields('e')
+    ->condition('hash', $hash, '=')
+    ->execute();
+
+  // Mail or hash doesn't exist.
+  if (!isset($mail_result) || !$mail_result->rowCount()) {
+
+    $confirm_status = FALSE;
+
+    module_invoke_all('device_mail_verification_update', FALSE, FALSE);
+
   }
+  // Hash does exist.
   else {
-  	echo "salah weee";
+
+    $current_mail = $mail_result->fetchAssoc();
+    // Hash already processed.
+    if ($current_mail['status'] != 0) {
+
+      switch ($current_mail['status']) {
+        case 1:
+          $confirm_status = 'already_confirmed';
+          break;
+
+        case 2:
+          $confirm_status = 'already_timeout';
+          break;
+      }
+
+      module_invoke_all('device_mail_verification_update', $current_mail, $confirm_status);
+
+    }
+    // Hash not processed yet.
+    else {
+
+      $entities = entity_load('device', array($current_mail['did']));
+      // Settings don't exist (this should NOT happen!).
+      if (empty($entities)) {
+
+        $confirm_status = FALSE;
+
+        module_invoke_all('device_mail_verification_update', $current_mail, FALSE);
+
+      }
+      // Settings loaded.
+      else {
+        // Either no timeout or timeout has no effect.
+        if (variable_get('device_mail_timeout', 'none') == 'none') {
+
+          db_update('device_mail_verification')
+            ->fields(array('status' => 1))
+            ->condition('dmv_id', $current_mail['dmv_id'], '=')
+            ->execute();
+
+          $confirm_status = 'confirmed';
+
+          module_invoke_all('device_mail_verification_update', $current_mail, 'confirmed');
+
+          if (!$current_mail['new_flag']) {
+            device_mail_verification_merge_user($current_mail);
+          }
+
+        }
+        // A timeout might have occurred.
+        else {
+
+          // Success! Verification request for existing mail within timeout.
+          if ($current_mail['created'] + variable_get('device_mail_timeout', 'none') > time()) {
+
+            db_update('device_mail_verification')
+            ->fields(array('status' => 1))
+            ->condition('dmv_id', $current_mail['dmv_id'], '=')
+            ->execute();
+
+            $confirm_status = 'confirmed';
+
+            module_invoke_all('device_mail_verification_update', $current_mail, 'confirmed');
+
+            if (!$current_mail['new_flag']) {
+              device_mail_verification_merge_user($current_mail);
+            }
+
+          }
+          // Timeout reached, responding.
+          else {
+
+            db_update('device_mail_verification')
+            ->fields(array('status' => 2))
+            ->condition('dmv_id', $current_mail['dmv_id'], '=')
+            ->execute();
+
+            $confirm_status = 'timeout';
+          }
+        }
+      }
+    }
+
+  } 
+
+  switch ($confirm_status) {
+    case FALSE:
+      drupal_set_message(t("The mail address could not be confirmed."), 'error');
+      break;
+
+    case 'timeout':
+      drupal_set_message(t("It took you too long to confirm this mail address."), 'warning');
+      break;
+
+    case 'confirmed':
+      drupal_set_message(t("Your mail address has been confirmed."), 'status');
+      break;
+
+    case 'already_confirmed':
+      drupal_set_message(t("Your mail address has already been confirmed."), 'status');
+      break;
   }
+
+  return array();
 }
 
 /**
@@ -100,21 +228,173 @@ function device_mail_verification_send_verification($mail = '') {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
     if ($session !== FALSE) {
-      // Check mail has already registered.
-      $user = user_load_by_mail($mail);
-      if ($user === FALSE) {
-        // Send email verification.
-        $device_wrapper = entity_metadata_wrapper('device', $session['device']->did);
-        $device_wrapper->device_mail->set($mail);
-        $device_wrapper->save();
+      // add email to device_mail.
+      $device_wrapper = entity_metadata_wrapper('device', $session['device']->did);
+      $device_wrapper->device_mail->set($mail);
+      $device_wrapper->save();    
+
+      $hash_code = _device_mail_verification_send_verification_link($mail);
+
+      if ($hash_code) {
+      
+        $fields_insert = array(
+              'did' => $session['device']->did,
+              'status' => 0,
+              'mail' => $mail,
+              'hash' => $hash_code,
+              'created' => time(),
+            );
+
+        // Check mail has already registered.
+        $user = user_load_by_mail($mail);
+
+        if ($user === FALSE) {
+          $fields_insert['new_flag'] = 1;
+        }
+        else {
+          $fields_insert['new_flag'] = 0;
+        }
+
+        // Insert Data to device_mail_verification Table.
+        db_insert('device_mail_verification')
+        ->fields($fields_insert)
+        ->execute();
+
         // Return true.
         return TRUE;
       }
       else {
-        return services_error(t('Email has already registered.'), 406);
+        return services_error(t('Send email verification failed.'), 406);
       }
     }
   }
   // Other condition.
   return services_error(t('Invalid mail request.'), 406);
+}
+
+/**
+ * Function to Merge User.
+ */
+function device_mail_verification_merge_user($current_mail) {
+  global $language;
+
+  $device = device_load($current_mail['did']);
+
+  $device_account = db_select('commerce_order', 'co')
+    ->fields('co')
+    ->condition('uid', $device->uid, '=')
+    ->execute();
+
+  $web_user = user_load_by_mail($current_mail['mail']);
+
+  $web_account = db_select('commerce_order', 'co')
+    ->fields('co')
+    ->condition('uid', $web_user->uid, '=')
+    ->execute();
+
+  // Strategi 1. jika hanya salah satu user yang memiliki order, merge ke user yang memiliki order.
+  if (!$device_account->rowCount() || !$web_account->rowCount()) {
+    if ($device_account->rowCount() == 0) {
+      // Merge to web account and do not send email reset password.
+
+      // Block User Device. 
+      $block_device_user = user_load($device->uid);
+      $block_device_user->status = 0;
+      $block_device_user->save();
+
+      // Change UID in device.
+      $device_update = device_load($current_mail['did']);
+      $device_update->uid = $web_user->uid;
+      $device_update->save();
+
+      watchdog('Device Mail Varification', 
+        'Merge User Strategi 1-> device_account : !device_account_id merge to web_account : !web_account_id', 
+        array('!device_account_id' => $device->uid, '!web_account_id' => $web_user->uid));
+    }
+    elseif ($web_account->rowCount() == 0) {
+      // Merge to device account and send email reset password.
+      // Block Web Account.
+      $block_device_user = user_load($web_user->uid);
+      $block_device_user->status = 0;
+      $block_device_user->save();
+
+      // Change email in user , where uid = $device->uid;
+      $user_update = user_load($device->uid);
+      $user_update->mail = $current_mail['mail'];
+      $user_update->save();
+
+      // Send Email to reset Password.
+      $account = user_load($device->uid);
+      $mail = _user_mail_notify('password_reset', $account, $language);
+
+      watchdog('Device Mail Varification', 
+        'Merge User Strategi 1 ->  web_account : !web_account_id merge to device_account : !device_account_id', 
+        array('!device_account_id' => $device->uid, '!web_account_id' => $web_user->uid));
+    }
+    else
+    {
+      watchdog('Device Mail Varification', 
+        'Merge User Strategi 1 -> Something Wrong web_account : !web_account_id, device_account : !device_account_id', 
+        array('!device_account_id' => $device->uid, '!web_account_id' => $web_user->uid));
+    }
+  }
+  // Strategi 3. Jika kedua user tidak memiliki order, merge ke user yang memiliki device.
+  elseif (!$device_account->rowCount() && !$web_account->rowCount()) {
+    // Merge to device account and send email reset password.
+    // Block Web Account.
+    $block_device_user = user_load($web_user->uid);
+    $block_device_user->status = 0;
+    $block_device_user->save();
+
+    // Change email in user , where uid = $device->uid;
+    $user_update = user_load($device->uid);
+    $user_update->mail = $current_mail['mail'];
+    $user_update->save();
+
+    // Send Email to reset Password.
+    $account = user_load($device->uid);
+    $mail = _user_mail_notify('password_reset', $account, $language);
+
+    watchdog('Device Mail Varification', 
+      'Merge User Strategi 3 ->  web_account : !web_account_id merge to device_account : !device_account_id', 
+      array('!device_account_id' => $device->uid, '!web_account_id' => $web_user->uid));
+  }
+  // Strategi 2. & 4.
+  else {
+    // Check wheither web account has device already.
+    // tanya mas andreas buat cek entity ini, entitywrapper ? where : device_mail & did <> $current_mail[]
+    $check_web_account_device = FALSE;
+    // Strategi 4. Jika kedua user punya order, dan jika kedua user punya device.
+    if ($check_web_account_device) {
+      // Merge to oldest uid and send email reset password.
+    }
+    // Strategi 2. jika kedua user memiliki order, merge ke user yang memiliki device.
+    else {
+      // Merge to user who has device.
+      // Block Web Account.
+      $block_device_user = user_load($web_user->uid);
+      $block_device_user->status = 0;
+      $block_device_user->save();
+
+      // Change email in user , where uid = $device->uid;
+      $user_update = user_load($device->uid);
+      $user_update->mail = $current_mail['mail'];
+      $user_update->save();
+
+      // Update UID in commerce_order.
+      db_update('commerce_order')
+            ->fields(array('uid' => $device->uid))
+            ->condition('uid', $web_user->uid, '=')
+            ->execute();
+
+      // Send Email to reset Password.
+      $account = user_load($device->uid);
+      $mail = _user_mail_notify('password_reset', $account, $language);
+
+      watchdog('Device Mail Varification', 
+        'Merge User Strategi 2 ->  web_account : !web_account_id merge to device_account : !device_account_id', 
+        array('!device_account_id' => $device->uid, '!web_account_id' => $web_user->uid));
+    }
+  }
+
 }

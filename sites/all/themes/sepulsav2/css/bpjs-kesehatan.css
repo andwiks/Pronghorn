@@ -62,7 +62,7 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   right: 14px;
   margin: 0;
   margin-left: 1%;
-  background: #c72127;
+  background: #c72127 !important;
   color: #fff;
   border: 2px solid #c72127;
   border-radius: 46px;
@@ -77,11 +77,12 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   margin-top: 15px;*/
 }
 
+
 section.h_middle_top .form-bpjs .form-field input[type=text] {
   background: none !important;
 }
 
-section.h_middle_top .form-bpjs .form-field input.edit-new {
+section.h_middle_top .form-bpjs .form-field input.add-new {
   font-size: 22px;
   line-height: 22px;
 
@@ -92,7 +93,7 @@ section.h_middle_top .form-bpjs .form-field input.edit-new {
   right: 14px;
   margin: 0;
   margin-left: 1%;
-  background: #129d4a;
+  background: #129d4a !important;
   color: #fff;
   border: 2px solid #129d4a;
   border-radius: 46px;
@@ -100,4 +101,8 @@ section.h_middle_top .form-bpjs .form-field input.edit-new {
   -moz-border-radius: 46px;
   -ms-border-radius: 46px;
   -o-border-radius: 46px;
+}
+
+section.h_middle_top .form-bpjs .form-actions {
+  clear: none;
 }

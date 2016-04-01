@@ -1,0 +1,153 @@
+<?php
+
+/*
+ * File
+ * 
+ */
+ 
+function sepulsa_bulk_userpoint_menu(){
+  $items['admin/config/people/userpoints/bulk'] = array(
+      'title' => 'Add !points transaction (Bulk)',
+      'title arguments' => userpoints_translation(),
+      'description' => 'Admin Bulk add/delete userpoints',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('userpoint_bulk_form'),
+      'access callback' => array('userpoints_admin_access'),
+      'type' => MENU_LOCAL_ACTION,
+      'weight' => 0,
+  );
+  
+  return $items;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function sepulsa_bulk_userpoint_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to add points on 'userpoints' administration pages.
+  if (strpos($root_path, 'admin/config/people/userpoints/') !== FALSE) {
+
+    // Don't display the action link on some pages like settings and
+    // approve or decline confirmation forms.
+    $blacklist = array('settings', 'approve', 'decline');
+    foreach ($blacklist as $blacklisted_path) {
+      if (strpos($root_path, $blacklisted_path) !== FALSE) {
+        return;
+      }
+    }
+
+    $item = menu_get_item('admin/config/people/userpoints/bulk');
+
+    // For the transaction view pages, we want to directly link to the
+    // user for this transaction.
+    if (arg(4) == 'transaction' && (arg(6) == 'view' || arg(6) == 'edit')) {
+      $transaction = userpoints_transaction_load(arg(5));
+      $item['href'] .= '/' . $transaction->uid;
+    }
+
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+function userpoint_bulk_form($form = array(), &$form_state = array()){
+  $form['fid'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('File to Bulk Transaction'),
+    '#description' => '"username" , "points(+/- without . or ,)"',
+    '#upload_location' => 'temporary://',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('csv'),
+    ),
+    '#required' => FALSE,
+  );
+  
+  if (module_exists('taxonomy')) {
+    $options = userpoints_get_categories();
+    $form['tid'] = array(
+      '#type' => 'select',
+      '#title' => t('Category'),
+      '#default_value' => isset($txn->tid) ? $txn->tid : userpoints_get_default_tid(),
+      '#options' => $options,
+      '#description' => t('The !points category that should apply to this bulk transaction.', userpoints_translation()),
+      '#weight' => 0,
+      // Only show the category if there are actually categories to choose from.
+      '#access' => count($options) > 1,
+    );
+  }
+  
+  $form['actions'] = array(
+    '#type' => 'actions',
+  );
+
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+  return $form;
+}
+
+function get_uid_from_username($username){
+  $query = new EntityFieldQuery;
+  $result = $query
+    ->entityCondition('entity_type', 'user')
+    ->propertyCondition('name', trim($username))
+    ->execute();
+  $ufindser = array_keys($result['user']);
+  return $ufindser[0];  
+}
+
+function userpoint_bulk_form_submit($form, &$form_state){
+  //dpm($form_state);
+  $uri =  db_query("SELECT uri FROM {file_managed} WHERE fid = :fid", array(
+            ':fid' => $form_state['values']['fid'],
+          ))->fetchField();
+  if(!empty($uri) ){
+    if(file_exists(drupal_realpath($uri))) {
+        $operations = array();
+        $handle = fopen(drupal_realpath($uri), "r");
+        while (($data = fgetcsv($handle, 0, ',', '"')) !== FALSE) {
+          $item = array (
+            'uid' => get_uid_from_username($data[0]),
+            'points' => $data[1],
+            'tid' => $form_state['values']['tid'],
+            'description' => '[BULK] ' . isset($data[2]) ? $data[2] : 'No Reason',
+          ); 
+          $operations[] = array(
+                  'bulk_userpoint',  
+                  array($item, $form, $form_state),  
+                );
+        }
+        $batch = array(
+              'title' => t('Bulk UserPoint ...'),
+              'operations' => $operations,  
+              'finished' => 'bulk_userpoint_finish', 
+              'error_message' => t('Something Went Wrong When Appending User Point Data.'),
+              'progress_message' => t('Adding @current of @total User Point Data.'),
+            );
+            batch_set($batch);
+            fclose($handle); 
+    }  
+  } else {
+    drupal_set_message(t('File Not Exsist')); 
+  }
+  
+}
+
+function bulk_userpoint_finish(){
+  drupal_set_message(t('Bulk User Point Success'));  
+}
+
+function bulk_userpoint($item, $form, $form_state) {
+  $params = array (
+    'uid' => $item['uid'],
+    'points' => $item['points'],
+    'tid' => $item['tid'],
+    'description' => $item['description'],
+  );
+  userpoints_userpointsapi($params);
+}

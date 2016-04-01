@@ -277,9 +277,17 @@ function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id
 
   $form['#attached']['css'][] = path_to_theme() . '/css/bpjs-kesehatan.css';
 
-  foreach (element_children($form['line_items']) as $child) {
+  foreach (element_children($form['line_items']) as $delta => $child) {
     $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';
-    $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+    $form['line_items'][$child]['field_customer_number']['#attributes']['class'][] = 'customer-number';
+
+    if ($delta == count(element_children($form['line_items'])) - 1) {
+      unset($form['line_items'][$child]['remove']);
+    }
+    else {
+      $form['line_items'][$child]['remove']['#value'] = '-';
+      $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+    }
   }
 
   $form['actions']['submit']['#attributes']['style'] = 'float:right';

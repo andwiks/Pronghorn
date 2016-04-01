@@ -7,14 +7,17 @@
     <label><?php print t('Customer Number', array(), array('context' => 'bpjs_kesehatan_form')); ?></label>
   </div>
 
-  <?php foreach (element_children($form['line_items']) as $child): ?>
+  <?php foreach (element_children($form['line_items']) as $delta => $child): ?>
     <div class="form-field">
       <?php print render($form['line_items'][$child]); ?>
+
+      <?php if ($delta == count(element_children($form['line_items'])) - 1): ?>
+        <?php print render($form['actions']['new']); ?>
+      <?php endif; ?>
     </div>
   <?php endforeach; ?>
 
   <div class="form-actions form-wrapper" id="edit-actions">
-    <?php print render($form['actions']['new']); ?>
     <?php print render($form['actions']['charge']); ?>
     <?php print render($form['actions']['submit']); ?>
   </div>

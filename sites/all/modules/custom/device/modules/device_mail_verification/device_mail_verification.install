@@ -55,6 +55,12 @@ function device_mail_verification_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'timeout' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('dmv_id', 'did'),
   );

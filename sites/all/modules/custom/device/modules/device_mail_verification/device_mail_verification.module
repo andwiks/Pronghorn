@@ -35,7 +35,7 @@ function test_send() {
   // print_r(time());
   // echo "<br>";
   // print_r(date("d-m-y H:i:s", time()));
-  // echo "<pre>";
+  echo "<pre>";
   // $user = user_load_by_mail('akuramdan@yahoo.com');
   // $mail_result = db_select('commerce_order', 'co')
   //   ->fields('co', array('order_id'))
@@ -77,6 +77,29 @@ function test_send() {
   // {
   //   echo "kaga";
   // }
+
+  // $test = entity_load('device', array('1'));
+  // $entity = array_shift($test);
+  // // list(, , $bundle) = entity_extract_ids('device', $entity);
+
+  // // $current_instance = field_info_instance('device', 'field_data_device_mail', $bundle);
+  // print_r($entity);die();
+  // if ($test) {
+  //   echo "ada";
+  // } else 
+  // {
+  //   echo "string";
+  // }
+  $device_wrapper = entity_metadata_wrapper('device', 1);
+  $device_wrapper->device_mail->set(NULL);
+  $device_wrapper->save();
+  // $entities = entity_load('device', array('1'));
+  // unset($entities->device_mail[LANGUAGE_NONE][0]);
+
+  $test = entity_load('device', array('1'));
+  $entity = array_shift($test);
+
+  print_r($entity);
 }
 
 /**
@@ -175,7 +198,7 @@ function _device_mail_verification_link_confirm($hash = NULL) {
         else {
 
           // Success! Verification request for existing mail within timeout.
-          if ($current_mail['created'] + variable_get('device_mail_timeout', 'none') > time()) {
+          if ($current_mail['timeout'] > time()) {
 
             db_update('device_mail_verification')
             ->fields(array('status' => 1))
@@ -264,13 +287,15 @@ function device_mail_verification_send_verification($mail = '') {
       $hash_code = _device_mail_verification_send_verification_link($mail);
 
       if ($hash_code) {
-      
+        $created = time();
+        $timeout = (variable_get('device_mail_timeout', 'none') != 'none') ? variable_get('device_mail_timeout', 'none') : 0;
         $fields_insert = array(
               'did' => $session['device']->did,
               'status' => 0,
               'mail' => $mail,
               'hash' => $hash_code,
-              'created' => time(),
+              'created' => $created,
+              'timeout' => $created+$timeout,
             );
 
         // Check mail has already registered.
@@ -485,5 +510,27 @@ function device_mail_verification_merge_user($current_mail) {
             '!changed_uid_order' => print_r($changed_uid_order, TRUE),));
       }
     }
+  }
+}
+
+/**
+ * Implements hook_cron()
+ */
+function device_mail_verification_cron() {
+  $mail_result = db_select('device_mail_verification', 'e')
+      ->fields('e')
+      ->condition('status', 1, '<>')
+      ->condition('timeout', time(), '<')
+      ->execute();
+
+  while ($current_mail = $mail_result->fetchAssoc()) {
+
+    db_delete('device_mail_verification')
+        ->condition('did', $current_mail['did'], '=')
+        ->execute();
+
+    $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
+    $device_wrapper->device_mail->set(NULL);
+    $device_wrapper->save();
   }
 }

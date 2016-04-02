@@ -102,3 +102,11 @@ function device_mail_verification_enable() {
     field_create_instance($instance);
   }
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function device_mail_verification_uninstall() {
+  // Delete device variables.
+  variable_del('device_mail_timeout');
+}

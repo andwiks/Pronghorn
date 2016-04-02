@@ -4,6 +4,7 @@ core = "7.x"
 package = "Sepulsa"
 
 dependencies[] = device
+dependencies[] = device_mail_verification
 dependencies[] = services
 dependencies[] = services_documentation
 dependencies[] = jwt_resources

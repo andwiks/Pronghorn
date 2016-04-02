@@ -1,5 +1,5 @@
 name = "Device Mail Verification"
-description = "Integrates Device with user in pronghorn"
+description = "Integrates Device with User in pronghorn."
 core = "7.x"
 package = "Sepulsa"
 

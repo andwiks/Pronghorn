@@ -17,89 +17,8 @@ function device_mail_verification_menu() {
       'access arguments' => array('access content'),
       'type' => MENU_CALLBACK,
     ),
-    'device_mail/test_send' => array(
-      'page callback' => 'test_send',
-      'access arguments' => TRUE,
-    ),
   );
   return $items;
-}
-
-function test_send() {
-  // $mail = _device_mail_verification_send_verification_link('nuraizatif@gmail.com');
-  // if ($mail) {
-  // 	echo $mail;
-  // } else {
-  // 	echo "kaga";
-  // }
-  // print_r(time());
-  // echo "<br>";
-  // print_r(date("d-m-y H:i:s", time()));
-  echo "<pre>";
-  // $user = user_load_by_mail('akuramdan@yahoo.com');
-  // $mail_result = db_select('commerce_order', 'co')
-  //   ->fields('co', array('order_id'))
-  //   ->condition('uid', 1, '=')
-  //   ->execute();
-  // $changed_uid_order = array();
-  // foreach ($mail_result as $result) {
-  //   $changed_uid_order[] = $result->order_id;
-  // }
-  // $user_wrapper = entity_metadata_wrapper('device', 1);
-
-  // $device_user_wrapper = entity_metadata_wrapper('device', 1);
-  // $device_user_wrapper->uid->set(0);
-  // $device_user_wrapper->save();
-
-
-  // $user_wrapper->mail->set('aizat@sepulsa.com');
-  // $user_wrapper->save();
-  // $user = user_load(1);
-  // foreach ($mail_result as $result) {
-  //   echo $result->order_id."<br>";
-  // }
-  // print_r($changed_uid_order);
-  // $confirm_status = 'confirmed';
-
-  // $current_mail['did'] = 1;
-  // $current_mail['mail'] = 'nuraizatif@gmail.com';
-
-  // module_invoke_all('device_mail_verification_update', $current_mail, 'confirmed');
-
-  // Send Email to reset Password.
-  // $account = user_load(1);
-  // $mail = _user_mail_notify('password_reset', $account, $language);
-
-  // if ($mail) {
-  //   echo "oke";
-  // }
-  // else
-  // {
-  //   echo "kaga";
-  // }
-
-  // $test = entity_load('device', array('1'));
-  // $entity = array_shift($test);
-  // // list(, , $bundle) = entity_extract_ids('device', $entity);
-
-  // // $current_instance = field_info_instance('device', 'field_data_device_mail', $bundle);
-  // print_r($entity);die();
-  // if ($test) {
-  //   echo "ada";
-  // } else 
-  // {
-  //   echo "string";
-  // }
-  $device_wrapper = entity_metadata_wrapper('device', 1);
-  $device_wrapper->device_mail->set(NULL);
-  $device_wrapper->save();
-  // $entities = entity_load('device', array('1'));
-  // unset($entities->device_mail[LANGUAGE_NONE][0]);
-
-  $test = entity_load('device', array('1'));
-  $entity = array_shift($test);
-
-  print_r($entity);
 }
 
 /**

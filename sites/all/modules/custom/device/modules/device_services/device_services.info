@@ -8,4 +8,5 @@ dependencies[] = services
 dependencies[] = services_documentation
 dependencies[] = jwt_resources
 dependencies[] = jwt_server
+dependencies[] = jwt_auth
 dependencies[] = zenziva

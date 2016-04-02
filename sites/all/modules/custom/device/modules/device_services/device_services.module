@@ -215,11 +215,11 @@ function device_services_services_resources() {
         ),
         'mail' => array(
           'help' => 'Associate device with email address.',
-          'callback' => 'device_services_resource_mail',
+          'callback' => 'device_mail_verification_send_verification',
           'file' => array(
-            'type' => 'inc',
-            'module' => 'device_services',
-            'name' => 'device_services',
+            'type' => 'module',
+            'module' => 'device_mail_verification',
+            'name' => 'device_mail_verification',
           ),
           'access callback' => 'services_access_menu',
           'documentation callback' => 'device_services_resource_mail_doc',

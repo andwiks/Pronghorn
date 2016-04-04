@@ -401,7 +401,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   }
   else{
     $return["status"] = false;
-    $return["message"] = "Order list halaman home tidak ditemukan";
+    $return["message"] = null;
     $return["data"] = null;
   }
   

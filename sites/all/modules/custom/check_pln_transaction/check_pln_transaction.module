@@ -1,0 +1,151 @@
+<?php
+/**
+ * @file
+ * check_pln_transaction.module
+ *
+ * @author aizat
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function check_pln_transaction_menu() {
+  $items = array();
+
+  $items['check_pln_transaction/check'] = array(
+    'title' => 'Check Transaction',
+    'description' => 'Check Transaction',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('check_pln_transaction_form'),
+    'access callback' => TRUE,
+  );
+
+  $items['check_pln_transaction/result'] = array(
+    'title' => 'Details Transaction',
+    'description' => 'Details Transaction',
+    'page callback' => 'check_pln_transaction_result',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * Function check_pln_transaction_result().
+ *
+ * Show the details transaction.
+ */
+function check_pln_transaction_result() {
+  $decode = base64_decode($_REQUEST['code']);
+  $decode = explode("|", $decode);
+  $table = "<table style='font-size:200%;'>
+				<tr>
+					<td><b>ID ORDER</b></td>
+					<td width='50px'><center>:</center></td>
+					<td>" . $decode[0] . "</td>
+				</tr>
+				<tr>
+					<td><b>TANGGAL ORDER</b></td>
+					<td width='50px'><center>:</center></td>
+					<td>" . date("d-m-y H:i:s",$decode[1]) . "</td>
+				</tr>
+				<tr>
+					<td><b>EMAIL</b></td>
+					<td width='50px'><center>:</center></td>
+					<td>" . $decode[3] . "</td>
+				</tr>
+        <tr>
+          <td><b>NOMOR METER</b></td>
+          <td width='50px'><center>:</center></td>
+          <td>" . $decode[5] . "</td>
+        </tr>
+        <tr>
+          <td><b>NOMOR PELANGGAN</b></td>
+          <td width='50px'><center>:</center></td>
+          <td>" . $decode[6] . "</td>
+        </tr>
+        <tr>
+          <td><b>NAMA PELANGGAN</b></td>
+          <td width='50px'><center>:</center></td>
+          <td>" . $decode[7] . "</td>
+        </tr>
+        <tr>
+          <td><b>NOMOR HP PELANGGAN</b></td>
+          <td width='50px'><center>:</center></td>
+          <td>" . $decode[8] . "</td>
+        </tr>
+				<tr>
+					<td><b>STATUS</b></td>
+					<td width='50px'><center>:</center></td>
+					<td>" . $decode[4] . "</td>
+				</tr>
+			</table>";
+
+  return $table;
+}
+
+/**
+ * Function check_pln_transaction_form.
+ */
+function check_pln_transaction_form() {
+  $form['pln_number'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nomor Pelanggan',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#required' => TRUE,
+  );
+
+  $form['phone_number'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Nomor HP',
+    '#size' => 20,
+    '#maxlength' => 20,
+    '#required' => TRUE,
+  );
+
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#value' => t('Check Transaction'),
+  );
+  return $form;
+}
+
+/**
+ * Function check_transaction_form_validate.
+ */
+function check_pln_transaction_form_validate($form, &$form_state) {
+}
+
+/**
+ * Function check_transaction_form_submit.
+ */
+function check_pln_transaction_form_submit($form, &$form_state) {
+  $result = db_select('commerce_order', 'co')->extend('PagerDefault');
+  $result->leftjoin('users', 'u', 'u.uid = co.uid');
+  $result->leftjoin('commerce_order_revision', 'cor', 'cor.order_id = co.order_id');
+  $result->leftjoin('commerce_line_item', 'cli', 'cli.order_id = co.order_id');
+  $result->leftjoin('token_reload', 'tr', 'tr.line_item_id = cli.line_item_id');
+  $result->leftjoin('field_data_electricity_phone_number', 'pn', 'pn.entity_id = cli.line_item_id');
+  $result->fields('co', array('order_id',
+                              'created',
+                              'uid'));
+  $result->fields('u', array('mail'));
+  $result->fields('tr', array('status','meter_number','customer_number','customer_name'));
+  $result->fields('pn', array('electricity_phone_number_value'));
+  $result->condition('pn.entity_type', 'commerce_line_item');
+  $result->condition('tr.customer_number', $form_state['values']['pln_number']);
+  $result->condition('pn.electricity_phone_number_value', $form_state['values']['phone_number']);
+  $result->orderBy('cor.revision_id', 'DESC');
+  $result->limit(1);
+  $details_order = $result->execute()->fetchAssoc();
+  $implode_details = implode("|", $details_order);
+  $encode = base64_encode($implode_details);
+  if (isset($details_order) && !empty($details_order)) {
+    $options = array('query' => array('code' => $encode));
+    drupal_goto('check_pln_transaction/result', $options);
+  }
+  else {
+    drupal_set_message(t('Order Not Found'), 'error');
+  }
+}

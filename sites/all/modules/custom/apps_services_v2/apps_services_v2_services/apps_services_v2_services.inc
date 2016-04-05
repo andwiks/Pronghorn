@@ -37,6 +37,13 @@ function apps_services_v2_services_sepulsa_operator_list($source) {
       
       //remove packet id
       foreach ($data['packet'] as $id_packet => $data_packet) {
+        //check first 2 string of title if only denom then add "Pulsa" wording
+        foreach ($data_packet as $id_data_packet => $content_data_packet) {
+          $init_title = substr($content_data_packet["title"], 0, 2);
+          if(strtolower($init_title) == "rp"){
+            $data_packet[$id_data_packet]["title"] = "Pulsa " . $content_data_packet["title"];
+          }
+        }
         $data['packet'] = $data_packet;
       }
       

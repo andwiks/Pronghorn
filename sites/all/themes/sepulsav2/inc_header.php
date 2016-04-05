@@ -30,28 +30,33 @@
                 <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">
                         <a href="<?php print url('user/' . $user->uid); ?>" class="header-login header-akun">
-                            <?php print t('AKUNKU'); ?>
+                            <?php print t('Akunku'); ?>
                         </a>
                         <div class="box_drop">
                             <div class="arr"></div>
+                            <?php
+                            /*
                             <div class="box_credit after_clear">
                                 <div class="left"><?php print t('SEPULSA CREDIT'); ?></div>
                                 <div class="right"><?php print number_format(userpoints_get_current_points($user->uid, 'all'), 0, ",", "."); ?> IDR</div>
                             </div>
-                            <a href="<?php print url('user/' . $user->uid); ?>"><?php print t('AKUN'); ?></a>
-                            <a href="<?php print url('user/referral_list'); ?>"><?php print t('DAFTAR REFERRAL'); ?></a>
-                            <a href="<?php print url('user/orders'); ?>"><?php print t('ORDER TRANSAKSI'); ?></a>
-                            <a href="<?php print url('user/token'); ?>"><?php print t('INFO KARTU'); ?></a>
-                            <a href="<?php print url('user/wallet'); ?>"><?php print t('DOMPET SAYA'); ?></a>
-                            <a href="<?php print url("user/voucher"); ?>"><?php print t('VOUCHER DISKON'); ?></a>
-                            <a href="<?php print url("konfirmasi"); ?>"><?php print t('KONFIRMASI PEMBAYARAN'); ?></a>
-                            <a href="<?php print url("user/logout"); ?>"><?php print t('KELUAR'); ?></a>
+                            */
+                            ?>
+                            <a href="<?php print url('user/' . $user->uid); ?>"><?php print t('Akun'); ?></a>
+                            <a href="<?php print url('user/referral_list'); ?>"><?php print t('Daftar Referral'); ?></a>
+                            <a href="<?php print url('user/orders'); ?>"><?php print t('Order Transaksi'); ?></a>
+                            <a href="<?php print url('user/token'); ?>"><?php print t('Info Kartu'); ?></a>
+                            <a href="<?php print url('user/wallet'); ?>"><?php print t('Dompet Saya'); ?></a>
+                            <a href="<?php print url("user/voucher"); ?>"><?php print t('Voucher Diskon'); ?></a>
+                            <a href="<?php print url("konfirmasi"); ?>"><?php print t('Konfirmasi Pembayaran'); ?></a>
+                            <a href="<?php print url("user/logout"); ?>"><?php print t('Keluar'); ?></a>
                         </div>
                     </div>
                     
-                    <div class="box login">
-                        <a href="<?php print url("user/login"); ?>" class="header-kredit">
+                    <div class="box kredit">
+                        <a href="<?php print url("user/wallet"); ?>" class="header-kredit header-kredit-login">
                             Sepulsa Kredit
+                            <br><span style="font-size: 14px;"><?php print number_format(userpoints_get_current_points($user->uid, 'all'), 0, ",", "."); ?> IDR</span>
                         </a>
 
                     </div>
@@ -94,7 +99,7 @@
 
                     </div>
                     <div class="box login">
-                        <a href="<?php print url("user/login"); ?>" class="header-kredit">
+                        <a href="<?php print url("user/wallet"); ?>" class="header-kredit">
                             Sepulsa Kredit
                         </a>
 

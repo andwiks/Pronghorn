@@ -543,8 +543,13 @@ section.h_middle_top input.form-submit.enabled
     height: 625px;
 }
 
-.home header .right_link .box .box_drop .arr {
+header .right_link .box .box_drop .arr {
     border-bottom: 5px solid #ccc !important;
+}
+
+header .right_link .box .box_drop
+{
+    border: 1px solid #ccc !important;    
 }
 
 .home .form.style_1 .row.bt_wrap .right .bt_std, 
@@ -587,6 +592,12 @@ header .right_link .box a.header-kredit
     line-height: 40px;
     padding-left: 50px;
     margin-right: 35px; 
+}
+
+header .right_link .box a.header-kredit-login
+{
+    line-height: 1.2;
+    text-align: left;
 }
 
 header .right_link .box .box_drop

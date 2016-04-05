@@ -3,10 +3,6 @@
     <?php print render($form['field_phone_number']); ?>
    </div>
 
-  <div class="form-field">
-    <label><?php print t('Customer Number', array(), array('context' => 'bpjs_kesehatan_form')); ?></label>
-  </div>
-
   <?php foreach (element_children($form['line_items']) as $delta => $child): ?>
     <div class="form-field">
       <?php print render($form['line_items'][$child]); ?>

@@ -42,6 +42,7 @@ function bpjs_kesehatan_commerce_line_item_type_info() {
 function bpjs_kesehatan_commerce_product_calculate_sell_price_line_item_alter($line_item) {
   if ($line_item->type == 'bpjs_kesehatan' && !empty($line_item->data['inquiry']['premi'])) {
     $line_item->commerce_unit_price[LANGUAGE_NONE][0]['amount'] = $line_item->data['inquiry']['premi'];
+    $line_item->commerce_unit_price[LANGUAGE_NONE][0]['data']['components'][0]['price']['amount'] = $line_item->data['inquiry']['premi'];
   }
 }
 
@@ -88,7 +89,10 @@ function bpjs_kesehatan_entity_presave($entity, $type) {
 
         $inquiry = kraken_api_call('inquire', 'POST', $data);
 
-        if (!empty($inquiry['status'])) {
+        if (is_string($inquiry)) {
+          throw new Exception($inquiry);
+        }
+        elseif (!empty($inquiry['status'])) {
           $entity->data['inquiry'] = $inquiry;
         }
         elseif (!empty($inquiry['message'])) {
@@ -124,6 +128,191 @@ function bpjs_kesehatan_form_commerce_cart_add_to_cart_form_bpjs_kesehatan_alter
   $form['#validate'][] = 'bpjs_kesehatan_add_to_cart_form_validate';
 }
 
+function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
+  $form['#prefix'] = '<div id="bpjs-kesehatan-form-wrapper">';
+  $form['#suffix'] = '</div>';
+
+  $form['line_items'] = array('#tree' => TRUE);
+
+  $instances = field_info_instances('commerce_line_item', 'bpjs_kesehatan');
+
+  $form['field_phone_number'] = array(
+    '#type' => 'textfield',
+    '#title' => $instances['field_phone_number']['label'],
+    '#required' => TRUE,
+  );
+
+  $values = array(
+    'type' => 'bpjs_kesehatan',
+  );
+
+  // Default line item.
+  if (empty($form_state['line_items'])) {
+    $form_state['line_items'][] = entity_create('commerce_line_item', $values);
+  }
+  // Add new button.
+  if (!empty($form_state['triggering_element']['#new'])) {
+    $form_state['line_items'][] = entity_create('commerce_line_item', $values);
+  }
+  // Remove button.
+  if (!empty($form_state['triggering_element']['#remove'])) {
+    unset($form_state['line_items'][$form_state['triggering_element']['#delta']]);
+  }
+
+  foreach ($form_state['line_items'] as $delta => $line_item) {
+    if ($line_item) {
+      $form['line_items'][$delta]['field_customer_number'] = array(
+        '#type' => 'textfield',
+        '#title' => $instances['field_customer_number']['label'],
+      );
+
+      if (count($form_state['line_items']) > 1) {
+        // Add remove button.
+        $form['line_items'][$delta]['remove'] = array(
+          '#type' => 'button',
+          '#button_type' => 'button',
+          '#value' => t('Remove'),
+          '#delta' => $delta,
+          '#name' => 'line_items[' . $delta . '][remove]',
+          '#remove' => TRUE,
+          '#ajax' => array(
+            'callback' => 'bpjs_kesehatan_form_ajax',
+            'wrapper' => 'bpjs-kesehatan-form-wrapper',
+          ),
+        );
+      }
+      else {
+        $form['line_items'][$delta]['field_customer_number']['#required'] = TRUE;
+      }
+    }
+  }
+
+  $form['payment_period'] = array(
+    '#type' => 'hidden',
+    '#value' => $instances['payment_period']['default_value'][0]['value'],
+  );
+
+  if (!empty($product_ids)) {
+    $form['product_id'] = array(
+      '#type' => 'hidden',
+      '#value' => reset($product_ids),
+    );
+  }
+
+  $form['actions'] = array('#type' => 'actions');
+  $form['actions']['new'] = array(
+    '#type' => 'button',
+    '#value' => t('Add new', array(), array('context' => __FUNCTION__)),
+    '#new' => TRUE,
+    '#ajax' => array(
+      'callback' => 'bpjs_kesehatan_form_ajax',
+      'wrapper' => 'bpjs-kesehatan-form-wrapper',
+    ),
+  );
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Add to cart'),
+  );
+  $form['actions']['charge'] = array(
+    '#type' => 'submit',
+    '#value' => t('Pay Now'),
+  );
+
+  return $form;
+}
+
+function bpjs_kesehatan_form_submit($form, &$form_state) {
+  $product_id = $form_state['values']['product_id'];
+  $product = commerce_product_load($product_id);
+
+  foreach ($form_state['line_items'] as $delta => $line_item) {
+    // If the line item passed to the function is new...
+    if (empty($line_item->line_item_id)) {
+      // Create the new product line item of the same type.
+      $new_line_item = commerce_product_line_item_new($product, 1, 0, $line_item->data, $line_item->type);
+      $new_line_item->field_customer_number = $line_item->field_customer_number;
+      $new_line_item->payment_period = $line_item->payment_period;
+
+      // Allow modules to prepare this as necessary. This hook is defined by the
+      // Product Pricing module.
+      drupal_alter('commerce_product_calculate_sell_price_line_item', $new_line_item);
+
+      // Unset the line item field values array if it is now empty.
+      // if (empty($form_state ['values']['line_item_fields'])) {
+      //   unset($form_state ['values']['line_item_fields']);
+      // }
+
+      // Process the unit price through Rules so it reflects the user's actual
+      // purchase price.
+      rules_invoke_event('commerce_product_calculate_sell_price', $new_line_item);
+
+      // Only attempt an Add to Cart if the line item has a valid unit price.
+      $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $new_line_item);
+
+      if (!is_null($line_item_wrapper->commerce_unit_price->value())) {
+        // Add the product to the specified shopping cart.
+        $form_state['line_items'][$delta] = commerce_cart_product_add($GLOBALS['user']->uid, $new_line_item, TRUE);
+      }
+      else {
+        drupal_set_message(t('%title could not be added to your cart.', array('%title' => $product->title)), 'error');
+      }
+    }
+  }
+
+  if ($form_state['triggering_element']['#value'] == $form['actions']['charge']['#value']) {
+    // Check rules action go to.
+    if (isset($GLOBALS['_rules_action_drupal_goto_do'])) {
+      unset($GLOBALS['_rules_action_drupal_goto_do']);
+    }
+    $form_state['redirect'] = 'checkout';
+  }
+}
+
+function bpjs_kesehatan_form_validate($form, &$form_state) {
+  if ($form_state['submitted']) {
+    foreach ($form_state['values']['line_items'] as $delta => $value) {
+      if (empty($value['field_customer_number'])) {
+        unset($form_state['line_items'][$delta]);
+      }
+      else {
+        $inquiry = &drupal_static('bpjs_kesehatan_inquiry_data__' . $value['field_customer_number']);
+
+        module_load_include('inc', 'kraken_api');
+
+        $data = array(
+          'customer_number' => $value['field_customer_number'],
+          'payment_period' => $form_state['values']['payment_period'],
+          'product_id' => entity_metadata_wrapper('commerce_product', $form_state['values']['product_id'])->kraken_product->value(),
+        );
+
+        $inquiry = kraken_api_call('inquire', 'POST', $data);
+        if (!empty($inquiry)) {
+          if (is_string($inquiry)) {
+            form_set_error('line_items][' . $delta . '][field_customer_number', $inquiry);
+          }
+          elseif ($inquiry['status']) {
+            $form_state['line_items'][$delta]->data['inquiry'] = $inquiry;
+          }
+          else {
+            form_set_error('line_items][' . $delta . '][field_customer_number', $inquiry['message']);
+          }
+        }
+        else {
+          form_set_error('inquiry', t('Please retry'));
+        }
+
+        $form_state['line_items'][$delta]->field_phone_number[LANGUAGE_NONE][0]['value'] = $form_state['values']['field_phone_number'];
+        $form_state['line_items'][$delta]->field_customer_number[LANGUAGE_NONE][0]['value'] = $value['field_customer_number'];
+        $form_state['line_items'][$delta]->payment_period[LANGUAGE_NONE][0]['value'] = $form_state['values']['payment_period'];
+      }
+    }
+  }
+}
+
+function bpjs_kesehatan_form_ajax($form, $form_state) {
+  return $form;
+}
+
 /**
  * Implements hook_preprocess_page().
  */
@@ -139,17 +328,7 @@ function bpjs_kesehatan_preprocess_page(&$variables) {
     if (!empty($result['commerce_product'])) {
       $product_ids = array_keys($result['commerce_product']);
 
-      $values = array(
-        'type' => 'bpjs_kesehatan',
-        'data' => array(
-          'context' => array(
-            'product_ids' => $product_ids,
-          ),
-        ),
-      );
-      $line_item = entity_create('commerce_line_item', $values);
-
-      $variables['bpjs_kesehatan_form'] = drupal_get_form('commerce_cart_add_to_cart_form_bpjs_kesehatan', $line_item);
+      $variables['bpjs_kesehatan_form'] = drupal_get_form('bpjs_kesehatan_form', $product_ids);
     }
   }
 }
@@ -222,25 +401,25 @@ function bpjs_kesehatan_payment_line_item($line_item_wrapper) {
 
 function bpjs_kesehatan_payment_period_options() {
   return array(
-    '01' => t('January'),
-    '02' => t('February'),
-    '03' => t('March'),
-    '04' => t('April'),
-    '05' => t('May'),
-    '06' => t('June'),
-    '07' => t('July'),
-    '08' => t('August'),
-    '09' => t('September'),
-    '10' => t('October'),
-    '11' => t('November'),
-    '12' => t('December'),
+    '01' => 1,
+    '02' => 2,
+    '03' => 3,
+    '04' => 4,
+    '05' => 5,
+    '06' => 6,
+    '07' => 7,
+    '08' => 8,
+    '09' => 9,
+    '10' => 10,
+    '11' => 11,
+    '12' => 12,
   );
 }
 
 function bpjs_kesehatan_payment_period_default_value($entity_type, $entity, $field, $instance, $langcode) {
   return array(
     array(
-      'value' => format_date(REQUEST_TIME, 'custom', 'm'),
+      'value' => '01',
     ),
   );
 }

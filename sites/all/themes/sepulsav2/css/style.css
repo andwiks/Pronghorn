@@ -469,6 +469,8 @@ section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../image
 section.h_middle_top .home_tab .nav_tab a span.ico.bolt{background:url(../images/material/signal_ico.png) no-repeat left top;}
 section.h_middle_top .home_tab .nav_tab a span.ico.finance{background:url(../images/material/finance_ico.png) no-repeat left top;}
 section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../images/material/lightning_ico.png) no-repeat left top;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bpjs{background:url(../images/material/bpjs_ico.png) no-repeat left top;}
+
 section.h_middle_top .home_tab .nav_tab a:last-child{border-right: none;}
 
 section.h_middle_top .home_tab .nav_tab a.active,

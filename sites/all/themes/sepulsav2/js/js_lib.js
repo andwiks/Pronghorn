@@ -101,28 +101,15 @@ $.fn.placeHolder = function (e) {
 function homeTab() {
     //init
     var hash = window.location.hash.substr(1);
-    if (hash=='multifinance')
-    {
-        $(".home_tab .content_tab #target_4").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.finance').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
+
+    if (hash === '' || hash === 'undefined') {
+        hash = 'pulsa';
     }
-    else if (hash=='biznet')
-    {
-        $(".home_tab .content_tab #target_3").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.bolt').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
-    }
-    else if (hash=='pln')
-    {
-        $(".home_tab .content_tab #target_2").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.listrik').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
-    }
-    else
-    {
-        var target = $(".home_tab .nav_tab a.active").attr('target');
-        $(".home_tab .content_tab #" + target).css('display', 'block');
+
+    if ($('.home_tab .content_tab #' + hash) !== 'undefined') {
+        $('.home_tab .content_tab #' + hash).css('display', 'block');
+        $('section.h_middle_top .home_tab .nav_tab a[target=' + hash + ']').addClass('active');
+        $('section.h_middle_top .home_tab .nav_tab a[target=' + hash + ']').siblings().removeClass('active');
     }
 
     $(".home_tab .nav_tab a").click(function (e) {

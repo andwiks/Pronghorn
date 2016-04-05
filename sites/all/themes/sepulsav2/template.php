@@ -267,6 +267,36 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
+ * Implements hook_form_FORM_ID_alter() for bpjs_kesehatan_form().
+ */
+function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id) {
+  $action = drupal_parse_url($form['#action']);
+  if (empty($action['fragment'])) {
+    $form['#action'] .= '#bpjs-kesehatan';
+  }
+
+  $form['#attached']['css'][] = path_to_theme() . '/css/bpjs-kesehatan.css';
+
+  foreach (element_children($form['line_items']) as $delta => $child) {
+    $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';
+    $form['line_items'][$child]['field_customer_number']['#attributes']['class'][] = 'customer-number';
+
+    if ($delta == count(element_children($form['line_items'])) - 1) {
+      unset($form['line_items'][$child]['remove']);
+    }
+    else {
+      $form['line_items'][$child]['remove']['#value'] = '-';
+      $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+    }
+  }
+
+  $form['actions']['new']['#value'] = '+';
+  $form['actions']['new']['#attributes']['class'][] = 'add-new';
+  $form['actions']['submit']['#attributes']['style'] = 'float:right';
+  $form['actions']['charge']['#attributes']['style'] = 'float:right';
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for views_form_commerce_cart_block_popup().
  */
 function sepulsav2_form_views_form_commerce_cart_block_popup_alter(&$form, &$form_state, $form_id) {
@@ -355,6 +385,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['#action'] .= '#pln';
         break;
 
+      case 'bpjs_kesehatan':
       case 'biznet':
       case 'multifinance':
         $form['product_id']['#attributes']['class'][] = 'input-text';
@@ -376,6 +407,10 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
           $form['description']['#weight'] = 1;
         }
 
+        if (!empty($form['line_item_fields']['payment_period'])) {
+          $form['line_item_fields']['payment_period'][LANGUAGE_NONE]['#title_display'] = 'invisible';
+        }
+
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
@@ -383,20 +418,20 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['submit']['#attributes']['style'][] = 'float:right;';
         $form['submit']['#weight'] = 3;
 
-        $form['submit']['#states'] = array(
+        // States for submit and charge button.
+        $states = array(
           'enabled' => array(
-            'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            'form#' . $form['#id'] . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
+
+        $form['submit']['#states'] = $states;
         // Add charge state: if available.
-        if (isset($form['charge']) && !empty($form['charge'])) {
-          $form['charge']['#states'] = array(
-            'enabled' => array(
-              'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
-            ),
-          );
+        if (!empty($form['charge'])) {
+          $form['charge']['#states'] = $states;
         }
-        $form['#action'] .= '#' . $form_state['line_item']->type;
+
+        $form['#action'] .= '#' . drupal_html_id($form_state['line_item']->type);
         break;
 
       case 'pln_prepaid':
@@ -800,6 +835,11 @@ function sepulsav2_status_messages($variables) {
  */
 function sepulsav2_theme($existing, $type, $theme, $path) {
   return array(
+    'bpjs_kesehatan_form' => array(
+      'render element' => 'form',
+      'path' => $path . '/templates/form',
+      'template' => 'bpjs-kesehatan-form',
+    ),
     'commerce_checkout_form_checkout' => array(
       'render element' => 'form',
       'path' => $path . '/templates/checkout',

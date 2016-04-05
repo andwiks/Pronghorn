@@ -331,6 +331,12 @@ section.h_middle_top select
 {
     border-color:#a1a1a1 !important; 
     color: #000 !important;
+
+
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
 }
 
 section.h_middle_top #sepulsa-autocomplete-packets select, 

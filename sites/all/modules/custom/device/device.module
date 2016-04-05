@@ -271,25 +271,6 @@ function device_operate_load($op = '') {
 }
 
 /**
- * Implements hook_device_mail_verification_update().
- */
-function device_device_mail_verification_update($mail, $status) {
-  // Check only for status confirmed and mail data is available.
-  if ($status == 'confirmed' && $mail !== FALSE) {
-    // Get device wrapper.
-    $device_wrapper = entity_metadata_wrapper('device', $mail['did']);
-    // Log this condition.
-    watchdog('device', 'Device @label (@id-@imei-@phone) email @email confirmed.', array(
-      '@label' => $device_wrapper->label->value(),
-      '@id' => $mail['did'],
-      '@imei' => $device_wrapper->imei->value(),
-      '@phone' => $device_wrapper->phone->value(),
-      '@email' => $mail['mail'],
-    ), WATCHDOG_INFO);
-  }
-}
-
-/**
  * Callback Functions.
  */
 

@@ -506,8 +506,16 @@ function commerce_coupon_remove_coupon_from_order_callback($coupon, $order) {
     return MENU_ACCESS_DENIED;
   }
 
-  commerce_coupon_remove_coupon_from_order($order, $coupon);
+  // Get order status: in cart.
+  $statuses = commerce_order_statuses(array('cart' => TRUE));
+  $statuses = array_keys($statuses);
+  // Can remove coupon if order status is in cart.
+  if (in_array($order->status, $statuses)) {
+    commerce_coupon_remove_coupon_from_order($order, $coupon);
+  }
+  // Show message to customer.
   drupal_set_message(t('Coupon removed from order'));
+  // Redirect customer to front page.
   drupal_goto();
 }
 

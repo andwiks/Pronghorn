@@ -98,6 +98,8 @@ section.h_middle_top input[type=submit], input[type=button] {
    padding: 10px;
    font-size: 14px;
    height: 65px;
+   width: 38%;
+   height: auto;
 }
 .form.style_1 input[type=text] {font-size: 12px;}
 
@@ -624,11 +626,13 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     width:86%;
     margin:0 auto;
+    width: 100%;
 }
 
 .topup-notes
 {
     width: 100%;
+    width: 60%;
 }
 
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
@@ -842,4 +846,81 @@ section.banner .caption
 section.banner .bx-viewport
 {
     left:0 !important;
+}
+
+/*revamp header*/
+
+header .wrapper
+{
+    position: relative;
+}
+
+header .logo
+{
+    left: 0;
+    top: 0;
+    margin: 20px 0 10px 0;
+}
+
+header .logo img
+{
+    margin: 0;
+}
+
+header .nav_mobile
+{
+    right: 0;
+}
+
+.header-img
+{
+    height: 470px;
+}
+
+section.h_middle_top {
+    top: -390px;
+    height: 370px;
+    width: 100%;
+    margin-bottom: -350px;
+    padding: 0;
+}
+
+section.h_middle_top .home_tab
+{
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+section.banner .caption
+{
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 80px;
+    text-align: center;
+    padding: 0;
+    display: none;
+}
+
+section.h_middle_top .home_tab .form input[type=text] {
+    width: 100%;
+}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    width: 25%;
+    padding:25px 0 0 0;
+}
+
+.home header
+{
+    border: none !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    padding-left: 40px;
+    padding-right: 10px;
+    height: 45px;
 }

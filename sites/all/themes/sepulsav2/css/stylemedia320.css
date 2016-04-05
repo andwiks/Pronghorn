@@ -28,9 +28,8 @@ section.h_middle_top .home_tab .nav_tab a {
 }
 section.h_middle_top .home_tab .nav_tab a span.ico {
     position: absolute;
-    /*transform: scale(0.8);
-    left: 9px;*/
-    transform: scale(0.6);
+    transform: scale(0.8);
+    /*left: 9px;*/
     left: 4px;
     bottom:11px;
 }
@@ -456,8 +455,8 @@ section.h_middle_top #sepulsa-autocomplete-packets
 
 section.h_middle_top input[type=submit], input[type=button]
 {
-    width: 45%;
-    font-size: 12px;
+    width: 100%;
+    font-size: 14px;
     white-space: pre-wrap;
     overflow-wrap: break-word;
     word-wrap: break-word;
@@ -856,7 +855,7 @@ body.home header .right_link .box.lang a
 /*fixing css for main/header banner */
 section.banner {
     overflow: hidden;
-    min-height: 320px !important;
+    min-height: 300px !important;
     padding: 0 !important;
 }
 
@@ -879,4 +878,209 @@ section.banner .caption
    width: 100%;
 }
 
+/* revamp header maret 2014 */
+
 section.banner .bx-wrapper .bx-pager {bottom: 15px;}
+
+section.banner
+{
+    display: none;
+}
+
+body.home header
+{
+    position: relative;
+}
+
+section.h_middle_top .home_tab {
+    left: 0;
+    top: 0;
+    margin-bottom: 15px;
+}
+
+.bx-wrapper
+{
+    margin:0 auto;
+}
+
+section.h_middle_top {
+    margin-bottom: 15px;
+}
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    width: 100%;
+    height: 52px;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active
+{
+    width: 83px;
+}
+
+/* revamp header */
+section.h_middle_top
+{
+    margin-top: 15px;
+    width: 100%;
+    top:0;
+    height: auto;
+}
+
+body.home header .logo
+{
+    margin: 0;
+}
+
+body.home header
+{
+    border-bottom: 1px solid #CCC;
+}
+
+header .logo
+{
+    left:0;
+}
+
+section.h_middle_top .home_tab {
+    /*background: #717171;*/
+}
+
+section.h_middle_top .home_tab .nav_tab a span.ico
+{
+    background-position: center !important;
+    right: auto !important;
+}
+
+section.h_middle_top .home_tab .nav_tab a span.ico.pulsa, 
+section.h_middle_top .home_tab .nav_tab a span.ico.listrik, 
+section.h_middle_top .home_tab .nav_tab a span.ico.bolt, 
+section.h_middle_top .home_tab .nav_tab a span.ico.finance
+{
+    background-position: center !important;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active, section.h_middle_top .home_tab .nav_tab a:hover
+{
+    line-height: 36px;
+}
+
+section.h_middle_top #edit-operator {
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    margin-top: 0px; 
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets
+{
+    margin-left: 0;
+}
+
+section.h_middle_top #edit-operator
+{
+    border-bottom: 1px solid #a1a1a1;
+}
+
+section.h_middle_top .info-pulsa
+{
+    margin: 0 0 10px 0; 
+}
+
+section.h_middle_top .info-pulsa p
+{
+    padding: 0 0 10px 0;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets select, 
+section.h_middle_top #edit-existing-phone, 
+section.h_middle_top .home_tab .form input[type=text], 
+section.h_middle_top .form-select
+{
+    font-size: 18px !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    padding: 10px;
+}
+
+section.h_middle_top .form-select option {
+    font-size: 16px;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets select, 
+section.h_middle_top .form-select, 
+section.h_middle_top #sepulsa-autocomplete-packets select#edit-packet
+{
+    padding-left: 10px !important;
+}
+
+section.h_middle_top .home_tab .form #edit-phone, 
+section.h_middle_top .home_tab .form #edit-existing-phone, 
+section.h_middle_top .home_tab .form .meter-number, 
+section.h_middle_top .home_tab .form .phone-number, 
+section.h_middle_top .home_tab .form .customer-number
+{
+    padding-left: 40px !important;
+    padding-right: 5px !important;
+}
+
+section.h_middle_top .home_tab .content_tab
+{
+    border: 2px solid #a1a1a1 !important;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../images/material/ico_phone_black.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bolt{background:url(../images/material/ico_biznet_black.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.finance{background:url(../images/material/ico_finance_black.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../images/material/ico_pln_black.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bpjs{background:url(../images/material/ico_bpjs_black.png) no-repeat left center;}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    color: #000 !important;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active:before 
+{
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-bottom: 18px solid #a1a1a1;
+    position: absolute;
+    bottom: -1px;
+}
+
+body.home header a.toggle {
+    background: url(../images/material/ico_burger.png) no-repeat;
+}
+
+.only-small
+{
+    display: block !important;
+}
+
+.only-large
+{
+    display: none !important;
+}
+
+header .nav_mobile .box_credit {
+    background: #ccc;
+    color: #000;
+}
+
+header .nav_mobile .box_drop
+{
+    border: 1px solid #ccc;
+    border-top: 5px solid #ccc;
+}
+
+header .nav_mobile .box_drop a:hover
+{
+    background: #0d7eb8;
+}

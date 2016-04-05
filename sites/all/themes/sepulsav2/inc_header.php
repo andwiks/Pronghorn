@@ -9,13 +9,18 @@
 ?>
     <header>
         <div class="wrapper">
+            <?php
+            /*
             <div class="soc_link">
                 <a href="https://www.facebook.com/sepulsa" class="fb">facebook</a>
                 <a href="https://twitter.com/sepulsa_id" class="tw">twitter</a>
             </div>
+            */
+            ?>
             <div class="logo">
                 <a href="<?php print url(); ?>">
-                    <img src="<?php print $theme_path; ?>/images/material/logo.png" alt="sepulsa" />
+                    <img src="<?php print $theme_path; ?>/images/material/sepulsa-white.png" alt="sepulsa" class="only-large"/>
+                    <img src="<?php print $theme_path; ?>/images/material/logo.png" alt="sepulsa" class="only-small"/>
                 </a>
             </div>
             <div class="right_link">
@@ -24,8 +29,7 @@
 
                 <?php if ($user->uid > 0) { ?>
                     <div class="box myacc">
-                        <a href="<?php print url('user/' . $user->uid); ?>" >
-                            <span class="ico"></span>
+                        <a href="<?php print url('user/' . $user->uid); ?>" class="header-login header-akun">
                             <?php print t('AKUNKU'); ?>
                         </a>
                         <div class="box_drop">
@@ -43,6 +47,13 @@
                             <a href="<?php print url("konfirmasi"); ?>"><?php print t('KONFIRMASI PEMBAYARAN'); ?></a>
                             <a href="<?php print url("user/logout"); ?>"><?php print t('KELUAR'); ?></a>
                         </div>
+                    </div>
+                    
+                    <div class="box login">
+                        <a href="<?php print url("user/login"); ?>" class="header-kredit">
+                            Sepulsa Kredit
+                        </a>
+
                     </div>
                     <div class="nav_mobile">
                         <a href="" class="toggle">toogle</a>
@@ -77,9 +88,14 @@
                         </div>
                     </div>
                     <div class="box login">
-                        <a href="<?php print url("user/login"); ?>" >
-                            <span class="ico"></span>
-                            Log In
+                        <a href="<?php print url("user/login"); ?>" class="header-login">
+                            Masuk / Daftar
+                        </a>
+
+                    </div>
+                    <div class="box login">
+                        <a href="<?php print url("user/login"); ?>" class="header-kredit">
+                            Sepulsa Kredit
                         </a>
 
                     </div>

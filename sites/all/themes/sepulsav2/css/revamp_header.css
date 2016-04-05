@@ -1,0 +1,595 @@
+
+section.h_middle_top .home_tab {
+    top: -96px;
+    width: 281px;
+    color: #040404 !important;
+}
+
+section.h_middle_top .home_tab, 
+section.h_middle_top .home_tab .content_tab, 
+section.h_middle_top .home_tab .nav_tab a
+{    
+    border: none !important;
+}
+
+section.h_middle_top .home_tab .nav_tab a {
+    position: relative;
+    height: 55px;
+    width: 55px;
+    line-height: 95px;
+    width: 25%;
+    height: 75px;
+    background: none;
+    border: none;
+    color: #fff !important;
+    padding-top: 5px;
+}
+section.h_middle_top .home_tab .nav_tab a span.ico {
+    position: absolute;
+    transform: scale(1);
+    left: 15px;
+    bottom:11px;
+}
+section.h_middle_top .home_tab .nav_tab a.active{
+    background: none;
+    border: none;
+}
+
+section.h_middle_top .home_tab .nav_tab a span.ico {
+    background-position: -70px bottom !important;
+}
+
+
+section.h_middle_top .home_tab .content_tab { padding: 22px 20px 15px;}
+section.h_middle_top .home_tab .form input[type=text] {width: 153px;height: 30px;padding: 10px 75px 10px 10px;}
+section.h_middle_top .home_tab .form input.bt {right: 10px;top: 10px;}
+section.h_middle_top .home_tab span.note {font-size: 10px;line-height: 14px;}
+section.h_middle_top .voucher_vendor {width: 260px;margin: auto}
+
+/* form img */
+.form.style_1 .drop_transaksi {
+    display: none;
+}
+
+.form.style_1 input.bt {
+    display: none;
+}
+
+/* form wrapper */
+.form.style_1 .row.saldo
+{
+    width: 100%;
+}
+
+/* form operator info */
+.form.style_1 .row.saldo .left {
+    width: 210px;
+    font-size: 16px;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.form.style_1 .row.saldo .right {
+    width: 100%;
+    left: 0;
+}
+
+
+.form.style_1 .row.bt_wrap .right .bt_std {
+    font-size: 16px;
+    height: 45px;
+    width: 230px;
+    
+    width: 46%;
+    font-size: 14px;
+}
+
+/* form action section */
+.form.style_1 .row.bt_wrap .left {
+    width: 240px;
+}
+
+.form.style_1 .row.bt_wrap .right {
+    width: 240px;
+    width: 100%;
+    margin: 20px 0 0 0;
+}
+
+/* nominal harga */
+.form.style_1 .row.saldo .right select {
+    height: 100%;
+    width: 240px;
+    height: 52px;
+    padding: 10px 75px 10px 10px;
+    background: url(../images/material/drop_ico_2.png) no-repeat right 15px center;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-indent: 1px;
+    border: 1px solid #105c8c;
+
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/*box position*/
+section.h_middle_top {
+    top: -480px;
+    left: 0;
+    height: 445px;
+    background: none;
+    border: none;
+    margin: 0;
+    margin-bottom: -425px;
+    width: 50%;
+}
+
+section.h_middle_top .home_tab {
+    width: 460px;
+    top: 0;
+    left: 85px;
+    background: #fff;
+    background: none;
+    border: none;
+    margin: 0;
+}
+
+section.banner
+{
+    margin: 0;
+    padding: 0;
+}
+
+section.banner, section.banner img
+{
+    /*width: auto;
+    height: 100%;*/
+    width: 100%;
+    height:auto;
+}
+
+section.banner .caption {
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    top: 40%;
+    color: #fff;
+    width: 455px;
+    top: 48%;
+    right: 7%;
+    text-align: right;
+}
+
+section.banner .caption a {
+    display: inline-block;
+    padding: 0;
+    margin: 0 5px;
+    background: none;
+}
+
+section.banner .caption h1
+{
+    font-size: 24px;
+}
+
+section.banner .caption p
+{
+    font-size: 14px;
+}
+
+header .right_link .box.lang a
+{
+    background: #fff !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    width: 100%;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    border: none;
+    border-bottom: 1px solid;
+    background: none !important;
+    border-color:#a1a1a1 !important;    
+
+    font-size: 18px !important;
+    color: #000 !important;
+
+    padding-left: 40px;
+    padding-right: 20px;
+}
+
+.form.style_1 .row.bt_wrap .right .bt_std.centered
+{
+    display: block;
+    margin: 0 auto;
+}
+
+.topup-notes
+{
+    float: none;
+    display: inline-block !important;
+    width: 60%;
+}
+
+section.h_middle_top .home_tab .content_tab {
+    /*min-height: 395px;*/
+    background: #fff;
+    /*border: 5px solid #a1a1a1 !important;*/
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+
+    box-shadow: 0 0 0 5px rgba(255,255,255,0.2);
+    border-radius: 5px;
+}
+
+section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
+{
+    width: 47%;
+    font-size: 12px;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active:before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-bottom: 20px solid #fff;
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    z-index: 9999;
+}
+
+section.h_middle_top .home_tab .nav_tab a span.ico {
+    position: absolute;
+    transform: scale(0.8);
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+}
+
+section.h_middle_top .home_tab .nav_tab a.active, 
+section.h_middle_top .home_tab .nav_tab a:hover
+{
+    background: none !important;
+    border: none !important;
+    z-index: 9999;
+}
+
+section.banner .bx-wrapper
+{
+    margin: 0 auto;
+}
+
+section.banner .bx-wrapper .bx-pager {
+    bottom: 20px;
+}
+
+section.banner .bx-wrapper .bx-pager.bx-default-pager a:hover
+{
+    background: #0d7eb8;
+}
+
+section.banner .bx-wrapper .bx-pager.bx-default-pager a.active
+{
+    background: #00a9ff;
+}
+
+.bx-wrapper .bx-pager.bx-default-pager a
+{
+    width: 20px;
+    height: 20px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+}
+
+/* header caption */
+section.banner a.header-action
+{
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    margin: 0 auto;
+    padding: 15px 10px;
+    display: inline-block;
+    background: transparent;
+    border: 1px solid #717171;
+    line-height: 1.5;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    font-size: 14px;
+}
+
+
+/* custom form */
+section.h_middle_top #sepulsa-autocomplete-packets
+{
+    margin-left:2%;
+    width: 58% !important; 
+}
+
+section.h_middle_top select
+{
+    border-color:#a1a1a1 !important; 
+    color: #000 !important;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets select, 
+section.h_middle_top .form-select
+{
+    border-top: none;
+    border-left: none;
+    padding-right: 40px;
+    background: url(../images/material/bg_selectbox.jpg) no-repeat right center !important;
+    padding-top: 5px;
+    padding-left: 40px !important;
+    padding-right: 10px;
+}
+
+section.h_middle_top #sepulsa-autocomplete-packets select#edit-packet
+{
+    background: url(../images/material/bg_selectbox.jpg) no-repeat right center;
+    padding-top: 5px;
+    padding-left: 0 !important;
+}
+
+section.h_middle_top select#edit-existing-phone
+{
+    background: none !important;
+    border-right:none; 
+}
+
+
+section.h_middle_top .form-select option
+{
+    background: #eeeeee;
+    cursor: pointer;
+    border: 1px solid #cfcfcf;
+    color: #040404;
+}
+
+section.h_middle_top .form-select option:hover
+{
+    background: #0d7eb8;
+    color: #fff;
+}
+
+section.h_middle_top .home_tab .form #edit-phone, 
+section.h_middle_top .home_tab .form #edit-existing-phone
+{
+    margin-top: 0 !important;    
+    background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    color: #000;
+}
+
+section.h_middle_top .home_tab .form input[type=text].meter-number
+{  
+    background: url(../images/material/ico_pln_black.png) no-repeat center left !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text].phone-number
+{   
+    background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text].customer-number
+{   
+    background: url(../images/material/ico_kres_black.png) no-repeat center left 10px !important;
+}
+
+section.h_middle_top .home_tab .form#biznet input[type=text].customer-number
+{   
+    background: url(../images/material/ico_biznet_black.png) no-repeat center left !important;
+}
+
+section.h_middle_top .home_tab .form#multifinance input[type=text].customer-number
+{   
+    background: url(../images/material/ico_finance_black.png) no-repeat center left !important;
+}
+
+/* header */
+header .logo img
+{
+    margin: 0;
+}
+
+header .logo {
+    background: none;
+    margin:25px 0;
+    left: 85px;
+}
+
+header .right_link
+{
+    margin: 25px 0;
+    width: auto;
+}
+
+header .right_link .box a
+{
+    padding: 0;
+    background: none;
+    color: #fff !important;
+}
+
+/* icon form */
+
+
+section.h_middle_top .home_tab .nav_tab a span.ico
+{    
+    width: 42px;
+    height: 42px;
+    background-position: 0px !important;
+}
+
+section.h_middle_top #edit-operator
+{
+    background: #cccccc !important;
+    color: #000;
+    margin-top: 10px;
+    height: 45px;
+    line-height: 45px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+}
+
+.topup-notes ul li
+{
+    color: #000 !important;
+    font-size: 11px;
+}
+
+.commerce-add-to-cart
+{
+    margin-top: 0;
+}
+
+section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
+{
+    background: #6d6e70 !important;
+    background: #0d7eb8 !important;
+    /*background: #199d49 !important;*/
+    color: #fff;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+}
+
+section.h_middle_top .btn.disabled, 
+section.h_middle_top  .btn[disabled], 
+section.h_middle_top  fieldset[disabled], 
+section.h_middle_top  input[type=submit][disabled=disabled], 
+section.h_middle_top  button[disabled=disabled]
+{
+    background: #ccc !important;
+    color: #000;
+}
+
+section.h_middle_top .info-pulsa
+{
+    margin: 10px 0px;
+    clear: both;
+}
+
+section.h_middle_top .info-pulsa p
+{
+    color: #000;
+    font-size: 12px !important;
+    padding: 5px 30px 5px 10px;
+    border-bottom: 1px solid #a1a1a1;
+    padding-left: 45px;
+}
+
+section.h_middle_top .hidden_div
+{
+    border: none !important;
+    margin: 10px 0px !important;
+    clear: both;
+    color: #000;
+    font-size: 12px !important;
+    padding: 10px 30px 10px 10px !important;
+    border-bottom: 1px solid #a1a1a1 !important;
+}
+
+section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
+{
+    margin: 5px 0;
+    width: 38%;
+}
+
+section.h_middle_top input#edit-add-charge, section.h_middle_top input.form-submit
+{
+    display: none !important;
+}
+
+section.h_middle_top .topup-action input.form-submit, 
+section.h_middle_top input.form-submit.enabled
+{
+    display: block !important;
+    /*text-indent: -9999px;*/
+}
+
+.header-img
+{
+    background: url(../images/content/main-bg-2.png) no-repeat center;
+    height: 625px;
+}
+
+.home header .right_link .box .box_drop .arr {
+    border-bottom: 5px solid #ccc !important;
+}
+
+.home .form.style_1 .row.bt_wrap .right .bt_std, 
+.home header .right_link .box .box_drop .box_credit, 
+.home .form.style_1 .row.saldo .left
+{
+    background: #ccc !important;
+    color: #000;
+}
+
+header .right_link .box .box_drop a
+{    
+    color: #000 !important;
+}
+
+header .right_link .box .box_drop a:hover
+{    
+    background: #0d7eb8;
+}
+
+header .right_link .box {
+    float: right;
+    width: auto;
+    height: auto;
+    /*position: inherit;*/
+}
+
+header .right_link .box a.header-login
+{
+    background: url(../images/material/ico_login.png) no-repeat center left;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 50px;
+}
+
+header .right_link .box a.header-kredit
+{
+    background: url(../images/material/ico_deposit.png) no-repeat center left;
+    height: 40px;
+    line-height: 40px;
+    padding-left: 50px;
+    margin-right: 35px; 
+}
+
+header .right_link .box .box_drop
+{
+    top: 50px;
+    left: -45px;
+}
+
+.not-front header {
+    height: 100px;
+    background: #283c4a;
+}

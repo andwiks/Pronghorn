@@ -62,7 +62,9 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   right: 14px;
   margin: 0;
   margin-left: 1%;
-  background: #c72127 !important;
+  /*background: #c72127 !important;*/
+  background: transparent url("../images/material/trash_ico.png") no-repeat center !important;
+  text-indent: -9999px;
   color: #fff;
   border: 2px solid #c72127;
   border-radius: 46px;
@@ -93,8 +95,8 @@ section.h_middle_top .form-bpjs .form-field input.add-new {
   right: 14px;
   margin: 0;
   margin-left: 1%;
-  background: #129d4a !important;
-  color: #fff;
+  background: transparent; !important;
+  color: #129d4a;
   border: 2px solid #129d4a;
   border-radius: 46px;
   -webkit-border-radius: 46px;

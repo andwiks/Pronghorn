@@ -480,13 +480,85 @@ section.banner .bx-viewport
 .topup-action {
    width: 86%;
    margin: 0 auto;
+   width: 100%;
 }
 section.h_middle_top input[type=submit], input[type=button] {
    width: 45%;
    white-space: pre-wrap;
    overflow-wrap: break-word;
    word-wrap: break-word;
+   width: 38%;
 }
 .topup-notes {
    width: 100%;
+   width: 60%;
+}
+
+/*revamp header*/
+
+header .wrapper
+{
+    position: relative;
+}
+
+header .logo
+{
+    left: 0;
+    top: 0;
+    margin: 20px 0 10px 0;
+}
+
+header .logo img
+{
+    margin: 0;
+}
+
+header .nav_mobile
+{
+    right: 0;
+}
+
+.header-img
+{
+    height: 470px;
+}
+
+section.h_middle_top {
+    top: -390px;
+    height: 370px;
+    width: 100%;
+    margin-bottom: -350px;
+    padding: 0;
+}
+
+section.h_middle_top .home_tab
+{
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+section.banner .caption
+{
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 80px;
+    text-align: center;
+    padding: 0;
+    display: none;
+}
+
+section.h_middle_top .home_tab .form input[type=text] {
+    width: 100%;
+}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    width: 25%;
+}
+
+.home header
+{
+    border: none !important;
 }

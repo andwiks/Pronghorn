@@ -23,9 +23,9 @@
  * @return mixed
  *   Access and refresh token or error message.
  */
-function device_services_resource_request($imei = '', $phone = '') {
+function device_services_resource_request($imei = '', $phone = '', $agent = '') {
   // Check input imei and phone.
-  if (!empty($imei) && !empty($phone)) {
+  if (!empty($imei) && !empty($phone) && !empty($agent)) {
     // 1. Validate phone number.
     // 1a. Available and not empty.
     // 1b. Has pattern ^08digits.
@@ -56,6 +56,7 @@ function device_services_resource_request($imei = '', $phone = '') {
           'imei' => $imei,
           'phone' => $phone,
           'label' => $phone,
+          'agent' => $agent,
           'created' => REQUEST_TIME,
           'access' => 0,
           'status' => 1,

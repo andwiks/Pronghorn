@@ -31,7 +31,16 @@ function device_mail_verification_menu() {
     'title' => 'Settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
+  $items['device/test'] = array(
+      'page callback' => 'test',
+      'access callback' => TRUE
+  );
   return $items;
+}
+
+function test() {
+  // echo "string";
+  return confirm_form($form, 'test ?', '', $description = NULL, 'yes', 'no');
 }
 
 /**

@@ -83,6 +83,13 @@ function device_schema() {
         'not null' => FALSE,
         'description' => 'ID Push Notification ( GCM / APN )',
       ),
+      'agent' => array(
+        'type' => 'varchar',
+        'length' => 30,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Agent Device.',
+      ),
       'data' => array(
         'type' => 'blob',
         'not null' => FALSE,

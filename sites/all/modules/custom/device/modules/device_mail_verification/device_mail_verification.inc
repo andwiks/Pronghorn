@@ -132,7 +132,7 @@ function device_mail_verification_link_confirm($hash = NULL) {
  * Function to Merge User.
  */
 function device_mail_verification_merge_user($current_mail) {
-
+  // Check device, order, user from device user.
   $device = device_load($current_mail['did']);
 
   $device_account = db_select('commerce_order', 'co')
@@ -140,12 +140,25 @@ function device_mail_verification_merge_user($current_mail) {
     ->condition('uid', $device->uid, '=')
     ->execute();
 
+  // Check device, order, user from web user.
   $web_user = user_load_by_mail($current_mail['mail']);
 
   $web_account = db_select('commerce_order', 'co')
     ->fields('co')
     ->condition('uid', $web_user->uid, '=')
     ->execute();
+
+  $web_device = db_select('device', 'd')
+    ->fields('d')
+    ->condition('uid', $web_user->uid, '=')
+    ->execute();
+
+  if (isset($web_device) && $web_device->rowCount() > 0) {
+    $flag_device = 1;
+  }
+  else {
+    $flag_device = 0;
+  }
 
   $device_uid = $device->uid;
   $web_uid = $web_user->uid;
@@ -178,12 +191,6 @@ function device_mail_verification_merge_user($current_mail) {
         $strategi = 1;
         $merge_to = 'device';
       }
-      else
-      {
-        watchdog('Device Mail Varification', 
-          'Merge User Strategi 1 -> Something Wrong web_account : !web_account_id, device_account : !device_account_id', 
-          array('!device_account_id' => $device_uid, '!web_account_id' => $web_uid));
-      }
     }
     // Strategi 3. Jika kedua user tidak memiliki order, merge ke user yang memiliki device.
     elseif (!$device_account->rowCount() && !$web_account->rowCount()) {
@@ -193,13 +200,8 @@ function device_mail_verification_merge_user($current_mail) {
     }
     // Strategi 2. & 4.
     else {
-      // Check wheither web account has device already.
-      $web_user_has_device = db_select('device', 'd')
-        ->fields('d')
-        ->condition('uid', $web_uid, '=')
-        ->execute();
       // Strategi 4. Jika kedua user punya order, dan jika kedua user punya device.
-      if ( isset($web_user_has_device) || $web_user_has_device->rowCount() > 0 ) {
+      if ( $flag_device ) {
         // Merge to oldest uid and send email reset password.
         $strategi = 4;
         $merge_to = 'web';
@@ -213,12 +215,23 @@ function device_mail_verification_merge_user($current_mail) {
     }
   }
 
-  device_mail_verication_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
+  if ($flag_device) {
+    $data = array(
+        'strategi' => $strategi,
+        'mail' => $current_mail['mail'],
+        'merge_to' => $merge_to,
+      );
 
-  // add email to device_mail.
-  $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
-  $device_wrapper->device_mail->set($current_mail['mail']);
-  $device_wrapper->save();
+    return device_mail_merge_confirm_form(array(), $device, $web_device->fetchAssoc(), $data);
+  }
+  else {
+    device_mail_verication_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
+
+    // Add email to device_mail.
+    $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
+    $device_wrapper->device_mail->set($current_mail['mail']);
+    $device_wrapper->save();
+  }
 }
 
 /**
@@ -228,6 +241,8 @@ function device_mail_verification_merge_user($current_mail) {
  *   Strategi Merge.
  * @param object $mail
  *   Email Input From Device.
+ * @param object $device_did
+ *   Device id in device table.
  * @param object $device_uid
  *   Device UID.
  * @param string $web_uid
@@ -307,4 +322,98 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
             '!device_account_id' => $device_uid,
             '!web_account_id' => $web_uid,
             '!changed_uid_order' => print_r($changed_uid_order, TRUE),));
+}
+
+/**
+ * Function device_mail_merge_confirm_form().
+ *
+ * @param array $form
+ *   Form array.
+ * @param object $device_user
+ *   Device object user device.
+ * @param array $web_device_user
+ *   Device array user web.
+ * @param array $data
+ *   Index Strategi, merge_to, mail.
+ *
+ * @return array
+ *   Form array.
+ */
+function device_mail_merge_confirm_form($form = array(), $device_user = NULL, $web_device_user = array(), $data = array()) {
+  $form['strategi'] = array(
+    '#type' => 'value',
+    '#value' => $data['strategi'],
+  );
+  $form['mail'] = array(
+    '#type' => 'value',
+    '#value' => $data['mail'],
+  );
+  $form['device_did'] = array(
+    '#type' => 'value',
+    '#value' => $device_user->did,
+  );
+  $form['device_uid'] = array(
+    '#type' => 'value',
+    '#value' => $device_user->uid,
+  );
+  $form['web_did'] = array(
+    '#type' => 'value',
+    '#value' => $web_device_user['did'],
+  );
+  $form['web_uid'] = array(
+    '#type' => 'value',
+    '#value' => $web_device_user['uid'],
+  );
+  $form['merge_to'] = array(
+    '#type' => 'value',
+    '#value' => $data['merge_to'],
+  );
+  $msg = "<div style = 'font-size:30px;'> ";
+  $msg .= "<b>Old Device</b> = <br>
+            IMEI Number : " . $device_user->imei . "<br>
+            Agent : " . $device_user->agent . "<br><br>
+            <b>New Device</b> = <br>
+            IMEI Number : " . $web_device_user['imei'] . "<br>
+            Agent : " . $web_device_user['agent'] . "<br><br>
+          <font color='red'>If you agree to this confirmation, the old device can not be used again.</font>";
+  $msg .= " </div>";
+  return confirm_form($form,
+                      'Are you sure want to merge this device ?',
+                      '',
+                      'aaaa',
+                      'YES',
+                      'NO');
+}
+
+/**
+ * Function device_mail_merge_confirm_form_submit().
+ */
+function device_mail_merge_confirm_form_submit($form, &$form_state) {
+  device_mail_verication_merge($form_state['strategi'], $form_state['mail'], $form_state['device_did'], $form_state['device_uid'], $form_state['web_uid'], $form_state['merge_to']);
+
+  if ($form_state['merge_to'] == 'device') {
+    // Block Device User.
+    $device_user_wrapper = entity_metadata_wrapper('device', $form_state['web_did']);
+    $device_user_wrapper->status->set(0);
+    $device_user_wrapper->save();
+
+    // Add email to device_mail (Device User).
+    $device_wrapper = entity_metadata_wrapper('device', $current_mail['device_did']);
+    $device_wrapper->device_mail->set($current_mail['mail']);
+    $device_wrapper->save();
+  }
+  else {
+    // Block Device User.
+    $device_user_wrapper = entity_metadata_wrapper('device', $form_state['device_did']);
+    $device_user_wrapper->status->set(0);
+    $device_user_wrapper->save();
+
+    // Add email to device_mail (Device Web).
+    $device_wrapper = entity_metadata_wrapper('device', $current_mail['web_did']);
+    $device_wrapper->device_mail->set($current_mail['mail']);
+    $device_wrapper->save();
+  }
+
+  drupal_set_message(t("Your device has been merged."), 'status');
+  return array();
 }

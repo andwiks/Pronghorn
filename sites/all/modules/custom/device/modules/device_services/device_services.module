@@ -184,6 +184,17 @@ function device_services_services_resources() {
               'optional' => FALSE,
               'http_method' => 'POST',
             ),
+            array(
+              'name' => 'agent',
+              'type' => 'string',
+              'description' => 'A valid device agent.',
+              'source' => array(
+                'data' => 'agent',
+                'param' => 'agent',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
           ),
         ),
         'verify' => array(

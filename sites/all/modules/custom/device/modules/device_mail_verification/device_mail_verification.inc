@@ -68,7 +68,7 @@ function device_mail_verification_link_confirm($hash = NULL) {
           $confirm_status = 'confirmed';
 
           // Merge User.
-          device_mail_verification_merge_user($current_mail);
+          return device_mail_verification_merge_user($current_mail); exit();
 
         }
         // A timeout might have occurred.
@@ -85,7 +85,7 @@ function device_mail_verification_link_confirm($hash = NULL) {
             $confirm_status = 'confirmed';
             
             // Merge User.
-            device_mail_verification_merge_user($current_mail);
+            return device_mail_verification_merge_user($current_mail); exit();
 
           }
           // Timeout reached, responding.
@@ -222,7 +222,7 @@ function device_mail_verification_merge_user($current_mail) {
         'merge_to' => $merge_to,
       );
 
-    return device_mail_merge_confirm_form(array(), $device, $web_device->fetchAssoc(), $data);
+    return device_mail_merge_confirm_form(array(), array(), $device, $web_device->fetchAssoc(), $data);
   }
   else {
     device_mail_verication_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
@@ -231,6 +231,9 @@ function device_mail_verification_merge_user($current_mail) {
     $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
     $device_wrapper->device_mail->set($current_mail['mail']);
     $device_wrapper->save();
+
+    drupal_set_message(t("Your mail address has been confirmed."), 'status');
+    return array();    
   }
 }
 
@@ -339,7 +342,7 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
  * @return array
  *   Form array.
  */
-function device_mail_merge_confirm_form($form = array(), $device_user = NULL, $web_device_user = array(), $data = array()) {
+function device_mail_merge_confirm_form($form = array(), $form_state = array(), $device_user = NULL, $web_device_user = array(), $data = array()) {
   $form['strategi'] = array(
     '#type' => 'value',
     '#value' => $data['strategi'],
@@ -368,11 +371,11 @@ function device_mail_merge_confirm_form($form = array(), $device_user = NULL, $w
     '#type' => 'value',
     '#value' => $data['merge_to'],
   );
-  $msg = "<div style = 'font-size:30px;'> ";
-  $msg .= "<b>Old Device</b> = <br>
+  $msg = "<div style = 'font-size:20px;'> ";
+  $msg .= "<b>New Device</b> = <br>
             IMEI Number : " . $device_user->imei . "<br>
             Agent : " . $device_user->agent . "<br><br>
-            <b>New Device</b> = <br>
+            <b>Old Device</b> = <br>
             IMEI Number : " . $web_device_user['imei'] . "<br>
             Agent : " . $web_device_user['agent'] . "<br><br>
           <font color='red'>If you agree to this confirmation, the old device can not be used again.</font>";
@@ -380,9 +383,7 @@ function device_mail_merge_confirm_form($form = array(), $device_user = NULL, $w
   return confirm_form($form,
                       'Are you sure want to merge this device ?',
                       '',
-                      'aaaa',
-                      'YES',
-                      'NO');
+                      $msg);
 }
 
 /**

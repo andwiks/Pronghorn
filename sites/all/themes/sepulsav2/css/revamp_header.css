@@ -190,8 +190,7 @@ header .right_link .box.lang a
 section.h_middle_top .home_tab .form input[type=text]
 {
     width: 100%;
-    padding-top: 25px;
-    padding-bottom: 25px;
+    height: 55px;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
@@ -201,7 +200,7 @@ section.h_middle_top .home_tab .form input[type=text]
     background: none !important;
     border-color:#a1a1a1 !important;    
 
-    font-size: 18px !important;
+    font-size: 16px !important;
     color: #000 !important;
 
     padding-left: 40px;
@@ -348,7 +347,8 @@ section.h_middle_top .form-select
     background: url(../images/material/bg_selectbox.jpg) no-repeat right center !important;
     padding-top: 5px;
     padding-left: 40px !important;
-    padding-right: 10px;
+    padding-right: 30px;
+    font-size: 16px !important;
 }
 
 section.h_middle_top #sepulsa-autocomplete-packets select#edit-packet
@@ -463,7 +463,7 @@ section.h_middle_top #edit-operator
 .topup-notes ul li
 {
     color: #000 !important;
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .commerce-add-to-cart

@@ -361,8 +361,8 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
-        $form['submit']['#attributes']['class'][] = 'pull-right';
         $form['submit']['#attributes']['class'][] = 'enabled';
+        $form['submit']['#attributes']['class'][] = 'pull-right';
         $form['submit']['#attributes']['style'][] = 'float:right;';
 
         $form['submit']['#weight'] = 3;

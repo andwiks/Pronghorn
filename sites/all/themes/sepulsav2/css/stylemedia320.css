@@ -23,8 +23,23 @@ section.banner .caption a{  margin: 25px 0 0 0;font-size: 12px;padding: 0 0 22px
 
 section.h_middle_top .home_tab {top: -96px;width: 281px;}
 section.h_middle_top .home_tab .nav_tab a {
-    position: relative;height: 55px;width: 55px;text-indent: -999px;  line-height: 55px;
-    width: 50px;
+    /*position: relative;
+    height: 55px;
+    width: 55px;
+    text-indent: -999px;
+    line-height: 55px;
+    width: 50px;*/
+
+    position: relative;
+    line-height: 1.2;
+
+    padding: 0;
+    padding-top: 42px;
+
+    width: 25%;
+    height: 37px;
+
+    font-size: 11px;
 }
 section.h_middle_top .home_tab .nav_tab a span.ico {
     position: absolute;
@@ -485,18 +500,6 @@ table.tab-pulsa tr td
     width: auto;
 }
 
-/*section.h_middle_top .home_tab .nav_tab a
-{
-    width: 100%;
-}
-
-section.h_middle_top .home_tab .nav_tab a.active
-{
-    padding-left: 20%;
-    width: 80%;
-}
-*/
-
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
 {
     width: 40%;
@@ -855,7 +858,7 @@ body.home header .right_link .box.lang a
 /*fixing css for main/header banner */
 section.banner {
     overflow: hidden;
-    min-height: 300px !important;
+    min-height: 60px;
     padding: 0 !important;
 }
 
@@ -878,13 +881,15 @@ section.banner .caption
    width: 100%;
 }
 
-/* revamp header maret 2014 */
+/* revamp header maret 2016 */
 
 section.banner .bx-wrapper .bx-pager {bottom: 15px;}
 
 section.banner
 {
-    display: none;
+    /*display: none;*/
+    background: #1d262c;
+    padding: 10px 0;
 }
 
 body.home header
@@ -903,10 +908,6 @@ section.h_middle_top .home_tab {
     margin:0 auto;
 }
 
-section.h_middle_top {
-    margin-bottom: 15px;
-}
-
 section.h_middle_top .home_tab .form input[type=text]
 {
     width: 100%;
@@ -915,16 +916,24 @@ section.h_middle_top .home_tab .form input[type=text]
 
 section.h_middle_top .home_tab .nav_tab a.active
 {
-    width: 83px;
+    /*width: 83px;*/
+    width: 25%;
+    padding: 0;
+    text-align: center;
+    font-size: 11px;
+    padding-top: 42px;
+    height: 37px;
 }
 
-/* revamp header */
 section.h_middle_top
 {
-    margin-top: 15px;
+    margin-top: 0;
     width: 100%;
     top:0;
-    height: auto;
+    height: auto;    
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    background: #1d262c;
 }
 
 body.home header .logo
@@ -949,7 +958,7 @@ section.h_middle_top .home_tab {
 section.h_middle_top .home_tab .nav_tab a span.ico
 {
     background-position: center !important;
-    right: auto !important;
+    /*right: auto !important;*/
 }
 
 section.h_middle_top .home_tab .nav_tab a span.ico.pulsa, 
@@ -962,7 +971,8 @@ section.h_middle_top .home_tab .nav_tab a span.ico.finance
 
 section.h_middle_top .home_tab .nav_tab a.active, section.h_middle_top .home_tab .nav_tab a:hover
 {
-    line-height: 36px;
+    /*line-height: 36px;*/
+    line-height: 1.2;
 }
 
 section.h_middle_top #edit-operator {
@@ -1028,31 +1038,32 @@ section.h_middle_top .home_tab .form .customer-number
 
 section.h_middle_top .home_tab .content_tab
 {
-    border: 2px solid #a1a1a1 !important;
+    /*border: 2px solid #a1a1a1 !important;*/
+    border: none;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
 }
 
-section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../images/material/ico_phone_black.png) no-repeat left center;}
+/*section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../images/material/ico_phone_black.png) no-repeat left center;}
 section.h_middle_top .home_tab .nav_tab a span.ico.bolt{background:url(../images/material/ico_biznet_black.png) no-repeat left center;}
 section.h_middle_top .home_tab .nav_tab a span.ico.finance{background:url(../images/material/ico_finance_black.png) no-repeat left center;}
 section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../images/material/ico_pln_black.png) no-repeat left center;}
-section.h_middle_top .home_tab .nav_tab a span.ico.bpjs{background:url(../images/material/ico_bpjs_black.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bpjs{background:url(../images/material/ico_bpjs_black.png) no-repeat left center;}*/
 
 section.h_middle_top .home_tab .nav_tab a
 {
-    color: #000 !important;
+    color: #fff !important;
 }
 
 section.h_middle_top .home_tab .nav_tab a.active:before 
 {
     border-left: 13px solid transparent;
     border-right: 13px solid transparent;
-    border-bottom: 18px solid #a1a1a1;
+    border-bottom: 18px solid #fff;
     position: absolute;
-    bottom: -1px;
+    bottom: 0;
 }
 
 body.home header a.toggle {
@@ -1083,4 +1094,28 @@ header .nav_mobile .box_drop
 header .nav_mobile .box_drop a:hover
 {
     background: #0d7eb8;
+}
+
+section.banner .header-img
+{
+    height: 50px;
+    background: none;
+    margin: 15px 0;
+}
+
+section.banner .caption
+{
+    top:5px;
+    display: block;
+}
+
+section.banner .caption .content
+{
+    display:none;
+}
+
+section.banner .caption h1
+{
+    font-size: 22px !important;
+    margin: 0 !important;
 }

@@ -888,7 +888,8 @@ section.banner .bx-wrapper .bx-pager {bottom: 15px;}
 section.banner
 {
     /*display: none;*/
-    background: #1d262c;
+    background: #1d262c;    
+    background: #727577;
     padding: 10px 0;
 }
 
@@ -934,6 +935,7 @@ section.h_middle_top
     margin-bottom: 15px;
     padding-bottom: 15px;
     background: #1d262c;
+    background: #727577; 
 }
 
 body.home header .logo
@@ -1088,7 +1090,6 @@ header .nav_mobile .box_credit {
 header .nav_mobile .box_drop
 {
     border: 1px solid #ccc;
-    border-top: 5px solid #ccc;
 }
 
 header .nav_mobile .box_drop a:hover
@@ -1118,4 +1119,77 @@ section.banner .caption h1
 {
     font-size: 22px !important;
     margin: 0 !important;
+}
+
+.mobile-download
+{
+    display: block;
+    background: #129d4a;
+    width: 100%;
+    padding: 15px 10px;
+    color: #fff;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.mobile-download:after {
+    clear: both;
+    content: "";
+    display: block;
+}
+
+.mobile-download {
+    display: block;
+    background: #129d4a;
+    width: 100%;
+    padding: 15px 10px;
+    color: #fff;
+}
+
+.mobile-download .notif-info {
+    line-height: 17px;
+    float: left;
+    margin-top: 5px;
+}
+
+    .mobile-download a.close {
+        border-radius: 50%;
+        background: #fff;
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        text-align: center;
+        margin-right: 5px;
+    }
+
+.mobile-download .notif-download
+{
+    float: right;
+}
+
+     .mobile-download a.download {
+        background: #0d7eb8;
+        font-size: 12px;
+        color: #fff;
+        display: block;
+        padding: 10px;
+
+        border-radius: 3px;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+    }
+
+
+header .logo img
+{
+    margin-left: 0;
+}
+
+header .nav_mobile
+{
+    right: 0;
 }

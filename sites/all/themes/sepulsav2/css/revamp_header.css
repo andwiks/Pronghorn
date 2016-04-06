@@ -610,3 +610,8 @@ header .right_link .box .box_drop
     height: 100px;
     background: #283c4a;
 }
+
+.mobile-download
+{
+    display: none;
+}

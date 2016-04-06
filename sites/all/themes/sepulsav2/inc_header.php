@@ -7,6 +7,16 @@
  * @since January 27th 2015.
  */
 ?>
+
+<div class="mobile-download">
+    <div class="notif-info">
+        <a href="#" class="close">x</a> Gunakan Aplikasi Sepulsa
+    </div>
+    <div class="notif-download">
+        <a href="https://play.google.com/store/apps/details?id=com.sepulsa.android&utm_source=mweb&utm_medium=toogle_notif_mobile&utm_campaign=new_theme" class="download">Download App</a>
+    </div>
+</div>
+
     <header>
         <div class="wrapper">
             <?php
@@ -64,7 +74,7 @@
                         <a href="" class="toggle">toogle</a>
                         <div class="box_drop">
                             <div class="box_credit after_clear">
-                                <div class="left"><?php print t('SEPULSA CREDIT'); ?></div>
+                                <div class="left"><?php print t('SEPULSA KREDIT'); ?></div>
                                 <div class="right"><?php print commerce_currency_format(userpoints_get_current_points($user->uid, 'all'), 'IDR'); ?></div>
                             </div>
                             <a href="<?php print url('user/' . $user->uid); ?>" ><?php print t('Informasi Akun'); ?></a>

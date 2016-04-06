@@ -319,6 +319,12 @@ function menuMobile() {
         e.preventDefault();
         $(this).parent().children(".box_drop").slideToggle(300);
     });
+
+
+    $(".mobile-download .close").click(function (e) {
+        e.preventDefault();
+        $(".mobile-download").css('display', 'none');
+    });
 }
 
 function randomTheme() {

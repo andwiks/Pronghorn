@@ -10,13 +10,11 @@
  * Callback Functions.
  */
 
-
-
 /**
- * Function device_mail_verification_link_confirm()
+ * Function device_mail_verification_link_confirm().
  *
- * @param $hash.
- * hash from email.
+ * @param string $hash
+ *   hash from email.
  */
 function device_mail_verification_link_confirm($hash = NULL) {
   // Di sini akan ada merge user.
@@ -83,7 +81,6 @@ function device_mail_verification_link_confirm($hash = NULL) {
             ->execute();
 
             $confirm_status = 'confirmed';
-            
             // Merge User.
             return device_mail_verification_merge_user($current_mail); exit();
 
@@ -166,20 +163,21 @@ function device_mail_verification_merge_user($current_mail) {
   $strategi = 0;
   $merge_to = '';
 
-  // New User
+  // New User.
   if ($current_mail['new_flag']) {
-    // Update Email User Device. 
+    // Update Email User Device.
     $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
     $device_user_wrapper->mail->set($current_mail['mail']);
     $device_user_wrapper->save();
 
-    // Send Reset Password
-    watchdog('Device Mail Varification', 
-          'Merge User New User-> device_account : !device_account_id', 
-          array('!device_account_id' => $device_uid,));
+    // Send Reset Password.
+    watchdog('Device Mail Varification',
+          'Merge User New User-> device_account : !device_account_id',
+          array('!device_account_id' => $device_uid));
   }
   else {
-    // Strategi 1. jika hanya salah satu user yang memiliki order, merge ke user yang memiliki order.
+    // Strategi 1. jika hanya salah satu user yang memiliki order,
+    // Merge ke user yang memiliki order.
     if (!$device_account->rowCount() || !$web_account->rowCount()) {
       if ($device_account->rowCount() == 0) {
         // Merge to web account and do not send email reset password.
@@ -192,7 +190,8 @@ function device_mail_verification_merge_user($current_mail) {
         $merge_to = 'device';
       }
     }
-    // Strategi 3. Jika kedua user tidak memiliki order, merge ke user yang memiliki device.
+    // Strategi 3. Jika kedua user tidak memiliki order,
+    // Merge ke user yang memiliki device.
     elseif (!$device_account->rowCount() && !$web_account->rowCount()) {
       // Merge to device account and send email reset password.
       $strategi = 3;
@@ -200,13 +199,15 @@ function device_mail_verification_merge_user($current_mail) {
     }
     // Strategi 2. & 4.
     else {
-      // Strategi 4. Jika kedua user punya order, dan jika kedua user punya device.
-      if ( $flag_device ) {
+      // Strategi 4. Jika kedua user punya order,
+      // Dan jika kedua user punya device.
+      if ($flag_device) {
         // Merge to oldest uid and send email reset password.
         $strategi = 4;
         $merge_to = 'web';
       }
-      // Strategi 2. jika kedua user memiliki order, merge ke user yang memiliki device.
+      // Strategi 2. jika kedua user memiliki order,
+      // Merge ke user yang memiliki device.
       else {
         // Merge to user who has device.
         $strategi = 2;
@@ -217,12 +218,12 @@ function device_mail_verification_merge_user($current_mail) {
 
   if ($flag_device) {
     $data = array(
-        'strategi' => $strategi,
-        'mail' => $current_mail['mail'],
-        'merge_to' => $merge_to,
-      );
+      'strategi' => $strategi,
+      'mail' => $current_mail['mail'],
+      'merge_to' => $merge_to,
+    );
 
-    return device_mail_merge_confirm_form(array(), array(), $device, $web_device->fetchAssoc(), $data);
+    return drupal_get_form('device_mail_merge_confirm_form', $device, $web_device->fetchAssoc(), $data);
   }
   else {
     device_mail_verication_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
@@ -233,7 +234,7 @@ function device_mail_verification_merge_user($current_mail) {
     $device_wrapper->save();
 
     drupal_set_message(t("Your mail address has been confirmed."), 'status');
-    return array();    
+    return array();
   }
 }
 
@@ -318,9 +319,10 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
       $mail = _user_mail_notify('password_reset', $account);
     }
   }
-  watchdog('Device Mail Varification', 
-          'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id , changed UID commerce_order : !changed_uid_order', 
-          array('!merge_to' => $merge_to,
+  watchdog('Device Mail Varification',
+          'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id , changed UID commerce_order : !changed_uid_order',
+          array(
+            '!merge_to' => $merge_to,
             '!strategi' => $strategi,
             '!device_account_id' => $device_uid,
             '!web_account_id' => $web_uid,

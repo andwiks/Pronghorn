@@ -55,7 +55,7 @@ function bpjs_kesehatan_commerce_product_type_info() {
   $product_types['bpjs_kesehatan'] = array(
     'type' => 'bpjs_kesehatan',
     'name' => t('BPJS Kesehatan'),
-    'description' => t('A BPJS Keseahtan product.'),
+    'description' => t('A BPJS Kesehatan product.'),
   );
 
   return $product_types;

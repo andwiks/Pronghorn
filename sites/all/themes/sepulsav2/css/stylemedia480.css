@@ -843,3 +843,28 @@ section.banner .bx-viewport
 {
     left:0 !important;
 }
+
+section.h_middle_top .form-bpjs .form-field input.remove {
+    top: 6px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    -ms-border-radius: 40px;
+    -o-border-radius: 40px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new
+{
+    top: 6px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    -ms-border-radius: 40px;
+    -o-border-radius: 40px;
+    background: transparent !important;
+    color: #129d4a !important;
+}

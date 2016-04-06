@@ -585,6 +585,11 @@ header .right_link .box a.header-login
     padding-left: 50px;
 }
 
+header .right_link .box a.header-akun
+{
+    background: url(../images/material/ico_akun.png) no-repeat center left;
+}
+
 header .right_link .box a.header-kredit
 {
     background: url(../images/material/ico_deposit.png) no-repeat center left;
@@ -614,4 +619,9 @@ header .right_link .box .box_drop
 .mobile-download
 {
     display: none;
+}
+
+.promo_banner .wrapper
+{
+    width: 100%;
 }

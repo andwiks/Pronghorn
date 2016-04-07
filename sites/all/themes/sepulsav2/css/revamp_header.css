@@ -119,6 +119,7 @@ section.h_middle_top .voucher_vendor {width: 260px;margin: auto}
 
 /*box position*/
 section.h_middle_top {
+/*  before feedback 7 april  
     top: -480px;
     left: 0;
     height: 445px;
@@ -126,6 +127,15 @@ section.h_middle_top {
     border: none;
     margin: 0;
     margin-bottom: -425px;
+    width: 50%;
+*/
+    top: -400px;
+    left: 0;
+    height: 400px;
+    background: none;
+    border: none;
+    margin: 0;
+    margin-bottom: -400px;
     width: 50%;
 }
 
@@ -540,7 +550,8 @@ section.h_middle_top input.form-submit.enabled
 .header-img
 {
     background: url(../images/content/main-bg-2.png) no-repeat center;
-    height: 625px;
+    /*before 7 april> height: 625px;*/
+    height: 525px;
 }
 
 header .right_link .box .box_drop .arr {

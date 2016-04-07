@@ -674,6 +674,7 @@ section.banner
     top: 0;
     left: 0;
     max-width: 72%;
+    width: 75px;
 }
 
 #mobile_banner .mobile-content

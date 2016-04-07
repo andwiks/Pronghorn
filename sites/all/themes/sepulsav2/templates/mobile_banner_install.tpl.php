@@ -45,7 +45,7 @@
 </script>
 <div id="mobile_banner">
 	<div class="mobile-img">
-		<img style="padding: 10px;" width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" />
+		<img style="" width="90px" src="<?php if (isset($content['image_path'])) print $content['image_path'] ?>" />
 	</div>
 	<div class="mobile-content">
 		<?php if (isset($content['apps_desc'])) print $content['apps_desc']  ?>

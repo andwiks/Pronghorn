@@ -44,7 +44,7 @@ $settings = variable_get('sepulsa_settings', array());
         <?php if (module_exists('bpjs_kesehatan') && user_access('view any commerce_product entity of bundle bpjs_kesehatan')): ?>
           <a href="" target="bpjs-kesehatan">
             <span class="ico bpjs"></span>
-            <?php print t('bayar bpjs'); ?>
+            <?php print t('bpjs kesehatan', array(), array('context' => 'front_page_tab')); ?>
           </a>
         <?php endif; ?>
       </div>

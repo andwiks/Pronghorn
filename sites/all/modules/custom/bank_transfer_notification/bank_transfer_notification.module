@@ -75,37 +75,81 @@ function bank_transfer_notification_cron_queue_info() {
 }
 
 /**
- * Function to invoke rules.
+ * Function bank_transfer_notification_send_email().
+ *
+ * @todo
+ * Send email to notification.
+ * @param object $order
+ * Object item commerce_order.
  */
 function bank_transfer_notification_send_email($order) {
   // Make sure these orders have not received email notification.
   $exist_order_id = db_query_range("SELECT order_id FROM {bank_transfer_notification} WHERE order_id = :order_id", 0, 1, array('order_id' => $order->order_id))->fetchField();
 
+  $user_order = user_load($order->uid);
+
   if (empty($exist_order_id)) {
     $payment = commerce_payment_method_instance_load($order->data['payment_method']);
-    $order->account_owner = '';
-    $order->account_number = '';
-    $order->account_bank = '';
-    $order->account_branch = '';
-    $order->policy = '';
-    if (!empty($payment['settings']['details']['account_owner'])) {
-      $order->account_owner = $payment['settings']['details']['account_owner'];
+
+    $lang = language_default('language');
+    
+    $send = drupal_mail(
+      'bank_transfer_notification',
+      'notif',
+      $user_order->mail,
+      $lang,
+      array(
+        'account_owner' => $payment['settings']['details']['account_owner'],
+        'account_number' => $payment['settings']['details']['account_number'],
+        'account_bank' => $payment['settings']['details']['account_bank'],
+        'account_branch' => $payment['settings']['details']['account_branch'],
+        'policy' => $payment['settings']['details']['policy'],
+      )
+    );
+
+    if ($send) {
+      db_insert('bank_transfer_notification')
+      ->fields(array('order_id' => $order->order_id, 'status' => 1))
+      ->execute();
+      watchdog('bank_transfer_notification', t("Send Nofitication to !mail Success.",
+        array('!mail' => $user_order->mail)));
     }
-    if (!empty($payment['settings']['details']['account_number'])) {
-      $order->account_number = $payment['settings']['details']['account_number'];
+    else {
+      watchdog('bank_transfer_notification', t("Send Nofitication to !mail Failed.",
+        array('!mail' => $user_order->mail)));
     }
-    if (!empty($payment['settings']['details']['account_bank'])) {
-      $order->account_bank = $payment['settings']['details']['account_bank'];
-    }
-    if (!empty($payment['settings']['details']['account_branch'])) {
-      $order->account_branch = $payment['settings']['details']['account_branch'];
-    }
-    if (!empty($payment['settings']['policy'])) {
-      $order->policy = $payment['settings']['policy'];
-    }
-    rules_invoke_all('bank_transfer_notification_queue_email', $order);
-    db_insert('bank_transfer_notification')
-    ->fields(array('order_id' => $order->order_id, 'status' => 1))
-    ->execute();
+
+  }
+}
+
+/**
+ * Implements hook_mail()
+ */
+function bank_transfer_notification_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'notif':
+      $langcode = $message['language'];
+      $message['subject'] = t("Bank Transfer Notification from !site", 
+                            array('!site' => variable_get('site_name')), 
+                            array('langcode' => $langcode));
+      $message['body'][] = variable_get('opening_bank_transfer_notification', 'Mohon lakukan pembayaran ke :');
+      $message['body'][] = '';
+      $message['body'][] = t("Nama Bank : !bank", 
+        array('!bank' => $params['account_bank']), 
+        array('langcode' => $langcode));
+      $message['body'][] = t("Nomor rekening : !norek", 
+        array('!norek' => $params['account_number']), 
+        array('langcode' => $langcode));
+      $message['body'][] = t("Atas nama : !account_owner", 
+        array('!account_owner' => $params['account_owner']), 
+        array('langcode' => $langcode));
+      $message['body'][] = t("Kantor cabang : !account_branch", 
+        array('!account_branch' => $params['account_branch']), 
+        array('langcode' => $langcode));
+      $message['body'][] = '';
+      $message['body'][] = t("!policy", 
+        array('!policy' => $params['policy']), 
+        array('langcode' => $langcode));
+      break;
   }
 }

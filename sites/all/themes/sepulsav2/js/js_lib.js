@@ -328,12 +328,12 @@ function menuMobile() {
 }
 
 function randomTheme() {
-    if ($("body").hasClass('home')) {
+    /*if ($("body").hasClass('home')) {
         var class_rand = ['', 'blue', 'green', 'red'];
         var random = Math.floor((Math.random() * 4) + 0);
 
         $("body").addClass(class_rand[random]);
-    }
+    }*/
 }
 
 function stepIsiPulsa() {

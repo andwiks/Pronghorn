@@ -1099,6 +1099,7 @@ header .nav_mobile .box_drop a:hover
 
 section.banner .header-img
 {
+    position: relative;
     height: 50px;
     background: none;
     padding: 15px 0;

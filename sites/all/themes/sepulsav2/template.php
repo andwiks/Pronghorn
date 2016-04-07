@@ -447,6 +447,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'meter-number';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
         $form['line_item_fields']['field_phone_number']['#weight'] = -5;
@@ -454,6 +455,7 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'phone-number';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
         if (!empty($form['description'])) {

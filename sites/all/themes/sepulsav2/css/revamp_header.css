@@ -667,6 +667,15 @@ section.banner
     width: 35%;
 }
 
+#mobile_banner .mobile-img img
+{
+    padding: 0 12px;
+    right: 0;
+    top: 0;
+    left: 0;
+    max-width: 72%;
+}
+
 #mobile_banner .mobile-content
 {
     float: right;
@@ -748,12 +757,12 @@ section.std_content .voucher .c_left .grid_voucher_order table thead th {
 
 section.std_content .voucher .c_left .grid_voucher_order table tr
 {    
-    background: #606060;
+    color: #606060;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order p
 {
-    background: #606060;
+    color: #606060;
     line-height: 10px;
 }
 
@@ -804,6 +813,7 @@ section.std_content .box_voucher h4 {
     -ms-border-radius: 3px;
     -o-border-radius: 3px;
     margin-top: 10px;
+    background: #0d7eb8;
 }
 
 /* payment */

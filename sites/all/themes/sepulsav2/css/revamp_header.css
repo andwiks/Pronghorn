@@ -706,3 +706,102 @@ section.banner
     font-size: 10px;
     text-shadow: none;
 }
+
+/* voucher page */
+section.std_content .voucher .custom-voucher
+{
+    width: 100%;
+    margin-top: 5px;
+    border-top: 3px solid #105c8c;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table
+{
+    width: 90%;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot th
+{
+    background: #0d7eb8;
+    height: 30px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt
+{
+    background: #0d7eb8;
+    line-height: 30px;
+    text-transform: uppercase;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child {
+    padding-left: 30px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table thead th {
+    text-align: left;
+    font-family: "robotomedium";
+    font-size: 12px;
+    text-transform: uppercase;
+    padding: 15px 7px 10px;
+    color: #000;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table tr
+{    
+    background: #606060;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order p
+{
+    background: #606060;
+    line-height: 10px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order p b {
+    font-family: "robotoregular";
+}
+
+section.std_content .voucher .c_left .grid_voucher_order p {
+    width: 590px;
+    margin: 15px auto 50px;
+    font-family: "robotoregular";
+    color: #005784;
+    color: #606060;
+    margin: 10px auto 15px auto;
+}
+
+section.std_content .voucher h2 {
+    color: #000;
+    font-size: 24px;
+    margin: 15px 0 10px 0;
+}
+
+section.std_content .voucher h5 {
+    line-height: 1.2;
+    font-family: "robotolight";
+    font-size: 14px;
+}
+
+section.std_content .filter {
+    padding: 9px 0;
+}
+
+section.std_content .list_voucher .box_voucher .image {
+    margin: 0 0 10px;
+}
+
+section.std_content .box_voucher h4 {
+    line-height: 15px;
+    margin: 0 0 12px 0;
+}
+
+.commerce-add-to-cart input[type=submit], input[type=button] {
+    padding: 10px 0;
+    width: 65%;
+    border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    -ms-border-radius: 3px;
+    -o-border-radius: 3px;
+    margin-top: 10px;
+}

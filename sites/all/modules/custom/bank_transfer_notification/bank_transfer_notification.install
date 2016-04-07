@@ -10,7 +10,7 @@
  * Implements hook_schema().
  */
 function bank_transfer_notification_schema() {
-  $schema['bank_transfer_notification'] = array(
+  $schema['bank_transfer_notification_queue'] = array(
     'description' => 'Storing Order ID and notification queue for bank transfer transaction',
     'fields' => array(
       'id' => array(
@@ -26,8 +26,23 @@ function bank_transfer_notification_schema() {
         'description' => 'Queue Status',
         'type' => 'int',
       ),
+      'created' => array(
+        'description' => 'Queue Status',
+        'type' => 'int',
+        'length' => 11,
+      ),
     ),
     'primary key' => array('id'),
   );
   return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function bank_transfer_notification_uninstall() {
+  variable_del('bank_transfer_notification_hour');
+  variable_del('bank_transfer_notification_hour_limit_to_delete');
+  variable_del('bank_transfer_notification_policy_default');
+  variable_del('opening_bank_transfer_notification');
 }

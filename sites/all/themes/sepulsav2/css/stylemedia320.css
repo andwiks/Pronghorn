@@ -1101,12 +1101,12 @@ section.banner .header-img
 {
     height: 50px;
     background: none;
-    margin: 15px 0;
+    padding: 15px 0;
 }
 
 section.banner .caption
 {
-    top:5px;
+    top:15px;
     display: block;
 }
 

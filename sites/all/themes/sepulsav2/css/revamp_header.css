@@ -549,7 +549,7 @@ section.h_middle_top input.form-submit.enabled
 
 .header-img
 {
-    background: url(../images/content/main_bg.jog) repeat center bottom;
+    background: url(../images/content/main_bg.jpg) repeat center bottom;
     /*before 7 april> height: 625px;*/
     background-size:100%; 
     height: 525px;
@@ -636,4 +636,73 @@ header .right_link .box .box_drop
 .promo_banner .wrapper
 {
     width: 100%;
+}
+
+
+/*header
+{
+    z-index: -1;
+}
+
+section.banner
+{
+    z-index: -2;
+}*/
+
+#mobile_banner {
+    width: 100%; 
+    z-index: 101; 
+    position: relative;
+    width: 100%;
+    height: 80px;
+    background-color: #0d7eb8;
+    text-align: left;
+    color: #fff;
+    padding: 15px 0;
+}
+
+#mobile_banner .mobile-img
+{
+    float: left;
+    width: 35%;
+}
+
+#mobile_banner .mobile-content
+{
+    float: right;
+    width: 65%;
+}
+
+#mobile_banner a.download {
+    margin-top: 5px;
+    background: #fff;
+    font-size: 12px;
+    color: #000;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border: 2px outset buttonface;
+}
+
+#mobile_banner #close_banner {
+    border: none;
+    border-radius: 50%;
+    background: #fff;
+    width: 15px;
+    height: 15px;
+    display: block;
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    line-height: 15px;
+    padding: 0;
+    color: #0d7eb8;
+    font-size: 10px;
+    text-shadow: none;
 }

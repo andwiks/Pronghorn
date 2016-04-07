@@ -8,6 +8,8 @@
  */
 ?>
 
+<?php
+/*
 <div class="mobile-download">
     <div class="notif-info">
         <a href="#" class="close">x</a> Gunakan Aplikasi Sepulsa
@@ -15,7 +17,9 @@
     <div class="notif-download">
         <a href="https://play.google.com/store/apps/details?id=com.sepulsa.android&utm_source=mweb&utm_medium=toogle_notif_mobile&utm_campaign=new_theme" class="download">Download App</a>
     </div>
-</div>
+</div> 
+*/
+?>
 
     <header>
         <div class="wrapper">

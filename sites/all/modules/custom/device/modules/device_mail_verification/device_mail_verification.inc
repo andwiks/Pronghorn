@@ -50,13 +50,7 @@ function device_mail_verification_link_confirm($hash = NULL) {
 
       $entities = entity_load('device', array($current_mail['did']));
       // Settings don't exist (this should NOT happen!).
-      if (empty($entities)) {
-
-        $confirm_status = FALSE;
-
-      }
-      // Settings loaded.
-      else {
+      if (!empty($entities)) {
         // Either no timeout or timeout has no effect.
         if (variable_get('device_mail_timeout', 0) == 0) {
 
@@ -209,19 +203,18 @@ function device_mail_verification_merge_user($current_mail) {
       $device_user_wrapper->mail->set($current_mail['mail']);
       $device_user_wrapper->save();
 
-      // Send Reset Password.
       watchdog('Device Mail Varification',
             'Merge User New User-> device_account : !device_account_id',
             array('!device_account_id' => $device_uid));
     }
     else {
       device_mail_verication_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
-
-      // Add email to device_mail.
-      $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
-      $device_wrapper->device_mail->set($current_mail['mail']);
-      $device_wrapper->save();
     }
+
+    // Add email to device_mail.
+    $device_wrapper = entity_metadata_wrapper('device', $current_mail['did']);
+    $device_wrapper->device_mail->set($current_mail['mail']);
+    $device_wrapper->save();
 
     return array();
   }

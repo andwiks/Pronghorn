@@ -638,17 +638,6 @@ header .right_link .box .box_drop
     width: 100%;
 }
 
-
-/*header
-{
-    z-index: -1;
-}
-
-section.banner
-{
-    z-index: -2;
-}*/
-
 #mobile_banner {
     width: 100%; 
     z-index: 101; 
@@ -715,6 +704,11 @@ section.banner
     color: #0d7eb8;
     font-size: 10px;
     text-shadow: none;
+}
+
+.voucher_vendor h3
+{
+    margin: 10px auto !important;
 }
 
 /* voucher page */
@@ -852,3 +846,114 @@ section.transaction table.cart
 {
     border: 1px solid #0d7eb8;
 }
+
+/* promotion area */
+.custom-content {
+    position: absolute;
+    text-align: center;
+    left: 20px;
+    top: 15px !important;
+    width: 450px;
+    height: auto;
+    overflow: hidden;
+    color: #1a1a1a;
+}
+
+.custom-content span.headline
+{
+    font-size:32px;
+    color:#1a1a1a;
+}
+
+.custom-content a.bt_slider_update
+{
+    clear: both;
+    background: #0d7eb8;
+    color: #fff;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    width: auto;
+    text-transform: none;
+    display: inline-block;
+    text-align: center;
+    margin: 10px auto 5px auto
+}
+
+.custom-content .img-slider img
+{
+    max-width: 130px;
+}
+
+.custom-content p {
+    margin: 0;
+    line-height: 1.2;
+}
+
+.promo_banner .slide
+{
+    text-align: right;
+}
+
+.bx-wrapper .bx-pager.bx-default-pager a {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.bx-wrapper .bx-pager, .bx-wrapper .bx-controls-auto
+{
+    padding: 0;
+    bottom: 0;
+}
+
+section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a:hover, section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a.active {
+    background: #b8c7c2;
+    border:1px solid #b8c7c2;
+}
+
+section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a {
+    background: #fff;
+    border:1px solid #b8c7c2;
+}
+
+    @media screen and (min-width:769px) and (max-width:1024px) {
+
+        .bx-wrapper img {
+            max-width: 55%;
+        }
+
+        .slide_content {
+            width: 95%;
+            height: 182px;
+            top: 0;
+            right: 0;
+            margin: 0 auto;
+        }
+
+        .custom-content {
+            height: auto;
+            width: 40%;
+            top: 0 !important;
+        }
+
+        .custom-content h2
+        {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .custom-content span.headline
+        {
+            font-size: 24px;
+        }
+
+        .custom-content a.bt_slider_update
+        {
+            margin-top: 15px;
+        }
+    }

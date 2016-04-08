@@ -626,3 +626,23 @@ section.promo_banner .slide img
     padding: 0;
     margin: 0;
 }
+
+.not-front header
+{
+    height: 60px;
+}
+
+.not-front header .logo
+{
+    margin: 10px 0 0 10px;
+}
+
+.not-front header .logo img
+{
+    margin:0;
+}
+
+header .nav_mobile
+{
+    right: 0px;
+}

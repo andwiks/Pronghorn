@@ -992,4 +992,24 @@ section.promo_banner .slide img
 /* voucher page */
 section.std_content .voucher .c_left .grid_voucher_order table {
     width: 80%;
-}}
+}
+
+.not-front header
+{
+    height: 60px;
+}
+
+.not-front header .logo
+{
+    margin: 10px 0 0 10px;
+}
+
+.not-front header .logo img
+{
+    margin:0;
+}
+
+header .nav_mobile
+{
+    right: 0px;
+}

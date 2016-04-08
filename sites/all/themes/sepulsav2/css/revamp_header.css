@@ -355,6 +355,7 @@ section.h_middle_top .form-select
     border-left: none;
     padding-right: 40px;
     background: url(../images/material/bg_selectbox.jpg) no-repeat right center !important;
+    background-position: center right 0px !important;
     padding-top: 5px;
     padding-left: 40px !important;
     padding-right: 30px;
@@ -364,6 +365,7 @@ section.h_middle_top .form-select
 section.h_middle_top #sepulsa-autocomplete-packets select#edit-packet
 {
     background: url(../images/material/bg_selectbox.jpg) no-repeat right center;
+    background-position: center right 0px !important;
     padding-top: 5px;
     padding-left: 0 !important;
 }
@@ -543,7 +545,10 @@ section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
 
 section.h_middle_top input#edit-add-charge, section.h_middle_top input.form-submit
 {
+    /*
+    edited for frendy
     display: none !important;
+    */
 }
 
 section.h_middle_top .topup-action input.form-submit, 
@@ -1039,7 +1044,7 @@ section.transaction table.cart
 .bx-wrapper .bx-pager, .bx-wrapper .bx-controls-auto
 {
     padding: 0;
-    bottom: 0;
+    /*bottom: 0;*/
 }
 
 section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a:hover, section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a.active {
@@ -1054,7 +1059,7 @@ section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a {
 
     @media screen and (min-width:769px) and (max-width:1024px) {
 
-        .bx-wrapper img {
+        /*.bx-wrapper img {
             max-width: 55%;
         }
 
@@ -1086,5 +1091,5 @@ section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a {
         .custom-content a.bt_slider_update
         {
             margin-top: 15px;
-        }
+        }*/
     }

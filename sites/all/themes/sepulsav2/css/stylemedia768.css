@@ -565,7 +565,7 @@ section.h_middle_top .home_tab .nav_tab a
 
 /* promotion area */
 section.promo_banner .img-slider img {
-    display: block;
+    display: block !important;
     margin: 0 auto;
     max-width: 120px;
     height: auto;
@@ -645,4 +645,10 @@ section.promo_banner .slide img
 header .nav_mobile
 {
     right: 0px;
+}
+
+
+#mobile_banner
+{
+    top:55px;
 }

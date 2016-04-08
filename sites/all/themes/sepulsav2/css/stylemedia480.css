@@ -927,7 +927,7 @@ section.h_middle_top .home_tab .form input[type=text]
 
 /* promotion area */
 section.promo_banner .img-slider img {
-    display: block;
+    display: block !important;
     margin: 0 auto;
     max-width: 120px;
     height: auto;
@@ -989,6 +989,11 @@ section.promo_banner .slide img
     margin: 0;
 }
 
+section#front_first .bx-wrapper
+{
+    margin-bottom: 0;
+}
+
 /* voucher page */
 section.std_content .voucher .c_left .grid_voucher_order table {
     width: 80%;
@@ -1012,4 +1017,9 @@ section.std_content .voucher .c_left .grid_voucher_order table {
 header .nav_mobile
 {
     right: 0px;
+}
+
+#mobile_banner
+{
+    top:55px;
 }

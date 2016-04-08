@@ -1229,7 +1229,7 @@ section.promo_banner .slide img
 
 section.promo_banner .img-slider img
 {
-    display: block;
+    display: block !important;
     margin: 0 auto;
     max-width: 120px;
     height: auto;

@@ -356,8 +356,6 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'phone-number';
 
-        $form['product_id']['#suffix'] = '<p></p>';
-
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';

@@ -577,7 +577,7 @@ section.promo_banner .img-slider img {
 
 section.promo_banner .slide img 
 {
-    display: none;
+    /*display: none;*/
 }
 
 .custom-content span.headline {

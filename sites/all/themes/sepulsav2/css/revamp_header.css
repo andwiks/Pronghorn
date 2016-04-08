@@ -545,10 +545,7 @@ section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
 
 section.h_middle_top input#edit-add-charge, section.h_middle_top input.form-submit
 {
-    /*
-    edited for frendy
     display: none !important;
-    */
 }
 
 section.h_middle_top .topup-action input.form-submit, 

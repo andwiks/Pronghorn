@@ -41,8 +41,9 @@ function device_mail_verification_mail($key, &$message, $params) {
   switch ($key) {
     case 'verify':
       $langcode = $message['language'];
-      $message['subject'] = t("Verification of your mail at !site", array('!site' => variable_get('site_name')), array('langcode' => $langcode));
-      $message['body'][] = t("Please click on the following link to confirm this email address at !site.", array('!site' => variable_get('site_name')), array('langcode' => $langcode));
+      $message['subject'] = variable_get('device_mail_subject', 'Verification of your mail at Sepulsa.com');
+      $message['body'][] = variable_get('device_mail_body',
+      'Please click on the following link to confirm this email address at Sepulsa.com');
       $message['body'][] = url(
         'device_mail/verification/' . $params['hash'],
         array(

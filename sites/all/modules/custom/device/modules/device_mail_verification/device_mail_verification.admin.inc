@@ -48,5 +48,25 @@ function device_mail_verification_settings($form = array(), $form_state = array(
     '#default_value' => variable_get('device_mail_timeout', 0),
     '#description' => t('Set timeout verification.'),
   );
+  // Enable / disable default claims.
+  $form['dmv']['device_mail_subject'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Set subject verification mail.'),
+    '#default_value' => variable_get('device_mail_subject', 'Verification of your mail at Sepulsa.com'),
+    '#description' => t('Set subject verification mail.'),
+    '#cols' => 30,
+    '#rows' => 5,
+  );
+  // Enable / disable default claims.
+  $form['dmv']['device_mail_body'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Set subject verification mail.'),
+    '#default_value' => variable_get('device_mail_body',
+      'Please click on the following link to confirm this email address at Sepulsa.com'),
+    '#description' => t('Set subject verification body before link verification.'),
+    '#cols' => 30,
+    '#rows' => 5,
+  );
+
   return system_settings_form($form);
 }

@@ -104,9 +104,24 @@ function device_mail_verification_enable() {
 }
 
 /**
+ * Implements hook_install().
+ */
+function device_mail_verification_install() {
+  // Delete device variables.
+  variable_set('device_mail_timeout', (60 * 60 * 24));
+  \variable_set('device_mail_subject', 'Verification of your mail at Sepulsa.com');
+  variable_set('device_mail_body',
+      'Please click on the following link to confirm this email address at Sepulsa.com');
+  variable_get('device_mail_redirect', '');
+}
+
+/**
  * Implements hook_uninstall().
  */
 function device_mail_verification_uninstall() {
   // Delete device variables.
   variable_del('device_mail_timeout');
+  variable_del('device_mail_subject');
+  variable_del('device_mail_body');
+  variable_del('device_mail_redirect');
 }

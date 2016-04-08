@@ -625,7 +625,37 @@ header .right_link .box .box_drop
 
 .not-front header {
     height: 100px;
-    background: #283c4a;
+    /*background: #283c4a;*/
+}
+
+.not-front .wrapper
+{
+    width: 1050px;
+    margin: 0 auto;
+    max-width: 100%;
+    position: relative;
+}
+
+.not-front .only-large
+{
+    display: none !important;
+}
+
+.not-front .only-small
+{
+    display: block !important;
+}
+
+.not-front header .logo
+{
+    margin:25px 0 0 0;
+    left: 0;
+    height: auto;
+}
+
+.not-front header .right_link .box a 
+{
+    color: #0d7eb8 !important;
 }
 
 .mobile-download
@@ -722,12 +752,17 @@ section.std_content .voucher .custom-voucher
 section.std_content .voucher .c_left .grid_voucher_order table
 {
     width: 90%;
+    margin-top: 15px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table thead {
+    display: none;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot th
 {
     background: #0d7eb8;
-    height: 30px;
+    height: 40px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt
@@ -735,10 +770,20 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt
     background: #0d7eb8;
     line-height: 30px;
     text-transform: uppercase;
+
+    width: 99%;
+    
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    line-height: 40px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order table td:first-child {
     padding-left: 30px;
+    padding-left: 10px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order table thead th {
@@ -800,7 +845,6 @@ section.std_content .box_voucher h4 {
 }
 
 .commerce-add-to-cart input[type=submit], input[type=button] {
-    padding: 10px 0;
     width: 65%;
     border-radius: 3px;
     -webkit-border-radius: 3px;
@@ -809,6 +853,31 @@ section.std_content .box_voucher h4 {
     -o-border-radius: 3px;
     margin-top: 10px;
     background: #0d7eb8;
+
+    line-height: 40px;
+    height: 40px;
+    padding: 0;
+    width: 60%;
+    font-size: 14px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(2)
+{
+    border-radius: 0px 8px 8px 0px;
+    -moz-border-radius: 0px 8px 8px 0px;
+    -webkit-border-radius: 0px 8px 8px 0px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(1)
+{
+    border-radius: 8px 0px 0px 8px;
+    -moz-border-radius: 8px 0px 0px 8px;
+    -webkit-border-radius: 8px 0px 0px 8px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child
+{
+    background: none;
 }
 
 /* payment */

@@ -49,8 +49,10 @@
   <tfoot>
     <tr>
       <th><?php print t('TOTAL PAYMENT'); ?></th>
-      <th colspan="2">
+      <th>
         <?php print commerce_currency_format($order_total['amount'], $order_total['currency_code']); ?>
+      </th>
+      <th>
         <a href="<?php print url("checkout"); ?>" class="add_bt"><?php print t('Proses'); ?></a>
       </th>
     </tr>

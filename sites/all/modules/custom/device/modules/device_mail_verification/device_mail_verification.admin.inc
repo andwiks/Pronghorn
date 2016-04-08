@@ -48,7 +48,7 @@ function device_mail_verification_settings($form = array(), $form_state = array(
     '#default_value' => variable_get('device_mail_timeout', 0),
     '#description' => t('Set timeout verification.'),
   );
-  // Enable / disable default claims.
+  // Setting subject mail.
   $form['dmv']['device_mail_subject'] = array(
     '#type' => 'textarea',
     '#title' => t('Set subject verification mail.'),
@@ -57,7 +57,7 @@ function device_mail_verification_settings($form = array(), $form_state = array(
     '#cols' => 30,
     '#rows' => 5,
   );
-  // Enable / disable default claims.
+  // Setting body mail.
   $form['dmv']['device_mail_body'] = array(
     '#type' => 'textarea',
     '#title' => t('Set subject verification mail.'),
@@ -67,6 +67,11 @@ function device_mail_verification_settings($form = array(), $form_state = array(
     '#cols' => 30,
     '#rows' => 5,
   );
-
+  $form['dmv']['device_mail_redirect'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Set Redirect Page.'),
+    '#default_value' => variable_get('device_mail_redirect', ''),
+    '#description' => t('Set redirect page after confirm.'),
+  );
   return system_settings_form($form);
 }

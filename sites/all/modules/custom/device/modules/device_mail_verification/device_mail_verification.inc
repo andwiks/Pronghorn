@@ -122,7 +122,7 @@ function device_mail_verification_link_confirm($hash = NULL) {
       break;
   }
 
-  return array();
+  drupal_goto(variable_get('device_mail_redirect', ''));
 }
 
 /**
@@ -418,5 +418,5 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
   }
 
   drupal_set_message(t("Your device has been merged."), 'status');
-  return array();
+  drupal_goto(variable_get('device_mail_redirect', ''));
 }

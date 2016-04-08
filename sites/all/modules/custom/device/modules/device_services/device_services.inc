@@ -23,9 +23,9 @@
  * @return mixed
  *   Access and refresh token or error message.
  */
-function device_services_resource_request($imei = '', $phone = '') {
+function device_services_resource_request($imei = '', $phone = '', $agent = '') {
   // Check input imei and phone.
-  if (!empty($imei) && !empty($phone)) {
+  if (!empty($imei) && !empty($phone) && !empty($agent)) {
     // 1. Validate phone number.
     // 1a. Available and not empty.
     // 1b. Has pattern ^08digits.
@@ -56,6 +56,7 @@ function device_services_resource_request($imei = '', $phone = '') {
           'imei' => $imei,
           'phone' => $phone,
           'label' => $phone,
+          'agent' => $agent,
           'created' => REQUEST_TIME,
           'access' => 0,
           'status' => 1,
@@ -449,19 +450,7 @@ function device_services_resource_mail($mail = '') {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
     if ($session !== FALSE) {
-      // Check mail has already registered.
-      $user = user_load_by_mail($mail);
-      if ($user === FALSE) {
-        // Send email verification.
-        $device_wrapper = entity_metadata_wrapper('device', $session['device']->did);
-        $device_wrapper->device_mail->set($mail);
-        $device_wrapper->save();
-        // Return true.
-        return TRUE;
-      }
-      else {
-        return services_error(t('Email has already registered.'), 406);
-      }
+      return device_mail_verification_send_verification($mail, $session['device']->did);
     }
   }
   // Other condition.

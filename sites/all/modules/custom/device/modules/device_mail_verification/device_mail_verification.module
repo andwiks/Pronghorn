@@ -20,7 +20,7 @@ function device_mail_verification_menu() {
     ),
   );
   $items['admin/config/devices/device_mail_settings'] = array(
-    'title' => 'Device Mail Varification Settings',
+    'title' => 'Mail Varification',
     'description' => 'Configure default behavior of device mail.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('device_mail_verification_settings'),
@@ -102,7 +102,7 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
     return TRUE;
   }
   else {
-    return services_error(t('Send email verification failed.'), 406);
+    return FALSE;
   }
 }
 

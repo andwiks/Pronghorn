@@ -776,9 +776,10 @@ section.std_content .voucher .c_left .grid_voucher_order table thead {
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot th
 {
-    background: #0d7eb8;
+    background: #fff;
     height: 40px;
     line-height: 40px;
+    color: #606060;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order table tr td
@@ -883,7 +884,7 @@ section.std_content .box_voucher h4 {
     font-size: 14px;
 }
 
-section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(2)
+/*section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(2)
 {
     border-radius: 0px 8px 8px 0px;
     -moz-border-radius: 0px 8px 8px 0px;
@@ -895,7 +896,7 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(1)
     border-radius: 8px 0px 0px 8px;
     -moz-border-radius: 8px 0px 0px 8px;
     -webkit-border-radius: 8px 0px 0px 8px;
-}
+}*/
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child
 {
@@ -911,6 +912,30 @@ section.std_content .voucher .c_left .grid_voucher_order table td:first-child im
     margin-right: 5px;
 }
 
+.wrapper_3
+{
+    width: 975px;
+}
+
+section.std_content .list_voucher .box_voucher
+{
+    width: 33%
+    margin:0;
+}
+
+section.std_content .list_voucher .box_voucher .image
+{
+    padding: 0 10px;
+}
+
+section.std_content .list_voucher .box_voucher h4, 
+section.std_content .list_voucher .box_voucher p, 
+section.std_content .list_voucher .box_voucher a, 
+section.std_content .list_voucher .box_voucher .field-content
+{
+    padding: 0 10px;
+}
+
 /* payment */
 section.transaction table.cart thead {
     background: #0d7eb8;
@@ -924,7 +949,7 @@ section.transaction input[type=text]
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add, .commerce_coupon #edit-commerce-coupon-coupon-add--4, .commerce_coupon input[name='coupon_add']
 {
     background: #0d7eb8;
-    height: 47px;
+    height: 50px;
 }
 
 section.transaction #edit-continue

@@ -394,32 +394,38 @@ section.h_middle_top .home_tab .form #edit-existing-phone
 {
     margin-top: 0 !important;    
     background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
     color: #000;
 }
 
 section.h_middle_top .home_tab .form input[type=text].meter-number
 {  
     background: url(../images/material/ico_pln_black.png) no-repeat center left !important;
+    background-position: center left 0 !important; 
 }
 
 section.h_middle_top .home_tab .form input[type=text].phone-number
 {   
     background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
 }
 
 section.h_middle_top .home_tab .form input[type=text].customer-number
 {   
     background: url(../images/material/ico_kres_black.png) no-repeat center left 10px !important;
+    background-position: center left 10px !important;
 }
 
 section.h_middle_top .home_tab .form#biznet input[type=text].customer-number
 {   
     background: url(../images/material/ico_biznet_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
 }
 
 section.h_middle_top .home_tab .form#multifinance input[type=text].customer-number
 {   
     background: url(../images/material/ico_finance_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
 }
 
 /* header */

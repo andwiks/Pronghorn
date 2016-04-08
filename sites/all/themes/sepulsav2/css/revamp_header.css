@@ -658,6 +658,21 @@ header .right_link .box .box_drop
     color: #0d7eb8 !important;
 }
 
+.not-front header .right_link .box a.header-login
+{
+    background: url(../images/material/ico_login_blue.png) no-repeat center left;
+}
+
+.not-front header .right_link .box a.header-akun
+{
+    background: url(../images/material/ico_akun_blue.png) no-repeat center left;
+}
+
+.not-front header .right_link .box a.header-kredit
+{
+    background: url(../images/material/ico_deposit_blue.png) no-repeat center left;
+}
+
 .mobile-download
 {
     display: none;
@@ -763,6 +778,13 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot th
 {
     background: #0d7eb8;
     height: 40px;
+    line-height: 40px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table tr td
+{
+    height: 40px;
+    line-height: 40px;  
 }
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt
@@ -878,6 +900,15 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(1)
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child
 {
     background: none;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table td:first-child img
+{
+    position: relative;
+    left: 0;
+    top: 8px;
+    display: inline-block;
+    margin-right: 5px;
 }
 
 /* payment */

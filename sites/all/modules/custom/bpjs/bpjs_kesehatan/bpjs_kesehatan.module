@@ -230,6 +230,7 @@ function bpjs_kesehatan_form_submit($form, &$form_state) {
     if (empty($line_item->line_item_id)) {
       // Create the new product line item of the same type.
       $new_line_item = commerce_product_line_item_new($product, 1, 0, $line_item->data, $line_item->type);
+      $new_line_item->field_phone_number = $line_item->field_phone_number;
       $new_line_item->field_customer_number = $line_item->field_customer_number;
       $new_line_item->payment_period = $line_item->payment_period;
 

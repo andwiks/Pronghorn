@@ -50,7 +50,7 @@
 	<div class="mobile-content">
 		<?php if (isset($content['apps_desc'])) print $content['apps_desc']  ?>
 	  		<br>
-	  		<a href="<?php if (isset($content['apps_path'])) print $content['apps_path'] ?>" class="download">Download Gratis</a> 
+	  		<a href="<?php if (isset($content['apps_path'])) print $content['apps_path'] ?>" class="download" id="download-app-mobile">Download Gratis</a> 
 	  		<button id="close_banner" class="myButton">x</button>
 	</div>
  </div>

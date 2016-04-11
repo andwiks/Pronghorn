@@ -1,0 +1,38 @@
+<?php
+/**
+ * @file
+ * device_services.install
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function device_services_install() {
+  variable_set('device_services_default_claims', array(
+    'iss' => gethostname(),
+    'sub' => '',
+    'aud' => '',
+  ));
+  variable_set('device_services_enable_claims', array(
+    'aud' => 0,
+    'exp' => 'exp',
+    'iat' => 'iat',
+    'iss' => 'iss',
+    'nbf' => 'nbf',
+    'sub' => 0,
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function device_services_uninstall() {
+  variable_del('device_services_default_claims');
+  variable_del('device_services_enable_claims');
+}

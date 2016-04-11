@@ -83,6 +83,15 @@ function userpoints_sepulsa_apply(EntityDrupalWrapper $order_wrapper, $user = NU
   $point_amount = userpoints_get_current_points($user->uid, 'all');
   $order_total = $order_wrapper->commerce_order_total->amount->value();
   $amount = $order_total > $point_amount ? $point_amount : $order_total;
+  
+  /*
+   * apps_services_v2_payment_list_credit -- apps_services_v2_payment_list.module
+   * over ride and exclude kredit if the user set the use credit as false
+   */
+  if (module_exists('apps_services_v2_payment_list') && variable_get('apps_services_v2_payment_list_credit_option', 1) && isset($_SESSION["use_credit"]) && $_SESSION["use_credit"] == false) {
+    //exclude credit by over ride the recognized credit value into 0
+    $amount = 0;
+  }
 
   if ($amount) {
     $line_item = commerce_userpoints_discount_line_item_factory_new($order_wrapper->getIdentifier());

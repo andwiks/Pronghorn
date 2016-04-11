@@ -1,0 +1,9 @@
+; $Id$
+name = Apps Services v2 Services
+description = List of v1 Services with v2 Structures
+package = Apps Services v2
+version = 0.1
+core = 7.x
+dependencies[] = services
+dependencies[] = services_documentation
+dependencies[] = sepulsa

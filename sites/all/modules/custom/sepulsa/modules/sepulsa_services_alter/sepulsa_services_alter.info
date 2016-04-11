@@ -1,0 +1,7 @@
+name = "Sepulsa Services Alter"
+description = "Modify current sepulsa services."
+core = "7.x"
+package = "Sepulsa"
+configure = "admin/config/services/sepulsa"
+dependencies[] = services
+dependencies[] = rest_server

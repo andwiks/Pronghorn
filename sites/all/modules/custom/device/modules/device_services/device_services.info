@@ -1,0 +1,13 @@
+name = "Device Services"
+description = "Integrates Device with Services module."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = device
+dependencies[] = device_mail_verification
+dependencies[] = services
+dependencies[] = services_documentation
+dependencies[] = jwt_resources
+dependencies[] = jwt_server
+dependencies[] = jwt_auth
+dependencies[] = zenziva

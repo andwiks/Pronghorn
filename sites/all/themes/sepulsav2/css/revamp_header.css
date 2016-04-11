@@ -1234,8 +1234,8 @@ section.gratis_voucher .desc
 }
 
 section.promo_banner .slide a.link-campaign {
-    display: block;
+/*    display: block;
     z-index: 1;
     position: absolute;
-    right: 0;
+    right: 0;*/
 }

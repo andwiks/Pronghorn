@@ -184,7 +184,10 @@ section.banner .caption a {
 
 section.banner .caption h1
 {
-    font-size: 24px;
+    /*font-size: 24px;*/
+    font-family: "robotolight";
+    font-size: 34px;
+    margin: 0 0 15px 0;
 }
 
 section.banner .caption p

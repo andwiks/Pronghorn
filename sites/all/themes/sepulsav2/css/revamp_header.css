@@ -129,13 +129,13 @@ section.h_middle_top {
     margin-bottom: -425px;
     width: 50%;
 */
-    top: -400px;
+    top: -460px;
     left: 0;
-    height: 400px;
+    height: 460px;
     background: none;
     border: none;
     margin: 0;
-    margin-bottom: -400px;
+    margin-bottom: -460px;
     width: 50%;
 }
 
@@ -560,7 +560,7 @@ section.h_middle_top input.form-submit.enabled
     background: url(../images/content/main_bg.jpg) repeat center bottom;
     /*before 7 april> height: 625px;*/
     background-size:100%; 
-    height: 525px;
+    height: 580px;
 }
 
 header .right_link .box .box_drop .arr {

@@ -1090,3 +1090,13 @@ section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a {
             margin-top: 15px;
         }*/
     }
+
+.content_tab .alert-block
+{
+    font-size: 12px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    margin-bottom: 0;
+}

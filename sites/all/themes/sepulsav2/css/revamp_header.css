@@ -1103,3 +1103,64 @@ section.promo_banner .bx-wrapper .bx-pager.bx-default-pager a {
     box-sizing: border-box;
     margin-bottom: 0;
 }
+
+/* USP */
+.usp-content {
+    display:none;
+}
+.box:hover .usp-content {
+    display:block;
+}
+
+section.h_keuntungan .box {
+    float: left;
+    width: 190px;
+    margin: 0 96px 0 0;
+    height: 190px;
+    position: relative;
+    color: #107eb8;
+    cursor: pointer;
+}
+
+section.h_keuntungan .box .image {
+    height: 115px;
+    line-height: 115px;
+    margin: 25px auto 0px auto;
+}
+
+section.h_keuntungan .usp-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    width: 190px;
+    height: 190px;
+    margin: 0;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #107eb8;
+    color: #fff;
+}
+
+section.h_keuntungan .usp-content h5, section.h_keuntungan .usp-content p {
+    color: #fff !important;
+}
+
+section.h_keuntungan h2, section.easy_step h2
+{
+    padding: 0;
+    margin: 15px 0 10px 0;
+}
+
+section.h_keuntungan h4, section.easy_step h4 {
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+
+section.h_keuntungan
+{
+    background: none;
+    padding: 0;
+    border-top: 1px solid #ccc;
+}

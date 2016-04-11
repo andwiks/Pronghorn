@@ -3,7 +3,7 @@
         <div class="slider">
         <?php foreach ($rows as $row_count => $row): ?>            
             <div class="slide">
-                <a href="<?php print $row['field_link_target']  ?>">
+                <a href="<?php print $row['field_link_target']  ?>" class="link-campaign">
                 <?php print $row['field_image_banner']; ?>
                 </a>
                 <div class="slide_content">

@@ -595,6 +595,8 @@ section.promo_banner .slide img
     padding: 0;
     left: 0;
     top: 0 !important;
+    margin: 0 0 0 15px;
+    width: 45%;
 }
 
 .custom-content h2
@@ -652,6 +654,11 @@ header .nav_mobile
 {
     top:55px;
     display: none;
+}
+
+.bx-wrapper img
+{
+    max-width: 50%
 }
 
 /* USP */

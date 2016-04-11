@@ -584,6 +584,7 @@ section.promo_banner .slide img
     font-size: 22px;
     margin: 10px 0;
     display: block;
+    font-size: 16px;
 }
 
 .custom-content
@@ -601,8 +602,15 @@ section.promo_banner .slide img
 
 .custom-content h2
 {
-    font-size: 32px;
-    margin: 15px 0 30px 0;
+    /*font-size: 32px;
+    margin: 15px 0 30px 0;*/
+    font-size: 28px;
+    margin: 5px 0 15px 0;
+}
+
+.custom-content a.bt_slider_update
+{
+    font-size: 14px;
 }
 
 .custom-content .highlight
@@ -612,7 +620,8 @@ section.promo_banner .slide img
 
 .custom-content .img-slider
 {
-    margin-bottom:25px;
+    /*margin-bottom:25px;*/
+    margin: 0;
 }
 
 .slide_content {
@@ -627,7 +636,7 @@ section.promo_banner .slide img
     bottom: 20px;
     padding: 0;
     margin: 0;
-    bottom: -20px;
+    bottom: -30px;
 }
 
 .not-front header

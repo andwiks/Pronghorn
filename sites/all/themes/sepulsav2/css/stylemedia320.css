@@ -1254,6 +1254,7 @@ section.promo_banner .img-slider img
     padding: 0;
     left: 0;
     top: 0 !important;
+    width: 200px;
 }
 
 .custom-content h2

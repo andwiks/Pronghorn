@@ -23,6 +23,7 @@ $(document).ready(function () {
         auto: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
         mode: 'fade', 
         pager: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        controls : ($(".promo_banner .slider > .slide").length > 1) ? true: false
     });// carousel voucher vendor
 
 

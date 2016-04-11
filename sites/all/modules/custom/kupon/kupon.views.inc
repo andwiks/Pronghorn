@@ -269,8 +269,8 @@ function kupon_views_query_alter(&$view, &$query) {
     } else {
       $wrapper = entity_metadata_wrapper('commerce_order', $order);
       $line_items = $wrapper->commerce_line_items;
-      $total = commerce_line_items_total($line_items,$type);
-      
+      $total = commerce_line_items_total($line_items);
+
       //change amount to use base_price if exist
       $amount = 0;
       if(isset($order->commerce_order_total["und"][0]["data"]["components"]) && !empty($order->commerce_order_total["und"][0]["data"]["components"]) && count($order->commerce_order_total["und"][0]["data"]["components"]) > 0){
@@ -280,7 +280,7 @@ function kupon_views_query_alter(&$view, &$query) {
             $amount += $component["price"]["amount"];
           }
         }
-        
+
         //replace the total amount with the base price amount
         if($amount > 0){
           $total['amount'] = $amount;

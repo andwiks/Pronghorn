@@ -1356,3 +1356,8 @@ section.h_keuntungan .usp-content {
     height: 170px;
     padding: 5px;
 }
+
+#mobile_banner {
+    display: block;
+    top: 0;
+}

@@ -1039,6 +1039,11 @@ section.transaction table.cart
     border: 1px solid #0d7eb8;
 }
 
+section.transaction table.cart th:last-child, section.transaction table.cart td:last-child
+{
+    border-right: none;
+}
+
 /* promotion area */
 .custom-content {
     position: absolute;

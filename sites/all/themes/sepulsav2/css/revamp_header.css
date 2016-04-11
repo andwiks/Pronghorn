@@ -1170,3 +1170,13 @@ section.h_keuntungan
 section {
     overflow: hidden;
 }
+
+section.gratis_voucher
+{
+    margin: 0 auto;
+}
+
+section.gratis_voucher .desc
+{
+    margin: 10px 0 0 0;
+}

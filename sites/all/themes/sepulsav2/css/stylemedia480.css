@@ -1023,3 +1023,56 @@ header .nav_mobile
 {
     top:55px;
 }
+
+/* USP */
+section.h_keuntungan .usp-content h5 {
+    display: none;
+}
+
+section.h_keuntungan .box p {
+    color: #797979 !important;
+}
+
+.usp-content
+{
+    display: block;
+}
+
+section.h_keuntungan .usp-content
+{
+    background: none;
+    width: auto;
+    padding: 0;
+    height: auto;
+    margin: auto;
+    position: relative;
+    display: block;
+}
+
+section.h_keuntungan .box .image
+{
+    height: 80px;
+    width: 80px;
+    line-height: 80px;
+    margin: 0;
+    transform: scale(0.8);
+    float: left;
+}
+
+section.h_keuntungan .box h5
+{
+    text-align: left;
+}
+
+section.h_keuntungan .box {
+    width: auto;
+    height: auto;
+    float: none;
+    padding: 10px 0 15px 0;
+    margin: 0 auto 10px auto !important;
+    cursor: auto;
+}
+
+section.h_keuntungan .wrapper_2 {
+    width: 440px;
+}

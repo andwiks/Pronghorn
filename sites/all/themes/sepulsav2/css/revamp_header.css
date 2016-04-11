@@ -1163,4 +1163,6 @@ section.h_keuntungan
     background: none;
     padding: 0;
     border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px; 
 }

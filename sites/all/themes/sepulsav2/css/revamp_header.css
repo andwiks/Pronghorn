@@ -184,12 +184,12 @@ section.banner .caption a {
     background: none;
 }
 
-section.banner .caption a#download-now {
+section.banner .caption a.download-now {
     border-radius: 5px;
     height: 50px;
 }
 
-section.banner .caption a#download-now:hover {
+section.banner .caption a.download-now:hover {
     background: #ccc;
 }
 

@@ -1113,6 +1113,11 @@ section.transaction table.cart th:last-child, section.transaction table.cart td:
     text-align: right;
 }
 
+.promo_banner .bx-wrapper
+{
+    margin-bottom: 35px;
+}
+
 .bx-wrapper .bx-pager.bx-default-pager a {
     width: 15px;
     height: 15px;

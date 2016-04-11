@@ -2,6 +2,7 @@
     <div class="wrapper">
         <div class="slider">
         <?php foreach ($rows as $row_count => $row): ?>
+            <a href="<?php print $row['field_link_target']  ?>">
             <div class="slide">
                 <?php print $row['field_image_banner']; ?>
                 <div class="slide_content">
@@ -9,6 +10,7 @@
                 </div>
                 
             </div>
+            </a>
         <?php endforeach; ?>
         </div>
     </div>

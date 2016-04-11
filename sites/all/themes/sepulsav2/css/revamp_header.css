@@ -173,6 +173,8 @@ section.banner .caption {
     top: 48%;
     right: 7%;
     text-align: right;
+    top: auto;
+    bottom: 177px;
 }
 
 section.banner .caption a {

@@ -1227,14 +1227,16 @@ section.gratis_voucher .desc
     margin: 10px 0 0 0;
 }
 
-/*.bx-wrapper img
+.bx-wrapper img
 {
     max-width: 100%;
 }
 
+
 section.promo_banner .slide a.link-campaign {
     display: block;
     z-index: 1;
-    position: absolute;
+    /*position: absolute;*/
+    position: relative;
     right: 0;
-}*/
+}

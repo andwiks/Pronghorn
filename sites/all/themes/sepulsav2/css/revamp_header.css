@@ -589,6 +589,10 @@ header .right_link .box .box_drop .arr {
     border-bottom: 5px solid #fff !important;
 }
 
+.not-front header .right_link .box .box_drop .arr {
+    border-bottom: 5px solid #ccc !important;
+}
+
 header .right_link .box .box_drop
 {
     border: 1px solid #ccc !important;    
@@ -1006,7 +1010,7 @@ section.transaction input[type=text]
 section.transaction #edit-continue
 {
     background: #0d7eb8;
-    
+
     border-radius: 5px;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;

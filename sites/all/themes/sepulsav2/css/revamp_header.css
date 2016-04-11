@@ -1049,11 +1049,22 @@ section.transaction table.cart th:last-child, section.transaction table.cart td:
     position: absolute;
     text-align: center;
     left: 20px;
+    left: 5%;
     top: 15px !important;
     width: 450px;
     height: auto;
     overflow: hidden;
     color: #1a1a1a;
+}
+
+.custom-content h2
+{
+    font-size: 40px;
+}
+
+.custom-content .img-slider {
+    height: 80px;
+    line-height: 80px;
 }
 
 .custom-content span.headline
@@ -1079,6 +1090,12 @@ section.transaction table.cart th:last-child, section.transaction table.cart td:
     display: inline-block;
     text-align: center;
     margin: 10px auto 5px auto
+}
+
+.custom-content a.bt_slider_update:hover
+{
+    color: #b0aeae !important;
+    background: #004c73 !important; 
 }
 
 .custom-content .img-slider img
@@ -1245,6 +1262,7 @@ section.gratis_voucher .desc
 .bx-wrapper img
 {
     max-width: 100%;
+    max-width: 850px;
 }
 
 

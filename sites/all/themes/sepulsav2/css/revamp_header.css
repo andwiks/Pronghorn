@@ -1166,3 +1166,7 @@ section.h_keuntungan
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px; 
 }
+
+section {
+    overflow: hidden;
+}

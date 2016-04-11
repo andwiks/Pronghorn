@@ -1250,6 +1250,11 @@ section.h_keuntungan
     padding-bottom: 10px; 
 }
 
+section.easy_step
+{
+    height: 580px;
+}
+
 section {
     overflow: hidden;
 }
@@ -1282,4 +1287,9 @@ section.promo_banner .slide a.link-campaign {
 section.promo_banner .bx-wrapper .bx-controls-direction a
 {
     display: block;
+}
+
+footer
+{
+    margin-top: 15px;
 }

@@ -515,6 +515,14 @@ section.h_middle_top input[type=submit], section.h_middle_top input[type=button]
     -o-border-radius: 3px;
 }
 
+
+section.h_middle_top input[type=submit]:hover, 
+section.h_middle_top input[type=button]:hover
+{
+    background: #004c73 !important;
+    color: #b0aeae !important;
+}
+
 section.h_middle_top .btn.disabled, 
 section.h_middle_top  .btn[disabled], 
 section.h_middle_top  fieldset[disabled], 
@@ -826,6 +834,12 @@ section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt
     line-height: 40px;
 }
 
+section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt:hover
+{
+    background: #004c73 !important;
+    color: #b0aeae !important;
+}
+
 section.std_content .voucher .c_left .grid_voucher_order table td:first-child {
     padding-left: 30px;
     padding-left: 10px;
@@ -906,6 +920,12 @@ section.std_content .box_voucher h4 {
     font-size: 14px;
 }
 
+.commerce-add-to-cart input[type=submit]:hover, 
+input[type=button]:hover {
+    color: #b0aeae !important;
+    background: #004c73 !important; 
+}
+
 /*section.std_content .voucher .c_left .grid_voucher_order tfoot th:nth-child(2)
 {
     border-radius: 0px 8px 8px 0px;
@@ -974,9 +994,24 @@ section.transaction input[type=text]
     height: 50px;
 }
 
+.commerce_coupon #edit-commerce-coupon-coupon-add--2:hover, 
+.commerce_coupon #edit-commerce-coupon-coupon-add:hover, 
+.commerce_coupon #edit-commerce-coupon-coupon-add--4:hover, 
+.commerce_coupon input[name='coupon_add']:hover
+{
+    color: #b0aeae !important;
+    background: #004c73 !important; 
+}
+
 section.transaction #edit-continue
 {
     background: #0d7eb8;
+}
+
+section.transaction #edit-continue:hover
+{
+    color: #b0aeae !important;
+    background: #004c73 !important; 
 }
 
 section.transaction table.cart .sub_foot, section.transaction table.cart tfoot

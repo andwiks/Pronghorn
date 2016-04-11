@@ -1006,6 +1006,12 @@ section.transaction input[type=text]
 section.transaction #edit-continue
 {
     background: #0d7eb8;
+    
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
 }
 
 section.transaction #edit-continue:hover

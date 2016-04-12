@@ -802,6 +802,7 @@ section.std_content .voucher .c_left .grid_voucher_order table
 {
     width: 90%;
     margin-top: 15px;
+    margin-bottom: 10px;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order table thead {
@@ -965,7 +966,7 @@ section.std_content .voucher .c_left .grid_voucher_order table td:first-child im
 
 section.std_content .list_voucher .box_voucher
 {
-    width: 33%
+    width: 33%;
     margin:0;
 }
 

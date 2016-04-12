@@ -1288,9 +1288,10 @@ section.promo_banner .img-slider img
 
 .bx-wrapper .bx-pager
 {
-    bottom: 20px;
+    /*bottom: 20px;*/
     padding: 0;
     margin: 0;
+    bottom: 0;
 }
 
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child

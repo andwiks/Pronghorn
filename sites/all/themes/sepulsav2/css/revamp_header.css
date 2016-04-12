@@ -1316,3 +1316,8 @@ body.home footer
 {
     margin-top: 15px;
 }
+
+.wrap_popup .box_popup .close
+{
+    z-index: 999;
+}

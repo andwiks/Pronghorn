@@ -203,7 +203,7 @@ function device_mail_verification_merge_user($current_mail) {
       $device_user_wrapper->mail->set($current_mail['mail']);
       $device_user_wrapper->save();
 
-      watchdog('Device Mail Varification',
+      watchdog('Device Mail Verification',
             'Merge User New User-> device_account : !device_account_id',
             array('!device_account_id' => $device_uid));
     }
@@ -307,7 +307,7 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
     ->condition('mail', $mail, '=')
     ->execute();
 
-  watchdog('Device Mail Varification',
+  watchdog('Device Mail Verification',
           'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id , changed UID commerce_order : !changed_uid_order',
           array(
             '!merge_to' => $merge_to,

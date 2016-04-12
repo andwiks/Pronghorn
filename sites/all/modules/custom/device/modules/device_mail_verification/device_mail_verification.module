@@ -20,7 +20,7 @@ function device_mail_verification_menu() {
     ),
   );
   $items['admin/config/devices/device_mail_settings'] = array(
-    'title' => 'Mail Varification',
+    'title' => 'Mail Verification',
     'description' => 'Configure default behavior of device mail.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('device_mail_verification_settings'),

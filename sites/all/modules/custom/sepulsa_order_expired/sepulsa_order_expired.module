@@ -1,0 +1,20 @@
+<?php
+/**
+ * @file
+ * sepulsa_order_expired.module
+ *
+ * @author azul@sepulsa.com
+ */
+
+ /**
+ * Implements hook_commerce_order_status_info().
+ */
+function sepulsa_order_expired_commerce_order_status_info() {
+  $order_statuses['order_expired'] = array(
+    'name' => 'order_expired',
+    'title' => t('Expired'),
+    'state' => 'canceled',
+  );
+
+  return $order_statuses;
+}

@@ -614,6 +614,7 @@ header .right_link .box .box_drop a
 header .right_link .box .box_drop a:hover
 {    
     background: #0d7eb8;
+    color: #fff !important;
 }
 
 header .right_link .box {

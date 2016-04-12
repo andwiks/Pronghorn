@@ -75,3 +75,85 @@ function device_mail_verification_settings($form = array(), $form_state = array(
   );
   return system_settings_form($form);
 }
+
+function device_mail_update_manual($form = array(), $form_state = array()) {
+  $form['update_manual'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Update Manual User Device'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['update_manual']['mail_user'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email User : '),
+    '#default_value' => '',
+    '#description' => t('The user will be merged.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Proses'),
+    '#submit' => array('device_mail_update_manual_submit'),
+  );
+  return $form;
+}
+
+function device_mail_update_manual_submit($form, &$form_state) {
+  if (valid_email_address($form_state['values']['mail_user'])) {
+    $user = db_select('users', 'u')
+            ->fields('u')
+            ->condition('mail', $form_state['values']['mail_user'],'=')
+            ->condition('status', 1, '=')
+            ->execute()
+            ->fetchAssoc();
+
+    if (isset($user) && !empty($user)) {
+      $device_account = db_select('device', 'd')
+            ->fields('d')
+            ->condition('uid', $user['uid'], '=')
+            ->condition('status', 1, '=')
+            ->execute()
+            ->fetchAssoc();
+      if (isset($device_account) && !empty($device_account)) {
+        $user = db_select('commerce_order', 'co')
+            ->fields('co')
+            ->condition('uid', $user['uid'], '=')
+            ->execute();
+        foreach ($user as $key) {
+          db_update('commerce_order_revision')
+                ->fields(array('order_id' => $key->order_id))
+                ->condition('revision_uid', $key->uid, '=')
+                ->execute();
+          db_update('commerce_payment_transaction')
+                ->fields(array('order_id' => $key->order_id))
+                ->condition('uid', $key->uid, '=')
+                ->execute();
+          $transaction_revision = db_select('commerce_payment_transaction', 't')
+            ->fields('t')
+            ->condition('order_id', $key->order_id, '=')
+            ->execute();
+          foreach ($transaction_revision as $trans) {
+            db_update('commerce_payment_transaction_revision')
+                ->fields(array('transaction_id' => $trans->transa))
+                ->condition('revision_uid', $key->uid, '=')
+                ->execute();
+          }
+        }
+        drupal_set_message(t("Device with email : !mail has updated.",
+          array("!mail" => $form_state['values']['mail_user'])), 'status');
+      }
+      else {
+        drupal_set_message(t("Device with email : !mail , not found !.",
+          array("!mail" => $form_state['values']['mail_user'])), 'error');
+      }
+    }
+    else {
+      drupal_set_message(t("Email : !mail , not found !.",
+      array("!mail" => $form_state['values']['mail_user'])), 'error');
+    }
+  }
+  else {
+    drupal_set_message(t("Please enter valid Email."), 'error');
+  }
+
+  drupal_goto('admin/devices/update_manual');
+}

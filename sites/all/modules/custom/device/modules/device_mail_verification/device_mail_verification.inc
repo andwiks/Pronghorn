@@ -263,10 +263,7 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
       }
 
       // Update UID in commerce_order.
-      db_update('commerce_order')
-            ->fields(array('uid' => $device_uid))
-            ->condition('uid', $web_uid, '=')
-            ->execute();
+      device_mail_transfer_order($web_uid, $device_uid);
     }
   }
   else {
@@ -291,10 +288,7 @@ function device_mail_verication_merge($strategi = '', $mail = '', $device_did = 
       }
 
       // Update UID in commerce_order.
-      db_update('commerce_order')
-            ->fields(array('uid' => $web_uid))
-            ->condition('uid', $device_uid, '=')
-            ->execute();
+      device_mail_transfer_order($device_uid, $web_uid);
 
       // Send Email to reset Password.
       $account = user_load($web_uid);
@@ -423,4 +417,31 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
 
   drupal_set_message(t("Your device has been merged."), 'status');
   drupal_goto(variable_get('device_mail_redirect', ''));
+}
+
+/**
+ * Function device_mail_transfer_order().
+ *
+ * @param string $current_uid
+ *   Sting current_uid.
+ * @param string $update_uid
+ *   String update_uid.
+ */
+function device_mail_transfer_order($current_uid = '' , $update_uid = '') {
+  db_update('commerce_order')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_order_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_payment_transaction')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_payment_transaction_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->execute();
 }

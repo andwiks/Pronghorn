@@ -85,7 +85,7 @@ function device_schema() {
       ),
       'agent' => array(
         'type' => 'varchar',
-        'length' => 30,
+        'length' => 254,
         'not null' => FALSE,
         'default' => '',
         'description' => 'Agent Device.',

@@ -997,6 +997,23 @@ section.transaction input[type=text]
 {
     background: #0d7eb8;
     height: 50px;
+    margin-left: 5px;
+    width: 173px;
+
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-code, .commerce_coupon #edit-commerce-coupon-coupon-code--2, .commerce_coupon #edit-commerce-coupon-coupon-code--4, .commerce_coupon input[name='commerce_coupon[coupon_code]']
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
 }
 
 .commerce_coupon #edit-commerce-coupon-coupon-add--2:hover, 

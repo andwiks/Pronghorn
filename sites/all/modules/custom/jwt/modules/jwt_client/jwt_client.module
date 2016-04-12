@@ -158,8 +158,20 @@ function jwt_client_jwt_auth_verified($claims) {
       // @todo: check if previously user has uid has previous session.
       // Get jwt audience.
       $aud = $claims['aud']->getValue();
-      // Get user account based on aud.
-      $account = user_load_by_mail($aud);
+      // Get active user account based on aud (mail).
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'user')
+        ->propertyCondition('mail', $aud)
+        ->propertyCondition('status', 1)
+        ->propertyOrderBy('uid', DESC);
+      $result = $query->execute();
+      // Load the user account.
+      if (!empty($result) && isset($result['user']) && !empty($result['user'])) {
+        $account = user_load(key($result['user']));
+      }
+      else {
+        $account = user_load_by_mail($aud);
+      }
       // Check if can get user id.
       if ($account->uid == 0) {
         // Create user dummy: set up the user fields.

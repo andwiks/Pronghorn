@@ -969,6 +969,7 @@ section.std_content .list_voucher .box_voucher
 {
     width: 33%;
     margin:0;
+    margin-bottom: 35px;
 }
 
 section.std_content .list_voucher .box_voucher .image

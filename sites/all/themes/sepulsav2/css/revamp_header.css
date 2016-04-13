@@ -443,7 +443,8 @@ section.h_middle_top .home_tab .form#multifinance input[type=text].customer-numb
     background: url(../images/material/ico_finance_black.png) no-repeat center left !important;
     background-position: center left 0 !important;
 }
-section.h_middle_top .home_tab .form#multifinance input[type=text]#edit-field-phone-number
+
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number
 {   
     background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
     background-position: center left 0 !important;

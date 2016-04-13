@@ -1,0 +1,95 @@
+<?php
+/**
+ * @file
+ * zenziva.module
+ *
+ * @todo: save balance using cron.
+ * @todo: check balance before send api.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function zenziva_menu() {
+  $items['admin/config/services/zenziva'] = array(
+    'title' => 'Zenziva',
+    'description' => 'Configure zenziva settings.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('zenziva_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'zenziva.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function zenziva_api().
+ *
+ * @param string $phone
+ *   Phone number.
+ * @param string $message
+ *   Phone message.
+ *
+ * return mixed
+ *   Result from Zenziva or FALSE if failed.
+ */
+function zenziva_api($phone, $message) {
+  // Get zenziva settings.
+  $settings = variable_get('zenziva_settings', array(
+    'target' => 'https://reguler.zenziva.net/apps/smsapi.php',
+    'userkey' => '',
+    'passkey' => '',
+    'type' => 'dc',
+    'balance' => 'https://reguler.zenziva.net/apps/smsapibalance.php',
+    'ssl_verify' => FALSE,
+  ));
+  // Define query url.
+  $query_url = array(
+    'userkey' => $settings['userkey'],
+    'passkey' => $settings['passkey'],
+    'nohp' => $phone,
+    'pesan' => $message,
+  );
+  if ($settings['type'] != 'dc') {
+    $query_url['tipe'] = $settings['type'];
+  }
+  // Define url to called: automatically encode the url.
+  $url = url($settings['target'], array(
+    'query' => $query_url,
+    'external' => TRUE,
+  ));
+  $context = array();
+  if ($settings['ssl_verify'] === TRUE) {
+    $context = array(
+      'context' => stream_context_create(array(
+        'ssl' => array(
+          'SNI_enabled' => FALSE,
+          'verify_peer' => FALSE,
+          'verify_peer_name' => FALSE,
+        ),
+      )),
+    );
+  }
+  // Request it.
+  $result = drupal_http_request($url, $context);
+  // Check the result.
+  if (isset($result->data)) {
+    // Return data is XML: load it using simplexml.
+    $data = simplexml_load_string($result->data);
+    // Valid xml must have message.
+    if (isset($data->message)) {
+      return (array) $data->message;
+    }
+  }
+  // Log the result.
+  watchdog('zenziva', 'Target API Request Failed Result: <pre>!result</pre>', array(
+    '!result' => print_r($result, TRUE),
+  ), WATCHDOG_ERROR);
+  // Return FALSE.
+  return FALSE;
+}

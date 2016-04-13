@@ -271,6 +271,22 @@ function kupon_views_query_alter(&$view, &$query) {
       $line_items = $wrapper->commerce_line_items;
       $total = commerce_line_items_total($line_items);
 
+      //change amount to use base_price if exist
+      $amount = 0;
+      if(isset($order->commerce_order_total["und"][0]["data"]["components"]) && !empty($order->commerce_order_total["und"][0]["data"]["components"]) && count($order->commerce_order_total["und"][0]["data"]["components"]) > 0){
+        //collect all base price amount
+        foreach ($order->commerce_order_total["und"][0]["data"]["components"] as $component){
+          if($component["name"] == "base_price"){
+            $amount += $component["price"]["amount"];
+          }
+        }
+
+        //replace the total amount with the base price amount
+        if($amount > 0){
+          $total['amount'] = $amount;
+        }
+      }
+
       //if more then 100k, default it to 100k
       //if ($total['amount'] > 100000) $total['amount'] = 100000;
 

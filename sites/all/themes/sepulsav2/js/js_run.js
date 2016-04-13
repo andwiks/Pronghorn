@@ -17,9 +17,13 @@ $(document).ready(function () {
         marginSlide: 7
     });// carousel voucher 
 
+    $(".promo_banner .slider > .slide").length
+
     $(".promo_banner .slider").bxSlider({
-        auto: true,
-        mode: 'fade'
+        auto: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        mode: 'fade', 
+        pager: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        controls : ($(".promo_banner .slider > .slide").length > 1) ? true: false
     });// carousel voucher vendor
 
 

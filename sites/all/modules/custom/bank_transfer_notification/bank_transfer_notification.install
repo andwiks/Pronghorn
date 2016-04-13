@@ -1,0 +1,33 @@
+<?php
+/**
+ * @file
+ * bank_transfer_notification.install
+ *
+ * Create Table for Report
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function bank_transfer_notification_schema() {
+  $schema['bank_transfer_notification'] = array(
+    'description' => 'Storing Order ID and notification queue for bank transfer transaction',
+    'fields' => array(
+      'id' => array(
+        'description' => 'id',
+        'type' => 'serial',
+      ),
+      'order_id' => array(
+        'description' => 'Order ID',
+        'type' => 'varchar',
+        'length' => 255,
+      ),
+      'status' => array(
+        'description' => 'Queue Status',
+        'type' => 'int',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}

@@ -1,0 +1,91 @@
+<?php
+/**
+ * @file
+ * jwt_client.install
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function jwt_client_schema() {
+  $schema['jwt_client'] = array(
+    'description' => 'Stores jwt client configurations.',
+    'fields' => array(
+      'cid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique client ID.',
+      ),
+      'name' => array(
+        'description' => 'The machine name of the client configuration.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'label' => array(
+        'description' => 'The human-readable label of the client configuration.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'endpoint' => array(
+        'description' => 'Client service endpoint.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'resources' => array(
+        'description' => 'List of client service resource.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'passkey' => array(
+        'description' => 'Passkey for this client configuration.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'active' => array(
+        'description' => 'A boolean indicating whether this configuration is active.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the configuration was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the configuration was last saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'active' => array('active'),
+    ),
+    'primary key' => array('cid'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function jwt_client_uninstall() {
+  // Delete entity jwt_config.
+  field_attach_delete_bundle('jwt_client', 'jwt_client');
+}

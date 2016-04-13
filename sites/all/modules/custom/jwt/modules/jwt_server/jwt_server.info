@@ -1,0 +1,7 @@
+name = "JWT Server"
+description = "Provides common JSON Web Tokens resources for the server side."
+core = 7.x
+package = "Sepulsa"
+php = 5.6
+dependencies[] = jwt
+configure = "admin/config/services/jwt/server"

@@ -319,15 +319,21 @@ function menuMobile() {
         e.preventDefault();
         $(this).parent().children(".box_drop").slideToggle(300);
     });
+
+
+    $(".mobile-download .close").click(function (e) {
+        e.preventDefault();
+        $(".mobile-download").css('display', 'none');
+    });
 }
 
 function randomTheme() {
-    if ($("body").hasClass('home')) {
+    /*if ($("body").hasClass('home')) {
         var class_rand = ['', 'blue', 'green', 'red'];
         var random = Math.floor((Math.random() * 4) + 0);
 
         $("body").addClass(class_rand[random]);
-    }
+    }*/
 }
 
 function stepIsiPulsa() {

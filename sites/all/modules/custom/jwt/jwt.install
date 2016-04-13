@@ -1,0 +1,150 @@
+<?php
+/**
+ * @file
+ * jwt.install
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function jwt_schema() {
+  $schema['jwt_config'] = array(
+    'description' => 'Stores jwt configurations.',
+    'fields' => array(
+      'cid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique config ID.',
+      ),
+      'name' => array(
+        'description' => 'The machine name of the configuration.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ),
+      'label' => array(
+        'description' => 'The human-readable label of the configuration.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'description' => array(
+        'description' => 'A brief description of the configuration.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'alg' => array(
+        'description' => 'The algorithm to use.',
+        'type' => 'char',
+        'length' => 5,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      // Method: input or file.
+      'method' => array(
+        'description' => 'Input secret / key method.',
+        'type' => 'varchar',
+        'length' => 5,
+        'not null' => TRUE,
+      ),
+      'public_key' => array(
+        'description' => 'The public key.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'private_key' => array(
+        'description' => 'The private key.',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'enabled' => array(
+        'description' => 'A boolean indicating whether this configuration is enabled.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+      ),
+      'created' => array(
+        'description' => 'The Unix timestamp when the configuration was created.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'changed' => array(
+        'description' => 'The Unix timestamp when the configuration was last saved.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'enabled' => array('enabled'),
+    ),
+    'primary key' => array('cid', 'name'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function jwt_requirements($phase) {
+  $requirements = array();
+  // Ensure translations don't break during installation.
+  $t = get_t();
+
+  // On runtime phase: module still can run without it.
+  if ($phase == 'runtime') {
+    // Check PHP openssl extension.
+    $requirements['jwt'] = array(
+      'title' => $t('JWT'),
+      'value' => $t('PHP OpenSSL Extension'),
+      'severity' => extension_loaded('openssl') ? REQUIREMENT_OK : REQUIREMENT_ERROR,
+    );
+
+    // Check JWT library.
+    drupal_load('module', 'libraries');
+    $libraries = jwt_libraries_info();
+    foreach ($libraries as $name => $info) {
+      $library = libraries_detect($name);
+      $requirements[$name] = array(
+        'title' => $library['name'],
+        'severity' => $library['installed'] ? REQUIREMENT_OK : REQUIREMENT_WARNING,
+        'value' => $library['installed'] ? l($library['version'], $library['vendor url']) : $library['error message'],
+      );
+    }
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_install().
+ */
+function jwt_install() {
+  // Define default variables.
+  variable_set('jwt_alg', array('HS256' => 'HS256'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function jwt_uninstall() {
+  // Delete entity jwt_config.
+  field_attach_delete_bundle('jwt_config', 'jwt_config');
+  // Delete variables.
+  variable_del('jwt_alg');
+  // Remove caches.
+  cache_clear_all('jwt', 'cache', TRUE);
+}

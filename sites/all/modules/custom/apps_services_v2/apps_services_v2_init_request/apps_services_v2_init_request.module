@@ -1,0 +1,118 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_init_request_services_resources() {
+    return array(
+        'init_request_v2' => array(
+            'actions' => array(
+                'validation_and_get_init' => array(
+                    'help' => 'Validate if user session is still active and get init data (maintenance,current version,cache status,etc)',
+                    'callback' => 'apps_services_v2_init_request_validation_and_get_init_services',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_init_request',
+                        'name' => 'apps_services_v2_init_request',
+                    ),
+                    'access callback' => 'services_access_menu',
+                    'documentation callback' => 'apps_services_v2_init_request_doc',
+                    'args' => array(
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+function apps_services_v2_init_request_menu() {
+    $items['admin/config/services/apps_services_v2/apps_services_v2_init_request'] = array(
+        'title'             => 'Service Init Request V2 Configuration',
+        'description'       => 'Configure page for Service Init Request V2',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('apps_services_v2_init_request_setting_form'),
+        'access arguments'  => array('access_apps_services_v2_init_request_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'apps_services_v2_init_request.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function apps_services_v2_init_request_permission() {
+    return array(
+        'access_apps_services_v2_init_request_config' => array(
+            'title'         => t('Accessing Service Init Request V2 Configuration'),
+            'description'   => t('Accessing Service Init Request V2 Configuration.')
+        ),
+    );
+}
+
+/**
+ * Function apps_services_v2_init_request_doc().
+ *
+ * Documentation callback for index actions deposit.
+ */
+function apps_services_v2_init_request_doc() {
+  global $base_url;
+  $response = '
+    {
+      "status": true,
+      "message": "",
+      "data": {
+        "cache_id": "XcF1d",
+        "android_current_version": "",
+        "android_google_play_link": "market://details?id=com.sepulsa.android",
+        "android_non_google_play_link": "https://play.google.com/store/apps/details?id=com.sepulsa.android",
+        "android_force_update": 0,
+        "ios_current_version": "",
+        "ios_link": "https://itunes.apple.com/id/app/sepulsa/id991045758?mt=8",
+        "ios_force_update": 0,
+        "maintenance": 0
+      }
+    }
+  ';
+  $element = array(
+    '#name' => 'Init Request Apps Service',
+    '#description' => 'List all data used by apps on init (maintenance,version,etc).',
+    '#auth' => FALSE,
+    '#path' => 'init_request_v2/validation_and_get_init',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/init_request_v2/validation_and_get_init.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

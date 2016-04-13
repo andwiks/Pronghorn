@@ -1,0 +1,9 @@
+name = "Device"
+description = "Manages the device registration and login system."
+core = "7.x"
+package = "Sepulsa"
+configure = "admin/config/devices/settings"
+dependencies[] = system
+dependencies[] = entity
+dependencies[] = rules
+dependencies[] = user

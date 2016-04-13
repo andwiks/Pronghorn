@@ -1,0 +1,7 @@
+name = "JWT Resources"
+description = "Provides common JSON Web Tokens resources for the services module."
+core = 7.x
+package = "Sepulsa"
+php = 5.6
+dependencies[] = jwt
+dependencies[] = services

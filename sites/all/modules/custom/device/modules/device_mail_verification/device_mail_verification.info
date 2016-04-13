@@ -1,0 +1,6 @@
+name = "Device Mail Verification"
+description = "Integrates Device with User in pronghorn."
+core = "7.x"
+package = "Sepulsa"
+configure = "admin/config/devices/device_mail_settings"
+dependencies[] = device

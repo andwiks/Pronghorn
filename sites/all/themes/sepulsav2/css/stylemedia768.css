@@ -480,13 +480,274 @@ section.banner .bx-viewport
 .topup-action {
    width: 86%;
    margin: 0 auto;
+   width: 100%;
 }
 section.h_middle_top input[type=submit], input[type=button] {
    width: 45%;
    white-space: pre-wrap;
    overflow-wrap: break-word;
    word-wrap: break-word;
+   width: 38%;
 }
 .topup-notes {
    width: 100%;
+   width: 60%;
+}
+
+/*revamp header*/
+
+header .wrapper
+{
+    position: relative;
+}
+
+header .logo
+{
+    left: 0;
+    top: 0;
+    margin: 20px 0 10px 0;
+}
+
+header .logo img
+{
+    margin: 0;
+}
+
+header .nav_mobile
+{
+    right: 0;
+}
+
+.header-img
+{
+    height: 470px;
+}
+
+section.h_middle_top {
+    top: -390px;
+    height: 370px;
+    width: 100%;
+    margin-bottom: -350px;
+    padding: 0;
+}
+
+section.h_middle_top .home_tab
+{
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+section.banner .caption
+{
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 80px;
+    text-align: center;
+    padding: 0;
+    display: none;
+}
+
+section.h_middle_top .home_tab .form input[type=text] {
+    width: 100%;
+}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    width: 25%;
+}
+
+.home header
+{
+    border: none !important;
+}
+
+/* promotion area */
+section.promo_banner .img-slider img {
+    display: block !important;
+    margin: 0 auto;
+    max-width: 120px;
+    height: auto;
+    right: 0;
+    left: 0;
+    position: relative;
+    top: 0;
+}
+
+section.promo_banner .slide img 
+{
+    /*display: none;*/
+}
+
+.custom-content span.headline {
+    font-size: 22px;
+    margin: 10px 0;
+    display: block;
+    font-size: 16px;
+}
+
+.custom-content
+{
+    margin-top:0;
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    padding: 0;
+    left: 0;
+    top: 0 !important;
+    margin: 0 0 0 15px;
+    width: 45%;
+}
+
+.custom-content h2
+{
+    /*font-size: 32px;
+    margin: 15px 0 30px 0;*/
+    font-size: 28px;
+    margin: 5px 0 15px 0;
+}
+
+.custom-content a.bt_slider_update
+{
+    font-size: 14px;
+}
+
+.custom-content .highlight
+{
+    font-size:24px;
+}
+
+.custom-content .img-slider
+{
+    /*margin-bottom:25px;*/
+    margin: 0;
+}
+
+.slide_content {
+    position: absolute;
+    height: 210px;
+    max-height: 210px;
+    top: 0;
+}
+
+.bx-wrapper .bx-pager
+{
+    bottom: 20px;
+    padding: 0;
+    margin: 0;
+    bottom: -30px;
+}
+
+.not-front header
+{
+    height: 60px;
+}
+
+.not-front header .logo
+{
+    margin: 10px 0 0 10px;
+}
+
+.not-front header .logo img
+{
+    margin:0;
+}
+
+header .nav_mobile
+{
+    right: 0px;
+}
+
+
+#mobile_banner
+{
+    top:55px;
+    display: none;
+}
+
+.bx-wrapper img
+{
+    max-width: 60%;
+}
+
+/* USP */
+.usp-content {
+    display:none;
+}
+.box:hover .usp-content {
+    display:block;
+}
+
+section.h_keuntungan .box {
+    float: left;
+    /*width: 190px;
+    margin: 0 96px 0 0;*/
+    height: 190px;
+    position: relative;
+    color: #107eb8;
+    cursor: pointer;
+    width: 170px;
+    margin: 0 20px 0 0 !important;
+}
+
+section.h_keuntungan .box .image {
+    height: 115px;
+    line-height: 115px;
+    margin: 25px auto 0px auto;
+    float: none;
+}
+
+section.h_keuntungan .box h5 {
+    padding:10px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+section.h_keuntungan .usp-content {
+    display: none;
+    position: absolute;
+    top: 0;
+    /*width: 190px;*/
+    height: 190px;
+    margin: 0;
+    padding: 15px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: #107eb8;
+    color: #fff;
+    width: 170px;
+}
+
+section.h_keuntungan .usp-content h5, section.h_keuntungan .usp-content p {
+    color: #fff !important;
+}
+
+section.h_keuntungan h2, section.easy_step h2
+{
+    padding: 0;
+    margin: 15px 0 10px 0;
+}
+
+section.h_keuntungan h4, section.easy_step h4 {
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+
+section.h_keuntungan
+{
+    background: none;
+    padding: 0;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px; 
+}
+
+section.h_keuntungan .usp-content h5 {
+    display: none;
+}
+
+section.h_keuntungan .wrapper_2 {
+    width: 760px;
 }

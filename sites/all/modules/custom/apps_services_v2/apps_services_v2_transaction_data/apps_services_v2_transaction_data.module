@@ -1,0 +1,922 @@
+<?php
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_transaction_data_services_resources() {
+    return array(
+        'transaction_v2' => array(
+            'actions' => array(
+                'favorite' => array(
+                    'help' => 'Add/Remove Favorite Order',
+                    'callback' => 'apps_services_v2_transaction_data_favorite',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_transaction_data',
+                        'name' => 'apps_services_v2_transaction_data',
+                    ),
+                    'documentation callback' => 'apps_services_v2_transaction_data_favorite_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'order_id',
+                        'type' => 'int',
+                        'description' => 'favorite order id',
+                        'source' => array(
+                          'data' => 'order_id',
+                          'param' => 'order_id',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+                'home_transaction_list' => array(
+                    'help' => 'Get Transaction List in Home Page',
+                    'callback' => 'apps_services_v2_transaction_home_list',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_transaction_data',
+                        'name' => 'apps_services_v2_transaction_data',
+                    ),
+                    'documentation callback' => 'apps_services_v2_transaction_home_list_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'size',
+                        'type' => 'int',
+                        'description' => 'number of items shown',
+                        'source' => array(
+                          'data' => 'size',
+                          'param' => 'size',
+                        ),
+                        'default value' => 5,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'favorite_only',
+                        'type' => 'int',
+                        'description' => 'show favorite only order list if set true',
+                        'source' => array(
+                          'data' => 'favorite_only',
+                          'param' => 'favorite_only',
+                        ),
+                        'default value' => 0,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+                'transaction_history_list' => array(
+                    'help' => 'Get Transaction History List in History Page',
+                    'callback' => 'apps_services_v2_transaction_history_list',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_transaction_data',
+                        'name' => 'apps_services_v2_transaction_data',
+                    ),
+                    'documentation callback' => 'apps_services_v2_transaction_history_list_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'page',
+                        'type' => 'int',
+                        'description' => 'number of items shown',
+                        'source' => array(
+                          'data' => 'page',
+                          'param' => 'page',
+                        ),
+                        'default value' => 1,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'size',
+                        'type' => 'int',
+                        'description' => 'number of items shown',
+                        'source' => array(
+                          'data' => 'size',
+                          'param' => 'size',
+                        ),
+                        'default value' => 10,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+/**
+ * Function apps_services_v2_transaction_data_favorite_doc().
+ *
+ * Documentation callback for favorite transaction.
+ */
+function apps_services_v2_transaction_data_favorite_doc() {
+  global $base_url;
+  $response = '
+    {
+      "status": true,
+      "message": "Order difavoritkan",
+      "data": []
+    }
+  ';
+  $element = array(
+    '#name' => 'Transaction Favorite Apps Service',
+    '#description' => 'Add/Remove Favorite transaction.',
+    '#auth' => FALSE,
+    '#path' => 'transaction_v2/favorite',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/transaction_v2/favorite.json<br />'
+    . 'POST data application/json: { "order_id" : "12345", "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+      'user_is_anonymous' => array(
+        '#question' => '406 Not Acceptable : Harap login terlebih dahulu',
+        '#description' => 'User have not log in into the server.',
+        '#response' => '
+        [
+          "Harap login terlebih dahulu"
+        ]',
+      ),
+      'not_user_owned_order' => array(
+        '#question' => '406 Not Acceptable : Order tidak sesuai dengan user aktif',
+        '#description' => 'The order defined is not owned by the active user.',
+        '#response' => '
+        [
+          "Order tidak sesuai dengan user aktif"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_transaction_home_list_doc().
+ *
+ * Documentation callback for transaction home list.
+ */
+function apps_services_v2_transaction_home_list_doc() {
+  global $base_url;
+  $response = '
+    {
+    "status": true,
+    "message": "Order list halaman home pengguna",
+    "data": [
+      {
+        "order_id": "154598",
+        "mail": "ananto.sql@gmail.com",
+        "order_status": "invoiced",
+        "created": "1451718356",
+        "amount": "50000",
+        "product_amount": "50000",
+        "currency_code": "IDR",
+        "response": {
+          "order_number": "201601-655",
+          "revision_id": "650105",
+          "revision_uid": "0",
+          "mail": "ananto.sql@gmail.com",
+          "status": "invoiced",
+          "log": "Order status updated via Rules.",
+          "revision_timestamp": "1451718488",
+          "revision_hostname": "52.74.47.66",
+          "data": {
+            "last_cart_refresh": 1451718353,
+            "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans",
+            "commerce_veritrans": {
+              "response": {
+                "status_code": "200",
+                "status_message": "Success, Credit Card 3D Secure transaction is successful",
+                "transaction_id": "d8c46f06-d550-4488-9c17-ea333c8da07a",
+                "masked_card": "542640-3348",
+                "order_id": "154598-1",
+                "gross_amount": "23000.00",
+                "payment_type": "credit_card",
+                "transaction_time": "2016-01-02 14:06:30",
+                "transaction_status": "capture",
+                "fraud_status": "accept",
+                "approval_code": "T46890",
+                "bank": "mandiri",
+                "eci": "02"
+              },
+              "token": "542640-3348-372f97ac-45d1-4d5f-be92-2a6fbb1acea3",
+              "phone": null,
+              "amount": 23000,
+              "currency_code": "IDR"
+            },
+            "commerce_payment_order_paid_in_full_invoked": true
+          },
+          "order_id": "154598",
+          "type": "favorite",
+          "uid": "43",
+          "created": "1451718356",
+          "changed": "1451718488",
+          "hostname": "202.62.17.101",
+          "commerce_line_items": [
+            {
+              "line_item_id": "626015",
+              "order_id": "154598",
+              "type": "mobile_prepaid",
+              "line_item_label": "BLT50",
+              "quantity": "1.00",
+              "created": "1451718286",
+              "changed": "1451718488",
+              "data": [],
+              "commerce_unit_price": {
+                "amount": "50000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": [
+                    {
+                      "name": "base_price",
+                      "price": {
+                        "amount": "50000",
+                        "currency_code": "IDR",
+                        "data": {
+                          "components": []
+                        }
+                      },
+                      "included": true
+                    }
+                  ]
+                }
+              },
+              "commerce_total": {
+                "amount": "50000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": [
+                    {
+                      "name": "base_price",
+                      "price": {
+                        "amount": 50000,
+                        "currency_code": "IDR",
+                        "data": {
+                          "components": []
+                        }
+                      },
+                      "included": true
+                    }
+                  ]
+                }
+              },
+              "commerce_product": {
+                "revision_id": "423",
+                "sku": "BLT50",
+                "title": "Rp 50.000",
+                "revision_uid": "0",
+                "status": "1",
+                "log": "",
+                "revision_timestamp": "1445121212",
+                "data": false,
+                "product_id": "176",
+                "type": "pulsa",
+                "language": "und",
+                "uid": "102",
+                "created": "1440400940",
+                "changed": "1445121212",
+                "commerce_price": {
+                  "und": [
+                    {
+                      "amount": "50000",
+                      "currency_code": "IDR",
+                      "data": {
+                        "components": []
+                      }
+                    }
+                  ]
+                },
+                "field_api_provider": {
+                  "und": [
+                    {
+                      "value": "kraken"
+                    }
+                  ]
+                },
+                "field_credit_amount": {
+                  "und": [
+                    {
+                      "value": "50000"
+                    }
+                  ]
+                },
+                "field_package_code": {
+                  "und": [
+                    {
+                      "value": "20"
+                    }
+                  ]
+                },
+                "field_data_packet": {
+                  "und": [
+                    {
+                      "value": "0"
+                    }
+                  ]
+                },
+                "field_deskripsi": [],
+                "rdf_mapping": []
+              },
+              "commerce_display_path": "",
+              "field_phone_number": "9991289663",
+              "field_topup_status": "1",
+              "field_topup_data": [
+                "a:4:{s:6:\"status\";s:11:\"Belum Bayar\";s:3:\"try\";i:1;s:5:\"total\";i:1;s:4:\"data\";s:0:\"\";}"
+              ],
+              "field_line_item_status": "success",
+              "rdf_mapping": []
+            }
+          ],
+          "commerce_order_total": {
+            "amount": "23000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": 50000,
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                },
+                {
+                  "name": "userpoints",
+                  "price": {
+                    "amount": -27000,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_customer_billing": [],
+          "field_commerce_billy_cancel_date": [],
+          "field_commerce_billy_i_date": {
+            "und": [
+              {
+                "value": "1451718488",
+                "timezone": "Asia/Jakarta",
+                "timezone_db": "UTC",
+                "date_type": "datestamp"
+              }
+            ]
+          },
+          "commerce_coupons": [],
+          "commerce_discounts": [],
+          "field_order_source": {
+            "und": [
+              {
+                "value": "apps",
+                "format": null,
+                "safe_value": "apps"
+              }
+            ]
+          },
+          "field_imei": {
+            "und": [
+              {
+                "value": "864690026885288",
+                "format": null,
+                "safe_value": "864690026885288"
+              }
+            ]
+          },
+          "field_utm_source": [],
+          "field_utm_medium": [],
+          "field_utm_campaign": [],
+          "field_app": {
+            "und": [
+              {
+                "value": "Android 2.0.5",
+                "format": null,
+                "safe_value": "Android 2.0.5"
+              }
+            ]
+          },
+          "rdf_mapping": []
+        },
+        "product_id": "176",
+        "title": "Rp 50.000",
+        "type": "mobile_prepaid",
+        "field_phone_number": "9991289663",
+        "electricity_customer_number": null,
+        "electricity_phone_number": null,
+        "operator_title": "Bolt",
+        "favorite": true,
+        "revision_timestamp": "1451718488"
+      }
+    ],
+    "credit_balance": 100
+  }
+  ';
+  $element = array(
+    '#name' => 'Transaction Home Page List',
+    '#description' => 'Get the list of home page transaction.',
+    '#auth' => FALSE,
+    '#path' => 'transaction_v2/home_transaction_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/transaction_v2/home_transaction_list.json<br />'
+    . 'POST data application/json: { "size" : "2", "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	    'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+      'user_is_anonymous' => array(
+        '#question' => '406 Not Acceptable : Harap login terlebih dahulu',
+        '#description' => 'User have not log in into the server.',
+        '#response' => '
+        [
+          "Harap login terlebih dahulu"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_transaction_history_list_doc().
+ *
+ * Documentation callback for transaction history list.
+ */
+function apps_services_v2_transaction_history_list_doc() {
+  global $base_url;
+  $response = '
+    {
+    "status": true,
+    "message": "Order list history pengguna",
+    "data": [
+      {
+        "order_id": "154598",
+        "mail": "ananto.sql@gmail.com",
+        "order_status": "invoiced",
+        "created": "1451718356",
+        "amount": "23000",
+        "product_amount": "50000",
+        "currency_code": "IDR",
+        "response": {
+          "order_number": "201601-655",
+          "revision_id": "650105",
+          "revision_uid": "0",
+          "mail": "ananto.sql@gmail.com",
+          "status": "invoiced",
+          "log": "Order status updated via Rules.",
+          "revision_timestamp": "1451718488",
+          "revision_hostname": "52.74.47.66",
+          "data": {
+            "last_cart_refresh": 1451718353,
+            "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans",
+            "commerce_veritrans": {
+              "response": {
+                "status_code": "200",
+                "status_message": "Success, Credit Card 3D Secure transaction is successful",
+                "transaction_id": "d8c46f06-d550-4488-9c17-ea333c8da07a",
+                "masked_card": "542640-3348",
+                "order_id": "154598-1",
+                "gross_amount": "23000.00",
+                "payment_type": "credit_card",
+                "transaction_time": "2016-01-02 14:06:30",
+                "transaction_status": "capture",
+                "fraud_status": "accept",
+                "approval_code": "T46890",
+                "bank": "mandiri",
+                "eci": "02"
+              },
+              "token": "542640-3348-372f97ac-45d1-4d5f-be92-2a6fbb1acea3",
+              "phone": null,
+              "amount": 23000,
+              "currency_code": "IDR"
+            },
+            "commerce_payment_order_paid_in_full_invoked": true
+          },
+          "order_id": "154598",
+          "type": "favorite",
+          "uid": "43",
+          "created": "1451718356",
+          "changed": "1451718488",
+          "hostname": "202.62.17.101",
+          "commerce_line_items": [
+            {
+              "line_item_id": "626015",
+              "order_id": "154598",
+              "type": "mobile_prepaid",
+              "line_item_label": "BLT50",
+              "quantity": "1.00",
+              "created": "1451718286",
+              "changed": "1451718488",
+              "data": [],
+              "commerce_unit_price": {
+                "amount": "50000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": [
+                    {
+                      "name": "base_price",
+                      "price": {
+                        "amount": "50000",
+                        "currency_code": "IDR",
+                        "data": {
+                          "components": []
+                        }
+                      },
+                      "included": true
+                    }
+                  ]
+                }
+              },
+              "commerce_total": {
+                "amount": "50000",
+                "currency_code": "IDR",
+                "data": {
+                  "components": [
+                    {
+                      "name": "base_price",
+                      "price": {
+                        "amount": 50000,
+                        "currency_code": "IDR",
+                        "data": {
+                          "components": []
+                        }
+                      },
+                      "included": true
+                    }
+                  ]
+                }
+              },
+              "commerce_product": {
+                "revision_id": "423",
+                "sku": "BLT50",
+                "title": "Rp 50.000",
+                "revision_uid": "0",
+                "status": "1",
+                "log": "",
+                "revision_timestamp": "1445121212",
+                "data": false,
+                "product_id": "176",
+                "type": "pulsa",
+                "language": "und",
+                "uid": "102",
+                "created": "1440400940",
+                "changed": "1445121212",
+                "commerce_price": {
+                  "und": [
+                    {
+                      "amount": "50000",
+                      "currency_code": "IDR",
+                      "data": {
+                        "components": []
+                      }
+                    }
+                  ]
+                },
+                "field_api_provider": {
+                  "und": [
+                    {
+                      "value": "kraken"
+                    }
+                  ]
+                },
+                "field_credit_amount": {
+                  "und": [
+                    {
+                      "value": "50000"
+                    }
+                  ]
+                },
+                "field_package_code": {
+                  "und": [
+                    {
+                      "value": "20"
+                    }
+                  ]
+                },
+                "field_data_packet": {
+                  "und": [
+                    {
+                      "value": "0"
+                    }
+                  ]
+                },
+                "field_deskripsi": [],
+                "rdf_mapping": []
+              },
+              "commerce_display_path": "",
+              "field_phone_number": "9991289663",
+              "field_topup_status": "1",
+              "field_topup_data": [
+                "a:4:{s:6:\"status\";s:11:\"Belum Bayar\";s:3:\"try\";i:1;s:5:\"total\";i:1;s:4:\"data\";s:0:\"\";}"
+              ],
+              "field_line_item_status": "success",
+              "rdf_mapping": []
+            }
+          ],
+          "commerce_order_total": {
+            "amount": "23000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": 50000,
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                },
+                {
+                  "name": "userpoints",
+                  "price": {
+                    "amount": -27000,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_customer_billing": [],
+          "field_commerce_billy_cancel_date": [],
+          "field_commerce_billy_i_date": {
+            "und": [
+              {
+                "value": "1451718488",
+                "timezone": "Asia/Jakarta",
+                "timezone_db": "UTC",
+                "date_type": "datestamp"
+              }
+            ]
+          },
+          "commerce_coupons": [],
+          "commerce_discounts": [],
+          "field_order_source": {
+            "und": [
+              {
+                "value": "apps",
+                "format": null,
+                "safe_value": "apps"
+              }
+            ]
+          },
+          "field_imei": {
+            "und": [
+              {
+                "value": "864690026885288",
+                "format": null,
+                "safe_value": "864690026885288"
+              }
+            ]
+          },
+          "field_utm_source": [],
+          "field_utm_medium": [],
+          "field_utm_campaign": [],
+          "field_app": {
+            "und": [
+              {
+                "value": "Android 2.0.5",
+                "format": null,
+                "safe_value": "Android 2.0.5"
+              }
+            ]
+          },
+          "rdf_mapping": []
+        },
+        "product_id": "176",
+        "title": "Rp 50.000",
+        "type": "mobile_prepaid",
+        "field_phone_number": "9991289663",
+        "electricity_customer_number": null,
+        "electricity_phone_number": null,
+        "operator_title": "Bolt",
+        "favorite": true,
+        "revision_timestamp": "1451718488"
+      }
+    ]
+  }
+  ';
+  $element = array(
+    '#name' => 'Transaction History Page List',
+    '#description' => 'Get Transaction History List in History Page.',
+    '#auth' => FALSE,
+    '#path' => 'transaction_v2/transaction_history_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/transaction_v2/transaction_history_list.json<br />'
+    . 'POST data application/json: { "page" : "2", "size" : "1", "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	    'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+      'user_is_anonymous' => array(
+        '#question' => '406 Not Acceptable : Harap login terlebih dahulu',
+        '#description' => 'User have not log in into the server.',
+        '#response' => '
+        [
+          "Harap login terlebih dahulu"
+        ]',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_views_api()
+ * set init data before views data
+ */
+function apps_services_v2_transaction_data_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module','apps_services_v2_transaction_data'). '/views',
+  );
+}
+
+/**
+ * Implements hook_views_data().
+ * put favorite data into views
+ */
+function apps_services_v2_transaction_data_views_data() {
+	$data['favorite_transaction']['table']['group'] = 'Favorite Order';
+
+  $data['favorite_transaction']['table']['base'] = array(
+		'field' => 'order_id',
+		'title' => 'Order ID',
+  );
+
+  $data['favorite_transaction']['table']['join'] = array(
+		'commerce_order' => array(
+				'left_field' => 'order_id',
+				'field' => 'order_id',
+		),
+		'users' => array(
+				'left_field' => 'uid',
+				'field' => 'uid',
+		),
+  );
+	
+	 $data ['favorite_transaction']['order_id'] = array(
+    'title' => t('Order ID'),
+    'help' => t('Order ID'),
+    // Define a relationship to the {node} table, so example_table views can
+    // add a relationship to nodes. If you want to define a relationship the
+    // other direction, use hook_views_data_alter(), or use the 'implicit' join
+    // method described above.
+    'relationship' => array(
+      'base' => 'commerce_order', // The name of the table to join with.
+      'base field' => 'order_id', // The name of the field on the joined table.
+      // 'field' => 'nid' -- see hook_views_data_alter(); not needed here.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Commerce Order Relationship'),
+      'title' => t('Commerce Order Relationship'),
+      'help' => t('Relationship to commerce order table'),
+    ),
+  );
+	 
+	 $data ['favorite_transaction']['uid'] = array(
+    'title' => t('UID'),
+    'help' => t('User UID who favorited the order'),
+    'relationship' => array(
+      'base' => 'users', // The name of the table to join with.
+      'base field' => 'uid', // The name of the field on the joined table.
+      'handler' => 'views_handler_relationship',
+      'label' => t('Users Relationship'),
+      'title' => t('Users Relationship'),
+      'help' => t('Relationship to users table'),
+    ),
+  );
+   
+  // Describe the order id column of the favorite transaction.
+  $data['favorite_transaction']['order_id'] = array(
+      'title' => t('Order Id'),
+      'help' => t('Favorite transaction order id'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'order_id', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+  
+  // Describe the uid column of the favorite transaction.
+  $data['favorite_transaction']['uid'] = array(
+      'title' => t('User Id'),
+      'help' => t('Favorite transaction user id'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'uid', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+
+  // Describe the created column of the favorite transaction.
+  $data['favorite_transaction']['created'] = array(
+      'title' => t('Created Date'),
+      'help' => t('Favorite transaction created date'),
+      'field' => array(
+          'handler' => 'views_handler_field_numeric',
+					'click sortable' => TRUE,
+      ),
+      'argument' => array(
+          'handler' => 'views_handler_argument_numeric',
+          'name field' => 'created', // display this field in the summary
+      ),
+      'sort' => array(
+          'handler' => 'views_handler_sort_numeric',
+      ),
+      'filter' => array(
+          'handler' => 'views_handler_filter_numeric',
+      ),
+  );
+	
+  return $data;
+}

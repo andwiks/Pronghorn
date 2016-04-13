@@ -106,6 +106,19 @@ function homeTab() {
         hash = 'pulsa';
     }
 
+        /* perbaikan hash yang tidak dikenali */
+
+        if (hash === 'bpjs' || hash === 'bpjs-kesehatan') {
+            hash = 'bpjs-kesehatan';
+        }
+
+            var categories = [ "pln", "biznet", "bpjs-kesehatan", "multifinance" ];
+            found = $.inArray(hash, categories);
+
+        if (found !== 0) {
+            hash = 'pulsa';
+        }
+
     if ($('.home_tab .content_tab #' + hash) !== 'undefined') {
         $('.home_tab .content_tab #' + hash).css('display', 'block');
         $('section.h_middle_top .home_tab .nav_tab a[target=' + hash + ']').addClass('active');

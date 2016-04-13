@@ -37,39 +37,34 @@ section.h_middle_top .form-bpjs .form-field input[type=text] {
 }
 
 section.h_middle_top .form-bpjs .form-field input.remove {
-  /*
-  float: left;
-  width: 9%;
-  margin: 0;
-  margin-left: 1%;
-  background: url("../images/material/trash_ico.png") no-repeat center !important;
-  border: 1px solid #717171;
-  border-radius: 3px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 7px;
-  -o-border-radius: 7px;
-  text-indent: -9999px;
-  */
-
   font-size: 22px;
   line-height: 22px;
 
   width: 46px;
   height: 46px;
   position: absolute;
-  top: 11px;
-  right: 14px;
+/*  top: 11px;
+  right: 14px;*/
   margin: 0;
   margin-left: 1%;
-  background: #c72127 !important;
+  /*background: #c72127 !important;*/
+  background: transparent url("../images/material/trash_ico.png") no-repeat center !important;
+  text-indent: -9999px;
   color: #fff;
   border: 2px solid #c72127;
-  border-radius: 46px;
+  /*border-radius: 46px;
   -webkit-border-radius: 46px;
   -moz-border-radius: 46px;
   -ms-border-radius: 46px;
-  -o-border-radius: 46px;
+  -o-border-radius: 46px;*/
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  top: 0;
+  right: 0;
 }
 
 #bpjs-kesehatan .topup-notes {
@@ -89,20 +84,32 @@ section.h_middle_top .form-bpjs .form-field input.add-new {
   width: 46px;
   height: 46px;
   position: absolute;
-  top: 11px;
-  right: 14px;
+/*  top: 11px;
+  right: 14px;*/
   margin: 0;
   margin-left: 1%;
-  background: #129d4a !important;
-  color: #fff;
+  background: transparent !important;
+  color: #129d4a !important;
   border: 2px solid #129d4a;
-  border-radius: 46px;
+/*  border-radius: 46px;
   -webkit-border-radius: 46px;
   -moz-border-radius: 46px;
   -ms-border-radius: 46px;
-  -o-border-radius: 46px;
+  -o-border-radius: 46px;*/
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  top: 0;
+  right: 0;
 }
 
 section.h_middle_top .form-bpjs .form-actions {
   clear: none;
+}
+
+.form-bpjs .form-field input.add-new {
+    display: block !important;
 }

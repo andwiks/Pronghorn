@@ -444,6 +444,13 @@ section.h_middle_top .home_tab .form#multifinance input[type=text].customer-numb
     background-position: center left 0 !important;
 }
 
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number, 
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number--2
+{   
+    background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
+}
+
 /* header */
 header .logo img
 {
@@ -1322,4 +1329,69 @@ body.home footer
 .wrap_popup .box_popup .close
 {
     z-index: 999;
+}
+
+/* perbaikan theme */
+#frameBlog .view-blog .views-row .blog-readmore, #frameBlog .view-blog .views-row .blog-readmore a
+{
+    clear: both;
+}
+
+section.sblog .caption {
+    text-align: center;
+    width: 100%;
+    top: 37%;
+    left: 0;
+    right: 0;
+}
+
+section.sblog .caption h1 {
+    font-size: 36px;
+    font-family: "robotoregular";
+}
+
+section.sblog .caption p {
+    font-size: 20px;
+}
+
+.not-front .wrapper
+{
+    width: 1170px;
+}
+
+.not-front footer {
+    margin-top: 40px;
+}
+
+section.h_middle_top
+{
+    height: auto;
+    min-height: 460px;
+}
+
+section.h_middle_top .home_tab .content_tab {
+    border: 1px solid #a1a1a1 !important;
+}
+
+section.h_middle_top {
+    height: auto;
+    position: absolute;
+    top: 120px;
+    min-height: 460px;
+    z-index: 1;
+}
+
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number, 
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number--2
+{   
+    background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
+}
+
+section.h_middle_top .home_tab .content_tab
+{
+    -webkit-box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    -moz-box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    margin-bottom: 5px;
 }

@@ -3926,6 +3926,11 @@ section.banner .bx-wrapper a.bx-next {background-position: top left;right: -40px
 section.banner .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
 section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}
 
+.form-text.error {
+    border: 2px solid red;
+    background: #ebebeb !important;
+}
+
 .only-large
 {
     display: block !important;
@@ -3935,3 +3940,4 @@ section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}
 {
     display: none !important;
 }
+

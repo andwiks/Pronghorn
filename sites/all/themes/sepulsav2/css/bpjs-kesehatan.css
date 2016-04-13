@@ -58,11 +58,11 @@ section.h_middle_top .form-bpjs .form-field input.remove {
   -ms-border-radius: 46px;
   -o-border-radius: 46px;*/
 
-  border-radius: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
   top: 0;
   right: 0;
 }
@@ -97,11 +97,11 @@ section.h_middle_top .form-bpjs .form-field input.add-new {
   -ms-border-radius: 46px;
   -o-border-radius: 46px;*/
 
-  border-radius: 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  -ms-border-radius: 0;
-  -o-border-radius: 0;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
   top: 0;
   right: 0;
 }

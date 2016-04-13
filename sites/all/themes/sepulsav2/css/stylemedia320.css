@@ -1367,3 +1367,128 @@ section.h_keuntungan .usp-content {
     display: block;
     top: 0;
 }
+
+/* perbaikan theme */
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 0;
+    right: 0;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 0;
+    right: 0;
+}
+
+/* header */
+.not-front header .logo {
+    margin: 10px 0 0 0;
+}
+
+.not-front .wrapper
+{
+    width: 93%;
+}
+
+/* blog */
+#frameBlog .view-blog .views-row .blog-readmore, 
+#frameBlog .view-blog .views-row .blog-readmore a
+{
+    float: none;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+}
+
+#frameBlog #inner #right_column,
+#frameBlog #inner #left_column {
+    width: 100%;
+}
+
+#frameBlog #right_column .views-row
+{
+    margin-left: 45px;
+}
+
+#frameBlog #right_column .content
+{
+    margin: 0 auto;
+}
+
+section.sblog .caption
+{
+    width: 93%;
+}
+
+section.sblog .caption p {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.views-field.views-field-body img
+{
+    width: 100%;
+    margin: 0 0 5px 0;
+}
+
+#frameBlog .view-blog .views-row h2, 
+#frameBlog .view-blog .views-row h2 a, 
+#frameBlog h2, #frameBlog h2 a 
+{
+    line-height: 1.3
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+/* footer */
+footer .footer-partner {
+    float: none;
+    margin: 15px auto 5px auto;
+    text-align: center;
+}
+footer .footer-partner table {
+    margin:0 auto;
+}
+
+#block-menu-menu-sidebar2 ul li:before
+{
+    content: none;
+}
+
+footer ul.menu {
+    text-align: center;
+}
+
+#block-menu-menu-sidebar2 ul li {
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+footer .right .box {
+    width: 95% !important;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+footer .right .box h6 {
+    font-size: 12px;
+}
+
+section.banner, section.h_middle_top {
+    background: #1d262c;
+}
+
+section.h_middle_top {
+    position: relative;
+    top: 0;
+}

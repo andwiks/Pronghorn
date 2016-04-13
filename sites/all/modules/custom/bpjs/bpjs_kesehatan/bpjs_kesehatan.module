@@ -397,8 +397,7 @@ function bpjs_kesehatan_payment_line_item($line_item_wrapper) {
   module_load_include('inc', 'kraken_api');
   $response = kraken_api_call('transaction', 'POST', $data);
 
-  $status = $response['status'] ? 'success' : 'failed';
-  $line_item_wrapper->field_line_item_status->set($status);
+  $line_item_wrapper->field_line_item_status->set($response['status']);
   $line_item_wrapper->field_transaction_id->set($response['transaction_id']);
 
   $line_item = $line_item_wrapper->value();

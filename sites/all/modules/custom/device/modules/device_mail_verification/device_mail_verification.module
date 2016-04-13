@@ -35,7 +35,7 @@ function device_mail_verification_menu() {
     'title' => 'Update User Device',
     'description' => 'Update User Device maually.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('device_mail_verification_update_manual'),
+    'page arguments' => array('device_mail_verification_wizard'),
     'access arguments' => array('administer devices'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'device_mail_verification.admin.inc',

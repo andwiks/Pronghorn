@@ -113,6 +113,10 @@ function device_mail_verification_update_manual($form = array(), $form_state = a
 }
 
 function device_mail_verification_update_manual_submit($form, &$form_state) {
+  // Store value form.
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
   $result = array();
   $info = FALSE;
   $merge_to = array('web','device');
@@ -168,10 +172,11 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
                 'merge_to' => $merge_to[$form_state['values']['merge_to']],
               );
 
-              $result = drupal_get_form('device_mail_merge_admin_confirm_form',
-                          $device,
-                          $web_device->fetchAssoc(),
-                          $data);
+              $form_state['step_information'][$current_step]['device_user'] = $device;
+              $form_state['step_information'][$current_step]['web_device_user'] = $web_device->fetchAssoc();
+              $form_state['step_information'][$current_step]['data'] = $data;
+
+              $form_state['step'] = 2;
             }
             else {
               device_mail_verification_admin_merge(
@@ -224,11 +229,18 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
       break;
     
     default:
-      drupal_set_message(t("Device not found."), 'error');
+      if ($form_state['step'] != 2) {
+        drupal_set_message(t("Device not found."), 'error');
+      }
       break;
   }
   
-  return (!empty($result)) ? $result : drupal_goto('admin/devices/update_manual');
+  if ($form_state['step'] == 2) {
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+    drupal_goto('admin/devices/update_manual');
+  }
 }
 
 /**
@@ -351,7 +363,7 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
 }
 
 /**
- * Function device_mail_merge_admin_confirm_form().
+ * Function device_mail_verification_merge_admin_confirm_form().
  *
  * @param array $form
  *   Form array.
@@ -365,7 +377,10 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
  * @return array
  *   Form array.
  */
-function device_mail_merge_admin_confirm_form($form = array(), &$form_state = array(), $device_user = NULL, $web_device_user = array(), $data = array()) {
+function device_mail_verification_merge_admin_confirm_form($form = array(), &$form_state = array()) {
+  $device_user = $form_state['step_information'][1]['device_user'];
+  $web_device_user = $form_state['step_information'][1]['web_device_user'];
+  $data = $form_state['step_information'][1]['data'];
   $form['strategi'] = array(
     '#type' => 'value',
     '#value' => $data['strategi'],
@@ -418,16 +433,16 @@ function device_mail_merge_admin_confirm_form($form = array(), &$form_state = ar
   $msg .= ' </div>';
   $form = confirm_form($form,
                       t('Are you sure want to merge this device ?'),
-                      '',
+                      'admin/devices/update_manual',
                       $msg);
-  $form['actions']['submit']['#submit'] = array('device_mail_merge_admin_confirm_form_submit');
+  $form['actions']['submit']['#submit'] = array('device_mail_verification_merge_admin_confirm_form_submit');
   return $form;
 }
 
 /**
- * Function device_mail_merge_admin_confirm_form_submit().
+ * Function device_mail_verification_merge_admin_confirm_form_submit().
  */
-function device_mail_merge_admin_confirm_form_submit($form, &$form_state) {
+function device_mail_verification_merge_admin_confirm_form_submit($form, &$form_state) {
   device_mail_verification_admin_merge(
                 $form_state['values']['mail'],
                 $form_state['values']['device_did'],
@@ -438,4 +453,25 @@ function device_mail_merge_admin_confirm_form_submit($form, &$form_state) {
 
   drupal_set_message(t("Your device has been merged."), 'status');
   drupal_goto('admin/devices/update_manual');
+}
+
+function _form_device_mail_verification_steps() {
+  return array(
+    1 => array(
+      'form' => 'device_mail_verification_update_manual',
+    ),
+    2 => array(
+      'form' => 'device_mail_verification_merge_admin_confirm_form',
+    ),
+  );
+}
+
+function device_mail_verification_wizard($form, &$form_state) {
+  if (empty($form_state['step'])) {
+    $form_state['step'] = 1;
+    $form_state['step_information'] = _form_device_mail_verification_steps();
+  }
+  $step = &$form_state['step'];
+  $form = $form_state['step_information'][$step]['form']($form, $form_state);
+  return $form;
 }

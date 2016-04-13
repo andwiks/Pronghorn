@@ -295,6 +295,8 @@ function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id
   $form['actions']['new']['#value'] = '+';
   $form['actions']['new']['#attributes']['class'][] = 'add-new';
   $form['actions']['submit']['#attributes']['style'] = 'float:right';
+  $form['actions']['submit']['#attributes']['class'][] = 'enabled';
+
   $form['actions']['charge']['#attributes']['style'] = 'float:right';
 }
 

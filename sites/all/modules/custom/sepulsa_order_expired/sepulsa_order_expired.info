@@ -1,3 +1,6 @@
-name = Sepulsa Report
-description = Sepulsa Report Dashboard
+name = Sepulsa Order Expired
+description = Sepulsa Custom Order Status: Expired
 core = "7.x"
+
+dependencies[] = commerce
+dependencies[] = commerce_order

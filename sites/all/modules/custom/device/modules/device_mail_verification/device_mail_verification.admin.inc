@@ -295,6 +295,9 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
       // Update UID in commerce_order.
       device_mail_verification_transfer_order($device_uid, $web_uid);
     }
+
+    $satu = $device_uid;
+    $dua = $web_uid;
   }
   else {
     // Block Web Account.
@@ -332,15 +335,18 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
       // Update UID in commerce_order.
       device_mail_verification_transfer_order($web_uid, $device_uid);
     }
+
+    $satu = $web_uid;
+    $dua = $device_uid;
   }
 
   watchdog('Device Mail Verification',
-          'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id , changed UID commerce_order : !changed_uid_order',
+          'Merge User Strategi !strategi ->  UID: !satu merge to !merge_to UID: !dua , changed UID commerce_order : !changed_uid_order',
           array(
             '!merge_to' => $merge_to,
             '!strategi' => 5,
-            '!device_account_id' => $device_uid,
-            '!web_account_id' => $web_uid,
+            '!satu' => $satu,
+            '!dua' => $dua,
             '!changed_uid_order' => print_r($changed_uid_order, TRUE),));
 }
 

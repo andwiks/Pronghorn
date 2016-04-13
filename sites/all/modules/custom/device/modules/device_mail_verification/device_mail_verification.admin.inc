@@ -76,6 +76,17 @@ function device_mail_verification_settings($form = array(), $form_state = array(
   return system_settings_form($form);
 }
 
+/**
+ * Function device_mail_verification_update_manual().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array. 
+ *
+ * @return array
+ *   System form update manual user device.
+ */
 function device_mail_verification_update_manual($form = array(), $form_state = array()) {
   $form['update_manual'] = array(
     '#type' => 'fieldset',
@@ -85,14 +96,14 @@ function device_mail_verification_update_manual($form = array(), $form_state = a
   );
   $form['update_manual']['device_did'] = array(
     '#type' => 'textfield',
-    '#title' => t('Device ID : '),
+    '#title' => t('Device ID :'),
     '#default_value' => '',
     '#description' => t('Device ID will be merged.'),
     '#required' => TRUE,
   );
   $form['update_manual']['mail_user'] = array(
     '#type' => 'textfield',
-    '#title' => t('Web Email : '),
+    '#title' => t('Web Email :'),
     '#default_value' => '',
     '#description' => t('The user will be merged.'),
     '#required' => TRUE,
@@ -112,6 +123,14 @@ function device_mail_verification_update_manual($form = array(), $form_state = a
   return $form;
 }
 
+/**
+ * Function device_mail_verification_update_manual_submit().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array. 
+ */
 function device_mail_verification_update_manual_submit($form, &$form_state) {
   // Store value form.
   $current_step = &$form_state['step'];
@@ -126,7 +145,7 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
       if (valid_email_address($form_state['values']['mail_user'])) {
         $web_user = db_select('users', 'u')
                 ->fields('u')
-                ->condition('mail', $form_state['values']['mail_user'],'=')
+                ->condition('mail', $form_state['values']['mail_user'], '=')
                 ->condition('status', 1, '=')
                 ->execute()
                 ->fetchAssoc();
@@ -227,14 +246,14 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
       drupal_set_message(t("Device and email : !mail has Merged. Check log to see details.",
         array("!mail" => $form_state['values']['mail_user'])), 'status');
       break;
-    
+
     default:
       if ($form_state['step'] != 2) {
         drupal_set_message(t("Device not found."), 'error');
       }
       break;
   }
-  
+
   if ($form_state['step'] == 2) {
     $form_state['rebuild'] = TRUE;
   }
@@ -244,7 +263,7 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
 }
 
 /**
- * kasus 1 : merge to web account. 
+ * Kasus 1 : merge to web account. 
  *            user device account di block.
  *            device id di form di arahkan ke web account. (device->uid pake uid email yang tertera)
  *            set email device yang baru
@@ -269,7 +288,7 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
  *            kalau ada history web semua history di pidahin ke device.
  */
 function device_mail_verification_admin_merge($mail = '', $device_did = '', $device_uid = '', $web_did = '',
-  $web_uid ='', $merge_to = '') {
+  $web_uid = '', $merge_to = '') {
   if ($merge_to == 'web') {
     // Block device Account.
     $web_user_wrapper = entity_metadata_wrapper('user', $device_uid);
@@ -367,12 +386,8 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
  *
  * @param array $form
  *   Form array.
- * @param object $device_user
- *   Device object user device.
- * @param array $web_device_user
- *   Device array user web.
- * @param array $data
- *   Index Strategi, merge_to, mail.
+ * @param array $form_state
+ *   Form array.
  *
  * @return array
  *   Form array.
@@ -455,6 +470,9 @@ function device_mail_verification_merge_admin_confirm_form_submit($form, &$form_
   drupal_goto('admin/devices/update_manual');
 }
 
+/**
+ * Function _form_device_mail_verification_steps().
+ */
 function _form_device_mail_verification_steps() {
   return array(
     1 => array(
@@ -466,6 +484,9 @@ function _form_device_mail_verification_steps() {
   );
 }
 
+/**
+ * Function device_mail_verification_wizard().
+ */
 function device_mail_verification_wizard($form, &$form_state) {
   if (empty($form_state['step'])) {
     $form_state['step'] = 1;

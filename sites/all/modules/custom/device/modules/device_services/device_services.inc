@@ -453,7 +453,8 @@ function device_services_resource_mail($mail = '') {
       $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
       if ($send_verify === FALSE) {
         return services_error(t('Send Email Failed.'), 406);
-      } else {
+      }
+      else {
         return TRUE;
       }
     }

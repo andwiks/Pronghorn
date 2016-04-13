@@ -141,6 +141,7 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
     '#title' => $instances['field_phone_number']['label'],
     '#required' => TRUE,
   );
+  $form['field_phone_number']['#attributes']['class'][] = 'phone-number';
 
   $values = array(
     'type' => 'bpjs_kesehatan',

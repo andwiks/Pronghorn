@@ -451,3 +451,34 @@ function apps_services_v2_transaction_format_order_home($order) {
   
   return $order;
 }
+
+/**
+ * Resources callback for order detail.
+ */
+function apps_services_v2_transaction_data_order_detail($order_id){
+  // Load commerce order.
+  $order = commerce_order_load($order_id);
+  
+  // Check whether order is valid.
+  if ($order !== FALSE) {
+    //add order_status to get order status for android gson framework
+    $order->order_status = $order->status;
+    
+    //stripos($order->field_app["und"][0]["value"],'ios') is a workaround to fix issues with missing discount code in live environment from ios order
+    if(isset($order->field_app["und"][0]["value"]) && stripos($order->field_app["und"][0]["value"],'ios') !== false){
+      // Get order wrapper.
+      $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+      // Proccess order line item: remove language none (und).
+      $order->commerce_line_items = $order_wrapper->commerce_line_items->value();
+      // Looping foreach line item.
+      foreach ((array) $order->commerce_line_items as $key => $line_item) {
+        $order->commerce_line_items[$key] = order_services_line_item($line_item);
+      }
+      
+      return $order;
+    }
+    return order_services_order($order);
+  }
+  // Reach this means error: invalid order.
+  return services_error(t('Invalid order'), 406);
+}

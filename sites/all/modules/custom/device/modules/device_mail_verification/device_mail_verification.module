@@ -35,7 +35,7 @@ function device_mail_verification_menu() {
     'title' => 'Update User Device',
     'description' => 'Update User Device maually.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('device_mail_update_manual'),
+    'page arguments' => array('device_mail_verification_update_manual'),
     'access arguments' => array('administer devices'),
     'type' => MENU_LOCAL_TASK,
     'file' => 'device_mail_verification.admin.inc',
@@ -132,4 +132,31 @@ function device_mail_verification_cron() {
           ->execute();
     }
   }
+}
+
+/**
+ * Function device_mail_verification_transfer_order().
+ *
+ * @param string $current_uid
+ *   Sting current_uid.
+ * @param string $update_uid
+ *   String update_uid.
+ */
+function device_mail_verification_transfer_order($current_uid = '' , $update_uid = '') {
+  db_update('commerce_order')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_order_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_payment_transaction')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->execute();
+  db_update('commerce_payment_transaction_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->execute();
 }

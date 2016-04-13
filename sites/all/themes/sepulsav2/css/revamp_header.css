@@ -1323,3 +1323,41 @@ body.home footer
 {
     z-index: 999;
 }
+
+/* feedback after 13 april */
+/* blog */
+#frameBlog .view-blog .views-row .blog-readmore, #frameBlog .view-blog .views-row .blog-readmore a
+{
+    clear: both;
+}
+
+section.sblog .caption {
+    text-align: center;
+    width: 100%;
+    top: 37%;
+    left: 0;
+    right: 0;
+}
+
+section.sblog .caption h1 {
+    font-size: 36px;
+    font-family: "robotoregular";
+}
+
+section.sblog .caption p {
+    font-size: 20px;
+}
+
+.not-front #frameBlog .wrapper {
+    width: 1170px;
+}
+
+/* header */
+.not-front header .logo {
+    margin: 10px 0 0 0;
+}
+
+.not-front .wrapper
+{
+    width: 95%;
+}

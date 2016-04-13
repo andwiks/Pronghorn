@@ -335,6 +335,7 @@ section.std_content .voucher .c_left {
 section.std_content .voucher .c_left .grid_voucher_order table {
     width: 280px;
     width: 96%;
+    margin-bottom: 65px;
 }
 section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child{
     min-width: 0;
@@ -1361,4 +1362,55 @@ section.h_keuntungan .usp-content {
 #mobile_banner {
     display: block;
     top: 0;
+}
+
+/* feedback after 13 april */
+/* blog */
+#frameBlog #inner #right_column,
+#frameBlog #inner #left_column {
+    width: 100%;
+}
+
+#frameBlog #right_column .views-row
+{
+    margin-left: 45px;
+}
+
+#frameBlog #right_column .content
+{
+    margin: 0 auto;
+}
+
+/* footer */
+footer .footer-partner {
+    float: none;
+    margin: 15px auto 5px auto;
+    text-align: center;
+}
+footer .footer-partner table {
+    margin:0 auto;
+}
+
+#block-menu-menu-sidebar2 ul li:before
+{
+    content: none;
+}
+
+footer ul.menu {
+    text-align: center;
+}
+
+#block-menu-menu-sidebar2 ul li {
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+footer .right .box {
+    width: 95% !important;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+footer .right .box h6 {
+    font-size: 12px;
 }

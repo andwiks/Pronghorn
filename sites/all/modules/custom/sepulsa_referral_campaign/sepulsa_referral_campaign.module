@@ -57,7 +57,7 @@ function sepulsa_referral_campaign_load($did) {
 /**
  * Implements hook_menu().
  */
-function device_menu() {
+function sepulsa_referral_campaign_menu() {
   $items = array();
   // Administration pages.
   $items['admin/config/sepulsa_referral_campaign'] = array(
@@ -69,7 +69,7 @@ function device_menu() {
     'file path' => drupal_get_path('module', 'system'),
   );
 
-  // Device setting page.
+  // Sepulsa Referral Campaign setting page.
   $items['admin/config/sepulsa_referral_campaign/settings'] = array(
     'title' => 'Settings',
     'description' => 'Sepulsa Referral Campaign settings page.',

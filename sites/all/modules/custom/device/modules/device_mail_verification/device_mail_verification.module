@@ -101,6 +101,10 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
     else {
       $fields_insert['new_flag'] = 0;
     }
+    // Delete Data in device_mail_verification if device already have record.
+    db_delete('device_mail_verification')
+      ->condition('did', $did)
+      ->execute();
 
     // Insert Data to device_mail_verification Table.
     db_insert('device_mail_verification')

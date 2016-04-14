@@ -6,8 +6,12 @@
  *
  * @ingroup views_templates
  */
+
+if($classes_array[0]){
+  $class_active='active';
+}
 ?>
-<div class="row accordion active">
+<div class="row accordion <?php print $class_active ?> ">
   <?php if (!empty($title)): ?>
     <div class="label"><?php print $title; ?> <span class="ico"></span></div>
   <?php endif; ?>

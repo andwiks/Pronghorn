@@ -137,12 +137,14 @@ function jwt_client_jwt_auth_verified($claims) {
         // Looping foreach scope current.
         foreach ($scope_current as $current_resource => $current_operation) {
           // Check scope current with client resource.
-          $intersect = array_intersect_assoc($client->resources[$current_resource], $current_operation);
-          if (isset($client->resources[$current_resource])
-            && !empty($intersect)
-          ) {
-            $scope_client = $client;
-            break 2;
+          if (isset($client->resources[$current_resource])) {
+            $intersect = array_intersect_assoc($client->resources[$current_resource], $current_operation);
+            if (isset($client->resources[$current_resource])
+              && !empty($intersect)
+            ) {
+              $scope_client = $client;
+              break 2;
+            }
           }
         }
       }
@@ -158,10 +160,22 @@ function jwt_client_jwt_auth_verified($claims) {
       // @todo: check if previously user has uid has previous session.
       // Get jwt audience.
       $aud = $claims['aud']->getValue();
-      // Get user account based on aud.
-      $account = user_load_by_mail($aud);
+      // Get active user account based on aud (mail).
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'user')
+        ->propertyCondition('mail', $aud)
+        ->propertyCondition('status', 1)
+        ->propertyOrderBy('uid', DESC);
+      $result = $query->execute();
+      // Load the user account.
+      if (!empty($result) && isset($result['user']) && !empty($result['user'])) {
+        $account = user_load(key($result['user']));
+      }
+      else {
+        $account = user_load_by_mail($aud);
+      }
       // Check if can get user id.
-      if ($account->uid == 0) {
+      if ($account === FALSE || (isset($account->uid) && $account->uid == 0)) {
         // Create user dummy: set up the user fields.
         $account = new stdClass();
         $account->is_new = TRUE;

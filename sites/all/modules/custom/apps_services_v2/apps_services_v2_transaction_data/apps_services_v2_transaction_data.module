@@ -7,6 +7,30 @@ function apps_services_v2_transaction_data_services_resources() {
     return array(
         'transaction_v2' => array(
             'actions' => array(
+                'transaction_history_detail' => array(
+                  'help' => 'Get Order Detail',
+                  'callback' => 'apps_services_v2_transaction_data_order_detail',
+                  'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_transaction_data',
+                        'name' => 'apps_services_v2_transaction_data',
+                  ),
+                  'documentation callback' => 'order_services_detail_doc',
+                  'access callback' => 'services_access_menu',
+                  'args' => array(
+                    array(
+                      'name' => 'order_id',
+                      'type' => 'int',
+                      'description' => 'A valid order id',
+                      'source' => array(
+                        'data' => 'order_id',
+                        'param' => 'order_id',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
                 'favorite' => array(
                     'help' => 'Add/Remove Favorite Order',
                     'callback' => 'apps_services_v2_transaction_data_favorite',

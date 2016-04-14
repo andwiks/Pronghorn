@@ -7,6 +7,7 @@
  * @ingroup views_templates
  */
 
+// Expand first row.
 if($classes_array[0]){
   $class_active='active';
 }

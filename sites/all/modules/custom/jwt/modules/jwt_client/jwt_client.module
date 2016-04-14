@@ -175,7 +175,7 @@ function jwt_client_jwt_auth_verified($claims) {
         $account = user_load_by_mail($aud);
       }
       // Check if can get user id.
-      if ($account->uid == 0) {
+      if ($account === FALSE || (isset($account->uid) && $account->uid == 0)) {
         // Create user dummy: set up the user fields.
         $account = new stdClass();
         $account->is_new = TRUE;

@@ -481,6 +481,18 @@ function device_services_resource_retrieve($did = 0) {
     if ($session !== FALSE) {
       // Check did must the same ass session device id.
       if ($did == $session['device']->did) {
+        // Reformating device mail: stupid way.
+        if (isset($session['device']->device_mail[LANGUAGE_NONE][0])
+          && !empty($session['device']->device_mail[LANGUAGE_NONE][0])
+        ) {
+          $session['device']->device_mail = $session['device']->device_mail[LANGUAGE_NONE][0];
+          if (isset($session['device']->device_mail['email']) && !empty($session['device']->device_mail['email'])) {
+            $session['device']->device_mail = $session['device']->device_mail['email'];
+          }
+        }
+        else {
+          $session['device']->device_mail = NULL;
+        }
         // Return device object.
         return $session;
       }
@@ -504,8 +516,21 @@ function device_services_resource_index() {
     $query->condition('uid', $session['device']->uid);
     $list = $query->execute()->fetchAll();
     if (!empty($list)) {
-      foreach ($list as $device) {
-        $devices[] = device_load($device->did);
+      foreach ($list as $d) {
+        $device = device_load($d->did);
+        // Reformating device mail: stupid way.
+        if (isset($device->device_mail[LANGUAGE_NONE][0])
+          && !empty($device->device_mail[LANGUAGE_NONE][0])
+        ) {
+          $device->device_mail = $device->device_mail[LANGUAGE_NONE][0];
+          if (isset($device->device_mail['email']) && !empty($device->device_mail['email'])) {
+            $device->device_mail = $device->device_mail['email'];
+          }
+        }
+        else {
+          $device->device_mail = NULL;
+        }
+        $devices[] = $device;
       }
     }
     return $devices;
@@ -525,6 +550,7 @@ function device_services_resource_logout() {
   $session = device_services_default_session_auth('logout');
   // Check session did.
   if ($session !== FALSE && isset($session['device']->did)) {
+    global $is_https;
     // Remove device session.
     db_delete('device_sessions')->condition('did', $session['device']->did)->execute();
     // Delete drupal session also.

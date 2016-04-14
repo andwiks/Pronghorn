@@ -28,6 +28,8 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
   if (isset($method['endpoint']['jwt_auth']['token'])
     && in_array($method['endpoint']['jwt_auth']['token'], array('optional', 'required'))
   ) {
+    // Get server information.
+    $server = services_server_info_object();
     // Check Authorization Bearer header.
     if (isset($_SERVER['HTTP_AUTHORIZATION']) && preg_match('#^Bearer\s+(.+)$#i', $_SERVER['HTTP_AUTHORIZATION'], $match)) {
       // Trim it.
@@ -70,10 +72,26 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
           module_invoke_all('jwt_auth_verified', $result);
           // Create Rules Event.
           rules_invoke_event('jwt_auth_verified', $result);
+
+          // Check server debug parameter.
+          if (isset($server->debug) && $server->debug) {
+            watchdog('jwt_auth', 'JWT Auth Debug. Server settings: <pre>@server</pre>', array(
+              '@server' => print_r($server, TRUE),
+            ), WATCHDOG_DEBUG);
+          }
+
           return;
         }
       }
     }
+
+    // Check server debug parameter.
+    if (isset($server->debug) && $server->debug) {
+      watchdog('jwt_auth', 'JWT Auth Debug. Server settings: <pre>@server</pre>', array(
+        '@server' => print_r($server, TRUE),
+      ), WATCHDOG_DEBUG);
+    }
+
     // Other condition: if required, return error message.
     if ($method['endpoint']['jwt_auth']['token'] == 'required') {
       return t('Invalid Access Token.');

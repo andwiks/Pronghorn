@@ -7,4 +7,3 @@ dependencies[] = system
 dependencies[] = entity
 dependencies[] = rules
 dependencies[] = user
-dependencies[] = email_field_verification

@@ -1,0 +1,84 @@
+<?php
+/**
+ * @file
+ * sepulsa_referral_campaign.module
+ *
+ * @author aizat
+ */
+
+// 30 items per page.
+define('TOTAL_ITEMS_PER_PAGE', 30);
+
+/**
+ * Implements hook_entity_info().
+ */
+function sepulsa_referral_campaign_entity_info() {
+  $lawmakers_entity_info['sepulsa_referral_campaign'] = array(
+    'label' => t('Sepulsa Referral Campaign'),
+    'controller class' => 'EntityAPIController',
+    'entity class' => 'Entity',
+    'base table' => 'sepulsa_referral_campaign',
+    'label callback' => 'entity_class_label',
+    'language callback' => 'device_language',
+    'uri callback' => 'entity_class_uri',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'src_id',
+    ),
+    'access callback' => 'sepulsa_referral_campaign_access',
+    'load hook' => 'sepulsa_referral_campaign_load',
+    'bundles' => array(
+      'sepulsa_referral_campaign' => array(
+        'label' => t('Sepulsa Referral Campaign'),
+        'admin' => array(
+          'path' => 'admin/config/sepulsa_referral_campaign/settings',
+          'access arguments' => array('administer sepulsa_referral_campaign'),
+        ),
+      ),
+    ),
+    'views controller class' => 'EntityDefaultViewsController',
+  );
+
+  return $lawmakers_entity_info;
+}
+
+/**
+ * Implements hook_load().
+ */
+function sepulsa_referral_campaign_load($did) {
+  // Get jwt config by id.
+  $entity = entity_load('sepulsa_referral_campaign', array($did));
+  if (isset($entity[$did]) && !empty($entity[$did])) {
+    return $entity[$did];
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function device_menu() {
+  $items = array();
+  // Administration pages.
+  $items['admin/config/sepulsa_referral_campaign'] = array(
+    'title' => 'Sepulsa Referral Campaign',
+    'description' => 'Configure Sepulsa Referral Campaign.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  // Device setting page.
+  $items['admin/config/sepulsa_referral_campaign/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Sepulsa Referral Campaign settings page.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_referral_campaign_settings'),
+    'access arguments' => array('administer sepulsa_referral_campaign'),
+    'file' => 'sepulsa_referral_campaign.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}

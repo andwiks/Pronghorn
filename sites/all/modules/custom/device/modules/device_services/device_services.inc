@@ -489,6 +489,9 @@ function device_services_resource_retrieve($did = 0) {
           if (isset($session['device']->device_mail['email']) && !empty($session['device']->device_mail['email'])) {
             $session['device']->device_mail = $session['device']->device_mail['email'];
           }
+          elseif (isset($session['device']->device_mail['value']) && !empty($session['device']->device_mail['value'])) {
+            $session['device']->device_mail = $session['device']->device_mail['value'];
+          }
         }
         else {
           $session['device']->device_mail = NULL;
@@ -525,6 +528,9 @@ function device_services_resource_index() {
           $device->device_mail = $device->device_mail[LANGUAGE_NONE][0];
           if (isset($device->device_mail['email']) && !empty($device->device_mail['email'])) {
             $device->device_mail = $device->device_mail['email'];
+          }
+          elseif (isset($device->device_mail['value']) && !empty($device->device_mail['value'])) {
+            $device->device_mail = $device->device_mail['value'];
           }
         }
         else {

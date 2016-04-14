@@ -477,7 +477,7 @@ function apps_services_v2_transaction_data_order_detail($order_id){
       
       return $order;
     }
-    return order_services_order($order);
+    return apps_services_v2_transaction_format_order_home($order);
   }
   // Reach this means error: invalid order.
   return services_error(t('Invalid order'), 406);

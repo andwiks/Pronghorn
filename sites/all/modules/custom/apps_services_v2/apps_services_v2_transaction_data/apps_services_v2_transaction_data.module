@@ -7,7 +7,7 @@ function apps_services_v2_transaction_data_services_resources() {
     return array(
         'transaction_v2' => array(
             'actions' => array(
-                'order_detail' => array(
+                'transaction_history_detail' => array(
                   'help' => 'Get Order Detail',
                   'callback' => 'apps_services_v2_transaction_data_order_detail',
                   'file' => array(

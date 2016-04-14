@@ -12,6 +12,5 @@
 function sepulsa_adminui_form_commerce_discount_form_alter(&$form, &$form_state, $form_id){
   // Set Discount status default to: Disabled.
   $form['status']['#default_value'] = 0;
-  // dpm($form['status']);
 }
 

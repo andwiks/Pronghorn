@@ -599,6 +599,10 @@ function sepulsav2_preprocess_html(&$variables) {
  * Implements hook_preprocess_page().
  */
 function sepulsav2_preprocess_page(&$variables) {
+
+  // Add template hook sugestion for node type.
+  $vars['theme_hook_suggestions'][] = 'node__' . $vars['node']->type;
+
   if (drupal_is_front_page()) {
     if (isset($_POST['form_id']) && $_POST['form_id'] == 'commerce_cart_add_to_cart_form') {
       $variables['active_tab'] = 'token_reload';

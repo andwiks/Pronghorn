@@ -1,0 +1,69 @@
+<?php
+/**
+ * @file
+ * Create table sepulsa_referral_campaign.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function sepulsa_referral_campaign_schema() {
+  $schema = array();
+
+  $schema['sepulsa_referral_campaign'] = array(
+    'description' => 'Sepulsa Referral Campaign table for Entity',
+    'fields' => array(
+      'src_id' => array(
+        'description' => 'Primary Key for referral campaign',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Title of referral campaign',
+        'type' => 'varchar',
+        'length' => '254',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'machine_name' => array(
+        'description' => 'Machine name of referral campaign',
+        'type' => 'varchar',
+        'length' => '254',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'start' => array(
+        'description' => 'Start date referral campaign',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'end' => array(
+        'description' => 'End date referral campaign',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'path' => array(
+        'description' => 'Path static page for referral campaign',
+        'type' => 'varchar',
+        'length' => '150',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'created' => array(
+        'description' => 'Created timestamp',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'changed' => array(
+        'description' => 'Changed timestamp',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('src_id'),
+    'indexes' => array(
+      'search_idx' => array('title', 'machine_name'),
+    ),
+  );
+  return $schema;
+}

@@ -1077,3 +1077,141 @@ section.h_keuntungan .box {
 section.h_keuntungan .wrapper_2 {
     width: 440px;
 }
+
+/* feedback after 13 april */
+/* blog */
+section.h_middle_top
+{
+    min-height: auto;
+    margin-bottom: auto;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}
+
+/* blog */
+#frameBlog #inner #right_column,
+#frameBlog #inner #left_column {
+    width: 100%;
+}
+
+#frameBlog #right_column .views-row
+{
+    margin-left: 45px;
+}
+
+#frameBlog #right_column .content
+{
+    margin: 0 auto;
+}
+
+/* header */
+.not-front header .logo {
+    margin: 10px 0 0 0;
+}
+
+.not-front .wrapper, .not-front .wrapper_2, .not-front .wrapper_3
+{
+    width: 93%;
+}
+
+.header-img
+{
+    height: 490px;
+}
+
+/* footer */
+
+footer .footer-partner {
+    float: none !important;
+    margin: 15px auto 10px auto;
+    text-align: center;
+}
+footer .footer-partner table {
+    margin:0 auto;
+}
+
+#block-menu-menu-sidebar2 ul li:before
+{
+    content: none;
+}
+
+footer ul.menu {
+    text-align: center;
+}
+
+#block-menu-menu-sidebar2 ul li {
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+#block-menu-menu-sidebar2 ul li a {
+    text-decoration: underline;
+}
+
+/*
+footer .right .box {
+    width: 95% !important;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+footer .right .box h6 {
+    font-size: 12px;
+}*/
+
+footer .right {
+    margin: 0 auto;
+    display: block;
+    clear: both;
+    float: none;
+}
+
+section.std_content .list_voucher
+{
+    width: 100%;
+}
+
+section.std_content .list_voucher .box_voucher
+{
+    width: 33%;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order tfoot th:last-child
+{
+    min-width: 150px;
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+{
+    width: 152px;
+}
+
+/* promotion */
+.bx-wrapper .bx-pager
+{
+    display: none;
+}
+section.promo_banner .slide
+{
+    height: 138px;
+    min-height: 138px;
+}   

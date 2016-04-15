@@ -1366,6 +1366,53 @@ section.h_keuntungan .usp-content {
 
 /* feedback after 13 april */
 /* blog */
+section.h_middle_top
+{
+    min-height: auto;
+    margin-bottom: auto;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}       
+
+/* header */
+.not-front header .logo {
+    margin: 10px 0 0 0;
+}
+
+.not-front .wrapper, .not-front .wrapper_2, .not-front .wrapper_3
+{
+    width: 93%;
+}
+
+/* blog */
+#frameBlog .view-blog .views-row .blog-readmore, 
+#frameBlog .view-blog .views-row .blog-readmore a
+{
+    float: none;
+    right: 0;
+    left: 0;
+    margin: 0 auto;
+}
+
 #frameBlog #inner #right_column,
 #frameBlog #inner #left_column {
     width: 100%;
@@ -1379,6 +1426,31 @@ section.h_keuntungan .usp-content {
 #frameBlog #right_column .content
 {
     margin: 0 auto;
+}
+
+section.sblog .caption
+{
+    width: 93%;
+}
+
+section.sblog .caption p {
+    font-size: 15px;
+    margin-top: 10px;
+}
+
+.views-field.views-field-body img
+{
+    width: 100%;
+    margin: 0 0 5px 0;
+}
+
+#frameBlog .view-blog .views-row h2, 
+#frameBlog .view-blog .views-row h2 a, 
+#frameBlog h2, #frameBlog h2 a 
+{
+    line-height: 1.3
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
 /* footer */
@@ -1413,4 +1485,60 @@ footer .right .box {
 
 footer .right .box h6 {
     font-size: 12px;
+}
+
+section.banner, section.h_middle_top {
+    background: #1d262c;
+}
+
+section.h_middle_top {
+    position: relative;
+    top: 0;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table
+{
+    margin-bottom: 65px; 
+}
+
+section.std_content .list_voucher .box_voucher
+{
+    width: 100%;
+}
+
+.commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
+{
+    width: 38%;
+}
+
+/*promotion area */
+section.promo_banner .slide img
+{
+    display:none;
+}
+
+.mweb
+{
+    display:block;
+}
+
+.mweb img
+{
+    width:100%;
+    display:block !important;
+}
+
+section.promo_banner .slide img
+{
+    right:0;
+}
+
+section.promo_banner .slide
+{
+    height: 200px;
+    min-height: 200px;
+}
+
+.bx-wrapper .bx-pager {
+    display: none;
 }

@@ -1348,16 +1348,144 @@ section.sblog .caption p {
     font-size: 20px;
 }
 
-.not-front #frameBlog .wrapper {
+.not-front .wrapper, .not-front .wrapper_2, .not-front .wrapper_3
+{
     width: 1170px;
 }
 
-/* header */
-.not-front header .logo {
-    margin: 10px 0 0 0;
+.not-front footer {
+    margin-top: 40px;
 }
 
-.not-front .wrapper
+section.h_middle_top
 {
-    width: 95%;
+    height: auto;
+    min-height: 460px;
 }
+
+section.h_middle_top .home_tab .content_tab {
+    border: 1px solid #a1a1a1 !important;
+}
+
+section.h_middle_top {
+    height: auto;
+    position: absolute;
+    top: 120px;
+    min-height: 460px;
+    z-index: 1;
+}
+
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number, 
+section.h_middle_top .home_tab .form#bpjs-kesehatan input[type=text]#edit-field-phone-number--2
+{   
+    background: url(../images/material/ico_phone_black.png) no-repeat center left !important;
+    background-position: center left 0 !important;
+}
+
+section.h_middle_top .home_tab .content_tab
+{
+    -webkit-box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    -moz-box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    box-shadow: 0px 0px 0px 5px rgba(205,205,205,0.2);
+    margin-bottom: 5px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 4px;
+    right: 4px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 4px;
+    right: 4px;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table
+{
+    width: 98%;
+    margin-bottom: 0; 
+}
+
+section.std_content .list_voucher .box_voucher
+{
+    width: 25%;
+}
+
+section.h_middle_top .home_tab .form input[type=text].error {
+    border-color: red !important;
+    background-color: #f0f0f0 !important;
+}
+
+section.h_middle_top .form-bpjs .form-field
+{
+    margin-bottom: 0px; 
+}
+
+section.h_middle_top .form-select option
+{
+    padding: 5px;
+    padding-left: 40px !important;
+}
+
+.header-img
+{
+    height: 535px;
+}
+
+section.banner .caption
+{
+    bottom: 140px;
+}
+
+section.h_middle_top
+{
+    min-height: 400px;
+    margin-bottom: -400px;
+}
+
+section.h_middle_top .topup-action input.form-submit, 
+section.h_middle_top input.form-submit.enabled
+{
+    padding:0;
+}
+
+/* for promotion area */
+.bx-wrapper img
+{
+    max-width:100%;
+    height: auto;
+}
+
+.mweb
+{
+    display:none;
+}
+
+.bx-wrapper .bx-viewport {
+    left: 0;
+}
+
+section.promo_banner .slide img {
+    display: block;
+    top:0;
+    max-width: 100%;
+    height: auto;
+}
+
+.slide_content
+{
+    height: auto;
+    max-height: none;
+}
+

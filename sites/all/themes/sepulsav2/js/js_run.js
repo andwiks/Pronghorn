@@ -22,10 +22,10 @@ $(document).ready(function () {
     $(".promo_banner .slider").bxSlider({
         auto: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
         mode: 'fade', 
-        pager: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        pager: false,
+        pause: 10000,
         controls : ($(".promo_banner .slider > .slide").length > 1) ? true: false
     });// carousel voucher vendor
-
 
     $(".banner .slider").bxSlider({
         auto: true,

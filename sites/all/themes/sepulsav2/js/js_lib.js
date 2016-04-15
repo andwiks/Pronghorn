@@ -98,6 +98,7 @@ $.fn.placeHolder = function (e) {
             $(this).val($(this).attr('value-placeholder'));
     });
 };
+
 function homeTab() {
     //init
     var hash = window.location.hash.substr(1);
@@ -105,6 +106,19 @@ function homeTab() {
     if (hash === '' || hash === 'undefined') {
         hash = 'pulsa';
     }
+
+    if (hash === 'bpjs' || hash === 'bpjs-kesehatan') {
+        hash = 'bpjs-kesehatan';
+    }
+
+        var categories = [ "pln", "biznet", "bpjs-kesehatan", "multifinance" ];
+        found = $.inArray(hash, categories);
+
+    if (found === -1) {
+        hash = 'pulsa';
+    }
+
+    /*alert(hash);*/
 
     if ($('.home_tab .content_tab #' + hash) !== 'undefined') {
         $('.home_tab .content_tab #' + hash).css('display', 'block');
@@ -126,6 +140,7 @@ function homeTab() {
     });
 
 }
+
 function kreditTab() {
     //init
     var target = $(".akun .nav_tab a.active").attr('target');

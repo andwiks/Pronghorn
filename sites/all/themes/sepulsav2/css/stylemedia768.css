@@ -751,3 +751,57 @@ section.h_keuntungan .usp-content h5 {
 section.h_keuntungan .wrapper_2 {
     width: 760px;
 }
+
+/* feedback after 13 april */
+section.h_middle_top
+{
+    min-height: 100%;
+    margin-bottom: auto;
+}
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 2px;
+    right: 2px;
+}
+
+section.h_middle_top
+{
+    margin-bottom: -370px;
+}
+
+section.h_middle_top 
+{
+    height: auto;
+    min-height: 370px;
+}
+
+/* header */
+.not-front header .logo {
+    margin: 10px 0 0 0;
+}
+
+.not-front .wrapper, .not-front .wrapper_2, .not-front .wrapper_3
+{
+    width: 93%;
+}
+
+section.std_content .voucher .c_left .grid_voucher_order table
+{
+    width: 94%;
+    margin-bottom: 10px;
+}

@@ -7,25 +7,34 @@
  */
 
 // 30 items per page.
-define('TOTAL_ITEMS_PER_PAGE', 30);
+define('CAMPAIGN_PER_PAGE', 30);
+// Admin uri links.
+define('ADMIN_CONTENT_SRC_MANAGE_URI', 'admin/content/referral_campaign/manage/');
+define('ADMIN_CONTENT_SRC_URI', 'admin/content/referral_campaign');
+
 
 /**
  * Implements hook_entity_info().
  */
 function sepulsa_referral_campaign_entity_info() {
-  $lawmakers_entity_info['sepulsa_referral_campaign'] = array(
+  $entity['sepulsa_referral_campaign'] = array(
     'label' => t('Sepulsa Referral Campaign'),
     'controller class' => 'EntityAPIController',
-    'entity class' => 'Entity',
+    'entity class' => 'RefferalSepulsa',
     'base table' => 'sepulsa_referral_campaign',
-    'label callback' => 'entity_class_label',
-    'language callback' => 'device_language',
-    'uri callback' => 'entity_class_uri',
+    'label callback' => 'sepulsa_referral_campaign_label_callback',
+    'uri callback' => 'sepulsa_referral_campaign_uri',
     'fieldable' => TRUE,
     'entity keys' => array(
       'id' => 'src_id',
     ),
-    'access callback' => 'sepulsa_referral_campaign_access',
+    'admin ui' => array(
+      'path' => 'admin/content/referral_campaign',
+      'controller class' => 'ReferralCampaignUIController',
+      'file' => 'includes/sepulsa_referral_campaign.admin.inc',
+    ),
+    'module' => 'sepulsa_referral_campaign',
+    'access callback' => 'sepulsa_referral_campaign_access_callback',
     'load hook' => 'sepulsa_referral_campaign_load',
     'bundles' => array(
       'sepulsa_referral_campaign' => array(
@@ -39,19 +48,41 @@ function sepulsa_referral_campaign_entity_info() {
     'views controller class' => 'EntityDefaultViewsController',
   );
 
-  return $lawmakers_entity_info;
+  return $entity;
 }
 
 /**
- * Implements hook_load().
+ * Menu autoloader for /sepulsa_referral_campaign.
  */
-function sepulsa_referral_campaign_load($did) {
-  // Get jwt config by id.
-  $entity = entity_load('sepulsa_referral_campaign', array($did));
-  if (isset($entity[$did]) && !empty($entity[$did])) {
-    return $entity[$did];
+function sepulsa_referral_campaign_load($referral_id, $reset = FALSE) {
+  $referral = sepulsa_referral_campaign_load_multiple(array($referral_id), array(), $reset);
+  return reset($referral);
+}
+
+/**
+ * Load multiple sepulsa_referral_campaign based on certain conditions.
+ */
+function sepulsa_referral_campaign_load_multiple($referral_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('sepulsa_referral_campaign', $referral_ids, $conditions, $reset);
+}
+
+/**
+ * Saves sepulsa_referral_campaign to database.
+ */
+function sepulsa_referral_campaign_save(sepulsa_referral_campaign $referral) {
+  return $referral->save();
+}
+
+/**
+ * Referral Campaign access callback.
+ */
+function sepulsa_referral_campaign_access_callback() {
+  if (user_is_anonymous() && !user_access('administer entities')) {
+    return FALSE;
   }
-  return FALSE;
+  else {
+    return TRUE;
+  }
 }
 
 /**
@@ -76,9 +107,116 @@ function sepulsa_referral_campaign_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sepulsa_referral_campaign_settings'),
     'access arguments' => array('administer sepulsa_referral_campaign'),
-    'file' => 'sepulsa_referral_campaign.admin.inc',
+    'file' => 'includes/sepulsa_referral_campaign.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
+}
+
+/**
+ * RefferalSepulsa custom entity class.
+ */
+class RefferalSepulsa extends Entity {
+}
+ 
+/**
+ * Custom controller for the administrator UI.
+ */
+class ReferralCampaignUIController extends EntityDefaultUIController {
+
+  /**
+   * Override the menu hook for default ui controller.
+   */
+  public function hook_menu() {
+    $items = parent::hook_menu();
+    $items[$this->path]['title'] = t('Sepulsa Referral Campaign');
+    $items[$this->path]['description'] = t('Sepulss Referral Campaign.');
+    $items[$this->path]['access callback'] = 'sepulsa_referral_campaign_access_callback';
+    $items[$this->path]['access arguments'] = array('administer entities');
+    $items[$this->path]['type'] = MENU_LOCAL_TASK;
+    return $items;
+  }
+
+  /**
+   * Admin form for searching and doing bulk operations.
+   */
+  public function overviewForm($form, &$form_state) {
+    $form['pager'] = array('#theme' => 'pager');
+
+    $header = array(
+      'src_id' => array('data' => t('Src ID'), 'field' => 'src_id'),
+      'title' => array('data' => t('Title'), 'field' => 'title'),
+      'start' => array('data' => t('Start Date'), 'field' => 'start'),
+      'end' => array('data' => t('End Date'), 'field' => 'end'),
+      'path' => array('data' => t('Path Static Page'), 'field' => 'path'),
+      'operations' => array('data' => t('Operations'), 'field' => 'operations'),
+    );
+
+    $options = array();
+    $search_term = !empty($_GET['search']) ? $_GET['search'] : NULL;
+
+    $query = new EntityFieldQuery();
+    $query
+      ->entityCondition('entity_type', 'sepulsa_referral_campaign');
+
+    if (!empty($search_term)) {
+      $query->propertyCondition('title', '%' . $search_term . '%', 'like');
+    }
+    // Check for sort order and sort key.
+    if (!empty($_GET['sort']) && !empty($_GET['order'])) {
+      $sort = strtoupper($_GET['sort']);
+      $order = strtolower($_GET['order']);
+      $order = str_replace(' ', '_', $order);
+      if ($order != 'operations') {
+        $query->propertyOrderBy($order, $sort);
+      }
+    }
+
+    $query->pager(CAMPAIGN_PER_PAGE);
+
+    $result = $query->execute();
+    $src_results = !empty($result['sepulsa_referral_campaign']) ? $result['sepulsa_referral_campaign'] : array();
+    $src_array = !empty($src_results) ? sepulsa_referral_campaign_load_multiple(array_keys($src_results)) : array();
+    foreach ($src_array as $referral_id => $ref) {
+      $options['src_id-' . $referral_id] = array(
+        'src_id' => $ref->src_id,
+        'title' => $ref->title,
+        'start' => $ref->start,
+        'end' => $ref->end,
+        'path' => $ref->path,
+        'operations' =>
+        l(t('Edit'), ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id, array('query' => array('destination' => ADMIN_CONTENT_SRC_URI))) . ' ' .
+        l(t('Delete'), ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id . '/delete', array('attributes' => array('class' => array('src-delete-' . $ref->src_id), ), 'query' => array('destination' => ADMIN_CONTENT_SRC_URI))),
+      );
+    }
+
+    $form['search'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Basic Search'),
+      '#collapsible' => TRUE,
+      '#collapsed' => !empty($search_term) ? FALSE : TRUE,
+    );
+
+    $form['search']['search_text'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Search Title'),
+      '#default_value' => !empty($search_term) ? $search_term : '',
+    );
+
+    $form['search']['search_submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Search'),
+    );
+
+    $form['entities'] = array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#attributes' => array('class' => array('entity-sort-table')),
+      '#empty' => t('There are no campaign.'),
+    );
+
+    return $form;
+  }
 }

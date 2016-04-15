@@ -45,7 +45,7 @@ function sepulsa_referral_campaign_schema() {
       'path' => array(
         'description' => 'Path static page for referral campaign',
         'type' => 'varchar',
-        'length' => '150',
+        'length' => '254',
         'not null' => TRUE,
         'default' => '',
       ),

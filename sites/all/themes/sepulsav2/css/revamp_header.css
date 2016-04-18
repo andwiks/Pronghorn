@@ -1323,3 +1323,94 @@ body.home footer
 {
     z-index: 999;
 }
+
+/* faq style for azul */
+    /* content landing page faqs */
+    section.std_content .c_right .row.accordion .content .faq-rows {
+        margin: 0 10px;
+        font-size: 14px;
+        line-height: 1.25; 
+        padding: 0 10px 15px 10px;
+    }
+
+    section.std_content .c_right .row.accordion .label
+    {
+        padding: 10px;
+        margin: 0 0 10px 0;
+    }
+
+    section.std_content .c_right .row.accordion.active {
+        background: #f5f5f5;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    section.std_content .c_right .row.accordion:hover
+    {
+        background: #f5f5f5;
+    }
+
+    section.std_content .c_right .row.accordion .label span.ico {
+        text-indent: -9999px;
+        content: "";
+        top: 5px;
+    }
+
+    section.std_content .c_right .row.accordion .content:before
+    {
+        display: none;
+    }
+
+    section.std_content .c_right .row.accordion {
+        margin-bottom: 5px;
+        padding-bottom: 0;
+    }
+
+    section.std_content .other h2 {
+        margin: 30px 0 15px 0;
+        padding: 0 0 10px 0;
+    }
+
+    /* faq link */
+    .region.region-sidebar-first .row.accordion {
+        padding: 5px 10px;
+        margin-bottom: 5px;
+    }
+
+    .region.region-sidebar-first .row.accordion.deactive.active {
+        background: #f5f5f5;
+    }
+
+    .region.region-sidebar-first .row.accordion span.ico {
+        width: 7px;
+        display: inline-block;
+    }
+
+    .region.region-sidebar-first .row.accordion .content{
+        margin-left: 10px;
+    }
+
+    .region.region-sidebar-first .row.accordion:hover
+    {
+        background: #f5f5f5;
+    }
+
+    /* detail faq */
+    section.std_content .c_right .node-book .content {
+        font-size: 14px;
+        line-height: 1.25;
+    }
+
+    section.std_content .c_right .node-book .content .field-name-field-faq-category {
+        margin: 10px 0;
+    }
+
+    section.std_content .c_right .view-faqs {
+        font-size: 14px;
+        line-height: 1.25;
+    }
+
+    section.std_content .other .c_right .view-footer p a:after {
+        content: "»";
+        padding-left: 5px;
+        display: inline-block;
+    }

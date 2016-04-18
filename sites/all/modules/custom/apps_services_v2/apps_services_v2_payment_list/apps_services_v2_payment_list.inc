@@ -100,7 +100,8 @@ function apps_services_v2_payment_list_checkout_payment($payment_method, $use_cr
     commerce_order_save($order);
     
     $return["status"] = true;
-    $return["data"] = order_services_order($order);
+    commerce_cart_order_refresh($order);
+    $return["data"] = apps_services_v2_payment_list_format_order($order);
 
     return $return;
   }

@@ -22,7 +22,7 @@
  *   System settings form array.
  */
 function device_mail_verification_settings($form = array(), $form_state = array()) {
-  // Fieldset for JWT.
+  // Fieldset for Device mail settings.
   $form['dmv'] = array(
     '#type' => 'fieldset',
     '#title' => t('Device Mail Settings'),
@@ -73,6 +73,35 @@ function device_mail_verification_settings($form = array(), $form_state = array(
     '#default_value' => variable_get('device_mail_redirect', ''),
     '#description' => t('Set redirect page after confirm.'),
   );
+  // Fieldset for Device merge settings.
+  $form['dms'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Device Merge Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  // Define list of order status.
+  $options = array();
+  $order_statuses = commerce_order_statuses();
+  foreach ($order_statuses as $status_key => $status_data) {
+    $options[$status_key] = t('@title (@state)', array(
+      '@title' => $status_data['title'],
+      '@state' => $status_data['state'],
+    ));
+  }
+  $form['dms']['device_mail_merge_order_status'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => t('Order status'),
+    '#description' => t('Only checked order status that will get merged.'),
+    '#default_value' => variable_get('device_mail_merge_order_status', array(
+      'completed' => 'completed',
+      'pending' => 'pending',
+      'processing' => 'processing',
+      'invoiced' => 'invoiced',
+    )),
+  );
+  // Return system settings form to automatically handle variables.
   return system_settings_form($form);
 }
 
@@ -82,7 +111,7 @@ function device_mail_verification_settings($form = array(), $form_state = array(
  * @param array $form
  *   Form array.
  * @param array $form_state
- *   Form state array. 
+ *   Form state array.
  *
  * @return array
  *   System form update manual user device.
@@ -129,7 +158,7 @@ function device_mail_verification_update_manual($form = array(), $form_state = a
  * @param array $form
  *   Form array.
  * @param array $form_state
- *   Form state array. 
+ *   Form state array.
  */
 function device_mail_verification_update_manual_submit($form, &$form_state) {
   // Store value form.
@@ -263,12 +292,12 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
 }
 
 /**
- * Kasus 1 : merge to web account. 
+ * Kasus 1 : merge to web account.
  *            user device account di block.
  *            device id di form di arahkan ke web account. (device->uid pake uid email yang tertera)
  *            set email device yang baru
  *            kalau ada history device semua historynya dipindahin ke web.
- * kasus 2 : merge to device account. 
+ * kasus 2 : merge to device account.
  *            device uid tetap.
  *            user web di block.
  *            change email device and user.
@@ -280,7 +309,7 @@ function device_mail_verification_update_manual_submit($form, &$form_state) {
  *            device web biarkan.
  *            kalau ada history device, semua historynya dipindahin ke web.
  * kasus 4 : merge to device account with device.
- *            form yakinin. 
+ *            form yakinin.
  *            device uid tetap.
  *            user web di block.
  *            block web device.

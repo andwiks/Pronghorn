@@ -203,9 +203,9 @@ function device_mail_verification_merge_user($current_mail) {
       $device_user_wrapper->mail->set($current_mail['mail']);
       $device_user_wrapper->save();
 
-      watchdog('Device Mail Verification',
-            'Merge User New User-> device_account : !device_account_id',
-            array('!device_account_id' => $device_uid));
+      watchdog('device_mail_verification', 'Merge User New User-> device_account : !device_account_id', array(
+        '!device_account_id' => $device_uid,
+      ), WATCHDOG_INFO);
     }
     else {
       device_mail_verification_merge($strategi, $current_mail['mail'], $current_mail['did'], $device_uid, $web_uid, $merge_to);
@@ -237,31 +237,34 @@ function device_mail_verification_merge_user($current_mail) {
  *   device / web.
  */
 function device_mail_verification_merge($strategi = '', $mail = '', $device_did = '', $device_uid = '', $web_uid = '', $merge_to = '') {
-  $changed_uid_order = array();
   if ($merge_to == 'device') {
     // Block Web Account.
     $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
     $web_user_wrapper->status->set(0);
     $web_user_wrapper->save();
+    // Get web user object.
+    $web_user = $web_user_wrapper->value();
 
     // Change email in user , where uid = $device_uid;
     $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
     $device_user_wrapper->mail->set($mail);
     $device_user_wrapper->save();
+    // Get device user object.
+    $device_user = $device_user_wrapper->value();
 
-    $account = user_load($device_uid);
-    $mail = _user_mail_notify('password_reset', $account);
+    // Transfer roles.
+    if (count($web_user->roles) > count($device_user->roles)) {
+      $device_user->roles = $web_user->roles;
+      // Save user: get account.
+      $device_user = user_save($device_user);
+    }
+
+    // Check if device user is load correctly.
+    if ($device_user !== FALSE) {
+      $mail = _user_mail_notify('password_reset', $device_user);
+    }
 
     if ($strategi = 2) {
-      // Log changed uid in commerce order.
-      $mail_result = db_select('commerce_order', 'co')
-        ->fields('co', array('order_id'))
-        ->condition('uid', $web_uid, '=')
-        ->execute();
-      foreach ($mail_result as $result) {
-        $changed_uid_order[] = $result->order_id;
-      }
-
       // Update UID in commerce_order.
       device_mail_verification_transfer_order($web_uid, $device_uid);
     }
@@ -271,28 +274,31 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
     $device_user_wrapper->status->set(0);
     $device_user_wrapper->save();
+    // Get device user object.
+    $device_user = $device_user_wrapper->value();
 
     // Change UID in device.
     $device_user_wrapper = entity_metadata_wrapper('device', $device_did);
     $device_user_wrapper->uid->set($web_uid);
     $device_user_wrapper->save();
+    // Get web user object.
+    $web_user = user_load($web_uid);
+
+    // Transfer roles: only if previous roles
+    if (count($device_user->roles) > count($web_user->roles)) {
+      $web_user->roles = $device_user->roles;
+      $web_user = user_save($web_user);
+    }
 
     if ($strategi == 4) {
-      // Log changed uid in commerce order.
-      $mail_result = db_select('commerce_order', 'co')
-        ->fields('co', array('order_id'))
-        ->condition('uid', $device_uid, '=')
-        ->execute();
-      foreach ($mail_result as $result) {
-        $changed_uid_order[] = $result->order_id;
-      }
-
       // Update UID in commerce_order.
       device_mail_verification_transfer_order($device_uid, $web_uid);
 
-      // Send Email to reset Password.
-      $account = user_load($web_uid);
-      $mail = _user_mail_notify('password_reset', $account);
+      // Check if web user load correctly.
+      if ($web_user !== FALSE) {
+        // Send Email to reset Password.
+        $mail = _user_mail_notify('password_reset', $web_user);
+      }
     }
   }
 
@@ -301,14 +307,12 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     ->condition('mail', $mail, '=')
     ->execute();
 
-  watchdog('Device Mail Verification',
-          'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id , changed UID commerce_order : !changed_uid_order',
-          array(
-            '!merge_to' => $merge_to,
-            '!strategi' => $strategi,
-            '!device_account_id' => $device_uid,
-            '!web_account_id' => $web_uid,
-            '!changed_uid_order' => print_r($changed_uid_order, TRUE),));
+  watchdog('device_mail_verification', 'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id.', array(
+    '!merge_to' => $merge_to,
+    '!strategi' => $strategi,
+    '!device_account_id' => $device_uid,
+    '!web_account_id' => $web_uid,
+  ), WATCHDOG_INFO);
 }
 
 /**

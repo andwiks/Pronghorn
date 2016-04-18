@@ -220,3 +220,46 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
     return $form;
   }
 }
+
+/**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_referral_campaign_commerce_order_presave($order) {
+  $details = array();
+  if ($order->status == 'invoiced') {
+    $order = db_select('commerce_order', 'co')
+          ->fields('co')
+          ->condition('uid', $order->uid, '=')
+          ->condition('order_id', $order->order_id, '<>')
+          ->execute();
+
+    if ($order->rowCount() == 0) {
+      $referral_details = db_select('referral_campaign_details', 'rcd');
+      $referral_details->join('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
+      $referral_details->fields('rcd', array('ref_id', 'uid', 'referral_uid'));
+      $referral_details->fields('src', array('rules_name'));
+      $referral_details->condition('rcd.referral_uid', $order->uid, '=');
+      $referral_details->condition('rcd.flag', 0, '=');
+      $referral_details->condition('src.start', REQUEST_TIME, '<=');
+      $referral_details->condition('src.end', REQUEST_TIME, '>=');
+      $result_ref = $referral_details->execute();
+      foreach ($result_ref as $result) {
+        $details = $result;
+      }
+      if (!empty($details)) {
+        $uid = user_load($details->uid);
+        $referral_uid = user_load($details->referral_uid);
+
+        // Invoke rules.
+        // rules_invoke_component($details->rules_name, $uid);
+        // rules_invoke_component($details->rules_name, $referral_uid);
+
+        // Change Flag in details.
+        db_update('referral_campaign_details')
+              ->fields(array('flag' => 1 , 'flag_timestamp' => REQUEST_TIME))
+              ->condition('ref_id', $details->ref_id, '=')
+              ->execute();
+      }
+    }
+  }
+}

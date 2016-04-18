@@ -380,6 +380,10 @@ function device_services_resource_verify($code = '') {
           // Update device uid.
           $device_wrapper = entity_metadata_wrapper('device', $session['device']->did);
           $device_wrapper->uid->set($account->uid);
+          // If user has valid email address, use it for device mail.
+          if (!preg_match('#\.dummy$#', $account->mail)) {
+            $device_wrapper->device_mail->set($account->mail);
+          }
           $device_wrapper->save();
 
           // Regenerate session: session already started.

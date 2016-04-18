@@ -182,8 +182,8 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
       $options['src_id-' . $referral_id] = array(
         'src_id' => $ref->src_id,
         'title' => $ref->title,
-        'start' => $ref->start,
-        'end' => $ref->end,
+        'start' => date('d M Y H:i:s', $ref->start),
+        'end' => date('d M Y H:i:s', $ref->end),
         'path' => $ref->path,
         'operations' =>
         l(t('Edit'), ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id, array('query' => array('destination' => ADMIN_CONTENT_SRC_URI))) . ' ' .

@@ -117,6 +117,16 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#required' => TRUE,
   );
 
+  // Get rules compontents name and label.
+  $rules = rules_get_components(TRUE, 'action');
+  $form['rules_name'] = array(
+    '#type' => 'select',
+    '#title' => t('Rules Action'),
+    '#description' => t('Rules Action to fire'),
+    '#options' => $rules,
+    '#default_value' => isset($referral->rules_name) ? $referral->rules_name : '',
+  );
+
   $form['path'] = array(
     '#title' => t('Path Static Page'),
     '#type' => 'textfield',
@@ -179,6 +189,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     $entity->start = $start;
     $entity->end = $end;
     $entity->path = $form_state['values']['path'];
+    $entity->rules_name = $form_state['values']['rules_name'];
     $entity->changed = strtotime('now');
     $entity->save();
     drupal_set_message(t('Referral Campaign ID : @id has been saved.',
@@ -198,6 +209,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
       'start' => $start,
       'end' => $end,
       'path' => $form_state['values']['path'],
+      'rules_name' => $form_state['values']['rules_name'],
       'created' => strtotime('now'),
       'changed' => strtotime('now'),
     ));

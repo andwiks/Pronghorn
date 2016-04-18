@@ -1333,6 +1333,10 @@ body.home footer
         padding: 0 10px 15px 10px;
     }
 
+    section.std_content .c_right .row.accordion .content .faq-rows .faq-title {
+        font-weight: 600;
+    }
+
     section.std_content .c_right .row.accordion .label
     {
         padding: 10px;
@@ -1374,15 +1378,27 @@ body.home footer
     .region.region-sidebar-first .row.accordion {
         padding: 5px 10px;
         margin-bottom: 5px;
+        border-bottom: 1px dashed #929292;
+    }
+
+    .region.region-sidebar-first .row.accordion .label
+    {
+        font-size: 16px;
+        color: #929292;
+        font-family: "robotoregular";
+        padding: 5px 0;
+        line-height: 1.5;
     }
 
     .region.region-sidebar-first .row.accordion.deactive.active {
         background: #f5f5f5;
+        border-bottom: 1px dashed #f5f5f5;
     }
 
     .region.region-sidebar-first .row.accordion span.ico {
         width: 7px;
         display: inline-block;
+        text-align: center;
     }
 
     .region.region-sidebar-first .row.accordion .content{

@@ -18,9 +18,7 @@ if($classes_array[0]){
   <?php endif; ?>
   <div class="content">
   <?php foreach ($rows as $id => $row): ?>
-    <p>
       <?php print $row; ?>
-    </p>
   <?php endforeach; ?>
   </div>
 </div>

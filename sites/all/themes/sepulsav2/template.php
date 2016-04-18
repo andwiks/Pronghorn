@@ -994,3 +994,21 @@ function sepulsav2_process_radios_payment_method($element) {
 
   return $element;
 }
+
+function sepulsav2_preprocess_views_view(&$vars) {
+  if($vars["name"]=="commerce_cart_summary") {
+
+    $fee ='
+      <td class="product-subtotal">
+        <span class="amount"><strong>0  IDR</strong></span>
+      </td>
+    ';
+    $new_fee ='
+      <td class="product-subtotal">
+        <span class="amount"><strong>FREE</strong></span>
+      </td>
+    ';
+    $vars['footer'] = str_replace($fee,$new_fee,$vars["footer"]);
+
+  }
+}

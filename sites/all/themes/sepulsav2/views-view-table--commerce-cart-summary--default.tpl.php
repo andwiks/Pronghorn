@@ -36,8 +36,6 @@
 <tbody>
   <?php foreach ($rows as $row_count => $row): ?>
 
-        <?php kpr($row); ?>
-
     <tr class="cart_item">
       <?php foreach ($row as $field => $content): ?>
 

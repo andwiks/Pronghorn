@@ -4,7 +4,6 @@
  * device_mail_verification.install
  *
  * @author aizat@sepulsa.com
- *
  */
 
 /**
@@ -110,9 +109,14 @@ function device_mail_verification_install() {
   // Delete device variables.
   variable_set('device_mail_timeout', (60 * 60 * 24));
   variable_set('device_mail_subject', 'Verification of your mail at Sepulsa.com');
-  variable_set('device_mail_body',
-      'Please click on the following link to confirm this email address at Sepulsa.com');
-  variable_get('device_mail_redirect', '');
+  variable_set('device_mail_body', 'Please click on the following link to confirm this email address at Sepulsa.com');
+  variable_set('device_mail_redirect', '');
+  variable_set('device_mail_merge_order_status', array(
+    'completed' => 'completed',
+    'pending' => 'pending',
+    'processing' => 'processing',
+    'invoiced' => 'invoiced',
+  ));
 }
 
 /**
@@ -124,4 +128,5 @@ function device_mail_verification_uninstall() {
   variable_del('device_mail_subject');
   variable_del('device_mail_body');
   variable_del('device_mail_redirect');
+  variable_del('device_mail_merge_order_status');
 }

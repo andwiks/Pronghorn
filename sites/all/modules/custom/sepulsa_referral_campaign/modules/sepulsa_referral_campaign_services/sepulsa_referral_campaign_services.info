@@ -1,0 +1,8 @@
+name = "Sepulsa Refferal Campaign Services"
+description = "Integrates Sepulsa Refferal Campaign with Services module."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = sepulsa_referral_campaign
+dependencies[] = services
+dependencies[] = services_documentation

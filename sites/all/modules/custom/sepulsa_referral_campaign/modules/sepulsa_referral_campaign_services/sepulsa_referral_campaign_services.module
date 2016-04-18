@@ -1,0 +1,82 @@
+<?php
+/**
+ * @file
+ * sepulsa_referral_campaign_services.module
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function sepulsa_referral_campaign_services_services_resources() {
+  $sepulsa_referral_campaign_services = array(
+    'device' => array(
+      'operations' => array(
+        'index' => array(
+          'help' => 'List Campaign from a table',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'callback' => 'sepulsa_referral_campaign_services_resource_index',
+          'args' => array(),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_index_doc',
+        ),
+      ),
+      'actions' => array(
+        'request' => array(
+          'help' => 'Request referral code.',
+          'callback' => 'sepulsa_referral_campaign_services_resource_request',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_request_doc',
+          'args' => array(
+            array(
+              'name' => 'src_id',
+              'type' => 'string',
+              'description' => 'A valid device imei.',
+              'source' => array(
+                'data' => 'src_id',
+                'param' => 'src_id',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+        'register' => array(
+          'help' => 'Register with referral code.',
+          'callback' => 'sepulsa_referral_campaign_services_resource_verify',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_verify_doc',
+          'args' => array(
+            array(
+              'name' => 'code',
+              'type' => 'string',
+              'description' => 'A valid device code.',
+              'source' => array(
+                'data' => 'code',
+                'param' => 'code',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  return $sepulsa_referral_campaign_services;
+}

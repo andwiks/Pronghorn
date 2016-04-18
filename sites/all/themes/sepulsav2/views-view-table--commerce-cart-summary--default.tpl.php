@@ -41,7 +41,7 @@
 
         <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
           <?php
-
+            // Replace 0 IDR with text FREE.
             $total[$field] = strip_tags($content);
 
             if($field=='commerce_unit_price_1' && $total[$field]=='0  IDR'){

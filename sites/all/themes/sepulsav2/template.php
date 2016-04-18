@@ -995,6 +995,8 @@ function sepulsav2_process_radios_payment_method($element) {
   return $element;
 }
 
+
+// Replace string on line item admin_fee.
 function sepulsav2_preprocess_views_view(&$vars) {
   if($vars["name"]=="commerce_cart_summary") {
 

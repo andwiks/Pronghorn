@@ -62,7 +62,7 @@ function device_settings($form = array(), $form_state = array()) {
     'before' => '',
     'prefix' => '',
     'pattern' => 1,
-    'length' => 4,
+    'length' => 6,
     'suffix' => '',
     'after' => '',
   ));

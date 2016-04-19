@@ -10,36 +10,36 @@ function apps_services_v2_transaction_check_if_current_active_user_owned_order($
       return $order;
     }
   }
-  
+
   return false;
 }
 
-/* 
+/*
  * process favorited past transaction of user
  * if already favorite then remove favorite
  */
 function apps_services_v2_transaction_data_favorite($order_id, $source){
   global $user;
-  
+
   //get user uid
   $uid = $user->uid;
-  
+
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
-  
+
   //validate order id, check if it actually owned by active user
   $validate_order_id = apps_services_v2_transaction_check_if_current_active_user_owned_order($user, $order_id);
   if(!$validate_order_id){
     return services_error('Order tidak sesuai dengan user aktif', 406);
   }
-  
+
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
-    
+
   //add or remove favorite transaction
   //check if order_id already exist
   $num_favorited_order = db_select('favorite_transaction', 'ft')
@@ -77,7 +77,7 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
  * change the format of order listing
  */
 function apps_services_v2_transaction_change_format_order($order_container, $type=null){
-  
+
   //get all available operator data
   $operator = sepulsa_get_all_operator_data();
   //reorganize the returned operator for easy process
@@ -87,7 +87,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
       $operator_array[$prefix] = $data_operator["operator"];
     }
   }
-  
+
   //change return value of order container
   $selected_returned_value = array();
   foreach($order_container as $order){
@@ -108,7 +108,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     $temp_array_data["response"] = $order;
     $temp_array_data["product_id"] = $order->commerce_line_items[0]->commerce_product->product_id;
     $temp_array_data["title"] = $order->commerce_line_items[0]->commerce_product->title;
-    
+
     //get type order based on many case
     if(isset($order->commerce_line_items[0]->type) && !empty($order->commerce_line_items[0]->type)){
       $temp_array_data["type"] = $order->commerce_line_items[0]->type;
@@ -116,7 +116,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     elseif(isset($order->commerce_line_items->type) && !empty($order->commerce_line_items->type)){
       $temp_array_data["type"] = $order->commerce_line_items->type;
     }
-    
+
     //get phone number order based on many case
     if(isset($order->commerce_line_items[0]->field_phone_number) && !empty($order->commerce_line_items[0]->field_phone_number)){
       $temp_array_data["field_phone_number"] = $order->commerce_line_items[0]->field_phone_number;
@@ -127,7 +127,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     else{
       $temp_array_data["field_phone_number"] = null;
     }
-    
+
     //get electricity customer number order based on many case
     if(isset($order->commerce_line_items[0]->electricity_customer_number) && !empty($order->commerce_line_items[0]->electricity_customer_number)){
       $temp_array_data["electricity_customer_number"] = $order->commerce_line_items[0]->electricity_customer_number;
@@ -138,7 +138,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     else{
       $temp_array_data["electricity_customer_number"] = null;
     }
-    
+
     //if the one exist is field_customer_number use it for electricity_customer_number
     if(isset($order->commerce_line_items[0]->field_customer_number) && !empty($order->commerce_line_items[0]->field_customer_number)){
       $temp_array_data["electricity_customer_number"] = $order->commerce_line_items[0]->field_customer_number;
@@ -146,7 +146,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     elseif(isset($order->commerce_line_items->field_customer_number) && !empty($order->commerce_line_items->field_customer_number)){
       $temp_array_data["electricity_customer_number"] = $order->commerce_line_items->field_customer_number;
     }
-    
+
     //get electricity phone number
     if(isset($order->commerce_line_items[0]->electricity_phone_number) && !empty($order->commerce_line_items[0]->electricity_phone_number)){
       $temp_array_data["electricity_phone_number"] = $order->commerce_line_items[0]->electricity_customer_number;
@@ -162,7 +162,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
         $temp_array_data["electricity_phone_number"] = null;
       }
     }
-    
+
     //add operator returned value based on phone number
     if(isset($temp_array_data["type"]) && $temp_array_data["type"] == "mobile_prepaid"){
       $first_4_digit = substr($temp_array_data["field_phone_number"], 0, 4);
@@ -182,7 +182,7 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     else{
       $temp_array_data["operator_title"] = "Transaksi Sepulsa";
     }
-    
+
     //set favorite based on list data
     if(isset($order->type) && !empty($order->type) && $order->type == "favorite"){
       $temp_array_data["favorite"] = true;
@@ -193,12 +193,12 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
     else{
       $temp_array_data["favorite"] = false;
     }
-    
+
     $temp_array_data["revision_timestamp"] = $order->revision_timestamp;
-    
+
     $selected_returned_value[] = $temp_array_data;
   }
-  
+
   return $selected_returned_value;
 }
 
@@ -207,22 +207,22 @@ function apps_services_v2_transaction_change_format_order($order_container, $typ
  */
 function apps_services_v2_transaction_history_list($page, $size, $source){
   global $user;
-  
+
   //get current active user uid
   $uid = $user->uid;
-  
+
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
-  
+
   //set variable container
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
   $favorite_order_id = array();
-  
+
   //get favorite transaction order id from the database
   $result = db_select('favorite_transaction', 'ft')
             ->fields('ft', array('order_id', 'uid', 'created'))
@@ -232,24 +232,24 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
   foreach ($result as $usage) {
     $favorite_order_id[] = $usage->order_id;
   }
-  
+
   //set allowed order status list
   $allowed_cart_status = array("pending", "processing", "invoiced", "completed", "canceled");
-  
+
   //get order list
   $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));
-  
+
   //set order desc
   $order_list = array_reverse($order_list,true);
-  
+
   $start = ($page-1) * $size;
   $stop = $start + $size;
-  
+
   //loop order to get order data
   $favorite_order_container = array();
   $latest_order_container = array();
   $i = 1;
-  
+
   foreach ($order_list as $key => $value) {
     //include only allowed status order
     if(isset($value->status) && in_array($value->status, $allowed_cart_status)){
@@ -270,13 +270,13 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
       $i++;
     }
   }
-  
+
   //merge favorite and latest order data into one container
   $order_container = array_merge($favorite_order_container,$latest_order_container);
 
   //change the returned format
   $order_container = apps_services_v2_transaction_change_format_order($order_container);
-  
+
   if(count($order_container)){
     $return["status"] = true;
     $return["message"] = "Order list history pengguna";
@@ -287,7 +287,7 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
     $return["message"] = "Order list tidak ditemukan";
     $return["data"] = null;
   }
-  
+
   return $return;
 }
 
@@ -297,22 +297,22 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
  */
 function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   global $user;
-  
+
   //get current active user uid
   $uid = $user->uid;
-  
+
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
-  
+
   //set variable container
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
   $favorite_order_id = array();
-  
+
   //get favorite transaction order id from the database
   $result = db_select('favorite_transaction', 'ft')
             ->fields('ft', array('order_id', 'uid', 'created'))
@@ -322,15 +322,15 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   foreach ($result as $usage) {
     $favorite_order_id[] = $usage->order_id;
   }
-  
+
   //get order list
   $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));
   //set order desc
   $order_list = array_reverse($order_list,true);
-  
+
   //set allowed order status list
   $allowed_cart_status = array("pending", "processing", "invoiced", "completed");
-  
+
   //check how many favourite available in the return order list
   $count_favorite_order = 0;
   foreach ($order_list as $key => $value) {
@@ -338,13 +338,13 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
       $count_favorite_order++;
     }
   }
-  
+
   //check if favorite order already more than "$size", if still less then get latest order to complement
   $number_of_latest_order_needed = 0;
   if($count_favorite_order < $size){
     $number_of_latest_order_needed = $size - $count_favorite_order;
   }
-  
+
   //loop order to get order data
   $favorite_order_container = array();
   $latest_order_container = array();
@@ -370,13 +370,13 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
       }
     }
   }
-  
+
   //merge favorite and latest order data into one container
   $order_container = array_merge($favorite_order_container,$latest_order_container);
 
   //fill the order with latest order data as last filter, if actually no favorite order found in the current list
   $i = 0;
-  if($favorite_only == 0 && !count($order_container)){  
+  if($favorite_only == 0 && !count($order_container)){
     foreach ($order_list as $key => $value) {
       //include only allowed status order
       if(isset($value->status) && in_array($value->status, $allowed_cart_status)){
@@ -390,10 +390,10 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
       }
     }
   }
-  
+
   //change the returned format
   $order_container = apps_services_v2_transaction_change_format_order($order_container,"home");
-  
+
   if(count($order_container)){
     $return["status"] = true;
     $return["message"] = "Order list halaman home pengguna";
@@ -404,7 +404,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
     $return["message"] = null;
     $return["data"] = null;
   }
-  
+
   //check if needed to include email request
   //temporary disable email request api, since not used
   /*$return["request_email"] = "";
@@ -414,10 +414,10 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
       $return["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
     }
   }*/
-  
+
   //get credit balance
   $return["credit_balance"] = userpoints_get_current_points($uid, 'all');
-  
+
   return $return;
 }
 
@@ -448,7 +448,7 @@ function apps_services_v2_transaction_format_order_home($order) {
       }
     }
   }
-  
+
   return $order;
 }
 
@@ -458,12 +458,12 @@ function apps_services_v2_transaction_format_order_home($order) {
 function apps_services_v2_transaction_data_order_detail($order_id){
   // Load commerce order.
   $order = commerce_order_load($order_id);
-  
+
   // Check whether order is valid.
   if ($order !== FALSE) {
     //add order_status to get order status for android gson framework
     $order->order_status = $order->status;
-    
+
     //stripos($order->field_app["und"][0]["value"],'ios') is a workaround to fix issues with missing discount code in live environment from ios order
     if(isset($order->field_app["und"][0]["value"]) && stripos($order->field_app["und"][0]["value"],'ios') !== false){
       // Get order wrapper.
@@ -474,7 +474,7 @@ function apps_services_v2_transaction_data_order_detail($order_id){
       foreach ((array) $order->commerce_line_items as $key => $line_item) {
         $order->commerce_line_items[$key] = order_services_line_item($line_item);
       }
-      
+
       return $order;
     }
     return apps_services_v2_transaction_format_order_home($order);

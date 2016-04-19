@@ -165,7 +165,7 @@ function jwt_client_jwt_auth_verified($claims) {
       $query->entityCondition('entity_type', 'user')
         ->propertyCondition('mail', $aud)
         ->propertyCondition('status', 1)
-        ->propertyOrderBy('uid', DESC);
+        ->propertyOrderBy('uid', 'DESC');
       $result = $query->execute();
       // Load the user account.
       if (!empty($result) && isset($result['user']) && !empty($result['user'])) {

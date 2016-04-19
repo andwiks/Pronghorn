@@ -80,14 +80,6 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
             ), WATCHDOG_DEBUG);
           }
 
-          // Check if required but unable to get user object.
-          if ($method['endpoint']['jwt_auth']['token'] == 'required'
-            && user_is_anonymous()
-          ) {
-            // Force apps to get new token.
-            services_error(t('Invalid User'), 401);
-          }
-
           // Other condition: return gracefully.
           return;
         }

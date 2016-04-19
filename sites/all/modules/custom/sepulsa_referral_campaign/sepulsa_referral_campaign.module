@@ -67,6 +67,24 @@ function sepulsa_referral_campaign_load_multiple($referral_ids = array(), $condi
 }
 
 /**
+ * Funtion sepulsa_referral_campaign_getlist().
+ */
+function sepulsa_referral_campaign_getlist($active = FALSE) {
+  $list = array();
+  $query = db_select('sepulsa_referral_campaign', 'src');
+  $query->fields('src');
+  if ($active) {
+    $query->condition('src.start', REQUEST_TIME, '<=');
+    $query->condition('src.end', REQUEST_TIME, '>=');
+  }
+  $result = $query->execute();
+  foreach ($result as $key => $value) {
+    $list[] = $value;
+  }
+  return $list;
+}
+
+/**
  * Saves sepulsa_referral_campaign to database.
  */
 function sepulsa_referral_campaign_save(sepulsa_referral_campaign $referral) {

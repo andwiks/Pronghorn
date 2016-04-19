@@ -6,3 +6,4 @@ package = "Sepulsa"
 dependencies[] = sepulsa_referral_campaign
 dependencies[] = services
 dependencies[] = services_documentation
+dependencies[] = referral

@@ -11,7 +11,7 @@
  */
 function sepulsa_referral_campaign_services_services_resources() {
   $sepulsa_referral_campaign_services = array(
-    'device' => array(
+    'sepulsa_referral_campaign' => array(
       'operations' => array(
         'index' => array(
           'help' => 'List Campaign from a table',
@@ -39,12 +39,12 @@ function sepulsa_referral_campaign_services_services_resources() {
           'documentation callback' => 'sepulsa_referral_campaign_services_resource_request_doc',
           'args' => array(
             array(
-              'name' => 'src_id',
+              'name' => 'uid',
               'type' => 'string',
-              'description' => 'A valid device imei.',
+              'description' => 'A User id.',
               'source' => array(
-                'data' => 'src_id',
-                'param' => 'src_id',
+                'data' => 'uid',
+                'param' => 'uid',
               ),
               'optional' => FALSE,
               'http_method' => 'POST',
@@ -53,19 +53,19 @@ function sepulsa_referral_campaign_services_services_resources() {
         ),
         'register' => array(
           'help' => 'Register with referral code.',
-          'callback' => 'sepulsa_referral_campaign_services_resource_verify',
+          'callback' => 'sepulsa_referral_campaign_services_resource_register',
           'file' => array(
             'type' => 'inc',
             'module' => 'sepulsa_referral_campaign_services',
             'name' => 'sepulsa_referral_campaign_services',
           ),
           'access callback' => 'services_access_menu',
-          'documentation callback' => 'sepulsa_referral_campaign_services_resource_verify_doc',
+          // 'documentation callback' => 'sepulsa_referral_campaign_services_resource_register_doc',
           'args' => array(
             array(
               'name' => 'code',
               'type' => 'string',
-              'description' => 'A valid device code.',
+              'description' => 'A valid referral code.',
               'source' => array(
                 'data' => 'code',
                 'param' => 'code',
@@ -73,6 +73,19 @@ function sepulsa_referral_campaign_services_services_resources() {
               'optional' => FALSE,
               'http_method' => 'POST',
             ),
+          ),
+        ),
+        'getcampaign' => array(
+          'help' => 'Get active Campaign.',
+          'callback' => 'sepulsa_referral_campaign_services_resource_getcampaign',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'access callback' => 'services_access_menu',
+          // 'documentation callback' => 'sepulsa_referral_campaign_services_resource_register_doc',
+          'args' => array(
           ),
         ),
       ),

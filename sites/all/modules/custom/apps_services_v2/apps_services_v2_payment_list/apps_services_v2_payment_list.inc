@@ -84,8 +84,10 @@ function apps_services_v2_payment_list_checkout_payment($payment_method, $use_cr
   
   //check credit enable/disable setting
   if(variable_get('apps_services_v2_payment_list_credit_option', 1)){
-    if($use_credit > 0 && isset($_SESSION['use_credit'])){
-      unset($_SESSION['use_credit']);
+    if($use_credit > 0){
+      if(isset($_SESSION['use_credit'])){
+        unset($_SESSION['use_credit']);
+      }
     }
     else{
       $_SESSION["use_credit"] = false;

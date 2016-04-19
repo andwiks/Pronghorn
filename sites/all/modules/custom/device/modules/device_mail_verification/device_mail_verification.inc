@@ -52,34 +52,31 @@ function device_mail_verification_link_confirm($hash = NULL) {
       // Settings don't exist (this should NOT happen!).
       if (!empty($entities)) {
         // Either no timeout or timeout has no effect.
-        if (variable_get('device_mail_timeout', 0) == 0) {
-
+        // Or success! Verification request for existing mail within timeout.
+        if (variable_get('device_mail_timeout', 0) == 0
+          || $current_mail['timeout'] > REQUEST_TIME
+        ) {
           $confirm_status = 'confirmed';
-
           // Merge User.
           $result = device_mail_verification_merge_user($current_mail);
-
+          // Check if result not empty.
+          if (empty($result)) {
+            // Update mail verification to verified: updated twice?
+            // Check for new flag.
+            db_update('device_mail_verification')
+              ->fields(array('status' => 1))
+              ->condition('dmv_id', $current_mail['dmv_id'], '=')
+              ->execute();
+          }
         }
         // A timeout might have occurred.
         else {
-
-          // Success! Verification request for existing mail within timeout.
-          if ($current_mail['timeout'] > time()) {
-
-            $confirm_status = 'confirmed';
-            // Merge User.
-            $result = device_mail_verification_merge_user($current_mail);
-
-          }
-          // Timeout reached, responding.
-          else {
-            db_update('device_mail_verification')
+          db_update('device_mail_verification')
             ->fields(array('status' => 2))
             ->condition('dmv_id', $current_mail['dmv_id'], '=')
             ->execute();
 
-            $confirm_status = 'timeout';
-          }
+          $confirm_status = 'timeout';
         }
       }
     }
@@ -284,7 +281,7 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     // Get web user object.
     $web_user = user_load($web_uid);
 
-    // Transfer roles: only if previous roles
+    // Transfer roles: only if previous roles.
     if (count($device_user->roles) > count($web_user->roles)) {
       $web_user->roles = $device_user->roles;
       $web_user = user_save($web_user);

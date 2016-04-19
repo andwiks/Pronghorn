@@ -7,7 +7,7 @@
  */
 
 /**
- * Implements hook_menu()
+ * Implements hook_menu().
  */
 function device_mail_verification_menu() {
   $items = array(
@@ -44,7 +44,7 @@ function device_mail_verification_menu() {
 }
 
 /**
- * Implements hook_mail()
+ * Implements hook_mail().
  */
 function device_mail_verification_mail($key, &$message, $params) {
   switch ($key) {
@@ -66,7 +66,7 @@ function device_mail_verification_mail($key, &$message, $params) {
 /**
  * Function device_mail_verification_send_verification().
  */
-function device_mail_verification_send_verification($mail = '', $did = '') {    
+function device_mail_verification_send_verification($mail = '', $did = '') {
 
   $hash = drupal_hash_base64(drupal_get_hash_salt() . drupal_random_bytes(16) . $mail);
   $lang = language_default('language');
@@ -84,13 +84,13 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
     $created = time();
     $timeout = variable_get('device_mail_timeout', 0);
     $fields_insert = array(
-          'did' => $did,
-          'status' => 0,
-          'mail' => $mail,
-          'hash' => $hash,
-          'created' => $created,
-          'timeout' => $created+$timeout,
-        );
+      'did' => $did,
+      'status' => 0,
+      'mail' => $mail,
+      'hash' => $hash,
+      'created' => $created,
+      'timeout' => $created + $timeout,
+    );
 
     // Check mail has already registered.
     $user = user_load_by_mail($mail);
@@ -120,7 +120,7 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
 }
 
 /**
- * Implements hook_cron()
+ * Implements hook_cron().
  */
 function device_mail_verification_cron() {
   if (variable_get('device_mail_timeout', 0) != 0) {
@@ -146,21 +146,68 @@ function device_mail_verification_cron() {
  * @param string $update_uid
  *   String update_uid.
  */
-function device_mail_verification_transfer_order($current_uid = '' , $update_uid = '') {
-  db_update('commerce_order')
-        ->fields(array('uid' => $update_uid))
-        ->condition('uid', $current_uid, '=')
-        ->execute();
-  db_update('commerce_order_revision')
-        ->fields(array('revision_uid' => $update_uid))
-        ->condition('revision_uid', $current_uid, '=')
-        ->execute();
-  db_update('commerce_payment_transaction')
-        ->fields(array('uid' => $update_uid))
-        ->condition('uid', $current_uid, '=')
-        ->execute();
-  db_update('commerce_payment_transaction_revision')
-        ->fields(array('revision_uid' => $update_uid))
-        ->condition('revision_uid', $current_uid, '=')
-        ->execute();
+function device_mail_verification_transfer_order($current_uid = '', $update_uid = '') {
+  $result = array();
+  // Get merge order status settings.
+  $status = variable_get('device_mail_merge_order_status', array(
+    'completed' => 'completed',
+    'pending' => 'pending',
+    'processing' => 'processing',
+    'invoiced' => 'invoiced',
+  ));
+  $status = array_filter($status);
+  $status = array_values($status);
+  // Define order id based on selected order status.
+  $subquery = db_select('commerce_order', 'cos');
+  $subquery->addField('cos', 'order_id');
+  $subquery->condition('cos.status', $status, 'IN');
+  $subquery->condition('cos.uid', $current_uid, '=');
+  $oids = $subquery->execute()->fetchAllAssoc('order_id', PDO::FETCH_ASSOC);
+
+  // Transfer commerce order.
+  $result['commerce_order'] = db_update('commerce_order')
+    ->fields(array('uid' => $update_uid))
+    ->condition('uid', $current_uid, '=')
+    ->condition('order_id', $oids, 'IN')
+    ->execute();
+  // Transfer commerce order revision.
+  $result['commerce_order_revision'] = db_update('commerce_order_revision')
+    ->fields(array('revision_uid' => $update_uid))
+    ->condition('revision_uid', $current_uid, '=')
+    ->condition('order_id', $oids, 'IN')
+    ->execute();
+
+  // Define list of payment transaction id based on selected order id.
+  $payment_subquery = db_select('commerce_payment_transaction', 'cptt');
+  $payment_subquery->addField('cptt', 'transaction_id');
+  $payment_subquery->condition('cptt.order_id', $oids, 'IN');
+  $payment_subquery->condition('cptt.uid', $current_uid, '=');
+  $tids = $payment_subquery->execute()->fetchAllAssoc('transaction_id', PDO::FETCH_ASSOC);
+
+  // Transfer commerce payment transaction.
+  $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
+    ->fields(array('uid' => $update_uid))
+    ->condition('uid', $current_uid, '=')
+    ->condition('transaction_id', $tids, 'IN')
+    ->execute();
+  // Transfer commerce payment transaction revision.
+  $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
+    ->fields(array('revision_uid' => $update_uid))
+    ->condition('revision_uid', $current_uid, '=')
+    ->condition('transaction_id', $tids, 'IN')
+    ->execute();
+  // Transfer commerce veritrans token (saved cc).
+  $result['commerce_veritrans_token'] = db_update('commerce_veritrans_token')
+    ->fields(array('uid' => $update_uid))
+    ->condition('uid', $current_uid, '=')
+    ->condition('order_id', $oids, 'IN')
+    ->execute();
+
+  // Log this condition.
+  watchdog('device_mail_verification', 'Transfer Order @cuid to @uuid. Result: <pre>@result</pre> Order List: <pre>@oids</pre>.', array(
+    '@cuid' => $current_uid,
+    '@uuid' => $update_uid,
+    '@result' => print_r($result, TRUE),
+    '@oids' => print_r($oids, TRUE),
+  ), WATCHDOG_INFO);
 }

@@ -234,10 +234,13 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
   }
 
   //set allowed order status list
-  $allowed_cart_status = array("pending", "processing", "invoiced", "completed", "canceled");
+  $allowed_cart_status = array('pending', 'processing', 'invoiced', 'completed');
 
   //get order list
-  $order_list = commerce_order_load_multiple(array(), array('uid' => $uid));
+  $order_list = commerce_order_load_multiple(array(), array(
+    'uid' => $uid,
+    'status' => $allowed_cart_status,
+  ));
 
   //set order desc
   $order_list = array_reverse($order_list,true);

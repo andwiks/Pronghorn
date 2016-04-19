@@ -1333,10 +1333,14 @@ body.home footer
         padding: 0 10px 15px 10px;
     }
 
-    section.std_content .c_right .row.accordion .content .faq-rows .faq-title {
-        font-weight: 600;
+    section.std_content .c_right .row.accordion .content .faq-rows .faq-title a{
+        font-weight: 700;
+        color: #105C8C;
+        font-size: 15px;
     }
-
+    section.std_content .c_right .row.accordion .content .faq-rows .faq-title a:hover{
+        color: #333;
+    }
     section.std_content .c_right .row.accordion .label
     {
         padding: 10px;

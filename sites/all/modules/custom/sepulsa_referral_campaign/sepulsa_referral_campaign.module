@@ -197,15 +197,44 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
     $src_results = !empty($result['sepulsa_referral_campaign']) ? $result['sepulsa_referral_campaign'] : array();
     $src_array = !empty($src_results) ? sepulsa_referral_campaign_load_multiple(array_keys($src_results)) : array();
     foreach ($src_array as $referral_id => $ref) {
+      // Define operation link.
+      $links = array(
+        array(
+          'title' => t('Edit'),
+          'href' => ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id,
+        ),
+        array(
+          'title' => t('Delete'),
+          'href' => ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id . '/delete',
+        ),
+      );
+      // Check ctools module.
+      if (module_exists('ctools')) {
+        // Include ctools dropdown.theme.
+        ctools_include('dropbutton.theme');
+        // Generate ctools dropdown.
+        $operations = theme_links__ctools_dropbutton(array(
+          'class' => FALSE,
+          'image' => FALSE,
+          'title' => FALSE,
+          'attributes' => array(),
+          'links' => $links,
+        ));
+      }
+      else {
+        $operations = theme_links(array(
+          'links' => $links,
+          'attributes' => array(),
+          'heading' => array(),
+        ));
+      }
       $options['src_id-' . $referral_id] = array(
         'src_id' => $ref->src_id,
         'title' => $ref->title,
         'start' => date('d M Y H:i:s', $ref->start),
         'end' => date('d M Y H:i:s', $ref->end),
         'path' => $ref->path,
-        'operations' =>
-        l(t('Edit'), ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id, array('query' => array('destination' => ADMIN_CONTENT_SRC_URI))) . ' ' .
-        l(t('Delete'), ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id . '/delete', array('attributes' => array('class' => array('src-delete-' . $ref->src_id), ), 'query' => array('destination' => ADMIN_CONTENT_SRC_URI))),
+        'operations' => $operations,
       );
     }
 
@@ -265,12 +294,12 @@ function sepulsa_referral_campaign_commerce_order_presave($order) {
         $details = $result;
       }
       if (!empty($details)) {
-        $uid = user_load($details->uid);
-        $referral_uid = user_load($details->referral_uid);
+        $account_uid = user_load($details->uid);
+        $account_referral_uid = user_load($details->referral_uid);
 
         // Invoke rules.
-        // rules_invoke_component($details->rules_name, $uid);
-        // rules_invoke_component($details->rules_name, $referral_uid);
+        rules_invoke_component($details->rules_name, $account_uid);
+        rules_invoke_component($details->rules_name, $account_referral_uid);
 
         // Change Flag in details.
         db_update('referral_campaign_details')

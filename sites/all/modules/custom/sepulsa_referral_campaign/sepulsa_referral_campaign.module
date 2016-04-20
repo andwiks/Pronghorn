@@ -129,6 +129,24 @@ function sepulsa_referral_campaign_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['admin/reports/sepulsa_referral_campaign'] = array(
+    'title'            => t('Sepulsa Referral Campaign Summary'),
+    'description'      => t('Admin reports for the Sepulsa Referral Campaign.'),
+    'page callback'    => 'sepulsa_referral_campaign_summary_list',
+    'file' => 'includes/sepulsa_referral_campaign.admin.inc',
+    'access arguments' => array('administer sepulsa_referral_campaign'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/reports/sepulsa_referral_campaign/details/%/%'] = array(
+    'title'            => t('Sepulsa Referral Campaign Summary'),
+    'description'      => t('Admin reports for the Sepulsa Referral Campaign.'),
+    'page callback'    => 'sepulsa_referral_campaign_details_list',
+    'page arguments'   => array(4, 5),
+    'file' => 'includes/sepulsa_referral_campaign.admin.inc',
+    'access arguments' => array('administer sepulsa_referral_campaign'),
+  );
+
   return $items;
 }
 

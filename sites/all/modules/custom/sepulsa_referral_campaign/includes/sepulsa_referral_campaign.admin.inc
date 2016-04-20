@@ -218,3 +218,165 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     $form_state['redirect'] = 'admin/content/referral_campaign';
   }
 }
+
+/**
+ * Function sepulsa_referral_campaign_summary_list().
+ */
+function sepulsa_referral_campaign_summary_list() {
+  $pager = CAMPAIGN_PER_PAGE;
+  // Define table header.
+  $header = array(
+    array('data' => t('Ref ID'), 'field' => 'rcd.ref_id'),
+    array('data' => t('Campaign Title'), 'field' => 'rcd.src_id'),
+    array('data' => t('Refering User'), 'field' => 'rcd.referral_uid'),
+    array('data' => t('# Referred'), 'field' => 'num_referrals'),
+    array('data' => t('Operations'), 'field' => 'operations'),
+  );
+  // Query
+  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort'); 
+  $query->addExpression('COUNT(*)', 'num_referrals');
+  $query->innerJoin('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
+  $query->innerJoin('users', 'u', 'u.uid = rcd.referral_uid');
+  $query->fields('rcd', array('ref_id','src_id','referral_uid'));
+  $query->fields('src', array('title'));
+  $query->fields('u', array('mail'));
+  $query->condition('u.status', 1);
+  $query->groupBy('rcd.src_id');
+  $query->groupBy('rcd.referral_uid');
+  $result = $query->limit($pager)->orderByHeader($header)->execute()->fetchAll();
+  // Define table rows.
+  $rows = array();
+  foreach ($result as $row) {
+    // Define operation link.
+    $links = array(
+      array(
+        'title' => t('Details'),
+        'href' => 'admin/reports/sepulsa_referral_campaign/details/' . $row->src_id . '/' . $row->referral_uid,
+      ),
+    );
+    // Check ctools module.
+    if (module_exists('ctools')) {
+      // Include ctools dropdown.theme.
+      ctools_include('dropbutton.theme');
+      // Generate ctools dropdown.
+      $operations = theme_links__ctools_dropbutton(array(
+        'class' => FALSE,
+        'image' => FALSE,
+        'title' => FALSE,
+        'attributes' => array(),
+        'links' => $links,
+      ));
+    }
+    else {
+      $operations = theme_links(array(
+        'links' => $links,
+        'attributes' => array(),
+        'heading' => array(),
+      ));
+    }
+    // Append row to the rows container.
+    $rows[] = array(
+      'data' => array(
+        $row->ref_id,
+        $row->title,
+        $row->mail,
+        $row->num_referrals,
+        $operations,
+      ),
+    );
+  }
+  // Define start and end information.
+  $start_info = (empty($total)) ? 0 : (($total > $pager) ? ((isset($_GET['page']) && !empty($_GET['page'])) ? (intval($_GET['page']) * $pager) + 1 : 1) : 1);
+  $end_info = ($total > $pager) ? ((isset($_GET['page']) && !empty($_GET['page'])) ? (intval($_GET['page']) * $pager) + $pager : $pager) : $total;
+  $end_info = ($end_info > $total) ? $total : $end_info;
+  // Display page information.
+  $build['page_info'] = array(
+    '#markup' => t('Displaying @start - @end of @total (total page @page).<br />', array(
+      '@start' => $start_info,
+      '@end' => $end_info,
+      '@total' => $total,
+      '@page' => ceil($total / $pager),
+    )),
+  );
+
+  // Attach the pager table.
+  $build['pager_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are no details.'),
+  );
+
+  // Attach the pager theme.
+  $build['pager_pager'] = array('#theme' => 'pager');
+
+  // Return build variables.
+  return $build;
+}
+
+/**
+ * Function sepulsa_referral_campaign_details_list().
+ *
+ * @param string $campaign_id
+ * String campaign id.
+ * @param string $referral_uid
+ * String Referring UID.
+ */
+function sepulsa_referral_campaign_details_list($campaign_id = '', $referral_uid = ''){
+  $pager = CAMPAIGN_PER_PAGE;
+  // Define table header.
+  $header = array(
+    array('data' => t('User'), 'field' => 'rcd.uid'),
+    array('data' => t('Benefit'), 'field' => 'rcd.flag'),
+    array('data' => t('Benefit Taken Time'), 'field' => 'rcd.flag_timestamp'),
+    array('data' => t('IP'), 'field' => 'rcd.host'),
+  );
+  // Query
+  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort'); 
+  $query->innerJoin('users', 'u', 'u.uid = rcd.uid');
+  $query->fields('rcd', array('ref_id','src_id','referral_uid','uid','flag','flag_timestamp','host'));
+  $query->fields('u', array('mail'));
+  $query->condition('rcd.src_id', $campaign_id);
+  $query->condition('rcd.referral_uid', $referral_uid);
+  $result = $query->limit($pager)->orderByHeader($header)->execute()->fetchAll();
+  // Define table rows.
+  $rows = array();
+  foreach ($result as $row) {
+    // Append row to the rows container.
+    $rows[] = array(
+      'data' => array(
+        $row->mail,
+        ($row->flag) ? 'Taken' : 'Not Yet',
+        ($row->flag) ? date('d mm Y H:i:s', $row->flag_timestamp) : '-',
+        $row->host,
+      ),
+    );
+  }
+  // Define start and end information.
+  $start_info = (empty($total)) ? 0 : (($total > $pager) ? ((isset($_GET['page']) && !empty($_GET['page'])) ? (intval($_GET['page']) * $pager) + 1 : 1) : 1);
+  $end_info = ($total > $pager) ? ((isset($_GET['page']) && !empty($_GET['page'])) ? (intval($_GET['page']) * $pager) + $pager : $pager) : $total;
+  $end_info = ($end_info > $total) ? $total : $end_info;
+  // Display page information.
+  $build['page_info'] = array(
+    '#markup' => t('Displaying @start - @end of @total (total page @page).<br />', array(
+      '@start' => $start_info,
+      '@end' => $end_info,
+      '@total' => $total,
+      '@page' => ceil($total / $pager),
+    )),
+  );
+
+  // Attach the pager table.
+  $build['pager_table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are no details.'),
+  );
+
+  // Attach the pager theme.
+  $build['pager_pager'] = array('#theme' => 'pager');
+
+  // Return build variables.
+  return $build;
+}

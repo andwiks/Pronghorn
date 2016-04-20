@@ -110,7 +110,10 @@ function sepulsa_referral_campaign_services_resource_request_doc() {
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa_referral_campaign/request  .json<br />POST token data application/json: {"uid":"1"}',
     // Example response. E.g., a JSON array.
-    '#response' => '// Return Referral code.<br />{"code": "a1b2c3d4"}',
+    '#response' => '// Return Referral code.<br />{
+        "code": "6c6f6362",
+        "link_referral": "http://sepulsa.com/staticpage?code=6c6f6362"
+      }',
     // Errors.
     '#errors' => array(
       'invalid_uid' => array(

@@ -38,13 +38,18 @@ function sepulsa_referral_campaign_services_resource_getcampaign() {
  * Function sepulsa_referral_campaign_services_resource_request().
  */
 function sepulsa_referral_campaign_services_resource_request($uid = '') {
+  global $base_url;
   if (!empty($uid)) {
-	$return = array(
-	  'code' => _referral_uid2ref($uid),
-	);
-	return $return;
+    $list = sepulsa_referral_campaign_getlist(TRUE);
+    if ($list) {
+      $return = array(
+        'code' => _referral_uid2ref($uid),
+        'link_referral' => $base_url . '/' . $list[0]->path . '?code=' . _referral_uid2ref($uid),
+      );
+      return $return;
+    }
   }
-  return services_error(t('Invalid UID.'), 406);
+  return services_error(t('Invalid UID.'), 401);
 }
 
 /**

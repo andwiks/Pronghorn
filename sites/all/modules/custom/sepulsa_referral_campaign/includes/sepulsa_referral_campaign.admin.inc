@@ -279,7 +279,7 @@ function sepulsa_referral_campaign_summary_list() {
       'data' => array(
         $row->ref_id,
         $row->title,
-        $row->mail,
+        l($row->mail, "user/$row->referral_uid"),
         $row->num_referrals,
         $operations,
       ),
@@ -345,9 +345,9 @@ function sepulsa_referral_campaign_details_list($campaign_id = '', $referral_uid
     // Append row to the rows container.
     $rows[] = array(
       'data' => array(
-        $row->mail,
+        l($row->mail, "user/$row->uid"),
         ($row->flag) ? 'Taken' : 'Not Yet',
-        ($row->flag) ? date('d mm Y H:i:s', $row->flag_timestamp) : '-',
+        ($row->flag) ? date('d mm Y H:i:s', $row->flag_timestamp) : '',
         $row->host,
       ),
     );

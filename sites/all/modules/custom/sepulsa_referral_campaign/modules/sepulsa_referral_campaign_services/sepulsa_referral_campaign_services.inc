@@ -90,17 +90,3 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
   }
   return services_error(t('Invalid Referral Code.'), 406);
 }
-
-/**
- * Function sepulsa_referral_campaign_service_getDetails().
- */
-function sepulsa_referral_campaign_service_getDetails($code = '') {
-  if (!empty($code)) {
-	  $query = db_select('sepulsa_referral_campaign', 'src')
-	  			->fields('src')
-	  			->condition('src.start', REQUEST_TIME, '<=')
-	  			->condition('src.end', REQUEST_TIME, '>=')
-	  			->execute();
-  }
-  return FALSE;
-}

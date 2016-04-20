@@ -60,7 +60,7 @@ function sepulsa_referral_campaign_services_services_resources() {
             'name' => 'sepulsa_referral_campaign_services',
           ),
           'access callback' => 'services_access_menu',
-          // 'documentation callback' => 'sepulsa_referral_campaign_services_resource_register_doc',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_register_doc',
           'args' => array(
             array(
               'name' => 'code',
@@ -84,12 +84,125 @@ function sepulsa_referral_campaign_services_services_resources() {
             'name' => 'sepulsa_referral_campaign_services',
           ),
           'access callback' => 'services_access_menu',
-          // 'documentation callback' => 'sepulsa_referral_campaign_services_resource_register_doc',
-          'args' => array(
-          ),
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_getcampaign_doc',
+          'args' => array(),
         ),
       ),
     ),
   );
   return $sepulsa_referral_campaign_services;
+}
+
+/**
+ * Callback functions.
+ */
+
+/**
+ * Documentation callback for sepulsa_referral_campaign action request.
+ */
+function sepulsa_referral_campaign_services_resource_request_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Request referral code'),
+    '#description' => t('Generate referral code.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa_referral_campaign/request',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/request  .json<br />POST token data application/json: {"uid":"1"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '// Return Referral code.<br />{"code": "a1b2c3d4"}',
+    // Errors.
+    '#errors' => array(
+      'invalid_uid' => array(
+        '#question' => '406 Not Acceptable: Invalid UID.',
+        '#description' => t('Invalid UID.'),
+        '#response' => '["Invalid UID."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for sepulsa_referral_campaign action register.
+ */
+function sepulsa_referral_campaign_services_resource_register_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Use referral code to register.'),
+    '#description' => t('Use referral code to register in device.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa_referral_campaign/register',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/register  .json<br />POST token data application/json: {"code":"a1b2c3d4"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '// Return Boolean True.<br />[true]',
+    // Errors.
+    '#errors' => array(
+      'invalid_code' => array(
+        '#question' => '406 Not Acceptable: Invalid Referral Code.',
+        '#description' => t('Invalid Referral Code.'),
+        '#response' => '["Invalid Referral Code.."]',
+      ),
+      'no_active' => array(
+        '#question' => '406 Not Acceptable: There is no active campaign.',
+        '#description' => t('There is no active campaign when user use referral code.'),
+        '#response' => '["There is no active campaign."]',
+      ),
+      'used_code' => array(
+        '#question' => '406 Not Acceptable: Referral code has been used in this campaign.',
+        '#description' => t('Rerral code has already been used by the user in the same campaign.'),
+        '#response' => '["There is no active campaign."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for sepulsa_referral_campaign action getcampaign.
+ */
+function sepulsa_referral_campaign_services_resource_getcampaign_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Get active sepulsa referral camapaign.'),
+    '#description' => t('Get active sepulsa referral camapaign.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa_referral_campaign/getcampaign',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/getcampaign  .json',
+    // Example response. E.g., a JSON array.
+    '#response' => '// Return array active campaign.<br />[
+      {
+        "src_id": "3",
+        "title": "test 3",
+        "machine_name": "test_3",
+        "start": "1461085200",
+        "end": "1461171599",
+        "path": "admin",
+        "rules_name": "rules_order_referral",
+        "created": "1461120746",
+        "changed": "1461120746"
+      }
+    ]',
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
 }

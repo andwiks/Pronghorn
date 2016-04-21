@@ -229,6 +229,29 @@ function apps_services_v2_services_services_resources() {
                     ),
                   ),
                 ),
+                'checkout_initiate' => array(
+                  'help' => 'Checkout initiate process.',
+                  'callback' => 'apps_services_v2_services_resource_checkout_initiate',
+                  'access callback' => 'services_access_menu',
+                  'file' => array(
+                    'type' => 'inc',
+                    'module' => 'apps_services_v2_services',
+                    'name' => 'apps_services_v2_services',
+                  ),
+                  'args' => array(
+                    array(
+                      'name' => 'source',
+                      'type' => 'string',
+                      'description' => 'the source of the request',
+                      'source' => array(
+                        'data' => 'source',
+                        'param' => 'source',
+                      ),
+                      'optional' => FALSE,
+                      'http_method' => 'POST',
+                    ),
+                  ),
+                ),
                 'checkout_complete' => array(
                   'help' => "Complete checkout process.",
                   'callback' => 'apps_services_v2_services_resource_complete',

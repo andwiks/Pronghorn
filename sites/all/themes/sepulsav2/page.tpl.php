@@ -7,6 +7,13 @@
  * @since July 23th 2015.
  */
 ?>
+
+<?php if (!empty($page['page_img_header'])): ?>
+<section class="page_img_header">
+  <?php print render($page['page_img_header']); ?>
+</section>
+<?php endif; ?>
+
 <?php if ($node->type == 'campaign_page'): ?>
 <section class="std_content">
   <div class="wrapper_2 other after_clear">

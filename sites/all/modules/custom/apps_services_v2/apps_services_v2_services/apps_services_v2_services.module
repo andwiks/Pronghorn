@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * apps_services_v2_services.module
+ *
+ * @author temmy@sepulsa.com
+ */
 
 /**
  * Implements hook_services_resources().
@@ -233,6 +239,7 @@ function apps_services_v2_services_services_resources() {
                   'help' => 'Checkout initiate process.',
                   'callback' => 'apps_services_v2_services_resource_checkout_initiate',
                   'access callback' => 'services_access_menu',
+                  'documentation callback' => 'apps_services_v2_services_resource_checkout_initiate_doc',
                   'file' => array(
                     'type' => 'inc',
                     'module' => 'apps_services_v2_services',
@@ -1569,6 +1576,522 @@ function apps_services_v2_services_resource_coupon_remove_doc() {
     // Resource prefix.
     // Errors.
     '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_services_resource_checkout_initiate_doc().
+ */
+function apps_services_v2_services_resource_checkout_initiate_doc() {
+  global $base_url;
+  $response = '
+{
+  "status": true,
+  "message": [],
+  "data": {
+    "cart": {
+      "order_number": "278775",
+      "revision_id": "4",
+      "revision_uid": "42560",
+      "mail": "andreas+test1@sepulsa.com",
+      "status": "cart",
+      "log": "Created as a shopping cart order.",
+      "revision_timestamp": 1461232738,
+      "revision_hostname": "127.0.0.1",
+      "data": {
+        "last_cart_refresh": 1461232738,
+        "payment_method": "commerce_veritrans|commerce_payment_commerce_veritrans"
+      },
+      "order_id": "278775",
+      "type": "commerce_order",
+      "uid": "42560",
+      "created": "1461232158",
+      "changed": 1461232738,
+      "hostname": "127.0.0.1",
+      "commerce_line_items": [
+        {
+          "line_item_id": "1440862",
+          "order_id": "278775",
+          "type": "deposit_sepulsa",
+          "line_item_label": "DEPO1000",
+          "quantity": "1.00",
+          "created": "1461232158",
+          "changed": "1461232158",
+          "data": null,
+          "deposit_amount": null,
+          "commerce_unit_price": {
+            "amount": "1000000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": "1000000",
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": "1000000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": 1000000,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_product": {
+            "revision_id": "127",
+            "sku": "DEPO1000",
+            "title": "Rp. 1.000.000",
+            "revision_uid": "1",
+            "status": "1",
+            "log": "",
+            "revision_timestamp": "1447316910",
+            "data": false,
+            "product_id": "124",
+            "type": "deposit",
+            "language": "und",
+            "uid": "168",
+            "created": "1433777854",
+            "changed": "1447316910",
+            "commerce_price": {
+              "und": [
+                {
+                  "amount": "1000000",
+                  "currency_code": "IDR",
+                  "data": {
+                    "components": []
+                  }
+                }
+              ]
+            }
+          },
+          "commerce_display_path": null,
+          "id": null
+        },
+        {
+          "type": "fee",
+          "order_id": "278775",
+          "quantity": 1,
+          "data": null,
+          "line_item_id": "1440866",
+          "line_item_label": "Admin Fee",
+          "created": 1461232738,
+          "changed": 1461232738,
+          "commerce_unit_price": {
+            "amount": "0",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "admin_fee",
+                  "price": {
+                    "amount": "0",
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": 0,
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "admin_fee",
+                  "price": {
+                    "amount": 0,
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "id": 1
+        }
+      ],
+      "commerce_order_total": {
+        "amount": 1000000,
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": 1000000,
+                "currency_code": "IDR",
+                "data": []
+              },
+              "included": true
+            },
+            {
+              "name": "admin_fee",
+              "price": {
+                "amount": 0,
+                "currency_code": "IDR",
+                "data": []
+              },
+              "included": true
+            }
+          ]
+        }
+      },
+      "commerce_customer_billing": [],
+      "field_commerce_billy_cancel_date": [],
+      "field_commerce_billy_i_date": [],
+      "commerce_coupons": [],
+      "commerce_discounts": [],
+      "field_order_source": {
+        "und": [
+          {
+            "value": "MWEB",
+            "format": null,
+            "safe_value": "MWEB"
+          }
+        ]
+      },
+      "field_imei": [],
+      "field_utm_source": [],
+      "field_utm_medium": [],
+      "field_utm_campaign": [],
+      "field_app": [],
+      "payment_methods": {
+        "commerce_veritrans|commerce_payment_commerce_veritrans": {
+          "method_id": "commerce_veritrans",
+          "settings": {
+            "type": "credit_card",
+            "credit_card": {
+              "card_types": {
+                "visa": "visa",
+                "mastercard": "mastercard",
+                "amex": 0,
+                "discover": 0,
+                "dc": 0,
+                "dci": 0,
+                "cb": 0,
+                "jcb": 0,
+                "maestro": 0,
+                "visaelectron": 0,
+                "laser": 0,
+                "solo": 0,
+                "switch": 0
+              },
+              "bank": "mandiri",
+              "type": "twoclick",
+              "3ds": 1,
+              "bin_promo": ""
+            },
+            "echannel": {
+              "instruction": {
+                "value": "",
+                "format": "full_"
+              }
+            },
+            "prefix": "DEV",
+            "url": "https://api.sandbox.veritrans.co.id/v2",
+            "client_key": "VT-client-OKrCpIwqRkMEeBxC",
+            "server_key": "VT-server-IyWjwr8zzXb9FkIhnyiXN9RW",
+            "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_commerce_veritrans",
+          "weight": 0
+        },
+        "commerce_veritrans|commerce_payment_atm_mandiri": {
+          "method_id": "commerce_veritrans",
+          "settings": {
+            "type": "echannel",
+            "credit_card": {
+              "card_types": {
+                "visa": "visa",
+                "mastercard": "mastercard",
+                "amex": 0,
+                "discover": 0,
+                "dc": 0,
+                "dci": 0,
+                "cb": 0,
+                "jcb": 0,
+                "maestro": 0,
+                "visaelectron": 0,
+                "laser": 0,
+                "solo": 0,
+                "switch": 0
+              },
+              "bank": "mandiri",
+              "type": "twoclick",
+              "3ds": 1,
+              "bin_promo": ""
+            },
+            "echannel": {
+              "instruction": {
+                "value": "<ul class=\"decimal bullet-text\">\r\n  <li>Catat kode pembayaran yang akan Anda dapat di akhir transaksi.</li>\r\n  <li>Gunakan ATM Mandiri untuk menyelesaikan pembayaran.</li>\r\n  <li>Pilih menu ‘Bayar/Beli’, lalu pilih ‘Lainnya’, pilih ‘Lainnya’ kembali.</li>\r\n  <li>Pilih menu ‘Multi Payment’.</li>\r\n  <li>Masukkan kode institusi.</li>\r\n  <li>Masukkan kode pembayaran, lalu pilih ‘Benar’.</li>\r\n  <li>Pastikan detail pembayaran Anda benar & masukkan item pembayaran yang akan dibayar, lalu pilih ‘Ya’.</li>\r\n  <li>Pembayaran Anda dengan Mandiri Bill Payment selesai, mohon simpan struk untuk bukti pembayaran Anda.</li>\r\n</ul>\r\n",
+                "format": "full_html"
+              }
+            },
+            "prefix": "",
+            "url": "https://api.veritrans.co.id/v2",
+            "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
+            "server_key": "VT-server-lLIE-l7LzkLz_GqjSlah9Rq4",
+            "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_atm_mandiri",
+          "weight": 3
+        },
+        "bank_transfer|commerce_payment_bca_bank_transfer": {
+          "method_id": "bank_transfer",
+          "settings": {
+            "details": {
+              "account_owner": "PT Sepulsa Teknologi Indonesia",
+              "account_number": "2063137111",
+              "account_iban": "",
+              "bank_code_appellation": "",
+              "bank_code": "",
+              "account_swift": "",
+              "account_bank": "BCA",
+              "account_branch": "Thamrin"
+            },
+            "subject_oid": 0,
+            "policy": "<p>Harap melakukan transfer dan memberikan konfimasi pada <span style=\"font-weight:bolder;\">jam 09:00 - 16:00</span> setiap harinya.</p>\r\n<p>Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.</p>\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>.",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_bca_bank_transfer",
+          "weight": 5
+        },
+        "bank_transfer|commerce_payment_mandiri_bank_transfer": {
+          "method_id": "bank_transfer",
+          "settings": {
+            "details": {
+              "account_owner": "PT Sepulsa Teknologi Indonesia",
+              "account_number": "168 0000 696482",
+              "account_iban": "",
+              "bank_code_appellation": "",
+              "bank_code": "",
+              "account_swift": "",
+              "account_bank": "Mandiri",
+              "account_branch": "Jakarta Galeria Niaga Mediterania"
+            },
+            "subject_oid": 0,
+            "policy": "<p>Harap melakukan transfer dan memberikan konfimasi pada <span style=\"font-weight:bolder;\">jam 09:00 - 16:00</span> setiap harinya.</p>\r\n<p>Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.</p>\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>.",
+            "sepulsa_campaign": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "rule_name": "commerce_payment_mandiri_bank_transfer",
+          "weight": 6
+        }
+      }
+    },
+    "payment": [
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "credit_card",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
+            },
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": ""
+          },
+          "echannel": {
+            "instruction": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "prefix": "DEV",
+          "url": "https://api.sandbox.veritrans.co.id/v2",
+          "client_key": "VT-client-OKrCpIwqRkMEeBxC",
+          "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_commerce_veritrans",
+        "weight": null,
+        "title": "Kartu Kredit / Debit",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|commerce_payment_commerce_veritrans"
+      },
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "echannel",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
+            },
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": ""
+          },
+          "echannel": {
+            "instruction": {
+              "value": "<ul class=\"decimal bullet-text\">\r\n  <li>Catat kode pembayaran yang akan Anda dapat di akhir transaksi.</li>\r\n  <li>Gunakan ATM Mandiri untuk menyelesaikan pembayaran.</li>\r\n  <li>Pilih menu ‘Bayar/Beli’, lalu pilih ‘Lainnya’, pilih ‘Lainnya’ kembali.</li>\r\n  <li>Pilih menu ‘Multi Payment’.</li>\r\n  <li>Masukkan kode institusi.</li>\r\n  <li>Masukkan kode pembayaran, lalu pilih ‘Benar’.</li>\r\n  <li>Pastikan detail pembayaran Anda benar & masukkan item pembayaran yang akan dibayar, lalu pilih ‘Ya’.</li>\r\n  <li>Pembayaran Anda dengan Mandiri Bill Payment selesai, mohon simpan struk untuk bukti pembayaran Anda.</li>\r\n</ul>\r\n",
+              "format": "full_html"
+            }
+          },
+          "prefix": "",
+          "url": "https://api.veritrans.co.id/v2",
+          "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
+          "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_atm_mandiri",
+        "weight": 3,
+        "title": "ATM Mandiri",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|commerce_payment_atm_mandiri"
+      },
+      {
+        "method_id": "bank_transfer",
+        "settings": {
+          "details": {
+            "account_owner": "PT Sepulsa Teknologi Indonesia",
+            "account_number": "168 0000 696482",
+            "account_iban": "",
+            "bank_code_appellation": "",
+            "bank_code": "",
+            "account_swift": "",
+            "account_bank": "Mandiri",
+            "account_branch": "Jakarta Galeria Niaga Mediterania"
+          },
+          "subject_oid": 0,
+          "policy": "<p>Harap melakukan transfer dan memberikan konfimasi pada <span style=\"font-weight:bolder;\">jam 09:00 - 16:00</span> setiap harinya.</p>\r\n<p>Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.</p>\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>.",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_mandiri_bank_transfer",
+        "weight": 6,
+        "title": "Mandiri Bank Transfer",
+        "type": "payment_option",
+        "payment_code": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+      },
+      {
+        "payment_code": "use_sepulsa_credit_option",
+        "amount": 0,
+        "formatted_amount": "0",
+        "currency_code": "IDR"
+      }
+    ],
+    "card": [
+      {
+        "token_id": "1",
+        "uid": "42560",
+        "order_id": "71",
+        "phone": "081221212121",
+        "token": "4811115db6e634-4219-4a2e-8322-84903b3c5af4",
+        "expired": "1739983061",
+        "first": "481111",
+        "last": "1114"
+      }
+    ]
+  }
+}
+  ';
+  $element = array(
+    '#name' => 'Checkout initiate',
+    '#description' => 'Combine 3 resource endpoints get cart, get payment list, and get saved card.',
+    '#auth' => TRUE,
+    '#path' => 'services_v2/checkout_initiate.json',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/services_v2/checkout_initiate.json<br />
+    POST data application/json: { "source" : "android"}',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'invalid_user' => array(
+        '#question' => '401 Unauthorized: Invalid User',
+        '#description' => t('Drupal server can not detect valid user object.'),
+        '#response' => '
+        [
+            "Invalid User"
+        ]',
+      ),
+      'missing_cart' => array(
+        '#question' => '406 Not Acceptable: Cart missing',
+        '#description' => t('Unable to get shopping cart. Check user session.'),
+        '#response' => '
+        [
+            "Cart missing"
+        ]',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),

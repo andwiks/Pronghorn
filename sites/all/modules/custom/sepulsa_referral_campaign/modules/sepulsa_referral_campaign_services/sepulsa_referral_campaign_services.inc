@@ -14,24 +14,38 @@
  * Function sepulsa_referral_campaign_services_resource_index().
  */
 function sepulsa_referral_campaign_services_resource_index() {
-  // List sepulsa campaign.
-  $list = sepulsa_referral_campaign_getlist();
-  if (!empty($list)) {
-  	return $list;
+  global $user;
+  if ($user->uid > 0) {
+    // List sepulsa campaign.
+    $list = sepulsa_referral_campaign_getlist();
+    if (!empty($list)) {
+    	return $list;
+    }
+    $return = array(
+      'msg' => 'There is no active campaign.',
+    );
+    return $return;
   }
-  return FALSE;
+  return services_error(t('Invalid User.'), 401);
 }
 
 /**
  * Function sepulsa_referral_campaign_services_resource_getcampaign().
  */
 function sepulsa_referral_campaign_services_resource_getcampaign() {
-  // Active sepulsa campaign.
-  $list = sepulsa_referral_campaign_getlist(TRUE);
-  if (!empty($list)) {
-  	return $list;
+  global $user;
+  if ($user->uid > 0) {
+    // Active sepulsa campaign.
+    $list = sepulsa_referral_campaign_getlist(TRUE);
+    if (!empty($list)) {
+    	return $list;
+    }
+    $return = array(
+      'msg' => 'There is no active campaign.',
+    );
+    return $return;
   }
-  return FALSE;
+  return services_error(t('Invalid User.'), 401);
 }
 
 /**

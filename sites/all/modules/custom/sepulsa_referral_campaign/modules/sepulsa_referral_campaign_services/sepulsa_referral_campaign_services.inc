@@ -37,19 +37,22 @@ function sepulsa_referral_campaign_services_resource_getcampaign() {
 /**
  * Function sepulsa_referral_campaign_services_resource_request().
  */
-function sepulsa_referral_campaign_services_resource_request($uid = '') {
+function sepulsa_referral_campaign_services_resource_request() {
   global $base_url;
-  if (!empty($uid)) {
+  global $user;
+
+  if ($user->uid > 0) {
     $list = sepulsa_referral_campaign_getlist(TRUE);
     if ($list) {
       $return = array(
-        'code' => _referral_uid2ref($uid),
-        'link_referral' => $base_url . '/' . $list[0]->path . '?code=' . _referral_uid2ref($uid),
+        'code' => _referral_uid2ref($user->uid),
+        'link_referral' => $base_url . '/' . $list[0]->path . '?code=' . _referral_uid2ref($user->uid),
       );
       return $return;
     }
+    return services_error(t('There is no active campaign.'), 406);
   }
-  return services_error(t('Invalid UID.'), 401);
+  return services_error(t('Invalid User.'), 401);
 }
 
 /**

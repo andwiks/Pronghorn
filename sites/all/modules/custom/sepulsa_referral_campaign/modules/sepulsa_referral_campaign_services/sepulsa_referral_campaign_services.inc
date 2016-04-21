@@ -84,30 +84,30 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
     	  $referral_user = user_load($referral_uid);
     	  if (!empty($referral_user)) {
     	  	// Get UID in session.
-    		$uid = $user->uid; // Misal.
-    		// Check whether the user use referral code in the same campaign.
-  	    $query = db_select('referral_campaign_details', 'rcd')
-  	  			->fields('rcd')
-  	  			->condition('uid', $uid)
-  	  			->condition('src_id', $list[0]->src_id)
-  	  			->execute();
-    		if ($query->rowCount() == 0) {
-    		  // Set data for referral_campaign_details. 
-    		  $array_insert = array(
-    		    'src_id' => $list[0]->src_id,
-    		    'uid' => $uid,
-    		    'referral_uid' => $referral_uid,
-    		    'created' => REQUEST_TIME,
-    		    'host' => ip_address(),
-    		    'http_referer' => $_SERVER['HTTP_REFERER'],
-    		  );
-    		  // Insert data to referral_campaign_details.
-    		  db_insert('referral_campaign_details')
-  	  		  ->fields($array_insert)
-  			  ->execute();
-  	  	  return TRUE;
-    		}
-    		return services_error(t('Referral code has been used in this campaign.'), 406);
+      		$uid = $user->uid; // Misal.
+      		// Check whether the user use referral code in the same campaign.
+    	    $query = db_select('referral_campaign_details', 'rcd')
+    	  			->fields('rcd')
+    	  			->condition('uid', $uid)
+    	  			->condition('src_id', $list[0]->src_id)
+    	  			->execute();
+      		if ($query->rowCount() == 0) {
+      		  // Set data for referral_campaign_details. 
+      		  $array_insert = array(
+      		    'src_id' => $list[0]->src_id,
+      		    'uid' => $uid,
+      		    'referral_uid' => $referral_uid,
+      		    'created' => REQUEST_TIME,
+      		    'host' => ip_address(),
+      		    'http_referer' => $_SERVER['HTTP_REFERER'],
+      		  );
+      		  // Insert data to referral_campaign_details.
+      		  db_insert('referral_campaign_details')
+    	  		  ->fields($array_insert)
+    			  ->execute();
+    	  	  return TRUE;
+      		}
+      		return services_error(t('Referral code has been used in this campaign.'), 406);
     	  }
     	  return services_error(t('Invalid Referral Code.'), 406);
     	}

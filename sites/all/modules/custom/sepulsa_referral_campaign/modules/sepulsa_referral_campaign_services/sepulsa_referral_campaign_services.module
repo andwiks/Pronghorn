@@ -117,9 +117,14 @@ function sepulsa_referral_campaign_services_resource_request_doc() {
     // Errors.
     '#errors' => array(
       'invalid_uid' => array(
-        '#question' => '406 Not Acceptable: Invalid UID.',
+        '#question' => '401 Unauthorized: Invalid UID.',
         '#description' => t('Invalid UID.'),
         '#response' => '["Invalid UID."]',
+      ),
+      'no_active' => array(
+        '#question' => '406 Not Acceptable: There is no active campaign.',
+        '#description' => t('There is no active campaign when user use referral code.'),
+        '#response' => '["There is no active campaign."]',
       ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
@@ -147,6 +152,11 @@ function sepulsa_referral_campaign_services_resource_register_doc() {
     '#response' => '// Return Boolean True.<br />[true]',
     // Errors.
     '#errors' => array(
+      'invalid_uid' => array(
+        '#question' => '401 Unauthorized: Invalid UID.',
+        '#description' => t('Invalid UID.'),
+        '#response' => '["Invalid UID."]',
+      ),
       'invalid_code' => array(
         '#question' => '406 Not Acceptable: Invalid Referral Code.',
         '#description' => t('Invalid Referral Code.'),
@@ -200,6 +210,11 @@ function sepulsa_referral_campaign_services_resource_getcampaign_doc() {
     ]',
     // Errors.
     '#errors' => array(
+      'invalid_uid' => array(
+        '#question' => '401 Unauthorized: Invalid UID.',
+        '#description' => t('Invalid UID.'),
+        '#response' => '["Invalid UID."]',
+      ),
       'internal_server' => array(
         '#question' => '500 Internal Server Error',
         '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),

@@ -165,3 +165,27 @@ function kupon_get_own_voucher($user) {
 
   return $voucher;
 }
+
+/* implement hook_commerce_cart_product_add(). */
+function kupon_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  global $user;
+
+  foreach (commerce_info_fields('commerce_product_reference') as $field) {
+    // Build query.
+    $query = new EntityFieldQuery;
+    $query->entityCondition('entity_type', 'node', '=')
+      ->fieldCondition($field['field_name'], 'product_id', $product->product_id, '=')
+      ->range(0, 1);
+
+    if ($result = $query->execute()) {
+      // Return node id.
+      $nid = array_shift(array_keys($result['node']));
+      $vouchers = kupon_get_own_voucher($user);
+      if (in_array($nid, $vouchers)) {
+        // delete line item when voucher over limit
+        drupal_set_message(t('Sorry, cannot add this voucher.'), 'warning');
+        commerce_cart_order_product_line_item_delete($order, $line_item->line_item_id);
+      }
+    }
+  }
+}

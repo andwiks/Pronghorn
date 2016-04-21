@@ -293,6 +293,16 @@ function kupon_views_query_alter(&$view, &$query) {
       //change the views SQL here
       $query->where[1]['conditions'][4]['value'] = $total['amount'];
       $query->where[1]['conditions'][5]['value'] = $total['amount'];
+
+      $max_index = max(array_keys($query->where[1]['conditions']));
+      // get hidden voucher
+      $vouchers = kupon_get_own_voucher($user);
+      foreach ($vouchers as $key => $voucher) {
+        $index = $max_index + $key;
+        $query->where[1]['conditions'][$index]['field'] = 'node.nid';
+        $query->where[1]['conditions'][$index]['operator'] = '!=';
+        $query->where[1]['conditions'][$index]['value'] = $voucher;
+      }
     }
   }
 }

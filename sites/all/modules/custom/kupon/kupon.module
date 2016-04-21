@@ -142,3 +142,26 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
         drupal_set_message('Invalid Simple Coupon ID', 'error');
     }
 }
+
+// function to get user own voucher that must be hidden
+function kupon_get_own_voucher($user) {
+  $voucher = array();
+  // get count of user own voucher
+  $result = db_query("SELECT sc.field_simple_coupon_target_id AS simple_coupon, mt.field_coupon_max_taken_value AS max_taken, COUNT(sc.field_simple_coupon_target_id) AS count_simple_coupon
+    FROM
+    {node} n
+    LEFT JOIN {field_data_field_simple_coupon} sc ON n.nid = sc.entity_id AND (sc.entity_type = 'node' AND sc.deleted = '0')
+    INNER JOIN {node} nsc ON sc.field_simple_coupon_target_id = nsc.nid
+    LEFT JOIN {field_data_field_owned_coupon_expiry} ce ON n.nid = ce.entity_id AND (ce.entity_type = 'node' AND ce.deleted = '0')
+    LEFT JOIN {field_data_field_coupon_max_taken} mt ON nsc.nid = mt.entity_id AND (mt.entity_type = 'node' AND mt.deleted = '0')
+    WHERE (( (n.uid = '" . $user->uid . "' ) )AND(( (n.status = '1') AND (n.type IN  ('offline_owned_simple', 'offline_owned_unique', 'owned_simple_coupon', 'owned_unique_coupon')) AND (DATE_FORMAT(FROM_UNIXTIME(ce.field_owned_coupon_expiry_value), '%Y-%m-%d') >= '" . date('Y-m-d') . "') AND (sc.field_simple_coupon_target_id >= mt.field_coupon_max_taken_value) )))
+    GROUP BY simple_coupon");
+
+    //dpm($result->queryString);
+  foreach ($result as $record) {
+    $voucher[] = $record->simple_coupon;
+  }
+  // get nid of voucher that must be hidden
+
+  return $voucher;
+}

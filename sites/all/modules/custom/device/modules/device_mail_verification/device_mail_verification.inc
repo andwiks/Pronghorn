@@ -243,22 +243,37 @@ function device_mail_verification_merge_user($current_mail) {
  */
 function device_mail_verification_merge($strategi = '', $mail = '', $device_did = '', $device_uid = '', $web_uid = '', $merge_to = '') {
   if ($merge_to == 'device') {
-    // Block Web Account.
-    $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
-    $web_user_wrapper->status->set(0);
-    $web_user_wrapper->save();
-    // Get web user object.
-    $web_user = $web_user_wrapper->value();
+    // Wrap the code in try and catch for debugging purpose.
+    try {
+      // Block Web Account.
+      $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
+      $web_user_wrapper->status->set(0);
+      $web_user_wrapper->mail->set($mail . '_merged');
+      $web_user_wrapper->save();
+      // Get web user object.
+      $web_user = $web_user_wrapper->value();
 
-    // Change email in user , where uid = $device_uid;
-    $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
-    $device_user_wrapper->mail->set($mail);
-    $device_user_wrapper->save();
-    // Get device user object.
-    $device_user = $device_user_wrapper->value();
+      // Change email in user , where uid = $device_uid;
+      $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
+      $device_user_wrapper->mail->set($mail);
+      $device_user_wrapper->save();
+      // Get device user object.
+      $device_user = $device_user_wrapper->value();
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      watchdog('device_mail_verification', 'Unable to merge user to @merge using strategy @stra (w: @web, d: @dev) with trace: <pre>@trace</pre> <pre>@user</pre>', array(
+        '@merge' => $merge_to,
+        '@stra' => $strategi,
+        '@web' => $web_uid,
+        '@dev' => $device_uid,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR);
+    }
 
     // Transfer roles.
-    if (count($web_user->roles) > count($device_user->roles)) {
+    if (isset($web_user->roles) && isset($device_user->roles)
+      && count($web_user->roles) > count($device_user->roles)
+    ) {
       $device_user->roles = $web_user->roles;
       // Save user: get account.
       $device_user = user_save($device_user);
@@ -275,22 +290,37 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     }
   }
   else {
-    // Block User Device.
-    $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
-    $device_user_wrapper->status->set(0);
-    $device_user_wrapper->save();
-    // Get device user object.
-    $device_user = $device_user_wrapper->value();
+    // Wrap the code in try and catch for debugging purpose.
+    try {
+      // Block User Device.
+      $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
+      $device_user_wrapper->status->set(0);
+      $device_user_wrapper->mail->set($mail . '_merged');
+      $device_user_wrapper->save();
+      // Get device user object.
+      $device_user = $device_user_wrapper->value();
 
-    // Change UID in device.
-    $device_user_wrapper = entity_metadata_wrapper('device', $device_did);
-    $device_user_wrapper->uid->set($web_uid);
-    $device_user_wrapper->save();
-    // Get web user object.
-    $web_user = user_load($web_uid);
+      // Change UID in device.
+      $device_user_wrapper = entity_metadata_wrapper('device', $device_did);
+      $device_user_wrapper->uid->set($web_uid);
+      $device_user_wrapper->save();
+      // Get web user object.
+      $web_user = user_load($web_uid);
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      watchdog('device_mail_verification', 'Unable to merge user to @merge using strategy @stra (w: @web, d: @dev) with trace: <pre>@trace</pre> <pre>@user</pre>', array(
+        '@merge' => $merge_to,
+        '@stra' => $strategi,
+        '@web' => $web_uid,
+        '@dev' => $device_uid,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR);
+    }
 
     // Transfer roles: only if previous roles.
-    if (count($device_user->roles) > count($web_user->roles)) {
+    if (isset($device_user->roles) && isset($web_user->roles)
+      && count($device_user->roles) > count($web_user->roles)
+    ) {
       $web_user->roles = $device_user->roles;
       $web_user = user_save($web_user);
     }

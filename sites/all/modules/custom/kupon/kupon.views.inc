@@ -295,7 +295,7 @@ function kupon_views_query_alter(&$view, &$query) {
       $query->where[1]['conditions'][5]['value'] = $total['amount'];
 
       $max_index = max(array_keys($query->where[1]['conditions']));
-      // get hidden voucher
+      // Get hidden voucher.
       $vouchers = kupon_get_own_voucher($user);
       foreach ($vouchers as $key => $voucher) {
         $index = $max_index + $key;

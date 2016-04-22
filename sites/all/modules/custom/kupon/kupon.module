@@ -143,10 +143,12 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
     }
 }
 
-// function to get user own voucher that must be hidden
+/**
+ * Function to get user own voucher that must be hidden.
+ */
 function kupon_get_own_voucher($user) {
   $voucher = array();
-  // get count of user own voucher
+  // Get count of user own voucher.
   $result = db_query("SELECT sc.field_simple_coupon_target_id AS simple_coupon,
     mt.field_coupon_max_taken_value AS max_taken,
     COUNT(sc.field_simple_coupon_target_id) AS count_simple_coupon
@@ -167,26 +169,30 @@ function kupon_get_own_voucher($user) {
         AND (sc.field_simple_coupon_target_id >= mt.field_coupon_max_taken_value) ))
     GROUP BY simple_coupon");
 
-    //dpm($result->queryString);
   foreach ($result as $record) {
+    // Get nid of voucher that must be hidden.
     $voucher[] = $record->simple_coupon;
   }
-  // get nid of voucher that must be hidden
 
   return $voucher;
 }
 
-/* implement hook_commerce_cart_product_add(). */
+/**
+ * Implements hook_commerce_cart_product_add().
+ */
 function kupon_commerce_cart_product_add($order, $product, $quantity, $line_item) {
   kupon_delete_after_product_add($order, $product, $line_item);
 }
 
+/**
+ * Function to delete line item after product add to shopping cart.
+ */
 function kupon_delete_after_product_add($order, $product, $line_item) {
   global $user;
 
   foreach (commerce_info_fields('commerce_product_reference') as $field) {
     // Build query.
-    $query = new EntityFieldQuery;
+    $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node', '=')
       ->fieldCondition($field['field_name'], 'product_id', $product->product_id, '=')
       ->range(0, 1);
@@ -196,7 +202,7 @@ function kupon_delete_after_product_add($order, $product, $line_item) {
       $nid = array_shift(array_keys($result['node']));
       $vouchers = kupon_get_own_voucher($user);
       if (in_array($nid, $vouchers)) {
-        // delete line item when voucher over limit
+        // Delete line item when voucher over limit.
         drupal_set_message(t('Sorry, cannot add this voucher.'), 'warning');
         commerce_cart_order_product_line_item_delete($order, $line_item->line_item_id);
       }
@@ -204,11 +210,13 @@ function kupon_delete_after_product_add($order, $product, $line_item) {
   }
 }
 
-/* implement hook_views_pre_render(). */
+/**
+ * Implements hook_views_pre_render().
+ */
 function kupon_views_pre_render(&$view) {
   global $user;
 
-  if ($view->name=="commerce_cart_summary") {
+  if ($view->name == 'commerce_cart_summary') {
     $order = commerce_cart_order_load($user->uid);
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
     foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
@@ -219,4 +227,29 @@ function kupon_views_pre_render(&$view) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_entity_insert().
+ */
+function kupon_notify_cs($product, $user) {
+  $module = 'kupon';
+  $key = 'kupon_key';
+  $language = language_default();
+  $params = array(
+    '@email' => $user->mail,
+    '@voucher' => $product->title,
+  );
+
+  drupal_mail($module, $key, $mail, $language, $params);
+}
+
+/**
+ * Implements hook_mail().
+ */
+function kupon_mail($key, &$message, $params) {
+  $message['subject'] = t('Customer menambahkan voucher yang telah melewati quota', $params);
+  $message['body'] = array();
+  $message['body'][] = t('Hello,', $params);
+  $message['body'][] = t('Customer @email menambahkan voucher @voucher, padahal sudah melebihi quota.', $params);
 }

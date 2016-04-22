@@ -1,22 +1,28 @@
 <?php
 /**
- * File sepulsa_bulk_userpoint.module
- * Created By : Antonius Ananto
- * Module Usage : To Bulk User Point Data To table
+ * @file
+ * sepulsa_bulk_userpoint.module
+ *
+ * @desc
+ *   File sepulsa_bulk_userpoint.module
+ *   Created By : Antonius Ananto
+ *   Module Usage : To Bulk User Point Data To table
  */
-function sepulsa_bulk_userpoint_menu(){
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_bulk_userpoint_menu() {
   $items['admin/config/people/userpoints/bulk'] = array(
-      'title' => 'Add !points transaction (Bulk)',
-      'title arguments' => userpoints_translation(),
-      'description' => 'Admin Bulk add/delete userpoints',
-      'page callback' => 'drupal_get_form',
-      'page arguments' => array('userpoint_bulk_form'),
-      'access callback' => array('userpoints_admin_access'),
-      'type' => MENU_LOCAL_ACTION,
-      'weight' => 0,
-      'file path' => drupal_get_path('module', 'sepulsa_bulk_userpoint'),
-      'file' => 'sepulsa_bulk_userpoint.admin.inc',
-  );  
+    'title' => 'Add !points transaction (Bulk)',
+    'title arguments' => userpoints_translation(),
+    'description' => 'Admin Bulk add/delete userpoints',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('userpoint_bulk_form'),
+    'access callback' => array('userpoints_admin_access'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'sepulsa_bulk_userpoint.admin.inc',
+  );
   return $items;
 }
 
@@ -51,3 +57,49 @@ function sepulsa_bulk_userpoint_menu_local_tasks_alter(&$data, $router_item, $ro
   }
 }
 
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function bulk_userpoint_finish().
+ *
+ * @param bool $success
+ *   Success flag.
+ * @param array $results
+ *   Result array.
+ * @param arary $operations
+ *   Error operations.
+ */
+function sepulsa_bulk_userpoint_finish($success, $results, $operations) {
+  // Check if success flag.
+  if ($success) {
+    // Here we do something meaningful with the results.
+    drupal_set_message(t('Bulk userpoint success.'));
+  }
+  else {
+    // An error occurred: $operations contains the remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array(
+      '%error_operation' => $error_operation[0],
+      '@arguments' => print_r($error_operation[1], TRUE),
+    ));
+    drupal_set_message($message, 'error');
+  }
+}
+
+/**
+ * Function sepulsa_bulk_userpoint_process().
+ *
+ * @param array $item
+ *   Array of: uid, points, tid, and description.
+ */
+function sepulsa_bulk_userpoint_process($item) {
+  $params = array(
+    'uid' => $item['uid'],
+    'points' => $item['points'],
+    'tid' => $item['tid'],
+    'description' => $item['description'],
+  );
+  userpoints_userpointsapi($params);
+}

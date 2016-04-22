@@ -349,6 +349,21 @@ function device_services_resource_verify($code = '') {
             ->condition('init', $session['device']->phone)
             ->execute()->fetch();
 
+          // Check for blocked account status: search old user using email.
+          if (isset($account->status) && empty($account->status)
+            && isset($account->mail)
+          ) {
+            // Create or condition for mail.
+            $mail_or = db_or();
+            $mail_or->condition('mail', $account->mail);
+            $mail_or->condition('mail', $account->mail . '_merged');
+            // If block, there  is more suitable user: check using email.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('mail', $mail_or)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
+
           // Check if user is empty.
           if (empty($account)) {
             // Create user dummy: set up the user fields.
@@ -454,7 +469,18 @@ function device_services_resource_mail($mail = '') {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
     if ($session !== FALSE) {
+      // Send verification mail.
       $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
+      // Get error messages.
+      $messages = drupal_get_messages();
+      // Log if there is messages.
+      if (!empty($messages)) {
+        watchdog('device_services', 'Device mail service to @mail with messages: <pre>@mess</pre>.', array(
+          '@mail' => $mail,
+          '@mess' => print_r($messages, TRUE),
+        ), WATCHDOG_ERROR);
+      }
+      // Give result based on send verify variable.
       if ($send_verify === FALSE) {
         return services_error(t('Send Email Failed.'), 406);
       }

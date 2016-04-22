@@ -112,25 +112,30 @@ function device_mail_verification_link_confirm($hash = NULL) {
 function device_mail_verification_merge_user($current_mail) {
   // Check device, order, user from device user.
   $device = device_load($current_mail['did']);
-
+  // Get current order from this device user.
   $device_account = db_select('commerce_order', 'co')
     ->fields('co')
     ->condition('uid', $device->uid, '=')
     ->execute();
 
   // Check device, order, user from web user.
+  // If email is new: no user found.
   $web_user = user_load_by_mail($current_mail['mail']);
+  // Check the result.
+  if ($web_user !== FALSE) {
+    // Get current order from web user.
+    $web_account = db_select('commerce_order', 'co')
+      ->fields('co')
+      ->condition('uid', $web_user->uid, '=')
+      ->execute();
+    // Get device from web user.
+    $web_device = db_select('device', 'd')
+      ->fields('d')
+      ->condition('uid', $web_user->uid, '=')
+      ->execute();
+  }
 
-  $web_account = db_select('commerce_order', 'co')
-    ->fields('co')
-    ->condition('uid', $web_user->uid, '=')
-    ->execute();
-
-  $web_device = db_select('device', 'd')
-    ->fields('d')
-    ->condition('uid', $web_user->uid, '=')
-    ->execute();
-
+  // Define flag device.
   if (isset($web_device) && $web_device->rowCount() > 0) {
     $flag_device = 1;
   }
@@ -138,35 +143,18 @@ function device_mail_verification_merge_user($current_mail) {
     $flag_device = 0;
   }
 
+  // Define uid for each device / web.
   $device_uid = $device->uid;
-  $web_uid = $web_user->uid;
-
+  $web_uid = isset($web_user->uid) ? $web_user->uid : NULL;
+  // Define default strategi and merge to.
   $strategi = 0;
   $merge_to = '';
+  // Define counter for each device / web.
+  $device_acount_counter = isset($device_account) && is_object($device_account) ? $device_account->rowCount() : 0;
+  $web_account_counter = isset($web_account) && is_object($web_account) ? $web_account->rowCount() : 0;
 
-  // Strategi 1. jika hanya salah satu user yang memiliki order,
-  // Merge ke user yang memiliki order.
-  if (!$device_account->rowCount() || !$web_account->rowCount()) {
-    if ($device_account->rowCount() == 0) {
-      // Merge to web account and do not send email reset password.
-      $strategi = 1;
-      $merge_to = 'web';
-    }
-    elseif ($web_account->rowCount() == 0) {
-      // Merge to device account and send email reset password.
-      $strategi = 1;
-      $merge_to = 'device';
-    }
-  }
-  // Strategi 3. Jika kedua user tidak memiliki order,
-  // Merge ke user yang memiliki device.
-  elseif (!$device_account->rowCount() && !$web_account->rowCount()) {
-    // Merge to device account and send email reset password.
-    $strategi = 3;
-    $merge_to = 'device';
-  }
-  // Strategi 2. & 4.
-  else {
+  // Strategi 2 & 4: kedua user memiliki order.
+  if ($web_account_counter > 0 && $device_acount_counter > 0) {
     // Strategi 4. Jika kedua user punya order,
     // Dan jika kedua user punya device.
     if ($flag_device) {
@@ -182,6 +170,27 @@ function device_mail_verification_merge_user($current_mail) {
       $merge_to = 'device';
     }
   }
+  // Strategi 3. Jika kedua user tidak memiliki order,
+  // Merge ke user yang memiliki device.
+  elseif (empty($web_account_counter) && empty($device_acount_counter)) {
+    // Merge to device account and send email reset password.
+    $strategi = 3;
+    $merge_to = 'device';
+  }
+  // Strategi 1. jika hanya salah satu user yang memiliki order,
+  // Merge ke user yang memiliki order.
+  else {
+    if (empty($device_acount_counter)) {
+      // Merge to web account and do not send email reset password.
+      $strategi = 1;
+      $merge_to = 'web';
+    }
+    elseif (empty($web_account_counter)) {
+      // Merge to device account and send email reset password.
+      $strategi = 1;
+      $merge_to = 'device';
+    }
+  }
 
   if ($flag_device) {
     $data = array(
@@ -189,7 +198,6 @@ function device_mail_verification_merge_user($current_mail) {
       'mail' => $current_mail['mail'],
       'merge_to' => $merge_to,
     );
-
     return drupal_get_form('device_mail_merge_confirm_form', $device, $web_device->fetchAssoc(), $data);
   }
   else {
@@ -235,22 +243,37 @@ function device_mail_verification_merge_user($current_mail) {
  */
 function device_mail_verification_merge($strategi = '', $mail = '', $device_did = '', $device_uid = '', $web_uid = '', $merge_to = '') {
   if ($merge_to == 'device') {
-    // Block Web Account.
-    $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
-    $web_user_wrapper->status->set(0);
-    $web_user_wrapper->save();
-    // Get web user object.
-    $web_user = $web_user_wrapper->value();
+    // Wrap the code in try and catch for debugging purpose.
+    try {
+      // Block Web Account.
+      $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
+      $web_user_wrapper->status->set(0);
+      $web_user_wrapper->mail->set($mail . '_merged');
+      $web_user_wrapper->save();
+      // Get web user object.
+      $web_user = $web_user_wrapper->value();
 
-    // Change email in user , where uid = $device_uid;
-    $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
-    $device_user_wrapper->mail->set($mail);
-    $device_user_wrapper->save();
-    // Get device user object.
-    $device_user = $device_user_wrapper->value();
+      // Change email in user , where uid = $device_uid;
+      $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
+      $device_user_wrapper->mail->set($mail);
+      $device_user_wrapper->save();
+      // Get device user object.
+      $device_user = $device_user_wrapper->value();
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      watchdog('device_mail_verification', 'Unable to merge user to @merge using strategy @stra (w: @web, d: @dev) with trace: <pre>@trace</pre> <pre>@user</pre>', array(
+        '@merge' => $merge_to,
+        '@stra' => $strategi,
+        '@web' => $web_uid,
+        '@dev' => $device_uid,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR);
+    }
 
     // Transfer roles.
-    if (count($web_user->roles) > count($device_user->roles)) {
+    if (isset($web_user->roles) && isset($device_user->roles)
+      && count($web_user->roles) > count($device_user->roles)
+    ) {
       $device_user->roles = $web_user->roles;
       // Save user: get account.
       $device_user = user_save($device_user);
@@ -267,22 +290,37 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     }
   }
   else {
-    // Block User Device.
-    $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
-    $device_user_wrapper->status->set(0);
-    $device_user_wrapper->save();
-    // Get device user object.
-    $device_user = $device_user_wrapper->value();
+    // Wrap the code in try and catch for debugging purpose.
+    try {
+      // Block User Device.
+      $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
+      $device_user_wrapper->status->set(0);
+      $device_user_wrapper->mail->set($mail . '_merged');
+      $device_user_wrapper->save();
+      // Get device user object.
+      $device_user = $device_user_wrapper->value();
 
-    // Change UID in device.
-    $device_user_wrapper = entity_metadata_wrapper('device', $device_did);
-    $device_user_wrapper->uid->set($web_uid);
-    $device_user_wrapper->save();
-    // Get web user object.
-    $web_user = user_load($web_uid);
+      // Change UID in device.
+      $device_user_wrapper = entity_metadata_wrapper('device', $device_did);
+      $device_user_wrapper->uid->set($web_uid);
+      $device_user_wrapper->save();
+      // Get web user object.
+      $web_user = user_load($web_uid);
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      watchdog('device_mail_verification', 'Unable to merge user to @merge using strategy @stra (w: @web, d: @dev) with trace: <pre>@trace</pre> <pre>@user</pre>', array(
+        '@merge' => $merge_to,
+        '@stra' => $strategi,
+        '@web' => $web_uid,
+        '@dev' => $device_uid,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR);
+    }
 
     // Transfer roles: only if previous roles.
-    if (count($device_user->roles) > count($web_user->roles)) {
+    if (isset($device_user->roles) && isset($web_user->roles)
+      && count($device_user->roles) > count($web_user->roles)
+    ) {
       $web_user->roles = $device_user->roles;
       $web_user = user_save($web_user);
     }

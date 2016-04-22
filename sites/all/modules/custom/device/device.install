@@ -228,7 +228,7 @@ function device_install() {
     'before' => '',
     'prefix' => '',
     'pattern' => 1,
-    'length' => 4,
+    'length' => 6,
     'suffix' => '',
     'after' => '',
   ));

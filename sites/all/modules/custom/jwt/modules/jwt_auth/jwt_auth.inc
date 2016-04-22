@@ -31,7 +31,7 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
     // Get server information.
     $server = services_server_info_object();
     // Check Authorization Bearer header.
-    if (isset($_SERVER['HTTP_AUTHORIZATION']) && preg_match('#^Bearer\s+(.+)$#i', $_SERVER['HTTP_AUTHORIZATION'], $match)) {
+    if (isset($_SERVER['HTTP_AUTHORIZATION']) && preg_match('#^Bearer\s+([^\.]+\.[^\.]+\.[^\.]+)$#i', $_SERVER['HTTP_AUTHORIZATION'], $match)) {
       // Trim it.
       $match[1] = trim($match[1]);
       // Verify JWT using selected config.

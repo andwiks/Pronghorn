@@ -44,7 +44,7 @@
             $total[$field] = strip_tags($content);
 
             if($field=='commerce_total' && $total[$field]=='0  IDR'){
-              print 'FREE';
+              print t('FREE');
             }else{
               print $content;
             }

@@ -147,14 +147,24 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
 function kupon_get_own_voucher($user) {
   $voucher = array();
   // get count of user own voucher
-  $result = db_query("SELECT sc.field_simple_coupon_target_id AS simple_coupon, mt.field_coupon_max_taken_value AS max_taken, COUNT(sc.field_simple_coupon_target_id) AS count_simple_coupon
+  $result = db_query("SELECT sc.field_simple_coupon_target_id AS simple_coupon,
+    mt.field_coupon_max_taken_value AS max_taken,
+    COUNT(sc.field_simple_coupon_target_id) AS count_simple_coupon
     FROM
     {node} n
-    LEFT JOIN {field_data_field_simple_coupon} sc ON n.nid = sc.entity_id AND (sc.entity_type = 'node' AND sc.deleted = '0')
+    LEFT JOIN {field_data_field_simple_coupon} sc ON n.nid = sc.entity_id
+      AND (sc.entity_type = 'node' AND sc.deleted = '0')
     INNER JOIN {node} nsc ON sc.field_simple_coupon_target_id = nsc.nid
-    LEFT JOIN {field_data_field_owned_coupon_expiry} ce ON n.nid = ce.entity_id AND (ce.entity_type = 'node' AND ce.deleted = '0')
-    LEFT JOIN {field_data_field_coupon_max_taken} mt ON nsc.nid = mt.entity_id AND (mt.entity_type = 'node' AND mt.deleted = '0')
-    WHERE (( (n.uid = '" . $user->uid . "' ) )AND(( (n.status = '1') AND (n.type IN  ('offline_owned_simple', 'offline_owned_unique', 'owned_simple_coupon', 'owned_unique_coupon')) AND (DATE_FORMAT(FROM_UNIXTIME(ce.field_owned_coupon_expiry_value), '%Y-%m-%d') >= '" . date('Y-m-d') . "') AND (sc.field_simple_coupon_target_id >= mt.field_coupon_max_taken_value) )))
+    LEFT JOIN {field_data_field_owned_coupon_expiry} ce ON n.nid = ce.entity_id
+      AND (ce.entity_type = 'node' AND ce.deleted = '0')
+    LEFT JOIN {field_data_field_coupon_max_taken} mt ON nsc.nid = mt.entity_id
+      AND (mt.entity_type = 'node' AND mt.deleted = '0')
+    WHERE (
+      (n.uid = '" . $user->uid . "' )
+      AND ( (n.status = '1')
+        AND (n.type IN  ('offline_owned_simple', 'offline_owned_unique', 'owned_simple_coupon', 'owned_unique_coupon'))
+        AND (DATE_FORMAT(FROM_UNIXTIME(ce.field_owned_coupon_expiry_value), '%Y-%m-%d') >= '" . date('Y-m-d') . "')
+        AND (sc.field_simple_coupon_target_id >= mt.field_coupon_max_taken_value) ))
     GROUP BY simple_coupon");
 
     //dpm($result->queryString);
@@ -168,6 +178,10 @@ function kupon_get_own_voucher($user) {
 
 /* implement hook_commerce_cart_product_add(). */
 function kupon_commerce_cart_product_add($order, $product, $quantity, $line_item) {
+  kupon_delete_after_product_add($order, $product, $line_item);
+}
+
+function kupon_delete_after_product_add($order, $product, $line_item) {
   global $user;
 
   foreach (commerce_info_fields('commerce_product_reference') as $field) {
@@ -185,6 +199,23 @@ function kupon_commerce_cart_product_add($order, $product, $quantity, $line_item
         // delete line item when voucher over limit
         drupal_set_message(t('Sorry, cannot add this voucher.'), 'warning');
         commerce_cart_order_product_line_item_delete($order, $line_item->line_item_id);
+      }
+    }
+  }
+}
+
+/* implement hook_views_pre_render(). */
+function kupon_views_pre_render(&$view) {
+  global $user;
+
+  if ($view->name=="commerce_cart_summary") {
+    $order = commerce_cart_order_load($user->uid);
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+      $line_item = $line_item_wrapper->value();
+      if ($line_item->type == 'coupon') {
+        $product = $line_item_wrapper->commerce_product->value();
+        kupon_delete_after_product_add($order, $product, $line_item);
       }
     }
   }

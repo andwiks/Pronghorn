@@ -29,8 +29,8 @@ function device_mail_verification_link_confirm($hash = NULL) {
 
   // Mail or hash does exist.
   if (isset($mail_result) || $mail_result->rowCount() > 0) {
-
     $current_mail = $mail_result->fetchAssoc();
+
     // Hash already processed.
     if ($current_mail['status'] != 0) {
 
@@ -47,7 +47,6 @@ function device_mail_verification_link_confirm($hash = NULL) {
     }
     // Hash not processed yet.
     else {
-
       $entities = entity_load('device', array($current_mail['did']));
       // Settings don't exist (this should NOT happen!).
       if (!empty($entities)) {
@@ -80,7 +79,6 @@ function device_mail_verification_link_confirm($hash = NULL) {
         }
       }
     }
-
   }
 
   switch ($confirm_status) {
@@ -366,6 +364,8 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
  *   Form array.
  */
 function device_mail_merge_confirm_form($form = array(), &$form_state = array(), $device_user = NULL, $web_device_user = array(), $data = array()) {
+  // Attach theme to this form.
+  $form['#theme'] = 'device_merge_confirm_form';
   $form['strategi'] = array(
     '#type' => 'value',
     '#value' => $data['strategi'],
@@ -398,19 +398,17 @@ function device_mail_merge_confirm_form($form = array(), &$form_state = array(),
     '#type' => 'value',
     '#value' => $data['dmv_id'],
   );
-  $msg = '<div style = "font-size:20px;"> ';
-  $msg .= '<b>' . t('New Device') . '</b> = <br>
-            ' . t('IMEI Number') . ' : ' . $device_user->imei . '<br>
-            ' . t('Agent') . ' : ' . $device_user->agent . '<br><br>
-            <b>' . t('Old Device') . '</b> = <br>
-            ' . t('IMEI Number') . ' : ' . $web_device_user['imei'] . '<br>
-            ' . t('Agent') . ' : ' . $web_device_user['agent'] . '<br><br>
-          <span style="color:red;">' . t('If you agree to this confirmation, the old device can not be used again.') . '</font>';
+  $msg = '<div style = "font-size:20px; padding-bottom: 10px;">' . t('Are you sure want to merge this device ?', array(), array('context' => 'device_mail_verification')) . '<br /><br />';
+  $msg .= '<b>' . t('New Device', array(), array('context' => 'device_mail_verification')) . '</b><br />';
+  $msg .= t('IMEI Number', array(), array('context' => 'device_mail_verification')) . ': ' . $device_user->imei . '<br />';
+  $msg .= t('Agent', array(), array('context' => 'device_mail_verification')) . ': ' . $device_user->agent . '<br /><br />';
+  $msg .= '<b>' . t('Old Device', array(), array('context' => 'device_mail_verification')) . '</b><br />';
+  $msg .= t('IMEI Number', array(), array('context' => 'device_mail_verification')) . ': ' . $web_device_user['imei'] . '<br />';
+  $msg .= t('Agent', array(), array('context' => 'device_mail_verification')) . ': ' . $web_device_user['agent'] . '<br /><br />';
+  $msg .= '<span style="color:red;">' . t('If you agree to this confirmation, the old device can not be used again.', array(), array('context' => 'device_mail_verification')) . '</span><br />';
   $msg .= ' </div>';
-  $form = confirm_form($form,
-                      t('Are you sure want to merge this device ?'),
-                      '',
-                      $msg);
+  $form = confirm_form($form, t('Are you sure want to merge this device ?', array(), array('context' => 'device_mail_verification')), variable_get('device_mail_redirect', ''), $msg, t('Confirm', array(), array('context' => 'device_mail_verification')), t('Cancel', array(), array('context' => 'device_mail_verification')));
+  $form['actions']['cancel']['#attributes']['style'] = array('margin-left: 2%;');
   $form['actions']['submit']['#submit'] = array('device_mail_merge_confirm_form_submit');
   return $form;
 }

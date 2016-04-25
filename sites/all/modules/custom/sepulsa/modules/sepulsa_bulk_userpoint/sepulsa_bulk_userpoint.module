@@ -18,7 +18,7 @@ function sepulsa_bulk_userpoint_menu() {
     'title arguments' => userpoints_translation(),
     'description' => 'Admin Bulk add/delete userpoints',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('userpoint_bulk_form'),
+    'page arguments' => array('sepulsa_bulk_userpoint_bulk_form'),
     'access callback' => array('userpoints_admin_access'),
     'type' => MENU_LOCAL_ACTION,
     'file' => 'sepulsa_bulk_userpoint.admin.inc',
@@ -62,7 +62,7 @@ function sepulsa_bulk_userpoint_menu_local_tasks_alter(&$data, $router_item, $ro
  */
 
 /**
- * Function bulk_userpoint_finish().
+ * Function _sepulsa_bulk_userpoint_finish().
  *
  * @param bool $success
  *   Success flag.
@@ -71,7 +71,7 @@ function sepulsa_bulk_userpoint_menu_local_tasks_alter(&$data, $router_item, $ro
  * @param arary $operations
  *   Error operations.
  */
-function sepulsa_bulk_userpoint_finish($success, $results, $operations) {
+function _sepulsa_bulk_userpoint_finish($success, $results, $operations) {
   // Check if success flag.
   if ($success) {
     // Here we do something meaningful with the results.
@@ -89,17 +89,23 @@ function sepulsa_bulk_userpoint_finish($success, $results, $operations) {
 }
 
 /**
- * Function sepulsa_bulk_userpoint_process().
+ * Function _sepulsa_bulk_userpoint_process().
  *
  * @param array $item
  *   Array of: uid, points, tid, and description.
  */
-function sepulsa_bulk_userpoint_process($item) {
-  $params = array(
-    'uid' => $item['uid'],
-    'points' => $item['points'],
-    'tid' => $item['tid'],
-    'description' => $item['description'],
-  );
-  userpoints_userpointsapi($params);
+function _sepulsa_bulk_userpoint_process($item) {
+  // Check item data: only process if data are correct.
+  if (isset($item['uid']) && !empty($item['uid'])
+    && isset($item['points']) && !empty($item['points'])
+    && isset($item['tid']) && !empty($item['tid'])
+  ) {
+    $params = array(
+      'uid' => $item['uid'],
+      'points' => $item['points'],
+      'tid' => $item['tid'],
+      'description' => isset($item['description']) ? $item['description'] : '-',
+    );
+    userpoints_userpointsapi($params);
+  }
 }

@@ -14,7 +14,7 @@
  */
 
 /**
- * Function userpoint_bulk_form().
+ * Function sepulsa_bulk_userpoint_bulk_form().
  *
  * @param array $form
  *   Form array.
@@ -24,7 +24,7 @@
  * @return array
  *   Form array.
  */
-function userpoint_bulk_form($form = array(), &$form_state = array()) {
+function sepulsa_bulk_userpoint_bulk_form($form = array(), &$form_state = array()) {
   $form['fid'] = array(
     '#type' => 'managed_file',
     '#title' => t('File to Bulk Transaction'),
@@ -58,14 +58,14 @@ function userpoint_bulk_form($form = array(), &$form_state = array()) {
 }
 
 /**
- * Function userpoint_bulk_form_submit().
+ * Function sepulsa_bulk_userpoint_bulk_form_submit().
  *
  * @param array $form
  *   Form array.
  * @param array $form_state
  *   Form state array.
  */
-function userpoint_bulk_form_submit($form, &$form_state) {
+function sepulsa_bulk_userpoint_bulk_form_submit($form, &$form_state) {
   // Check if there is file id.
   if (!empty($form_state['values']['fid'])) {
     // Load file object.
@@ -88,7 +88,7 @@ function userpoint_bulk_form_submit($form, &$form_state) {
               )),
             );
             $operations[] = array(
-              'sepulsa_bulk_userpoint_process',
+              '_sepulsa_bulk_userpoint_process',
               array($item),
             );
           }
@@ -103,7 +103,7 @@ function userpoint_bulk_form_submit($form, &$form_state) {
         $batch = array(
           'title' => t('Bulk UserPoint'),
           'operations' => $operations,
-          'finished' => 'sepulsa_bulk_userpoint_finish',
+          'finished' => '_sepulsa_bulk_userpoint_finish',
           'error_message' => t('Something Went Wrong When Appending User Point Data.'),
           'progress_message' => t('Adding @current of @total User Point Data.'),
         );

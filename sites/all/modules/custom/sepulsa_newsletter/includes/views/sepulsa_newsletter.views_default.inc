@@ -101,7 +101,7 @@ function sepulsa_newsletter_views_default_views() {
 
   /* Display: Mailchimp Subscribers */
   $handler = $view->new_display('page', 'Mailchimp Subscribers', 'page');
-  $handler->display->display_options['path'] = 'admin/reports/mailchimp/mailchimp-subscribers';
+  $handler->display->display_options['path'] = 'admin/reports/newsletter/mailchimp-subscribers';
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Mailchimp Subscribers';
   $handler->display->display_options['menu']['description'] = 'Mailchimp Subscribers.';
@@ -114,7 +114,7 @@ function sepulsa_newsletter_views_default_views() {
   $handler = $view->new_display('views_data_export', 'Mailchimp Subscriber Export', 'views_data_export_1');
   $handler->display->display_options['pager']['type'] = 'some';
   $handler->display->display_options['style_plugin'] = 'views_data_export_csv';
-  $handler->display->display_options['path'] = 'admin/reports/mailchimp/mailchimp-subscriber-export';
+  $handler->display->display_options['path'] = 'admin/reports/newsletter/mailchimp-subscriber-export';
   $handler->display->display_options['displays'] = array(
     'page' => 'page',
     'default' => 0,

@@ -356,7 +356,7 @@ function device_services_resource_verify($code = '') {
             // Create or condition for mail.
             $mail_or = db_or();
             $mail_or->condition('mail', $account->mail);
-            $mail_or->condition('mail', $account->mail . '_merged');
+            $mail_or->condition('mail', $account->mail . '.merged');
             // If block, there  is more suitable user: check using email.
             $account = db_select('users', 'u')->fields('u')
               ->condition('mail', $mail_or)

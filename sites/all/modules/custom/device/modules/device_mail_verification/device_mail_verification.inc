@@ -246,7 +246,7 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
       // Block Web Account.
       $web_user_wrapper = entity_metadata_wrapper('user', $web_uid);
       $web_user_wrapper->status->set(0);
-      $web_user_wrapper->mail->set($mail . '_merged');
+      $web_user_wrapper->mail->set($mail . '.merged');
       $web_user_wrapper->save();
       // Get web user object.
       $web_user = $web_user_wrapper->value();
@@ -293,7 +293,7 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
       // Block User Device.
       $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
       $device_user_wrapper->status->set(0);
-      $device_user_wrapper->mail->set($mail . '_merged');
+      $device_user_wrapper->mail->set($mail . '.merged');
       $device_user_wrapper->save();
       // Get device user object.
       $device_user = $device_user_wrapper->value();

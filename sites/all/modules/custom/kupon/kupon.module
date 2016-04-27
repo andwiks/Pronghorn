@@ -136,7 +136,7 @@ function create_owned_unique_coupon_form_submit($form, &$form_state){
             $node = node_submit($node); // Prepare node for saving
             node_save($node);
             $unique_code_total = $unique_code_total + 1;
-        }    
+        }
         drupal_set_message('Unique Codes Import Successfully', 'notice');
     } else {
         drupal_set_message('Invalid Simple Coupon ID', 'error');
@@ -234,22 +234,24 @@ function kupon_views_pre_render(&$view) {
  */
 function kupon_notify_cs($product, $user) {
   $module = 'kupon';
-  $key = 'kupon_key';
-  $language = language_default();
+  $key = 'kupon_overlimit_voucher';
+  $from = "info@sepulsa.com";
+  $to = 'cs@sepulsa.com';
+  $message = "Customer " . $user->mail . " menambahkan voucher " . $product->title . ", padahal sudah melebihi quota.";
+  $subject = "Customer menambahkan voucher yang telah melewati quota.";
   $params = array(
-    '@email' => $user->mail,
-    '@voucher' => $product->title,
+    'subject' => $subject,
+    'body' => $message,
   );
-
-  drupal_mail($module, $key, $mail, $language, $params);
+  drupal_mail($module, $key, $to, language_default(), $params, $from);
 }
 
 /**
  * Implements hook_mail().
  */
 function kupon_mail($key, &$message, $params) {
-  $message['subject'] = t('Customer menambahkan voucher yang telah melewati quota', $params);
-  $message['body'] = array();
-  $message['body'][] = t('Hello,', $params);
-  $message['body'][] = t('Customer @email menambahkan voucher @voucher, padahal sudah melebihi quota.', $params);
+  if ($key == 'auto_bank_transfer_double_order') {
+    $message['subject'] = $params['subject'];
+    $message['body'] = array(0=>$params['body']);
+  }
 }

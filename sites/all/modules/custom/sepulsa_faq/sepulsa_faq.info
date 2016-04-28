@@ -1,0 +1,6 @@
+name = "Sepulsa FAQ"
+description = "Sepulsa FAQ customizaion."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = path

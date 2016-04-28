@@ -1,0 +1,24 @@
+<?php
+/**
+ * @file
+ * Hanya memodifikasi path url alias.
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function sepulsa_faq_form_alter(&$form, &$form_state, $form_id) {
+  if ($form['#node_edit_form'] == TRUE) {
+    if (property_exists($form['#node'], 'field_faq_category')) {
+      $form['path']['alias']['#default_value'] = 'faqs/' . _slugify($form['title']['#default_value']);
+    }
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function _slugify($str) {
+  $slug = preg_replace('/[^A-Za-z0-9-]+/', '-', strtolower(trim(str_replace('?', '', $str))));
+  return $slug;
+}

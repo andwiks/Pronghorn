@@ -4,6 +4,7 @@
  * page.tpl.php
  *
  * @author dwi@sepulsa.com
+ *
  * @since July 23th 2015.
  */
 ?>
@@ -31,16 +32,16 @@
 
 <section id="frameBlog">
     <div class="wrapper">
-        
+
         <div id="inner" class="clearfix">
-            <div id="left_column">      
+            <div id="left_column">
                 <?php print render($title_prefix); ?>
                 <?php print $messages; ?>
-                
+
                 <?php if ($title): ?>
                   <h1><?php print $title ?></h1>
                 <?php endif; ?>
-                
+
                 <?php print render($title_suffix); ?>
                 <?php if ($tabs): ?>
                   <div class="tabs">
@@ -68,10 +69,10 @@
             <?php if (!empty($page['sidebar_first'])): ?>
             <div id="right_column">
                <?php print render($page['sidebar_first']); ?>
-            </div> 
-            <?php endif; ?>           
+            </div>
+            <?php endif; ?>
         </div>
-        
+
     </div>
 </section>
 <?php else: ?>

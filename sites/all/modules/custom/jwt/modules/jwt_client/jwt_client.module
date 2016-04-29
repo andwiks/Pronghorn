@@ -189,6 +189,8 @@ function jwt_client_jwt_auth_verified($claims) {
         watchdog('jwt_client', 'Device Token with invalid device mail. Debug: <pre>@debug</pre>', array(
           '@debug' => $exp->getTraceAsString(),
         ), WATCHDOG_ERROR);
+        // This means: device is not available.
+        return services_error(t('Invalid User'), 401);
       }
 
       // Check if can get user id.

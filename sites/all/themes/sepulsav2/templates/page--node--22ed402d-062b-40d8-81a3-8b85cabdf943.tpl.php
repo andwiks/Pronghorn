@@ -7,9 +7,6 @@
  *
  * @since July 23th 2015.
  */
-if(menu_get_object()){
-  kpr($node);
-}
 ?>
 
 

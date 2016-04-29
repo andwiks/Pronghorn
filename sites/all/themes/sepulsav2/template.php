@@ -604,7 +604,9 @@ function sepulsav2_preprocess_html(&$variables) {
 /**
  * Implements hook_preprocess_page().
  */
-function sepulsav2_preprocess_page(&$variables) {
+function sepulsav2_preprocess_page(&$variables, $hook) {
+  $variables['theme_hook_suggestions'][] = "page__node__" . str_replace('-', '_', $variables['node']->uuid);
+
   if (drupal_is_front_page()) {
     if (isset($_POST['form_id']) && $_POST['form_id'] == 'commerce_cart_add_to_cart_form') {
       $variables['active_tab'] = 'token_reload';
@@ -613,6 +615,9 @@ function sepulsav2_preprocess_page(&$variables) {
       $variables['active_tab'] = 'topup';
     }
   }
+
+
+
 }
 
 /**

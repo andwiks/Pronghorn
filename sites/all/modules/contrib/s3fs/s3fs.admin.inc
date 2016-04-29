@@ -13,18 +13,18 @@ function s3fs_settings() {
   // NOTE: I'd like to be able to pull this information directly from the SDK, but
   // I couldn't find a way to get the human-readable region names.
   $region_map = array(
-    '' => 'Default',
-    'us-east-1' => 'US Standard (us-east-1)',
-    'us-west-1' => 'US West - Northern California  (us-west-1)',
-    'us-west-2' => 'US West - Oregon (us-west-2)',
-    'us-gov-west-1' => 'USA GovCloud Standard (us-gov-west-1)',
-    'eu-west-1' => 'EU - Ireland  (eu-west-1)',
-    'eu-central-1' => 'EU - Frankfurt (eu-central-1)',
-    'ap-southeast-1' => 'Asia Pacific - Singapore (ap-southeast-1)',
-    'ap-southeast-2' => 'Asia Pacific - Sydney (ap-southeast-2)',
-    'ap-northeast-1' => 'Asia Pacific - Tokyo (ap-northeast-1)',
-    'sa-east-1' => 'South America - Sao Paulo (sa-east-1)',
-    'cn-north-1' => 'China - Beijing (cn-north-1)',
+    '' => t('Default'),
+    'us-east-1' => t('US Standard (us-east-1)'),
+    'us-west-1' => t('US West - Northern California  (us-west-1)'),
+    'us-west-2' => t('US West - Oregon (us-west-2)'),
+    'us-gov-west-1' => t('USA GovCloud Standard (us-gov-west-1)'),
+    'eu-west-1' => t('EU - Ireland  (eu-west-1)'),
+    'eu-central-1' => t('EU - Frankfurt (eu-central-1)'),
+    'ap-southeast-1' => t('Asia Pacific - Singapore (ap-southeast-1)'),
+    'ap-southeast-2' => t('Asia Pacific - Sydney (ap-southeast-2)'),
+    'ap-northeast-1' => t('Asia Pacific - Tokyo (ap-northeast-1)'),
+    'sa-east-1' => t('South America - Sao Paulo (sa-east-1)'),
+    'cn-north-1' => t('China - Beijing (cn-north-1)'),
   );
 
   /////////////////////////////////////
@@ -120,9 +120,7 @@ function s3fs_settings() {
     '#type'          => 'checkbox',
     '#title'         => t('Use a CNAME'),
     '#default_value' => _s3fs_get_setting('use_cname'),
-    '#description'   => t('Serve files from a custom domain by using an appropriately named bucket,
-      e.g. "mybucket.mydomain.com".'
-    ),
+    '#description'   => t('Serve files from a custom domain, instead of "BUCKET_NAME.s3.REGION.amazonaws.com".'),
   );
 
   $form['advanced']['s3fs_cname_settings_fieldset'] = array(
@@ -135,9 +133,11 @@ function s3fs_settings() {
     ),
     's3fs_domain' => array(
       '#type'          => 'textfield',
-      '#title'         => t('CDN Domain Name'),
+      '#title'         => t('Domain Name'),
       '#default_value' => _s3fs_get_setting('domain'),
-      '#description'   => t('If serving files from CloudFront, the bucket name can differ from the domain name.'),
+      '#description'   => t("The domain name from which you want your files to be served. " .
+        "You will need to configure a DNS CNAME that maps from this domain to your bucket's URL."
+      ),
     ),
   );
 
@@ -267,6 +267,35 @@ function s3fs_settings() {
       This setting is case sensitive. Do not include leading or trailing slashes.<br>
       Changing this setting <b>will not</b> move any files. If you\'ve already uploaded files to S3 through S3 File
       System, you will need to manually move them into this folder.'
+    ),
+  );
+
+
+  $form['advanced']['additional_folders'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Additional Folder Settings'),
+    '#collapsible' => TRUE,
+    '#collapsed'   => TRUE,
+    '#description' => t(
+      'Like the root folder, changing these settings <b>will not</b> move any files. If you\'ve already uploaded files
+      to S3 through S3 File System, you will need to manually move them into the corresponding folders.'),
+  );
+
+  $form['advanced']['additional_folders']['s3fs_public_folder'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Public Folder'),
+    '#default_value' => _s3fs_get_setting('public_folder', 's3fs-public'),
+    '#description'   => t(
+      'The name of the folder in your bucket (or within the root folder) where public:// files will be stored.'
+    ),
+  );
+
+  $form['advanced']['additional_folders']['s3fs_private_folder'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Private Folder'),
+    '#default_value' => _s3fs_get_setting('private_folder', 's3fs-private'),
+    '#description'   => t(
+      'The name of the folder in your bucket (or within the root folder) where private:// files will be stored.'
     ),
   );
 

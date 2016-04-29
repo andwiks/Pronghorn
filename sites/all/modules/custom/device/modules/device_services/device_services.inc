@@ -4,8 +4,6 @@
  * devices_servies.inc
  *
  * @author andreas@sepulsa.com
- *
- * @todo: logout session.
  */
 
 /**
@@ -469,24 +467,32 @@ function device_services_resource_mail($mail = '') {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
     if ($session !== FALSE) {
-      // Send verification mail.
-      $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
-      // Get error messages.
-      $messages = drupal_get_messages();
-      // Log if there is messages.
-      if (!empty($messages)) {
-        watchdog('device_services', 'Device mail service to @mail with messages: <pre>@mess</pre>.', array(
-          '@mail' => $mail,
-          '@mess' => print_r($messages, TRUE),
-        ), WATCHDOG_ERROR);
+      // Get device wrapper.
+      $device_wrapper = entity_metadata_wrapper('device', $session['device']);
+      // Get device mail.
+      $device_mail = $device_wrapper->device_mail->value();
+      // Check current mail: no change.
+      if (empty($device_mail)
+        || (!empty($device_mail) && $device_mail != $mail)
+      ) {
+        // Send verification mail.
+        $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
+        // Get error messages.
+        $messages = drupal_get_messages();
+        // Log if there is messages.
+        if (!empty($messages)) {
+          watchdog('device_services', 'Device mail service to @mail with messages: <pre>@mess</pre>.', array(
+            '@mail' => $mail,
+            '@mess' => print_r($messages, TRUE),
+          ), WATCHDOG_ERROR);
+        }
+        // Give result based on send verify variable.
+        if ($send_verify === FALSE) {
+          return services_error(t('Send Email Failed.'), 406);
+        }
       }
-      // Give result based on send verify variable.
-      if ($send_verify === FALSE) {
-        return services_error(t('Send Email Failed.'), 406);
-      }
-      else {
-        return TRUE;
-      }
+      // Let the app know if the result is true: send email or not.
+      return TRUE;
     }
   }
   // Other condition.

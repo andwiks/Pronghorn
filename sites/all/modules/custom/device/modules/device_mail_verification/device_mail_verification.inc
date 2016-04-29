@@ -425,10 +425,13 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
     $form_state['values']['merge_to']);
 
   if ($form_state['values']['merge_to'] == 'device') {
-    // Block Device User.
-    $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
-    $device_user_wrapper->status->set(0);
-    $device_user_wrapper->save();
+    // Check if web did is not the same with device did.
+    if ($form_state['values']['web_did'] != $form_state['values']['device_did']) {
+      // Block Device User.
+      $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
+      $device_user_wrapper->status->set(0);
+      $device_user_wrapper->save();
+    }
 
     // Add email to device_mail (Device User).
     $device_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
@@ -436,10 +439,13 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
     $device_wrapper->save();
   }
   else {
-    // Block Device User.
-    $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
-    $device_user_wrapper->status->set(0);
-    $device_user_wrapper->save();
+    // Check if device did is not the same with web did.
+    if ($form_state['values']['device_did'] != $form_state['values']['web_did']) {
+      // Block Device User.
+      $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
+      $device_user_wrapper->status->set(0);
+      $device_user_wrapper->save();
+    }
 
     // Add email to device_mail (Device Web).
     $device_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
@@ -452,6 +458,6 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
     ->condition('mail', $form_state['values']['mail'], '=')
     ->execute();
 
-  drupal_set_message(t("Your device has been merged."), 'status');
+  drupal_set_message(t('Your device has been merged.'), 'status');
   drupal_goto(variable_get('device_mail_redirect', ''));
 }

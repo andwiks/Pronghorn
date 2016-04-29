@@ -7,6 +7,9 @@
  *
  * @since July 23th 2015.
  */
+if(menu_get_object()){
+  kpr($node);
+}
 ?>
 
 
@@ -32,6 +35,7 @@
 $uob_campaign_uuid = 0;
 if(property_exists($node, 'uuid')){
   $uob_campaign_uuid = $node->uuid;
+  $destination = 'UOB-acquisition-campaign';
 }
 $anonym = 0;
 if(!empty(user_is_anonymous())) {
@@ -44,6 +48,7 @@ if(!empty(user_is_anonymous())) {
   var webform_UOB_campaign = '';
   var webform_UOB_campaign = '<?php print $uob_campaign_uuid; ?>';
   var anonym = <?php print $anonym; ?>;
-  console.log(webform_UOB_campaign);
-  console.log(anonym);
+  var destination = '<?php print $destination; ?>';
+  var forgot_destination ='/user/password?destination='+destination;
+  var register_destination ='/user/register?destination='+destination;
 </script>

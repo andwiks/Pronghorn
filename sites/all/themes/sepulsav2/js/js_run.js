@@ -93,6 +93,10 @@ $(document).ready(function () {
     if(webform_UOB_campaign!=null && anonym==1){
         openPop(".wrap_popup#login");
         $('#login .box_popup .close').hide();
+
+        $('#login #user-login-form a[href="/user/password"]').attr("href", forgot_destination);
+        $('#login a[href="/user/register"]').attr("href", register_destination);
+
     }
 
 });

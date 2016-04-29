@@ -63,10 +63,11 @@ function offline_coupon_resource_redeem($code, $voucher_id) {
   $voucher = _offline_coupon_redeem($code, $voucher_id);
   // Check if can get voucher data.
   if (!empty($voucher)) {
-    return t('REDEEM BERHASIL!!<br />Kode diskon: @code <br /> @title', array(
-      '@code' => $voucher['code'],
-      '@title' => $voucher['title'],
-    ));
+    // Do not mess around with this message: disturb iOS apps.
+    $msg = "REDEEM BERHASIL!!!<br>";
+    $msg .= t("Kode diskon: ") . $voucher['code'];
+    $msg .= "<br>" . $voucher['title'];
+    return $msg;
   }
   // Other condition: Invalid Voucher.
   return services_error(t('Invalid Voucher'), 406);
@@ -200,7 +201,8 @@ function _offline_coupon_redeem($code, $voucher_id) {
           ->value();
         // Get order wrapper.
         $order_wrapper = entity_metadata_wrapper('commerce_order', $order_id);
-        if ($order_wrapper->mail->value() == $code) {
+        // Caseless string comparison.
+        if (strcasecmp($order_wrapper->mail->value(), $code) == 0) {
           $is_voucher_valid = TRUE;
         }
       }

@@ -149,8 +149,10 @@ function offline_coupon_redeem_form_submit($form, &$form_state) {
       '@title' => $voucher['title'],
     )));
   }
-  // Other condition: give error message: Invalid voucher.
-  drupal_set_message(t('Invalid voucher.'), 'error');
+  else {
+    // Other condition: give error message: Invalid voucher.
+    drupal_set_message(t('Invalid voucher.'), 'error');
+  }
 }
 
 /**

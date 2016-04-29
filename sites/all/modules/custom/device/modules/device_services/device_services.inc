@@ -342,25 +342,11 @@ function device_services_resource_verify($code = '') {
           // Delete drupal session also.
           db_delete('sessions')->condition($is_https ? 'ssid' : 'sid', $session['asid'])->execute();
 
-          // Search for old user.
+          // Search for old active user.
           $account = db_select('users', 'u')->fields('u')
             ->condition('init', $session['device']->phone)
+            ->condition('status', 1)
             ->execute()->fetch();
-
-          // Check for blocked account status: search old user using email.
-          if (isset($account->status) && empty($account->status)
-            && isset($account->mail)
-          ) {
-            // Create or condition for mail.
-            $mail_or = db_or();
-            $mail_or->condition('mail', $account->mail);
-            $mail_or->condition('mail', $account->mail . '.merged');
-            // If block, there  is more suitable user: check using email.
-            $account = db_select('users', 'u')->fields('u')
-              ->condition('mail', $mail_or)
-              ->condition('status', 1)
-              ->execute()->fetch();
-          }
 
           // Check if user is empty.
           if (empty($account)) {

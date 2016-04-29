@@ -179,8 +179,6 @@ function jwt_client_jwt_auth_verified($claims) {
         $device_mail = $device_wrapper->device_mail->value();
         // Check if token mail is not the same with device mail.
         if (!empty($device_mail)
-          && strpos($device_mail, '.merged') === FALSE
-          && strpos($device_mail, '.dummy') === FALSE
           && $device_mail != $aud
         ) {
           return services_error(t('Invalid User'), 401);

@@ -446,9 +446,9 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
 
         $form['line_item_fields']['#weight'] = 0;
 
-        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title'] = 'No. Handphone (misal: 08123456789)';
+        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title'] = t('No. Handphone (misal: 08123456789)');
 
-        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'] = 'No. Meter PLN (11 digit misal: 14224251XXX)';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'] = t('No. Meter PLN (11 digit misal: 14224251XXX)');
 
         $form['line_item_fields']['field_customer_number']['#weight'] = -10;
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
@@ -464,8 +464,6 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'phone-number';
-        //$form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
-        //
 
         if (!empty($form['description'])) {
           $form['description']['#prefix'] = '<div class="info-pulsa">';

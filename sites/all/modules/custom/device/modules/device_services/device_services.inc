@@ -47,6 +47,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         ->propertyCondition('imei', $imei)
         ->propertyCondition('phone', $phone);
       $result = $query->execute();
+
       // Check if empty result.
       if (empty($result)) {
         // Device is new: create new device entity.
@@ -127,11 +128,13 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         $device_wrapper = entity_metadata_wrapper('device', $did);
         $check['device_status'] = $device_wrapper->status->value();
         $check['device_uid'] = $device_wrapper->uid->value();
+
         // 2. Check verification status: unconfirmed or new.
         $query = new EntityFieldQuery();
         $query->entityCondition('entity_type', 'device_verification')
           ->propertyCondition('did', $did);
         $result = $query->execute();
+
         if (!empty($result)) {
           $check['dv_id'] = key($result['device_verification']);
           $dv_wrapper = entity_metadata_wrapper('device_verification', $check['dv_id']);
@@ -190,6 +193,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           // 2. confirmed: only if more than timeout.
           if ($check['dv_status'] == 2
             || ($check['dv_status'] == 1 &&  REQUEST_TIME > $check['dv_timeout'])
+            || ($check['dv_status'] == 0 &&  REQUEST_TIME > $check['dv_timeout'])
           ) {
             // Regenerate hash: set as new.
             $check['dv_hash'] = device_generate_hash();
@@ -197,6 +201,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             if ($check['dv_status'] == 2) {
               $dv_wrapper->status->set(0);
             }
+
             $dv_wrapper->created->set(REQUEST_TIME);
             $dv_wrapper->timeout->set(strtotime(variable_get('device_verification_timeout', '+30 minutes'), REQUEST_TIME));
             $dv_wrapper->hash->set($check['dv_hash']);
@@ -322,6 +327,10 @@ function device_services_resource_verify($code = '') {
         // Get wrapper for device verification.
         $verification_wrapper = entity_metadata_wrapper('device_verification', key($result['device_verification']));
         // Validate hash code, timeout and status.
+        print_r($verification_wrapper->timeout->value());
+        echo '<br />';
+        print_r(REQUEST_TIME);
+
         if ($verification_wrapper->hash->value() == $code
           && REQUEST_TIME < $verification_wrapper->timeout->value()
         ) {
@@ -450,7 +459,15 @@ function device_services_resource_verify($code = '') {
           ));
           // Return new token.
           return $token;
+        }else{
+          echo '<br />';
+
+          echo "REQUEST_TIME lebih besar loh";
         }
+
+        die();
+
+
       }
     }
   }

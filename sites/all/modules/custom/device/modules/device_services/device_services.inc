@@ -350,18 +350,39 @@ function device_services_resource_verify($code = '') {
 
           // Check if user is empty.
           if (empty($account)) {
-            // Create user dummy: set up the user fields.
-            $account = new stdClass();
-            $account->is_new = TRUE;
-            $account->name = $session['device']->phone;
-            $account->mail = $session['device']->imei . '@' . $session['device']->phone . '.dummy';
-            $account->pass = user_password();
-            $account->status = 1;
-            $account->init = $session['device']->phone;
-            $account->roles = array(
-              DRUPAL_AUTHENTICATED_RID => 'authenticated user',
-            );
-            $account = user_save($account);
+            // Check if there is dummy user.
+            $dummy = db_select('users', 'u')->fields('u')
+              ->condition('name', $session['device']->phone)
+              ->execute()->fetch();
+            if (empty($dummy)) {
+              try {
+                // Create user dummy: set up the user fields.
+                $account = new stdClass();
+                $account->is_new = TRUE;
+                $account->name = $session['device']->phone;
+                $account->mail = $session['device']->imei . '@' . $session['device']->phone . '.dummy';
+                $account->pass = user_password();
+                $account->status = 1;
+                $account->init = $session['device']->phone;
+                $account->roles = array(
+                  DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                );
+                $account = user_save($account);
+              }
+              catch (Exception $exp) {
+                // Log this condition.
+                watchdog('device_services', 'Create Dummy User Error with Trace: <pre>@trace</pre><pre>@session</pre>', array(
+                  '@trace' => $exp->getTraceAsString(),
+                  '@session' => print_r($session),
+                ), WATCHDOG_ERROR);
+              }
+            }
+            else {
+              // Activate dummy user.
+              $account = user_load($dummy->uid);
+              $account->status = 1;
+              $account = user_save($account);
+            }
           }
           else {
             // User may have another device: remove old sessions.

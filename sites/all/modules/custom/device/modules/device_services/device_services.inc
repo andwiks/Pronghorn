@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * devices_servies.inc
+ * Device request key access, device verification, send email confirmation etc.
  *
  * @author andreas@sepulsa.com
  */

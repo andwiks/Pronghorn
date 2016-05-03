@@ -327,10 +327,6 @@ function device_services_resource_verify($code = '') {
         // Get wrapper for device verification.
         $verification_wrapper = entity_metadata_wrapper('device_verification', key($result['device_verification']));
         // Validate hash code, timeout and status.
-        print_r($verification_wrapper->timeout->value());
-        echo '<br />';
-        print_r(REQUEST_TIME);
-
         if ($verification_wrapper->hash->value() == $code
           && REQUEST_TIME < $verification_wrapper->timeout->value()
         ) {
@@ -459,14 +455,7 @@ function device_services_resource_verify($code = '') {
           ));
           // Return new token.
           return $token;
-        }else{
-          echo '<br />';
-
-          echo "REQUEST_TIME lebih besar loh";
         }
-
-        die();
-
 
       }
     }

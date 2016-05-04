@@ -407,7 +407,8 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
             '!strategi' => 5,
             '!satu' => $satu,
             '!dua' => $dua,
-            '!changed_uid_order' => print_r($changed_uid_order, TRUE),));
+            '!changed_uid_order' => print_r($changed_uid_order, TRUE),
+          ));
 }
 
 /**

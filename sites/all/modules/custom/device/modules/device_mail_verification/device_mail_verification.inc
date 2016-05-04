@@ -130,6 +130,7 @@ function device_mail_verification_merge_user($current_mail) {
     $web_device = db_select('device', 'd')
       ->fields('d')
       ->condition('uid', $web_user->uid, '=')
+      ->condition('status', 1)
       ->execute();
   }
 

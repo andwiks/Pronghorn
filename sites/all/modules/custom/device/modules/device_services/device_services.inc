@@ -524,7 +524,7 @@ function device_services_resource_retrieve($did = 0) {
     }
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**
@@ -564,7 +564,7 @@ function device_services_resource_index() {
     return $devices;
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**
@@ -610,7 +610,7 @@ function device_services_resource_session_index() {
     return $sessions;
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**

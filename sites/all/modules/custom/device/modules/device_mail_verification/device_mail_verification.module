@@ -108,8 +108,8 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
 
     // Insert Data to device_mail_verification Table.
     db_insert('device_mail_verification')
-    ->fields($fields_insert)
-    ->execute();
+      ->fields($fields_insert)
+      ->execute();
 
     // Return true.
     return TRUE;
@@ -210,18 +210,20 @@ function device_mail_verification_transfer_order($current_uid = '', $update_uid 
     $payment_subquery->condition('cptt.uid', $current_uid, '=');
     $tids = $payment_subquery->execute()->fetchAllAssoc('transaction_id', PDO::FETCH_ASSOC);
 
-    // Transfer commerce payment transaction.
-    $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
-      ->fields(array('uid' => $update_uid))
-      ->condition('uid', $current_uid, '=')
-      ->condition('transaction_id', $tids, 'IN')
-      ->execute();
-    // Transfer commerce payment transaction revision.
-    $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
-      ->fields(array('revision_uid' => $update_uid))
-      ->condition('revision_uid', $current_uid, '=')
-      ->condition('transaction_id', $tids, 'IN')
-      ->execute();
+    if (!empty($tids)) {
+      // Transfer commerce payment transaction.
+      $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+      // Transfer commerce payment transaction revision.
+      $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+    }
     // Transfer commerce veritrans token (saved cc).
     $result['commerce_veritrans_token'] = db_update('commerce_veritrans_token')
       ->fields(array('uid' => $update_uid))

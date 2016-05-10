@@ -1,0 +1,5 @@
+name = Sepulsa Commerce Admin UI
+description = Commerce Admin UI customization
+core = "7.x"
+
+dependencies[] = commerce_discount

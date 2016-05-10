@@ -1,6 +1,0 @@
-name = Sepulsa Commmerce Admin UI
-description = Commmerce Admin UI customization
-core = "7.x"
-
-dependencies[] = commmerce
-dependencies[] = commmerce_discount

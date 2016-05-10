@@ -101,24 +101,21 @@ function deposit_sepulsa_get_order_id_submit($form = array(), &$form_state = arr
   if ($form_state['step'] != 2) {
     switch ($info) {
       case 1:
-          drupal_set_message(t("There is no product or deposit_sepulsa in type of line item"), 'error');
+          drupal_set_message(t('There is no product or deposit sepulsa in type of line item'), 'error');
         break;
 
       case 2:
-          drupal_set_message(t("Invalid Order ID"), 'error');
+          drupal_set_message(t('Invalid Order ID'), 'error');
         break;
 
       default:
-          drupal_set_message(t("This facility is only for orders with processing status"), 'error');
+          drupal_set_message(t('This facility is only for orders with processing status'), 'error');
         break;
     }
   }
 
   if ($form_state['step'] == 2) {
     $form_state['rebuild'] = TRUE;
-  }
-  else {
-    drupal_goto('admin/commerce/orders/process-fail-deposit');
   }
 }
 
@@ -144,7 +141,7 @@ function deposit_sepulsa_confirm_process_form($form = array(), &$form_state = ar
   $msg .= ' </div>';
   $form = confirm_form($form,
                       t('Are you sure want to process this order ?'),
-                      'admin/commerce/orders/process-fail-deposit',
+                      'admin/commerce/tools/deposit/process-manual',
                       $msg);
   $form['actions']['submit']['#submit'] = array('deposit_sepulsa_confirm_process_submit');
   return $form;
@@ -159,12 +156,23 @@ function deposit_sepulsa_confirm_process_form($form = array(), &$form_state = ar
  *   Form state array.
  */
 function deposit_sepulsa_confirm_process_submit($form = array(), &$form_state = array()) {
+  // Set correct line item: deposit_sepulsa.
   $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $form_state['step_information'][1]['line_item']);
   $line_item_wrapper->type->set('deposit_sepulsa');
   $line_item_wrapper->save();
+  // Load order data.
   $order = commerce_order_load($form_state['step_information'][1]['stored_values']['order_id']);
+  // Load user data.
   $user = user_load($order->uid);
+  // Queue topup deposit.
   topup_credit_deposit_action($order, $user, 28);
-  drupal_set_message('Deposit with invalid line item id: currently in queue.');
-  drupal_goto('admin/commerce/orders/process-fail-deposit');
+  // Show message to admin.
+  drupal_set_message('Deposit order: currently in queue, please wait for process.');
+  // Force queue topup deposit to run.
+  if (module_exists('ultimate_cron') === TRUE) {
+    $job = _ultimate_cron_job_load('queue_topup_credit_deposit');
+    if (!empty($job)) {
+      $job->launch();
+    }
+  }
 }

@@ -17,14 +17,24 @@ function deposit_sepulsa_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['admin/commerce/orders/process-fail-deposit'] = array(
-    'title' => 'Proses Manual Deposit Sepulsa',
+  $items['admin/commerce/tools/deposit'] = array(
+    'title' => 'Deposit',
+    'description' => 'Deposit sepulsa tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/commerce/tools/deposit/process-manual'] = array(
+    'title' => 'Proses Manual',
     'description' => 'Proses Manual Deposit Sepulsa.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('deposit_sepulsa_wizard_form'),
-    'access arguments' => array('administer deposit credit'),
+    'access arguments' => array('use deposit tools'),
     'file' => 'deposit_sepulsa.admin.inc',
-    'type' => MENU_LOCAL_TASK,
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
@@ -38,6 +48,10 @@ function deposit_sepulsa_permission() {
     'deposit credit' => array(
       'title' => t('Deposit credit'),
       'description' => t('Deposit to sepulsa credit.'),
+    ),
+    'use deposit tools' => array(
+      'title' => t('Use deposit tools'),
+      'description' => t('Perform manual deposit tasks.'),
     ),
   );
 }

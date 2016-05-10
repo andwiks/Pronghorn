@@ -7,6 +7,22 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function sepulsa_adminui_menu() {
+  // Create menu to handle several sepulsa admin tools.
+  $items['admin/commerce/tools'] = array(
+    'title' => 'Tools',
+    'description' => 'Sepulsa Admin Tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+  return $items;
+}
+
+/**
  * Implements hook_form_FORM_ID_alter().
  */
 function sepulsa_adminui_form_commerce_discount_form_alter(&$form, &$form_state, $form_id) {

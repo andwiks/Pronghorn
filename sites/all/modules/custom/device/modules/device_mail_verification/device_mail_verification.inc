@@ -341,9 +341,10 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
     ->condition('mail', $mail, '=')
     ->execute();
 
-  watchdog('device_mail_verification', 'Merge User Strategi !strategi ->  UID: !web_account_id merge to !merge_to UID: !device_account_id.', array(
+  watchdog('device_mail_verification', 'Merge User Strategi !strategi (!device_did) ->  UID: !web_account_id merge to !merge_to UID: !device_account_id.', array(
     '!merge_to' => $merge_to,
     '!strategi' => $strategi,
+    '!device_did' => $device_did,
     '!device_account_id' => $device_uid,
     '!web_account_id' => $web_uid,
   ), WATCHDOG_INFO);

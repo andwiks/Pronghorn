@@ -208,10 +208,9 @@ function device_list() {
     array('data' => t('ID'), 'field' => 'devir.did'),
     array('data' => t('IMEI'), 'field' => 'dev.imei'),
     array('data' => t('Phone'), 'field' => 'dev.phone'),
-    // array('data' => t('Label'), 'field' => 'dev.label'),
     array('data' => t('Created'), 'field' => 'dev.created'),
     array('data' => t('Access'), 'field' => 'dev.access'),
-    array('data' => t('Status'), 'field' => 'dev.status'),
+    array('data' => t('Device Status'), 'field' => 'dev.status'),
     array('data' => t('User'), 'field' => 'dev.uid'),
     array('data' => t('User Mail')),
     array('data' => t('OTP Confirmation'), 'field' => 'devir.status'),
@@ -255,10 +254,10 @@ function device_list() {
   $query->join('device_verification', 'devir', 'devir.did = dev.did');
   $query->leftJoin('device_mail_verification', 'dmv', 'dmv.did = dev.did');
   $query->fields('dev')->addField('devir', 'status', 'verification');
-  $query->fields('devir')->addField('devir', 'did', 'devir_did');
-  $query->fields('dmv')->addField('dmv', 'status', 'mail_verification');
+  $query->addField('dmv', 'status', 'mail_verification');
   $query->addField('devir', 'hash');
   $query->addField('devir', 'timeout', 'timeout');
+
   if (isset($search['imei'])) {
     $query->condition('dev.imei', $search['imei']);
   }
@@ -270,7 +269,7 @@ function device_list() {
     $query->condition('u.mail', $search['mail']);
   }
   $result = $query->limit($pager)->orderByHeader($header)->execute()->fetchAll();
-
+  // dpm($result);
   // Define table rows.
   $rows = array();
   foreach ($result as $row) {
@@ -278,7 +277,7 @@ function device_list() {
     $links = array(
       array(
         'title' => (empty($row->status)) ? t('Unblock') : t('Block'),
-        'href' => 'admin/devices/' . (empty($row->status) ? 'unblock' : 'block') . '/' . $row->devir_did,
+        'href' => 'admin/devices/' . (empty($row->status) ? 'unblock' : 'block') . '/' . $row->did,
       ),
       array(
         'title' => t('Delete'),
@@ -298,12 +297,17 @@ function device_list() {
       );
     }
 
+    /*
+    $query_dmv->condition('d.status', 1, '=');
+    $query_dmv->condition('dv.status', 1, '=');
+    $query_dmv->condition('dmv.status', 1, '!=');
+     */
+
     // Add operation links for Resend Mail Verification
-    if (($row->mail_verification == 2 || $row->mail_verification == 0) && $row->verification==1) {
-    // if ($row->mail_verification == 2 || $row->mail_verification == 0) {
+    if ($row->mail_verification !=1 && $row->status==1 && $row->verification==1) {
       $links[] = array(
         'title' => t('Resend Mail Verification'),
-        'href' => 'admin/devices/resend_mail_verification/' . $row->devir_did,
+        'href' => 'admin/devices/resend_mail_verification/' . $row->did,
       );
     }
 
@@ -363,7 +367,7 @@ function device_list() {
     // DateTime Warning https://www.drupal.org/node/1874768
     $rows[] = array(
       'data' => array(
-        $row->devir_did, $row->imei, $row->phone, /*$row->label,*/
+        $row->did, $row->imei, $row->phone, /*$row->label,*/
         format_date(intval($row->created), 'short'),
         (!empty($row->access)) ? format_date(intval($row->access), 'short') : '-',
         ($row->status > 0) ? t('Active') : '<strong>' . t('Blocked') . '</strong>',

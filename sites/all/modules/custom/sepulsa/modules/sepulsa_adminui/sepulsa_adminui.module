@@ -1,0 +1,26 @@
+<?php
+/**
+ * @file
+ * sepulsa_adminui.module
+ *
+ * @author azul@sepulsa.com
+ */
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sepulsa_adminui_form_commerce_discount_form_alter(&$form, &$form_state, $form_id) {
+  // Set Discount status default to: Disabled.
+  $form['status']['#default_value'] = 0;
+  // Disable product discount option.
+  if (isset($form['commerce_discount_type']['#options']['product_discount'])) {
+    unset($form['commerce_discount_type']['#options']['product_discount']);
+  }
+  // Disable product free option.
+  if (isset($form['commerce_discount_fields']['commerce_discount_offer']['und']['form']['type']['#options']['free_products'])) {
+    unset($form['commerce_discount_fields']['commerce_discount_offer']['und']['form']['type']['#options']['free_products']);
+  }
+  // Emphasize: name description.
+  $form['component_title']['#required'] = TRUE;
+  $form['component_title']['#description'] = '<span style="font-weight: bold; color: red;">' . t('Warning: this name will be shown to customers!') . '<span>';
+}

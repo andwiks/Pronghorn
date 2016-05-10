@@ -266,6 +266,13 @@ function device_operate_load($op = '') {
         'title' => t('Reset OTP'),
       );
       break;
+
+    case 'resend_mail_verification':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Resend Mail Verification'),
+      );
+      break;
   }
   return !empty($operation) ? $operation : FALSE;
 }
@@ -493,4 +500,29 @@ function device_unblock($did) {
   $device_wrapper = entity_metadata_wrapper('device', $did);
   $device_wrapper->status->set(1);
   $device_wrapper->save();
+}
+
+
+/**
+ * Function resend_mail_verification().
+ *
+ * resend_mail_verification device.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_resend_mail_verification($did) {
+  // Check device_verification & device_mail_verification
+    $query_dmv = db_select('device_verification', 'dv');
+    $query_dmv->join('device_mail_verification', 'dmv', 'dv.did = dmv.did');
+    $query_dmv->condition('dv.did', $did, '=');
+    $query_dmv->fields('dmv', array('did', 'status','mail'));
+    $result_dmv = $query_dmv->execute()->fetchAssoc();
+
+  if(!empty($result_dmv)){
+    drupal_set_message('kirim email pake: device_mail_verification_send_verification','status', FALSE);
+    device_mail_verification_send_verification($result_dmv['mail'],$result_dmv['did']);
+  }else{
+    drupal_set_message('Device verification not found, Please Resend OTP', 'warning', FALSE);
+  }
 }

@@ -232,6 +232,11 @@ function device_mail_verification_transfer_order($current_uid = '', $update_uid 
       ->execute();
   }
 
+  // ambil voucher current uid ke update uid
+  // ambil user point dari current uid ke update uid
+  // set null current uid
+
+
   // Log this condition.
   watchdog('device_mail_verification', 'Transfer Order @cuid to @uuid. Result: <pre>@result</pre> Order List: <pre>@oids</pre>.', array(
     '@cuid' => $current_uid,

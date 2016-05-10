@@ -17,8 +17,6 @@ function sepulsa_menu() {
   $items = array();
 
   $items['sepulsa'] = array(
-    //'title' => 'Recharge Your Phone',
-    //no need to put title on front page
     'description' => 'Sepulsa Front Page',
     'page callback' => 'sepulsa_front_page',
     'access callback' => TRUE,
@@ -26,8 +24,6 @@ function sepulsa_menu() {
   );
 
   $items['sepulsa/data'] = array(
-    //'title' => 'Recharge Your Phone',
-    //no need to put title on front page
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sepulsa_phone_form', TRUE),
     'access callback' => TRUE,
@@ -44,8 +40,8 @@ function sepulsa_menu() {
   );
 
   $items['admin/commerce/config/sepulsa'] = array(
-    'title' => t('Sepulsa'),
-    'description' => t('Sepulsa related configuration'),
+    'title' => 'Sepulsa',
+    'description' => 'Sepulsa related configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sepulsa_settings_form'),
     'access arguments' => array('configure store'),
@@ -64,7 +60,7 @@ function sepulsa_menu_alter(&$items) {
 }
 
 /**
- * Implement hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
   // Get sepulsa settings.
@@ -80,6 +76,37 @@ function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state,
     );
     // Add submit function to check for charge redirection.
     $form['#submit'][] = 'sepulsa_add_to_cart_charge_form_submit';
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function sepulsa_mail($key, &$message, $params) {
+  // Get global user object.
+  global $user;
+
+  switch ($key) {
+    // Customer has order not complete and go to front, need CS to check.
+    case 'order_not_complete_front':
+      $message['subject'] = t('Order Need Check from @site-name', array(
+        '@site-name' => variable_get('site_name', 'Drupal'),
+      ));
+      $message['body'][] = t('User @name (@mail) still has order @oid (@status) not complete but already paid. User access front page with that order. Order need to be checked.', array(
+        '@name' => $user->name,
+        '@mail' => $user->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+      ));
+      // Log this condition.
+      watchdog('sepulsa', 'User @name (@mail) still has order @oid (@status) not complete but already paid. User access front page with that order. Order Debug: <pre>@debug</pre>', array(
+        '@name' => $user->name,
+        '@mail' => $user->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+        '@debug' => print_r($params['order'], TRUE),
+      ), WATCHDOG_INFO);
+      break;
   }
 }
 
@@ -156,7 +183,7 @@ function sepulsa_get_packet($nid, $data_packet = FALSE) {
       if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.
         $price = field_get_items('commerce_product', $product, 'commerce_price');
-        // Get product description
+        // Get product description.
         $desc = "";
         if (isset($product->field_deskripsi[LANGUAGE_NONE][0]['value'])) {
           $desc = $product->field_deskripsi[LANGUAGE_NONE][0]['value'];
@@ -266,7 +293,7 @@ function sepulsa_get_existing_number() {
 			ORDER BY a.created DESC";
   $result = db_query($query, array(':uid' => $user->uid));
   foreach ($result as $row) {
-	$existing_number[] = $row->field_phone_number_value;
+    $existing_number[] = $row->field_phone_number_value;
   }
 
   return $existing_number;

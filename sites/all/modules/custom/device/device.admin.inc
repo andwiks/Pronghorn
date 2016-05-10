@@ -300,6 +300,7 @@ function device_list() {
 
     // Add operation links for Resend Mail Verification
     if (($row->mail_verification == 2 || $row->mail_verification == 0) && $row->verification==1) {
+    // if ($row->mail_verification == 2 || $row->mail_verification == 0) {
       $links[] = array(
         'title' => t('Resend Mail Verification'),
         'href' => 'admin/devices/resend_mail_verification/' . $row->devir_did,

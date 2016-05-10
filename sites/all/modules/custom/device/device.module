@@ -520,7 +520,7 @@ function device_resend_mail_verification($did) {
     $result_dmv = $query_dmv->execute()->fetchAssoc();
 
   if(!empty($result_dmv)){
-    drupal_set_message('kirim email pake: device_mail_verification_send_verification','status', FALSE);
+    // drupal_set_message('kirim email pake: device_mail_verification_send_verification','status', FALSE);
     device_mail_verification_send_verification($result_dmv['mail'],$result_dmv['did']);
   }else{
     drupal_set_message('Device verification not found, Please Resend OTP', 'warning', FALSE);

@@ -271,7 +271,6 @@ function device_list() {
   }
   $result = $query->limit($pager)->orderByHeader($header)->execute()->fetchAll();
 
-  dpm($result);
   // Define table rows.
   $rows = array();
   foreach ($result as $row) {
@@ -299,7 +298,7 @@ function device_list() {
       );
     }
 
-    // kpr($result_dmv['mail_verification']);
+    // Add operation links for Resend Mail Verification
     if (($row->mail_verification == 2 || $row->mail_verification == 0) && $row->verification==1) {
       $links[] = array(
         'title' => t('Resend Mail Verification'),
@@ -360,11 +359,12 @@ function device_list() {
 
 
     // Append row to the rows container.
+    // DateTime Warning https://www.drupal.org/node/1874768
     $rows[] = array(
       'data' => array(
         $row->devir_did, $row->imei, $row->phone, /*$row->label,*/
-        format_date($row->created, 'short'),
-        (!empty($row->access)) ? format_date($row->access, 'short') : '-',
+        format_date(intval($row->created), 'short'),
+        (!empty($row->access)) ? format_date(intval($row->access), 'short') : '-',
         ($row->status > 0) ? t('Active') : '<strong>' . t('Blocked') . '</strong>',
         l($row->uid, 'user/' . $row->uid, array(
           'attributes' => array('target' => '_blank'),

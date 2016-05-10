@@ -92,6 +92,7 @@ function deposit_sepulsa_get_order_id_submit($form = array(), &$form_state = arr
     $info = 1;
     foreach ($order_line_items as $line_item) {
       if (($line_item->type == 'product' || $line_item->type == 'deposit_sepulsa') && strpos($line_item->line_item_label, 'DEPO') !== FALSE) {
+        $form_state['step_information'][$current_step]['order_id'] = $order_id;
         $form_state['step_information'][$current_step]['line_item'] = $line_item;
         $form_state['step'] = 2;
       }
@@ -132,7 +133,11 @@ function deposit_sepulsa_get_order_id_submit($form = array(), &$form_state = arr
  */
 function deposit_sepulsa_confirm_process_form($form = array(), &$form_state = array()) {
   $msg = '<div style = "font-size:15px;"> ';
-  $msg .= '<b>' . t('Line Item To Process') . '</b> = <br>
+  $msg .= '<b>' . t('Line Item To Process for Order !oid', array(
+    '!oid' => l($form_state['step_information'][1]['order_id'], 'admin/commerce/orders/' . $form_state['step_information'][1]['order_id'], array(
+      'attributes' => array('target'=>'_blank'),
+    )),
+  )) . '</b><br>
             ' . t('Line Item :') . $form_state['step_information'][1]['line_item']->line_item_label . '<br>
             ' . t('Type :') . $form_state['step_information'][1]['line_item']->type . '<br>
             ' . t('Amount :') . $form_state['step_information'][1]['line_item']->commerce_unit_price[LANGUAGE_NONE][0]['currency_code'] . ' ' . $form_state['step_information'][1]['line_item']->commerce_unit_price[LANGUAGE_NONE][0]['amount'] . '<br><br>

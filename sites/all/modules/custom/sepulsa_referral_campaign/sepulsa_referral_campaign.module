@@ -7,11 +7,10 @@
  */
 
 // 30 items per page.
-define('CAMPAIGN_PER_PAGE', 30);
+define('SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE', 30);
 // Admin uri links.
-define('ADMIN_CONTENT_SRC_MANAGE_URI', 'admin/content/referral_campaign/manage/');
-define('ADMIN_CONTENT_SRC_URI', 'admin/content/referral_campaign');
-
+define('SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI', 'admin/content/referral_campaign/manage/');
+define('SEPULSA_REFERRAL_CAMPAIGN_ADMIN_CONTENT_SRC_URI', 'admin/content/referral_campaign');
 
 /**
  * Implements hook_entity_info().
@@ -130,8 +129,8 @@ function sepulsa_referral_campaign_menu() {
   );
 
   $items['admin/reports/sepulsa_referral_campaign'] = array(
-    'title'            => t('Sepulsa Referral Campaign Summary'),
-    'description'      => t('Admin reports for the Sepulsa Referral Campaign.'),
+    'title'            => 'Sepulsa Referral Campaign Summary',
+    'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
     'page callback'    => 'sepulsa_referral_campaign_summary_list',
     'file' => 'includes/sepulsa_referral_campaign.admin.inc',
     'access arguments' => array('administer sepulsa_referral_campaign'),
@@ -139,8 +138,8 @@ function sepulsa_referral_campaign_menu() {
   );
 
   $items['admin/reports/sepulsa_referral_campaign/details/%/%'] = array(
-    'title'            => t('Sepulsa Referral Campaign Summary'),
-    'description'      => t('Admin reports for the Sepulsa Referral Campaign.'),
+    'title'            => 'Sepulsa Referral Campaign Summary',
+    'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
     'page callback'    => 'sepulsa_referral_campaign_details_list',
     'page arguments'   => array(4, 5),
     'file' => 'includes/sepulsa_referral_campaign.admin.inc',
@@ -155,7 +154,7 @@ function sepulsa_referral_campaign_menu() {
  */
 class RefferalSepulsa extends Entity {
 }
- 
+
 /**
  * Custom controller for the administrator UI.
  */
@@ -209,7 +208,7 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
       }
     }
 
-    $query->pager(CAMPAIGN_PER_PAGE);
+    $query->pager(SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE);
 
     $result = $query->execute();
     $src_results = !empty($result['sepulsa_referral_campaign']) ? $result['sepulsa_referral_campaign'] : array();
@@ -219,11 +218,11 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
       $links = array(
         array(
           'title' => t('Edit'),
-          'href' => ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id,
+          'href' => SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI . $referral_id,
         ),
         array(
           'title' => t('Delete'),
-          'href' => ADMIN_CONTENT_SRC_MANAGE_URI . $referral_id . '/delete',
+          'href' => SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI . $referral_id . '/delete',
         ),
       );
       // Check ctools module.
@@ -284,6 +283,7 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
 
     return $form;
   }
+
 }
 
 /**
@@ -292,38 +292,54 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
 function sepulsa_referral_campaign_commerce_order_presave($order) {
   $details = array();
   if ($order->status == 'invoiced') {
-    $first_order = db_select('commerce_order', 'co')
-          ->fields('co')
-          ->condition('uid', $order->uid, '=')
-          ->condition('order_id', $order->order_id, '<>')
-          ->execute();
-
-    if ($first_order->rowCount() == 0) {
-      $referral_details = db_select('referral_campaign_details', 'rcd');
-      $referral_details->join('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
-      $referral_details->fields('rcd', array('ref_id', 'uid', 'referral_uid'));
-      $referral_details->fields('src', array('rules_name'));
-      $referral_details->condition('rcd.uid', $order->uid, '=');
-      $referral_details->condition('rcd.flag', 0, '=');
-      $referral_details->condition('src.start', REQUEST_TIME, '<=');
-      $referral_details->condition('src.end', REQUEST_TIME, '>=');
-      $result_ref = $referral_details->execute();
-      foreach ($result_ref as $result) {
-        $details = $result;
+    $benefit = FALSE;
+    $referral_details = db_select('referral_campaign_details', 'rcd');
+    $referral_details->join('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
+    $referral_details->fields('rcd', array('ref_id', 'uid', 'referral_uid'));
+    $referral_details->fields('src', array('rules_name',
+      'rules_name_referral',
+      'flag_first_order',
+    ));
+    $referral_details->condition('rcd.uid', $order->uid, '=');
+    $referral_details->condition('rcd.flag', 0, '=');
+    $referral_details->condition('src.start', REQUEST_TIME, '<=');
+    $referral_details->condition('src.end', REQUEST_TIME, '>=');
+    $result_ref = $referral_details->execute();
+    foreach ($result_ref as $result) {
+      $details = $result;
+    }
+    if (!empty($details)) {
+      // Check whether this campaign fire when first order.
+      if ($details->flag_first_order == 1) {
+        $first_order = db_select('commerce_order', 'co')
+              ->fields('co')
+              ->condition('uid', $order->uid, '=')
+              ->condition('order_id', $order->order_id, '<>')
+              ->execute();
+        // Check first order.
+        if ($first_order->rowCount() == 0) {
+          // Change benefit value.
+          $benefit = TRUE;
+        }
       }
-      if (!empty($details)) {
+      else {
+        // Change benefit value.
+        $benefit = TRUE;
+      }
+      // Check benefit.
+      if ($benefit) {
         $account_uid = user_load($details->uid);
         $account_referral_uid = user_load($details->referral_uid);
 
         // Invoke rules.
         rules_invoke_component($details->rules_name, $account_uid);
-        rules_invoke_component($details->rules_name, $account_referral_uid);
+        rules_invoke_component($details->rules_name_referral, $account_referral_uid);
 
         // Change Flag in details.
         db_update('referral_campaign_details')
-              ->fields(array('flag' => 1 , 'flag_timestamp' => REQUEST_TIME))
-              ->condition('ref_id', $details->ref_id, '=')
-              ->execute();
+                ->fields(array('flag' => 1, 'flag_timestamp' => REQUEST_TIME))
+                ->condition('ref_id', $details->ref_id, '=')
+                ->execute();
       }
     }
   }

@@ -11,7 +11,7 @@
  */
 
 /**
- * Function device_settings().
+ * Function sepulsa_referral_campaign_settings().
  *
  * @param array $form
  *   Form array.
@@ -21,16 +21,15 @@
  * @return array
  *   System settings form.
  */
-
 function sepulsa_referral_campaign_settings($form = array(), $form_state = array()) {
-  // Device verification fieldset.
+  // Sepulsa Referral Campaign fieldset.
   $form['sepulsa_referral_campaign'] = array(
     '#type' => 'fieldset',
     '#title' => t('Sepulsa Referral Campaign'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
-  // Device verification timeout.
+  // Sepulsa Referral Campaign timeout.
   $form['sepulsa_referral_campaign']['test'] = array(
     '#type' => 'textfield',
     '#title' => t('test'),
@@ -49,13 +48,11 @@ function sepulsa_referral_campaign_settings($form = array(), $form_state = array
  */
 function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   $form = array();
-  // echo "<pre>";
-  // print_r(date('d-m-Y', $referral->start));die();
 
   if (isset($referral->src_id)) {
     $form['src_id'] = array(
       '#type' => 'value',
-      '#value' => $referral->src_id
+      '#value' => $referral->src_id,
     );
   }
 
@@ -102,10 +99,10 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   }
 
   $form['active_time']['start'] = array(
-    '#type' => 'date', 
-    '#title' => t('Start Date Campaign'), 
-    '#default_value' => (isset($default_start)) ? $default_start : array(), 
-    '#description' => 'Date when the campaign will start.', 
+    '#type' => 'date',
+    '#title' => t('Start Date Campaign'),
+    '#default_value' => (isset($default_start)) ? $default_start : array(),
+    '#description' => 'Date when the campaign will start.',
     '#required' => TRUE,
   );
 
@@ -117,14 +114,33 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#required' => TRUE,
   );
 
+  $active = array(0 => t('No'), 1 => t('Yes'));
+  // Sepulsa Referral Campaign timeout.
+  $form['flag_first_order'] = array(
+    '#type' => 'radios',
+    '#title' => t('Referrer User get benefit in first order ?'),
+    '#default_value' => (isset($referral->flag_first_order)) ? $referral->flag_first_order : 0,
+    '#options' => $active,
+    '#description' => t('When it is no, benefit will send every transaction.'),
+  );
+
   // Get rules compontents name and label.
   $rules = rules_get_components(TRUE, 'action');
   $form['rules_name'] = array(
     '#type' => 'select',
-    '#title' => t('Rules Action'),
+    '#title' => t('Rules Action For Rererred User'),
     '#description' => t('Rules Action to fire'),
     '#options' => $rules,
     '#default_value' => isset($referral->rules_name) ? $referral->rules_name : '',
+  );
+
+  $rules = rules_get_components(TRUE, 'action');
+  $form['rules_name_referral'] = array(
+    '#type' => 'select',
+    '#title' => t('Rules Action For Referrer User'),
+    '#description' => t('Rules Action to fire for the referer user'),
+    '#options' => $rules,
+    '#default_value' => isset($referral->rules_name_referral) ? $referral->rules_name_referral : '',
   );
 
   $form['path'] = array(
@@ -166,7 +182,7 @@ function sepulsa_referral_campaign_form_validate($form, &$form_state) {
                       $form_state['values']['end']['month'] . '-' .
                       $form_state['values']['end']['year'] . ' 23:59:59');
   if ($end < $start) {
-   form_set_error('end', t('End date lower than start date.'));
+    form_set_error('end', t('End date lower than start date.'));
   }
 }
 
@@ -209,7 +225,9 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
       'start' => $start,
       'end' => $end,
       'path' => $form_state['values']['path'],
+      'flag_first_order' => $form_state['values']['flag_first_order'],
       'rules_name' => $form_state['values']['rules_name'],
+      'rules_name_referral' => $form_state['values']['rules_name_referral'],
       'created' => strtotime('now'),
       'changed' => strtotime('now'),
     ));
@@ -223,7 +241,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
  * Function sepulsa_referral_campaign_summary_list().
  */
 function sepulsa_referral_campaign_summary_list() {
-  $pager = CAMPAIGN_PER_PAGE;
+  $pager = SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE;
   // Define table header.
   $header = array(
     array('data' => t('Ref ID'), 'field' => 'rcd.ref_id'),
@@ -232,12 +250,12 @@ function sepulsa_referral_campaign_summary_list() {
     array('data' => t('# Referred'), 'field' => 'num_referrals'),
     array('data' => t('Operations'), 'field' => 'operations'),
   );
-  // Query
-  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort'); 
+  // Query.
+  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort');
   $query->addExpression('COUNT(*)', 'num_referrals');
   $query->innerJoin('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
   $query->innerJoin('users', 'u', 'u.uid = rcd.referral_uid');
-  $query->fields('rcd', array('ref_id','src_id','referral_uid'));
+  $query->fields('rcd', array('ref_id', 'src_id', 'referral_uid'));
   $query->fields('src', array('title'));
   $query->fields('u', array('mail'));
   $query->condition('u.status', 1);
@@ -318,12 +336,12 @@ function sepulsa_referral_campaign_summary_list() {
  * Function sepulsa_referral_campaign_details_list().
  *
  * @param string $campaign_id
- * String campaign id.
+ *   String campaign id.
  * @param string $referral_uid
- * String Referring UID.
+ *   String Referring UID.
  */
-function sepulsa_referral_campaign_details_list($campaign_id = '', $referral_uid = ''){
-  $pager = CAMPAIGN_PER_PAGE;
+function sepulsa_referral_campaign_details_list($campaign_id = '', $referral_uid = '') {
+  $pager = SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE;
   // Define table header.
   $header = array(
     array('data' => t('User'), 'field' => 'rcd.uid'),
@@ -331,10 +349,17 @@ function sepulsa_referral_campaign_details_list($campaign_id = '', $referral_uid
     array('data' => t('Benefit Taken Time'), 'field' => 'rcd.flag_timestamp'),
     array('data' => t('IP'), 'field' => 'rcd.host'),
   );
-  // Query
-  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort'); 
+  // Query.
+  $query = db_select('referral_campaign_details', 'rcd')->extend('PagerDefault')->extend('TableSort');
   $query->innerJoin('users', 'u', 'u.uid = rcd.uid');
-  $query->fields('rcd', array('ref_id','src_id','referral_uid','uid','flag','flag_timestamp','host'));
+  $query->fields('rcd', array('ref_id',
+    'src_id',
+    'referral_uid',
+    'uid',
+    'flag',
+    'flag_timestamp',
+    'host',
+  ));
   $query->fields('u', array('mail'));
   $query->condition('rcd.src_id', $campaign_id);
   $query->condition('rcd.referral_uid', $referral_uid);

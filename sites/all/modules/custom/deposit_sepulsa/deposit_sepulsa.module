@@ -10,17 +10,31 @@ function deposit_sepulsa_menu() {
   $items = array();
 
   $items['user/wallet'] = array(
-    'title' => t('My Wallet'),
+    'title' => 'My Wallet',
     'description' => 'Deposit money and show the history of it.',
     'page callback' => 'deposit_sepulsa_page',
     'access arguments' => array('deposit credit'),
     'type' => MENU_CALLBACK,
-    // 'title callback' => FALSE,
-    // 'title arguments' => array('!title', array('!title' => 'My Wallet')),
-    // 'title arguments' => array('My Wallet'),
-    // 'options' => array(
-    //   'html' => TRUE,
-    // ),
+  );
+
+  $items['admin/commerce/tools/deposit'] = array(
+    'title' => 'Deposit',
+    'description' => 'Deposit sepulsa tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/commerce/tools/deposit/process-manual'] = array(
+    'title' => 'Proses Manual',
+    'description' => 'Proses Manual Deposit Sepulsa.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('deposit_sepulsa_wizard_form'),
+    'access arguments' => array('use deposit tools'),
+    'file' => 'deposit_sepulsa.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
   );
 
   return $items;
@@ -35,11 +49,15 @@ function deposit_sepulsa_permission() {
       'title' => t('Deposit credit'),
       'description' => t('Deposit to sepulsa credit.'),
     ),
+    'use deposit tools' => array(
+      'title' => t('Use deposit tools'),
+      'description' => t('Perform manual deposit tasks.'),
+    ),
   );
 }
 
 /**
- * Implements page for deposit credit
+ * Implements page for deposit credit.
  */
 function deposit_sepulsa_page() {
   drupal_set_title(t('My Wallet'));
@@ -398,4 +416,48 @@ function get_deposit_product(){
   }
 
   return $option;
+}
+
+/**
+ * The action function for 'topup_credit_deposit'.
+ */
+function topup_credit_deposit_action($order, $user, $category) {
+  // Define default amount.
+  $amount = 0;
+  // Bundle using try and catch.
+  try {
+    // Get order wrapper.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Get order line items.
+    $line_items = $order_wrapper->commerce_line_items->value();
+    // Looping for each line item.
+    foreach ($line_items as $line_item) {
+      // Only if type: deposit_sepulsa.
+      if ($line_item->type == 'deposit_sepulsa') {
+        $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+        $line_item_price = $line_item_wrapper->commerce_unit_price->value();
+        if (isset($line_item_price['data']) && !empty($line_item_price['data'])
+          && isset($line_item_price['data']['components'][0]['price']['amount'])
+          && !empty($line_item_price['data']['components'][0]['price']['amount'])
+        ) {
+          $amount += intval($line_item_price['data']['components'][0]['price']['amount']);
+        }
+      }
+    }
+  }
+  catch (Exception $e) {
+    // Log it as watchdog error.
+    watchdog('deposit_sepulsa', 'Unable to get valid deposit pulsa amount. Debug: <pre>Error: @error</pre><pre>Order: @order</pre><pre>User: @user</pre>', array(
+      '@error' => $e->getTraceAsString(),
+      '@order' => print_r($order, TRUE),
+      '@user' => print_r($user, TRUE),
+    ), WATCHDOG_ERROR);
+  }
+
+  // Only queue it if amount is not empty.
+  if (!empty($amount)) {
+    $queue = DrupalQueue::get('topup_credit_deposit');
+    $queue_item = array('uid' => $user->uid, 'amount' => $amount, 'tid' => $category, 'order_id' => $order->order_id);
+    $queue->createItem($queue_item);
+  }
 }

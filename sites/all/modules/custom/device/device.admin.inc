@@ -269,7 +269,7 @@ function device_list() {
     $query->condition('u.mail', $search['mail']);
   }
   $result = $query->limit($pager)->orderByHeader($header)->execute()->fetchAll();
-  // dpm($result);
+
   // Define table rows.
   $rows = array();
   foreach ($result as $row) {
@@ -296,12 +296,6 @@ function device_list() {
         'href' => 'admin/devices/reset/' . $row->did,
       );
     }
-
-    /*
-    $query_dmv->condition('d.status', 1, '=');
-    $query_dmv->condition('dv.status', 1, '=');
-    $query_dmv->condition('dmv.status', 1, '!=');
-     */
 
     // Add operation links for Resend Mail Verification
     if ($row->mail_verification !=1 && $row->status==1 && $row->verification==1) {

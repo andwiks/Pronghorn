@@ -289,13 +289,15 @@ function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id
     else {
       $form['line_items'][$child]['remove']['#value'] = '-';
       $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+      $form['line_items'][$child]['remove']['#attributes']['title'] = 'Hapus No Pelanggan';
     }
   }
 
   $form['actions']['new']['#value'] = '+';
   $form['actions']['new']['#attributes']['class'][] = 'add-new';
-  $form['actions']['submit']['#attributes']['style'] = 'float:right';
-  $form['actions']['submit']['#attributes']['class'][] = 'enabled';
+  $form['actions']['submit']['#attributes']['style'] = 'float:right; background-color:#ccc !important; color: #000';
+  $form['actions']['submit']['#attributes']['class'][] = 'enabled inactive';
+  $form['actions']['submit']['#attributes']['title'] = 'Tambah No Pelanggan';
 
   $form['actions']['charge']['#attributes']['style'] = 'float:right';
 }

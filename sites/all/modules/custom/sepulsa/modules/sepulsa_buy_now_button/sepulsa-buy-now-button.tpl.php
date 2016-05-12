@@ -47,7 +47,7 @@ if (empty($utm_link)) {
   $utm_link = '/';
 }
 else {
-  $utm_link .= '/?' . $utm_link;
+  $utm_link = '/?' . $utm_link;
 }
 ?>
 <a href="<?php echo $utm_link ?>" class="bt_std bt_beli">

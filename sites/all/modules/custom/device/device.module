@@ -499,7 +499,7 @@ function device_unblock($did) {
  * Function device_verification_status()
  * Retrieve device status, verification status, email verification status.
  */
-function device_verification_status($uid,$umail){
+function device_verification_status($uid,$umail=''){
 
   $device_info = array();
 
@@ -508,24 +508,26 @@ function device_verification_status($uid,$umail){
   $q_device->leftJoin('device_mail_verification', 'dmv', 'dv.did = dmv.did');
   $q_device->condition('uid', $uid, '=');
   $q_device->addField('d', 'status','d_status');
+  $q_device->addField('d', 'did');
   $q_device->addField('d', 'imei');
   $q_device->addField('d', 'phone');
   $q_device->addField('dmv', 'mail');
   $q_device->addField('dv', 'status','dv_status');
   $q_device->addField('dmv', 'status','dmv_status');
+
   $r_device = $q_device->execute();
   $device = $r_device->fetchObject();
 
   if(!empty($device)){
 
     $device_info = [
+      'did' => $device->did,
       'imei' => $device->imei,
       'phone' => $device->phone,
       'mail' => (!empty($device->mail)) ? $device->mail : 'no_email',
       'd_status' => ($device->d_status==1) ? 'active':'blocked',
       'dv_status' => ($device->dv_status==1) ? 'confirmed':'not_confirmed',
       'dmv_status' => ($device->dmv_status==1) ? 'verified':'not_verified',
-      'description' => 'device have not been merge yet',
     ];
   }
 

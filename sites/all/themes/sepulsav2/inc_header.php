@@ -17,7 +17,7 @@
     <div class="notif-download">
         <a href="https://play.google.com/store/apps/details?id=com.sepulsa.android&utm_source=mweb&utm_medium=toogle_notif_mobile&utm_campaign=new_theme" class="download">Download App</a>
     </div>
-</div> 
+</div>
 */
 ?>
 
@@ -66,7 +66,7 @@
                             <a href="<?php print url("user/logout"); ?>"><?php print t('Keluar'); ?></a>
                         </div>
                     </div>
-                    
+
                     <div class="box kredit">
                         <a href="<?php print url("user/wallet"); ?>" class="header-kredit header-kredit-login">
                             Sepulsa Kredit

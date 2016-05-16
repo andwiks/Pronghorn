@@ -8,7 +8,12 @@
  */
 
 global $base_url;
-$theme_path = $base_url . '/' . path_to_theme();
+//$theme_path = $base_url . '/' . path_to_theme();
+if (module_exists('cdn') && cdn_status_is_enabled()){
+    $theme_path = file_create_url('public://' . '/' . path_to_theme());
+}else{
+    $theme_path = $base_url . '/' . path_to_theme();
+}
 ?>
 <section class="banner sblog">
     <img src="<?php print $theme_path; ?>/images/content/banner_blog.jpg" alt="sepulsa blog" />
@@ -20,7 +25,7 @@ $theme_path = $base_url . '/' . path_to_theme();
 
 <section id="frameBlog">
     <div class="wrapper">
-        
+
         <div id="inner" class="clearfix">
             <div id="left_column">
                 <?php print render($title_prefix); ?>
@@ -33,7 +38,7 @@ $theme_path = $base_url . '/' . path_to_theme();
                 <?php endif; ?>
 
                 <?php print $messages; ?>
-                
+
                 <?php print render($page['content']); ?>
 
                 <?php print render($title_suffix); ?>
@@ -41,9 +46,9 @@ $theme_path = $base_url . '/' . path_to_theme();
             <?php if (!empty($page['sidebar_first'])): ?>
             <div id="right_column">
                <?php print render($page['sidebar_first']); ?>
-            </div> 
-            <?php endif; ?>           
+            </div>
+            <?php endif; ?>
         </div>
-        
+
     </div>
 </section>

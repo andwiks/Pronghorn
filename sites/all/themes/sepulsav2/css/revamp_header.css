@@ -1407,3 +1407,127 @@ section.h_middle_top .home_tab .content_tab
     background-color: #06377B;
     color: #fff;
 }
+
+section.std_content .content ol li, 
+section.std_content .content ul li
+{
+    margin-left: 15px;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+section.std_content .content ol
+{
+    list-style: decimal;
+}
+
+section.std_content .content ul
+{
+    list-style: circle;
+}
+
+.uob-campaign
+{
+    -webkit-box-shadow: 0px 5px 5px 5px rgba(205,205,205,0.7);
+    -moz-box-shadow: 0px 5px 5px 5px rgba(205,205,205,0.7);
+    box-shadow: 0px 5px 5px 5px rgba(205,205,205,0.7);
+    margin-bottom: 5px;
+}
+
+.uob-snk
+{
+    border-right: 1px solid #ccc;
+}
+
+.uob-snk .uob-snk-content
+{
+    margin:10px 50px 10px 10px;
+}
+
+.uob-form .node-webform
+{
+    margin:10px 25px;
+}
+
+.uob-form .webform-container-inline label
+{
+    width: 126px;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.5;
+    display: inline-block;
+}
+
+.uob-form .webform-container-inline label.option
+{
+    display: inline;
+}
+
+.uob-form .form-item
+{
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+.uob-form input, .uob-form textarea, .uob-form select
+{
+    border: none;
+    border-bottom: 1px solid #959595;
+    max-width: 100%;
+}
+
+#edit-submitted-term-agree label.option {
+    float: right;
+    width: 96%;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.uob-form .form-actions input
+{
+    background: #06377b;
+    color: #fff;
+    width: 50%;
+    text-align: center;
+    max-width: 130px;
+    font-size: 14px;
+    margin: 0 auto;
+    display: block;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.std_content .uob .alert-block
+{
+    width: 100%;
+}
+
+.alert-confirmation
+{
+    color: #000;
+}
+
+.back-home
+{    
+    background: #06377b;
+    color: #fff;
+
+    padding:10px 15px;
+    margin:0 auto;
+    display: block;
+    text-align: center;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+
+    width:70px;
+    margin-top:15px;
+}

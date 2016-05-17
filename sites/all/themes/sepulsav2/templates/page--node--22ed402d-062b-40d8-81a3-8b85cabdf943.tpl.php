@@ -11,19 +11,27 @@
 
 
 <section class="std_content">
-  <div class="wrapper_2 other after_clear">
+
+  <div class="wrapper_2 other after_clear uob">
+    <?php print $messages; ?>
+  </div>
+
+  <div class="wrapper_2 other after_clear uob-campaign">
     <?php if (!empty($page['sidebar_first'])): ?>
       <div class="w3-col l6 m6 s12">
-        <?php print render($page['sidebar_first']); ?>
+        <div class="uob-snk">
+          <?php print render($page['sidebar_first']); ?>
+        </div>
       </div>
     <?php endif; ?>
 
     <div class="w3-col l6 m6 s12">
-      <?php print $messages; ?>
-      <?php print render($title_prefix); ?>
-      <?php if ($title): ?>
-      <?php endif; ?>
-      <?php print render($page['content']); ?>
+      <div class="uob-form">
+        <?php print render($title_prefix); ?>
+        <?php if ($title): ?>
+        <?php endif; ?>
+        <?php print render($page['content']); ?>
+      </div>
     </div>
   </div>
 </section>
@@ -48,4 +56,11 @@ if(!empty(user_is_anonymous())) {
   var destination = '<?php print $destination; ?>';
   var forgot_destination ='/user/password?destination='+destination;
   var register_destination ='/user/register?destination='+destination;
+</script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    //$('#edit-submitted-no-hp').removeAttr('required');​​​​​
+    $('#edit-submitted-no-hp').prop('required', false);
+  });
 </script>

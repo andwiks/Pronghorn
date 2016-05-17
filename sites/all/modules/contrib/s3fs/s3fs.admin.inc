@@ -451,25 +451,6 @@ function s3fs_actions() {
     }
   }
 
-  // Form button tambahan untuk copy files themes to s3
-  /*$form['s3fs_copy_themes'] = array(
-    '#type' => 'fieldset',
-    '#description' => t(
-      "Since you have S3 File System configured to take over for the public and/or private file systems, you
-      may wish to copy any files which were previously uploaded to your site into your S3 bucket. <br>
-      If you have a lot of files, or very large files, you'll want to use <i>drush s3fs-copy-local</i>
-      instead of this form, as the limitations imposed by browsers may break very long copy operations."
-    ),
-    '#title' => t('Copy Local Themes Files to S3'),
-  );
-  $form['s3fs_copy_themes']['sepulsa'] = array(
-      '#type' => 'submit',
-      '#prefix' => '<br>',
-      '#name' => 'sepulsa',
-      '#value' => t('Copy local themes files to S3'),
-      '#submit' => array('_s3fs_copy_themes_submit'),
-  );*/
-
   return $form;
 }
 
@@ -486,8 +467,3 @@ function _s3fs_refresh_cache_submit($form, &$form_state) {
 function _s3fs_copy_local_submit($form, &$form_state) {
   _s3fs_copy_file_system_to_s3($form_state['triggering_element']['#name']);
 }
-
-// Fungsi tambahan untuk copy files themes to s3
-/*function _s3fs_copy_themes_submit($form, &$form_state) {
-  _s3fs_copy_file_themes_to_s3($form_state['triggering_element']['#name']);
-}*/

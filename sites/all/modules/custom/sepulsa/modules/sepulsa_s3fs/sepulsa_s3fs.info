@@ -1,5 +1,5 @@
 name = Sepulsa S3FS
 description = "Custome S3FS module."
-package = Pro Drupal Development
+package = Sepulsa
 core = 7.x
 dependencies[] = s3fs

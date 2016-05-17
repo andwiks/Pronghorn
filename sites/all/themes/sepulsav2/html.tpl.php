@@ -7,12 +7,10 @@
  * @since July, 23th 2015.
  */
 global $base_url;
+$theme_path = $base_url . '/' . path_to_theme();
 if (module_exists('cdn') && cdn_status_is_enabled()){
     $theme_path = file_create_url('public://' . '/' . path_to_theme());
-}else{
-    $theme_path = $base_url . '/' . path_to_theme();
 }
-//drupal_set_message('<pre>Theme Path:'.print_r(file_create_url($theme_path), TRUE).'</pre>');
 $page_state = "home";
 ?>
 <!DOCTYPE html>

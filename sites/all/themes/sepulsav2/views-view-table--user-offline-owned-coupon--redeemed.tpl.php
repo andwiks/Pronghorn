@@ -1,10 +1,8 @@
 <?php
 global $base_url;
-//$theme_path = $base_url . '/' . path_to_theme();
+$theme_path = $base_url . '/' . path_to_theme();
 if (module_exists('cdn') && cdn_status_is_enabled()){
     $theme_path = file_create_url('public://' . '/' . path_to_theme());
-}else{
-    $theme_path = $base_url . '/' . path_to_theme();
 }
 ?>
 <nav class="after_clear">

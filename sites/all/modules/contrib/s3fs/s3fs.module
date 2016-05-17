@@ -812,27 +812,6 @@ function _s3fs_copy_file_system_to_s3($scheme) {
   drupal_set_message(t('Copied all local %scheme files to S3.', array('%scheme' => $scheme)), 'status');
 }
 
-// Fungsi tambahan untuk copy file themes to s3
-/*function _s3fs_copy_file_themes_to_s3() {
-  $source_folder = realpath(variable_get('', 'sites/all/themes'));
-  $target_folder = !empty($config['public_folder']) ? $config['public_folder'] . '/' : 's3fs-public/';
-
-  if (!empty($config['root_folder'])) {
-    $target_folder = "{$config['root_folder']}/$target_folder";
-  }
-
-  $file_paths = _s3fs_recursive_dir_scan($source_folder);
-  foreach ($file_paths as $path) {
-    $relative_path = str_replace($source_folder . '/', '', $path);
-    print "Copying public://$relative_path into S3...\n";
-    // Finally get to make use of S3fsStreamWrapper's "S3 is actually a local
-    // file system. No really!" functionality.
-    copy($path, "public://$relative_path");
-  }
-
-  drupal_set_message(t('Copied all local themes files to S3.', array('%scheme' => 'public')), 'status');
-}*/
-
 function _s3fs_recursive_dir_scan($dir) {
   $output = array();
   $files = scandir($dir);

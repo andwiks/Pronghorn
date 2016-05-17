@@ -999,3 +999,24 @@ function sepulsav2_process_radios_payment_method($element) {
 
   return $element;
 }
+
+
+
+/**
+ * Implements hook_webform_component_render_alter().
+ */
+function sepulsav2_webform_component_render_alter(&$element, &$component) {
+  if ($element['#type'] == 'date') {
+    $element['#process'][] = 'sepulsav2_webform_expand_date';
+  }
+}
+
+/**
+ * Process function to re-order the elements in the date widget.
+ */
+function sepulsav2_webform_expand_date($element) {
+  $element['day']['#weight'] = 0;
+  $element['month']['#weight'] = 1;
+  $element['year']['#weight'] = 2;
+  return $element;
+}

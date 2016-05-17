@@ -1,0 +1,6 @@
+name = "Sepulsa Services Views"
+description = "Sepulsa Services Views"
+core = "7.x"
+
+dependencies[] = device
+dependencies[] = services_views

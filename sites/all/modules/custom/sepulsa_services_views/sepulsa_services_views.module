@@ -1,0 +1,14 @@
+<?php
+/*
+* Implement hook_services_views_execute_view_alter().
+*/
+
+function sepulsa_services_views_services_views_execute_view_alter(&$output, $view) {
+  if ($view->name == 'test') {
+    $paged_output = array(
+      'results' => $output,
+      'total_rows' => $view->total_rows,
+    );
+    $output = $paged_output;
+  }
+}

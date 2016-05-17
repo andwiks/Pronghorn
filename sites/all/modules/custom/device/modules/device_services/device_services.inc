@@ -186,7 +186,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           return services_error(t('Device has been blocked.'), 401);
         }
 
-        return $check;
+        // return $check;
 
         // Check device verication: unconfirmed or new.
         // Confirmed but no / expired refresh token.

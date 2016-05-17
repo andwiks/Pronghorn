@@ -165,7 +165,8 @@ function sepulsa_reports_voucher_check() {
           $status['cart'] = $cart_query->execute()->fetchField();
 
           // Check order in cart only if status cart is not empty.
-          if (!empty($status['cart'])) {
+          // Only query order if there is 1 product only.
+          if (!empty($status['cart']) && count($products) == 1) {
             $order_query = db_select('commerce_order', 'co')->extend('TableSort');
             $order_query->join('commerce_line_item', 'cli', 'cli.order_id = co.order_id');
             $order_query->fields('co', array(

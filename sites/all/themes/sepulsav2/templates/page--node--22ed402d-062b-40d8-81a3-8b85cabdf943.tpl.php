@@ -12,10 +12,10 @@
 
 <section class="std_content">
 
-  <div class="wrapper_2 other after_clear">
+  <div class="wrapper_2 other after_clear uob">
     <?php print $messages; ?>
   </div>
-  
+
   <div class="wrapper_2 other after_clear uob-campaign">
     <?php if (!empty($page['sidebar_first'])): ?>
       <div class="w3-col l6 m6 s12">

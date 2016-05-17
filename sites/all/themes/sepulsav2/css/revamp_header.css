@@ -1501,3 +1501,33 @@ section.std_content .content ul
     -o-border-radius: 5px;
     border-radius: 5px;
 }
+
+.std_content .uob .alert-block
+{
+    width: 100%;
+}
+
+.alert-confirmation
+{
+    color: #000;
+}
+
+.back-home
+{    
+    background: #06377b;
+    color: #fff;
+
+    padding:10px 15px;
+    margin:0 auto;
+    display: block;
+    text-align: center;
+
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+
+    width:70px;
+    margin-top:15px;
+}

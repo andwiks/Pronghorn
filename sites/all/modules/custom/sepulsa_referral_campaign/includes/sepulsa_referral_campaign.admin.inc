@@ -46,6 +46,7 @@ function sepulsa_referral_campaign_settings($form = array(), $form_state = array
  */
 function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   $form = array();
+  $prefix = '';
 
   if (isset($referral->src_id)) {
     $form['src_id'] = array(
@@ -63,11 +64,18 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#maxlength' => 254,
   );
 
+  if (strpos(isset($referral->machine_name) ? $referral->machine_name : '',
+    'campaign_') === FALSE) {
+    $prefix = 'campaign_';
+  }
+
   $form['machine_name'] = array(
     '#type' => 'machine_name',
     '#default_value' => isset($referral->machine_name) ? $referral->machine_name : '',
     '#disabled' => isset($referral->machine_name),
     '#maxlength' => 32,
+    '#field_prefix' => '<span dir="ltr">' . $prefix,
+    '#field_suffix' => '</span>&lrm;',
     '#machine_name' => array(
       'exists' => 'sepulsa_referral_campaign_load_by_name',
       'source' => array('title'),
@@ -77,7 +85,7 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
 
   $form['active_time'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Active Time'),
+    '#title' => t('Configure Time of Campaign'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -89,6 +97,7 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
       'month' => str_replace('0', '', $date_start[1]),
       'year' => $date_start[2],
     );
+    $time_start = date('H:i:s', $referral->start);
   }
 
   if (isset($referral->end)) {
@@ -98,9 +107,17 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
       'month' => str_replace('0', '', $date_end[1]),
       'year' => $date_end[2],
     );
+    $time_end = date('H:i:s', $referral->end);
   }
 
-  $form['active_time']['start'] = array(
+  $form['active_time']['time_start'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Active Time'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['active_time']['time_start']['start'] = array(
     '#type' => 'date',
     '#title' => t('Start Date Campaign'),
     '#default_value' => (isset($default_start)) ? $default_start : array(),
@@ -108,12 +125,37 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#required' => TRUE,
   );
 
-  $form['active_time']['end'] = array(
+  $form['active_time']['time_start']['start_time'] = array(
+    '#title' => t('Start Time Campaign'),
+    '#type' => 'textfield',
+    '#default_value' => isset($time_start) ? $time_start : '',
+    '#description' => t('Time when the campaign will start. format : H:i:s, e.g. : 15:03:10'),
+    '#required' => TRUE,
+    '#maxlength' => 8,
+  );
+
+  $form['active_time']['time_end'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Deactive Time'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['active_time']['time_end']['end'] = array(
     '#type' => 'date',
     '#title' => t('Start End Campaign'),
     '#default_value' => (isset($default_end)) ? $default_end : array(),
-    '#description' => 'End when the campaign will start.',
+    '#description' => 'Date when the campaign will End.',
     '#required' => TRUE,
+  );
+
+  $form['active_time']['time_end']['end_time'] = array(
+    '#title' => t('End Time Campaign'),
+    '#type' => 'textfield',
+    '#default_value' => isset($time_end) ? $time_end : '',
+    '#description' => t('Time when the campaign will start. format : H:i:s, e.g. : 08:59:60'),
+    '#required' => TRUE,
+    '#maxlength' => 8,
   );
 
   $active = array(0 => t('No'), 1 => t('Yes'));
@@ -175,23 +217,85 @@ function sepulsa_referral_campaign_form_validate($form, &$form_state) {
   if (!drupal_valid_path($form_state['values']['path'])) {
     form_set_error('path', t('Path doesnt exits.'));
   }
-
-  // Check start / end date.
-  $start = strtotime($form_state['values']['start']['day'] . '-' .
-                      $form_state['values']['start']['month'] . '-' .
-                      $form_state['values']['start']['year'] . ' 00:00:00');
-  $end = strtotime($form_state['values']['end']['day'] . '-' .
-                      $form_state['values']['end']['month'] . '-' .
-                      $form_state['values']['end']['year'] . ' 23:59:59');
-  if ($end < $start) {
-    form_set_error('end', t('End date lower than start date.'));
+  $continue = TRUE;
+  $start_time = explode(':', $form_state['values']['start_time']);
+  if (count($start_time) == 3) {
+    if (in_range((int) $start_time[0], 0, 24, TRUE) &&
+      in_range((int) $start_time[1], 0, 59, TRUE) &&
+      in_range((int) $start_time[2], 0, 59, TRUE)) {
+      $continue = TRUE;
+    }
+    else {
+      form_set_error('start_time', t('Invalid time format in Start Time Campaign'));
+      $continue = FALSE;
+    }
   }
+  else {
+    form_set_error('start_time', t('Invalid time format in Start Time Campaign'));
+    $continue = FALSE;
+  }
+  $end_time = explode(':', $form_state['values']['end_time']);
+  if (count($end_time) == 3) {
+    if (in_range((int) $end_time[0], 0, 24, TRUE) &&
+      in_range((int) $end_time[1], 0, 59, TRUE) &&
+      in_range((int) $end_time[2], 0, 59, TRUE)) {
+      $continue = TRUE;
+    }
+    else {
+      form_set_error('end_time', t('Invalid time format in End Time Campaign'));
+      $continue = FALSE;
+    }
+  }
+  else {
+    form_set_error('end_time', t('Invalid time format in End Time Campaign'));
+    $continue = FALSE;
+  }
+  if ($continue) {
+    // Check start / end date.
+    $start = strtotime($form_state['values']['start']['day'] . '-' .
+                        $form_state['values']['start']['month'] . '-' .
+                        $form_state['values']['start']['year'] . ' ' .
+                        $start_time[0] . ':' . $start_time[1] . ':' .
+                        $start_time[2]);
+    $end = strtotime($form_state['values']['end']['day'] . '-' .
+                        $form_state['values']['end']['month'] . '-' .
+                        $form_state['values']['end']['year'] . ' ' .
+                        $end_time[0] . ':' . $end_time[1] . ':' .
+                        $end_time[2]);
+    if (empty($start)) {
+      form_set_error('start_time', t('Invalid time format in Start Time Campaign'));
+    }
+    elseif (empty($end)) {
+      form_set_error('end_time', t('Invalid time format in End Time Campaign'));
+    }
+    elseif ($end < $start) {
+      form_set_error('end', t('End date lower than start date.'));
+    }
+  }
+}
+
+/**
+ * Function in_range().
+ *
+ * For check time.
+ */
+function in_range($number, $min, $max, $inclusive = FALSE) {
+  if (is_int($number) && is_int($min) && is_int($max)) {
+    return $inclusive ? ($number >= $min && $number <= $max)
+        : ($number > $min && $number < $max);
+  }
+  return FALSE;
 }
 
 /**
  * Implements hook_form_submit().
  */
 function sepulsa_referral_campaign_form_submit($form, &$form_state) {
+  $machine_name = $form_state['values']['machine_name'];
+  if (strpos($form_state['values']['machine_name'], 'campaign_') === FALSE) {
+    $machine_name = 'campaign_' . $form_state['values']['machine_name'];
+  }
+
   if (isset($form_state['values']['src_id'])) {
     $start = strtotime($form_state['values']['start']['day'] . '-' .
                         $form_state['values']['start']['month'] . '-' .
@@ -203,7 +307,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     // Update sepulsa referral capaign: update entity.
     $entity = sepulsa_referral_campaign_load($form_state['values']['src_id']);
     $entity->title = $form_state['values']['title'];
-    $entity->machine_name = $form_state['values']['machine_name'];
+    $entity->machine_name = $machine_name;
     $entity->start = $start;
     $entity->end = $end;
     $entity->path = $form_state['values']['path'];
@@ -223,7 +327,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     // Sepulsa referral capaign is new: create new entity.
     $entity = entity_get_controller('sepulsa_referral_campaign')->create(array(
       'title' => $form_state['values']['title'],
-      'machine_name' => $form_state['values']['machine_name'],
+      'machine_name' => $machine_name,
       'start' => $start,
       'end' => $end,
       'path' => $form_state['values']['path'],

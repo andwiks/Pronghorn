@@ -17,7 +17,7 @@ define('SEPULSA_REFERRAL_CAMPAIGN_ADMIN_CONTENT_SRC_URI', 'admin/content/referra
  */
 function sepulsa_referral_campaign_entity_info() {
   $entity['sepulsa_referral_campaign'] = array(
-    'label' => t('Sepulsa Referral Campaign'),
+    'label' => t('Referral Campaign'),
     'controller class' => 'EntityAPIController',
     'entity class' => 'ReferralSepulsa',
     'base table' => 'sepulsa_referral_campaign',
@@ -39,7 +39,7 @@ function sepulsa_referral_campaign_entity_info() {
       'sepulsa_referral_campaign' => array(
         'label' => t('Sepulsa Referral Campaign'),
         'admin' => array(
-          'path' => 'admin/config/sepulsa_referral_campaign/settings',
+          'path' => 'admin/config/people/referral/sepulsa_referral_campaign',
           'access arguments' => array('administer sepulsa_referral_campaign'),
         ),
       ),
@@ -77,7 +77,7 @@ function sepulsa_referral_campaign_load_by_name($name) {
   $query = new EntityFieldQuery();
   $query
     ->entityCondition('entity_type', 'sepulsa_referral_campaign')
-    ->propertyCondition('machine_name', $name);
+    ->propertyCondition('machine_name', 'campaign_' . $name);
   $result = $query->execute();
   // Check the result.
   if (!empty($result)) {
@@ -131,7 +131,7 @@ function sepulsa_referral_campaign_menu() {
   $items = array();
   // Administration pages.
   $items['admin/config/people/referral/sepulsa_referral_campaign'] = array(
-    'title'             => 'Sepulsa Referral Campaign',
+    'title'             => 'Referral Campaign',
     'description'       => 'Configure Sepulsa Referral Campaign.',
     'page callback'     => 'system_admin_menu_block_page',
     'access arguments'  => array('access administration pages'),
@@ -150,7 +150,7 @@ function sepulsa_referral_campaign_menu() {
   );
 
   $items['admin/reports/sepulsa_referral_campaign'] = array(
-    'title'            => 'Sepulsa Referral Campaign Summary',
+    'title'            => 'Referral Campaign Summary',
     'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
     'page callback'    => 'sepulsa_referral_campaign_summary_list',
     'file'             => 'includes/sepulsa_referral_campaign.admin.inc',
@@ -159,7 +159,7 @@ function sepulsa_referral_campaign_menu() {
   );
 
   $items['admin/reports/sepulsa_referral_campaign/details/%/%'] = array(
-    'title'            => 'Sepulsa Referral Campaign Summary',
+    'title'            => 'Referral Campaign Summary',
     'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
     'page callback'    => 'sepulsa_referral_campaign_details_list',
     'page arguments'   => array(4, 5),

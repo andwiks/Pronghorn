@@ -1507,3 +1507,8 @@ section.h_middle_top {
 #edit-submitted-term-agree label.option {
     width: 90%;
 }
+
+.uob-form .webform-container-inline label
+{
+    width: 100%;
+}

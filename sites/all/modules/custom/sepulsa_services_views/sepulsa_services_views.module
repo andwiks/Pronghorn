@@ -2,13 +2,32 @@
 /*
 * Implement hook_services_views_execute_view_alter().
 */
-
 function sepulsa_services_views_services_views_execute_view_alter(&$output, $view) {
-  if ($view->name == 'test') {
+  global $user;
+  $uid = $user->uid;
+
+  watchdog("info", "hook altered!");
+
+  if ($view->name == 'user_offline_owned_coupon' && $view->current_display == 'user_offline_owned_coupon') {
     $paged_output = array(
       'results' => $output,
-      'total_rows' => $view->total_rows,
+      'uid' => $uid,
+      'device' => device_verification_status($uid),
     );
     $output = $paged_output;
   }
+
+
+  if ($view->name == 'user_owned_coupon' && $view->current_display == 'user_owned_coupon') {
+    $paged_output = array(
+      'results' => $output,
+      'uid' => $uid,
+      'device' => device_verification_status($uid),
+    );
+    $output = $paged_output;
+  }
+
+  /*
+  user_owned_coupon
+   */
 }

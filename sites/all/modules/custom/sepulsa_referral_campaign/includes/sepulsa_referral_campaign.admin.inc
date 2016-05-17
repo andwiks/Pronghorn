@@ -38,8 +38,6 @@ function sepulsa_referral_campaign_settings($form = array(), $form_state = array
     '#required' => TRUE,
   );
 
-  field_attach_form('lawmakers', $lawmakers, $form, $form_state);
-
   return system_settings_form($form);
 }
 
@@ -66,11 +64,15 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   );
 
   $form['machine_name'] = array(
-    '#title' => t('Mechine Name'),
-    '#type' => 'textfield',
+    '#type' => 'machine_name',
     '#default_value' => isset($referral->machine_name) ? $referral->machine_name : '',
-    '#description' => t('Default Mechine Name : replace space with _ (underscore) in title.'),
-    '#maxlength' => 254,
+    '#disabled' => isset($referral->machine_name),
+    '#maxlength' => 32,
+    '#machine_name' => array(
+      'exists' => 'sepulsa_referral_campaign_load_by_name',
+      'source' => array('title'),
+    ),
+    '#description' => t('A unique machine-readable name for the client configuration. It must only contain lowercase letters, numbers, and underscores.'),
   );
 
   $form['active_time'] = array(

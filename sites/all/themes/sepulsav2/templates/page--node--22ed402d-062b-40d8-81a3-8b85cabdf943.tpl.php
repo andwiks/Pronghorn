@@ -57,3 +57,10 @@ if(!empty(user_is_anonymous())) {
   var forgot_destination ='/user/password?destination='+destination;
   var register_destination ='/user/register?destination='+destination;
 </script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    //$('#edit-submitted-no-hp').removeAttr('required');​​​​​
+    $('#edit-submitted-no-hp').prop('required', false);
+  });
+</script>

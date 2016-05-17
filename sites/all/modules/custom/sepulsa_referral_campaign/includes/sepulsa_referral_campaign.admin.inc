@@ -299,10 +299,12 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
   if (isset($form_state['values']['src_id'])) {
     $start = strtotime($form_state['values']['start']['day'] . '-' .
                         $form_state['values']['start']['month'] . '-' .
-                        $form_state['values']['start']['year'] . ' 00:00:00');
+                        $form_state['values']['start']['year'] . ' ' .
+                        $form_state['values']['start_time']);
     $end = strtotime($form_state['values']['end']['day'] . '-' .
                         $form_state['values']['end']['month'] . '-' .
-                        $form_state['values']['end']['year'] . ' 23:59:59');
+                        $form_state['values']['end']['year'] . ' ' .
+                        $form_state['values']['end_time']);
 
     // Update sepulsa referral capaign: update entity.
     $entity = sepulsa_referral_campaign_load($form_state['values']['src_id']);
@@ -320,10 +322,12 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
   else {
     $start = strtotime($form_state['values']['start']['day'] . '-' .
                         $form_state['values']['start']['month'] . '-' .
-                        $form_state['values']['start']['year'] . ' 00:00:00');
+                        $form_state['values']['start']['year'] . ' ' .
+                        $form_state['values']['start_time']);
     $end = strtotime($form_state['values']['end']['day'] . '-' .
                         $form_state['values']['end']['month'] . '-' .
-                        $form_state['values']['end']['year'] . ' 23:59:59');
+                        $form_state['values']['end']['year'] . ' ' .
+                        $form_state['values']['end_time']);
     // Sepulsa referral capaign is new: create new entity.
     $entity = entity_get_controller('sepulsa_referral_campaign')->create(array(
       'title' => $form_state['values']['title'],

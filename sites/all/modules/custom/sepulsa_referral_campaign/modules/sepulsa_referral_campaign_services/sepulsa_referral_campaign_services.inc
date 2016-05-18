@@ -13,11 +13,11 @@
 /**
  * Function sepulsa_referral_campaign_services_resource_index().
  */
-function sepulsa_referral_campaign_services_resource_index() {
+function sepulsa_referral_campaign_services_resource_index($active = NULL) {
   global $user;
   if ($user->uid > 0) {
     // List sepulsa campaign.
-    $list = sepulsa_referral_campaign_getlist();
+    $list = sepulsa_referral_campaign_getlist($active);
     if (!empty($list)) {
       return $list;
     }
@@ -36,7 +36,7 @@ function sepulsa_referral_campaign_services_resource_getcampaign() {
   global $user;
   if ($user->uid > 0) {
     // Active sepulsa campaign.
-    $list = sepulsa_referral_campaign_getlist(TRUE);
+    $list = sepulsa_referral_campaign_getlist('active');
     if (!empty($list)) {
       return $list;
     }

@@ -21,7 +21,19 @@ function sepulsa_referral_campaign_services_services_resources() {
             'name' => 'sepulsa_referral_campaign_services',
           ),
           'callback' => 'sepulsa_referral_campaign_services_resource_index',
-          'args' => array(),
+          'args' => array(
+            array(
+              'name' => 'active',
+              'type' => 'string',
+              'description' => 'To get active campaign active / nonactive ( Default : All )',
+              'source' => array(
+                'data' => 'active',
+                'param' => 'active',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'GET',
+            ),
+          ),
           'access callback' => 'services_access_menu',
           'documentation callback' => 'sepulsa_referral_campaign_services_resource_index_doc',
           'jwt' => array(

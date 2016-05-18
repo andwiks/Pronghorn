@@ -1,11 +1,9 @@
 <?php
 /**
  * @file
- * devices_servies.inc
+ * Device request key access, device verification, send email confirmation etc.
  *
  * @author andreas@sepulsa.com
- *
- * @todo: logout session.
  */
 
 /**
@@ -49,6 +47,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         ->propertyCondition('imei', $imei)
         ->propertyCondition('phone', $phone);
       $result = $query->execute();
+
       // Check if empty result.
       if (empty($result)) {
         // Device is new: create new device entity.
@@ -129,11 +128,13 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         $device_wrapper = entity_metadata_wrapper('device', $did);
         $check['device_status'] = $device_wrapper->status->value();
         $check['device_uid'] = $device_wrapper->uid->value();
+
         // 2. Check verification status: unconfirmed or new.
         $query = new EntityFieldQuery();
         $query->entityCondition('entity_type', 'device_verification')
           ->propertyCondition('did', $did);
         $result = $query->execute();
+
         if (!empty($result)) {
           $check['dv_id'] = key($result['device_verification']);
           $dv_wrapper = entity_metadata_wrapper('device_verification', $check['dv_id']);
@@ -192,6 +193,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           // 2. confirmed: only if more than timeout.
           if ($check['dv_status'] == 2
             || ($check['dv_status'] == 1 &&  REQUEST_TIME > $check['dv_timeout'])
+            || ($check['dv_status'] == 0 &&  REQUEST_TIME > $check['dv_timeout'])
           ) {
             // Regenerate hash: set as new.
             $check['dv_hash'] = device_generate_hash();
@@ -199,6 +201,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             if ($check['dv_status'] == 2) {
               $dv_wrapper->status->set(0);
             }
+
             $dv_wrapper->created->set(REQUEST_TIME);
             $dv_wrapper->timeout->set(strtotime(variable_get('device_verification_timeout', '+30 minutes'), REQUEST_TIME));
             $dv_wrapper->hash->set($check['dv_hash']);
@@ -344,25 +347,57 @@ function device_services_resource_verify($code = '') {
           // Delete drupal session also.
           db_delete('sessions')->condition($is_https ? 'ssid' : 'sid', $session['asid'])->execute();
 
-          // Search for old user.
-          $account = db_select('users', 'u')->fields('u')
-            ->condition('init', $session['device']->phone)
-            ->execute()->fetch();
+          if (isset($session['device']->uid) && !empty($session['device']->uid)
+            && isset($session['device']->status) && $session['device']->status == 1) {
+            // Search for old active user using device uid.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('uid', $session['device']->uid)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
+          else {
+            // Search for old active user.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('init', $session['device']->phone)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
 
           // Check if user is empty.
           if (empty($account)) {
-            // Create user dummy: set up the user fields.
-            $account = new stdClass();
-            $account->is_new = TRUE;
-            $account->name = $session['device']->phone;
-            $account->mail = $session['device']->imei . '@' . $session['device']->phone . '.dummy';
-            $account->pass = user_password();
-            $account->status = 1;
-            $account->init = $session['device']->phone;
-            $account->roles = array(
-              DRUPAL_AUTHENTICATED_RID => 'authenticated user',
-            );
-            $account = user_save($account);
+            // Check if there is dummy user.
+            $dummy = db_select('users', 'u')->fields('u')
+              ->condition('name', $session['device']->phone)
+              ->execute()->fetch();
+            if (empty($dummy)) {
+              try {
+                // Create user dummy: set up the user fields.
+                $account = new stdClass();
+                $account->is_new = TRUE;
+                $account->name = $session['device']->phone;
+                $account->mail = $session['device']->imei . '@' . $session['device']->phone . '.dummy';
+                $account->pass = user_password();
+                $account->status = 1;
+                $account->init = $session['device']->phone;
+                $account->roles = array(
+                  DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+                );
+                $account = user_save($account);
+              }
+              catch (Exception $exp) {
+                // Log this condition.
+                watchdog('device_services', 'Create Dummy User Error with Trace: <pre>@trace</pre><pre>@session</pre>', array(
+                  '@trace' => $exp->getTraceAsString(),
+                  '@session' => print_r($session),
+                ), WATCHDOG_ERROR);
+              }
+            }
+            else {
+              // Activate dummy user.
+              $account = user_load($dummy->uid);
+              $account->status = 1;
+              $account = user_save($account);
+            }
           }
           else {
             // User may have another device: remove old sessions.
@@ -431,6 +466,7 @@ function device_services_resource_verify($code = '') {
           // Return new token.
           return $token;
         }
+
       }
     }
   }
@@ -454,13 +490,32 @@ function device_services_resource_mail($mail = '') {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
     if ($session !== FALSE) {
-      $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
-      if ($send_verify === FALSE) {
-        return services_error(t('Send Email Failed.'), 406);
+      // Get device wrapper.
+      $device_wrapper = entity_metadata_wrapper('device', $session['device']);
+      // Get device mail.
+      $device_mail = $device_wrapper->device_mail->value();
+      // Check current mail: no change.
+      if (empty($device_mail)
+        || (!empty($device_mail) && $device_mail != $mail)
+      ) {
+        // Send verification mail.
+        $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);
+        // Get error messages.
+        $messages = drupal_get_messages();
+        // Log if there is messages.
+        if (!empty($messages)) {
+          watchdog('device_services', 'Device mail service to @mail with messages: <pre>@mess</pre>.', array(
+            '@mail' => $mail,
+            '@mess' => print_r($messages, TRUE),
+          ), WATCHDOG_ERROR);
+        }
+        // Give result based on send verify variable.
+        if ($send_verify === FALSE) {
+          return services_error(t('Send Email Failed.'), 406);
+        }
       }
-      else {
-        return TRUE;
-      }
+      // Let the app know if the result is true: send email or not.
+      return TRUE;
     }
   }
   // Other condition.
@@ -506,7 +561,7 @@ function device_services_resource_retrieve($did = 0) {
     }
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**
@@ -546,7 +601,7 @@ function device_services_resource_index() {
     return $devices;
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**
@@ -592,7 +647,7 @@ function device_services_resource_session_index() {
     return $sessions;
   }
   // Other condition.
-  return services_error(t('Invalid device information.'), 404);
+  return services_error(t('Invalid device information.'), 401);
 }
 
 /**

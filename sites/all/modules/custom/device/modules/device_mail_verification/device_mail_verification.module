@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * device_mail_verification.module
+ * Device mail verification.
  *
  * @author aizat@sepulsa.com
  */
@@ -108,8 +108,8 @@ function device_mail_verification_send_verification($mail = '', $did = '') {
 
     // Insert Data to device_mail_verification Table.
     db_insert('device_mail_verification')
-    ->fields($fields_insert)
-    ->execute();
+      ->fields($fields_insert)
+      ->execute();
 
     // Return true.
     return TRUE;
@@ -139,6 +139,30 @@ function device_mail_verification_cron() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function device_mail_verification_theme() {
+  // Get module theme path.
+  $module_theme_path = drupal_get_path('module', 'device_mail_verification') . '/theme';
+  // Return theme array.
+  return array(
+    'device_merge_confirm_form' => array(
+      'render element' => 'form',
+      'path' => $module_theme_path,
+      'template' => 'device-merge-confirm-form',
+    ),
+    'page__device_mail__verification' => array(
+      'path' => $module_theme_path,
+      'template' => 'page--device-mail--verification',
+    ),
+    'html__device_mail__verification' => array(
+      'path' => $module_theme_path,
+      'template' => 'html--device-mail--verification',
+    ),
+  );
+}
+
+/**
  * Function device_mail_verification_transfer_order().
  *
  * @param string $current_uid
@@ -164,44 +188,49 @@ function device_mail_verification_transfer_order($current_uid = '', $update_uid 
   $subquery->condition('cos.uid', $current_uid, '=');
   $oids = $subquery->execute()->fetchAllAssoc('order_id', PDO::FETCH_ASSOC);
 
-  // Transfer commerce order.
-  $result['commerce_order'] = db_update('commerce_order')
-    ->fields(array('uid' => $update_uid))
-    ->condition('uid', $current_uid, '=')
-    ->condition('order_id', $oids, 'IN')
-    ->execute();
-  // Transfer commerce order revision.
-  $result['commerce_order_revision'] = db_update('commerce_order_revision')
-    ->fields(array('revision_uid' => $update_uid))
-    ->condition('revision_uid', $current_uid, '=')
-    ->condition('order_id', $oids, 'IN')
-    ->execute();
+  // Check if can get list of order ids.
+  if (!empty($oids)) {
+    // Transfer commerce order.
+    $result['commerce_order'] = db_update('commerce_order')
+      ->fields(array('uid' => $update_uid))
+      ->condition('uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
+    // Transfer commerce order revision.
+    $result['commerce_order_revision'] = db_update('commerce_order_revision')
+      ->fields(array('revision_uid' => $update_uid))
+      ->condition('revision_uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
 
-  // Define list of payment transaction id based on selected order id.
-  $payment_subquery = db_select('commerce_payment_transaction', 'cptt');
-  $payment_subquery->addField('cptt', 'transaction_id');
-  $payment_subquery->condition('cptt.order_id', $oids, 'IN');
-  $payment_subquery->condition('cptt.uid', $current_uid, '=');
-  $tids = $payment_subquery->execute()->fetchAllAssoc('transaction_id', PDO::FETCH_ASSOC);
+    // Define list of payment transaction id based on selected order id.
+    $payment_subquery = db_select('commerce_payment_transaction', 'cptt');
+    $payment_subquery->addField('cptt', 'transaction_id');
+    $payment_subquery->condition('cptt.order_id', $oids, 'IN');
+    $payment_subquery->condition('cptt.uid', $current_uid, '=');
+    $tids = $payment_subquery->execute()->fetchAllAssoc('transaction_id', PDO::FETCH_ASSOC);
 
-  // Transfer commerce payment transaction.
-  $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
-    ->fields(array('uid' => $update_uid))
-    ->condition('uid', $current_uid, '=')
-    ->condition('transaction_id', $tids, 'IN')
-    ->execute();
-  // Transfer commerce payment transaction revision.
-  $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
-    ->fields(array('revision_uid' => $update_uid))
-    ->condition('revision_uid', $current_uid, '=')
-    ->condition('transaction_id', $tids, 'IN')
-    ->execute();
-  // Transfer commerce veritrans token (saved cc).
-  $result['commerce_veritrans_token'] = db_update('commerce_veritrans_token')
-    ->fields(array('uid' => $update_uid))
-    ->condition('uid', $current_uid, '=')
-    ->condition('order_id', $oids, 'IN')
-    ->execute();
+    if (!empty($tids)) {
+      // Transfer commerce payment transaction.
+      $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+      // Transfer commerce payment transaction revision.
+      $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+    }
+    // Transfer commerce veritrans token (saved cc).
+    $result['commerce_veritrans_token'] = db_update('commerce_veritrans_token')
+      ->fields(array('uid' => $update_uid))
+      ->condition('uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
+  }
 
   // Log this condition.
   watchdog('device_mail_verification', 'Transfer Order @cuid to @uuid. Result: <pre>@result</pre> Order List: <pre>@oids</pre>.', array(

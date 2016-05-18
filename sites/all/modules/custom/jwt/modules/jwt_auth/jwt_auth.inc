@@ -31,7 +31,7 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
     // Get server information.
     $server = services_server_info_object();
     // Check Authorization Bearer header.
-    if (isset($_SERVER['HTTP_AUTHORIZATION']) && preg_match('#^Bearer\s+(.+)$#i', $_SERVER['HTTP_AUTHORIZATION'], $match)) {
+    if (isset($_SERVER['HTTP_AUTHORIZATION']) && preg_match('#^Bearer\s+([^\.]+\.[^\.]+\.[^\.]+)$#i', $_SERVER['HTTP_AUTHORIZATION'], $match)) {
       // Trim it.
       $match[1] = trim($match[1]);
       // Verify JWT using selected config.
@@ -78,14 +78,6 @@ function _jwt_auth_authenticate_call($settings, $method, $args) {
             watchdog('jwt_auth', 'JWT Auth Debug. Server settings: <pre>@server</pre>', array(
               '@server' => print_r($server, TRUE),
             ), WATCHDOG_DEBUG);
-          }
-
-          // Check if required but unable to get user object.
-          if ($method['endpoint']['jwt_auth']['token'] == 'required'
-            && user_is_anonymous()
-          ) {
-            // Force apps to get new token.
-            services_error(t('Invalid User'), 401);
           }
 
           // Other condition: return gracefully.

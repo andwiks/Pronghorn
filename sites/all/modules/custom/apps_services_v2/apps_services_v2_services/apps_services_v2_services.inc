@@ -9,32 +9,32 @@
 function apps_services_v2_services_sepulsa_operator_list($source) {
   // Define service friendly return value.
   $return = array();
-  
+
   //set default return value
   $return["status"] = false;
   $return["message"] = "Data Operator tidak ditemukan";
   $return["data"] = null;
-  
+
   // Set operator container data
   $data_container = array();
-  
+
   // Get operator data.
   $operator = sepulsa_get_all_operator_data();
-  
+
   // Looping for each operator data: contain term id and other operator data.
   foreach ($operator as $id => $data) {
     // Return only available cardtype and packet.
     if (isset($data['cardtype']) && !empty($data['cardtype'])
       && isset($data['packet']) && !empty($data['packet'])
     ) {
-      
+
       //remove cardtype id from key then put it as parameter
       foreach ($data['cardtype'] as $id_cardtype => $data_cardtype) {
         $data['cardtype'] = array();
         $data['cardtype']['id'] = $id_cardtype;
         $data['cardtype']['type'] = $data_cardtype;
       }
-      
+
       //remove packet id
       foreach ($data['packet'] as $id_packet => $data_packet) {
         //check first 2 string of title if only denom then add "Pulsa" wording
@@ -46,20 +46,20 @@ function apps_services_v2_services_sepulsa_operator_list($source) {
         }
         $data['packet'] = $data_packet;
       }
-      
+
       // Include id into operator data.
       $data_container[] = array('id' => $id) + $data;
-      
+
     }
   }
-  
+
   //set value return if data is not empty
   if(count($data_container) > 0){
     $return["status"] = true;
     $return["message"] = "";
     $return["data"] = $data_container;
   }
-  
+
   // Return service friendly return value.
   return $return;
 }
@@ -75,7 +75,7 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
   if (module_exists('pln_prepaid') && $type == 'electricity') {
     $type = 'pln_prepaid';
   }
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
@@ -83,7 +83,7 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
   $return["data"] = null;
 
   $products = &drupal_static(__FUNCTION__, array());
-  
+
   //create cache name based on type and source
   $cache_name = 'apps_services_v2_services_sepulsa_all_products_' . $type . '_' . $source;
 
@@ -99,27 +99,27 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
         if (isset($nodes[$nid])) {
           //generate temporary product container
           $product = array();
-          
+
           $field_product = $view['field_product'][0];
-          
+
           //set product name
           $product['product_name'] = $nodes[$nid]->type;
-          
+
           //set returned data as type only if type parameter is not empty
           if(isset($type) && !empty($type) && $product['product_name'] != $type){
             continue;
           }
-          
+
           //set container product detail
           $product['product'] = array();
 
           //set container product detail content
           $product['product']['title'] = $nodes[$nid]->title;
           $product['product']['id'] = $nid;
-          
+
           //set product id container
           $product['product']['product_type'] = array();
-          
+
           //get product id content
           if(isset($field_product["product_id"]['#options']) && count($field_product["product_id"]['#options']) > 0){
             foreach ($field_product["product_id"]['#options'] as $id_product_id => $name_product_id) {
@@ -134,17 +134,17 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
             $product['product']['product_type']['id'] = $field_product['product_id']['#value'];
             $product['product']['product_type']['name'] = null;
           }
-          
+
           //set quantity data
           $product['product']['quantity'] = null;
           if(isset($field_product['quantity']['#value']) && !empty($field_product['quantity']['#value'])){
             $product['product']['quantity'] = $field_product['quantity']['#value'];
           }
-          
+
           $products[] = $product;
         }
       }
-      
+
       //check if products data available after process
       //set before the cache so empty product will not be saved
       if(count($products) < 1){
@@ -187,7 +187,7 @@ function apps_services_v2_services_sepulsa_product_index($type, $source) {
  */
 function apps_services_v2_services_resource_add($product, $source) {
   global $user;
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
@@ -202,6 +202,14 @@ function apps_services_v2_services_resource_add($product, $source) {
     unset($product['fields']['electricity_customer_number']);
     unset($product['fields']['electricity_phone_number']);
   }
+
+  // Clear order what ever the condition is.
+  $order = commerce_cart_order_load($user->uid);
+  if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
+    // Delete all cart contents.
+    $order = commerce_cart_order_empty($order);
+  }
+
 
   // Check input product data:
   // 1. product_id: (int) valid product id loaded by commerce_product_load.
@@ -221,6 +229,10 @@ function apps_services_v2_services_resource_add($product, $source) {
       $types = commerce_line_item_types();
       // Check input type: by default product.
       $line_item_type = (isset($product['type']) && isset($types[$product['type']])) ? $product['type'] : 'product';
+      // Adjustment for deposit sepulsa.
+      if (isset($commerce_product->type) && $commerce_product->type == 'deposit') {
+        $line_item_type = 'deposit_sepulsa';
+      }
       // Create new line item based on product above.
       $line_item = commerce_product_line_item_new($commerce_product, $quantity, 0, array(), $line_item_type);
       // Get line item wrapper.
@@ -248,7 +260,7 @@ function apps_services_v2_services_resource_add($product, $source) {
       try {
         $line_item = commerce_cart_product_add($user->uid, $line_item);
         // Get the order.
-	$order = commerce_cart_order_load($user->uid);
+        $order = commerce_cart_order_load($user->uid);
         // Refresh it: so cart index will get new order data.
         commerce_cart_order_refresh($order);
         if ($line_item !== FALSE) {
@@ -284,14 +296,14 @@ function apps_services_v2_services_resource_add($product, $source) {
  */
 function apps_services_v2_services_resource_add_multiple($products, $source) {
   global $user;
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
   $return["message"] = "Mohon masukkan produk";
   $return["data"] = null;
   $temporary_data = null;
-  
+
   foreach ($products as $product) {
     // Backward compatibilty for old electricity product.
     if (module_exists('pln_prepaid') && $product['type'] == 'electricity' || $product['type'] == 'electricity_prepaid') {
@@ -301,7 +313,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
       unset($product['fields']['electricity_customer_number']);
       unset($product['fields']['electricity_phone_number']);
     }
-    
+
     // Check input product data:
     // 1. product_id: (int) valid product id loaded by commerce_product_load.
     // 2. type: (string) valid line item type. (optional: product).
@@ -370,7 +382,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
       }
     }
   }
-  
+
   if(!empty($temporary_data)){
     $return["data"] = order_services_line_item($temporary_data);
   }
@@ -386,7 +398,7 @@ function apps_services_v2_services_resource_add_multiple($products, $source) {
  */
 function apps_services_v2_services_resource_index($source) {
   global $user;
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
@@ -399,7 +411,7 @@ function apps_services_v2_services_resource_index($source) {
   if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
     // Return order object which already language compatible.
     $order = apps_services_v2_services_format_order($order);
-    
+
     //set return container and default value of return
     $return["status"] = true;
     $return["data"] = $order;
@@ -457,7 +469,7 @@ function apps_services_v2_services_format_order($order) {
       }
     }
   }
-  
+
   //change line item format to default array
   $data_temp_commerce_line_items = array();
   foreach ($order->commerce_line_items as $lid => $line_item) {
@@ -473,7 +485,7 @@ function apps_services_v2_services_format_order($order) {
     $data_temp_commerce_line_items[] = $line_item;
   }
   $order->commerce_line_items = $data_temp_commerce_line_items;
-  
+
   return $order;
 }
 
@@ -490,7 +502,7 @@ function apps_services_v2_services_resource_coupon_redeem($code, $source) {
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
-  
+
   $error = '';
   $uid = $GLOBALS['user']->uid;
   $order = commerce_cart_order_load($uid);
@@ -516,7 +528,7 @@ function apps_services_v2_services_resource_coupon_redeem($code, $source) {
       'coupon' => $coupon,
       'offer' => entity_metadata_wrapper('commerce_coupon', $coupon)->commerce_discount_reference->get(0)->commerce_discount_offer->value(),
     );
-    
+
     $return["status"] = true;
     $return["data"] = $return_data;
     return $return_data;
@@ -526,7 +538,7 @@ function apps_services_v2_services_resource_coupon_redeem($code, $source) {
   }
 }
 
-/*
+/**
  * remove promo code from user's order
  */
 function apps_services_v2_services_resource_coupon_remove($coupon_id, $source) {
@@ -536,7 +548,7 @@ function apps_services_v2_services_resource_coupon_remove($coupon_id, $source) {
 
   commerce_coupon_remove_coupon_from_order($order, $coupon);
   commerce_cart_order_refresh($order);
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = true;
@@ -558,13 +570,13 @@ function apps_services_v2_services_resource_coupon_remove($coupon_id, $source) {
  */
 function apps_services_v2_services_resource_complete($order_id, $source) {
   global $user;
-  
+
   //set return container and default value of return
   $return = array();
   $return["status"] = false;
   $return["message"] = "";
   $return["data"] = null;
-  
+
   // Get user's order.
   $order = commerce_order_load($order_id);
   // Check whether order can checkout.
@@ -601,10 +613,10 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
       commerce_payment_redirect_pane_next_page($order, $log);
       $description = array();
       $description["description"] = str_replace("\n", ' ', $message);
-      
+
       $return["status"] = true;
       $return["data"] = $description;
-      
+
       return $return;
     }
 
@@ -628,14 +640,70 @@ function apps_services_v2_services_resource_complete($order_id, $source) {
 
     $return["status"] = true;
     $return["data"] = $description;
-    
+
     return $return;
   }
   // Reach this means error: invalid order.
   return services_error(t('Invalid order'), 406);
 }
 
-/*
+/**
+ * Function apps_services_v2_services_resource_checkout_initiate().
+ */
+function apps_services_v2_services_resource_checkout_initiate($source) {
+  // Define result container default value.
+  $result = array(
+    'cart' => NULL,
+    'payment' => NULL,
+    'card' => NULL,
+  );
+  // Get global user object.
+  global $user;
+  // Validate if able to get valid user.
+  if (empty($user->uid) || user_is_anonymous()) {
+    return services_error(t('Invalid User'), 401);
+  }
+
+  // Get customer's cart.
+  $order = commerce_cart_order_load($user->uid);
+  // Check whether commerce cart can get user's shopping cart.
+  if ($order !== FALSE && commerce_cart_order_is_cart($order)) {
+    // Bundle this with try and catch.
+    try {
+      // Load commerce_checkout.pages.inc file.
+      module_load_include('inc', 'apps_services_v2_payment_list', 'apps_services_v2_payment_list');
+      // Get payment list.
+      $payment = apps_services_v2_payment_list_data($source);
+      if (isset($payment['status']) && $payment['status'] === TRUE) {
+        $result['payment'] = $payment['data'];
+      }
+      // Return order object which already language compatible.
+      $result['cart'] = apps_services_v2_services_format_order($order);
+      // Get saved card.
+      $saved_card = commerce_veritrans_token_get($user->uid);
+      if (!empty($saved_card)) {
+        $result['card'] = $saved_card;
+      }
+    }
+    catch (Exception $e) {
+      watchdog('apps_services_v2_services', 'Unable to initiate checkout for user @uid with trace: <pre>@trace</pre> <pre>@user</pre>', array(
+        '@uid' => $user->uid,
+        '@trace' => $e->getTraceAsString(),
+        '@user' => print_r($user, TRUE),
+      ), WATCHDOG_ERROR);
+    }
+  }
+  else {
+    // Reach this means error: unable to get user's shopping cart.
+    return services_error(t('Cart missing'), 406);
+  }
+
+
+  // Return result container.
+  return $result;
+}
+
+/**
  * Get token to get saved card from veritrans
  */
 function apps_services_v2_services_get_saved_card() {
@@ -644,13 +712,13 @@ function apps_services_v2_services_get_saved_card() {
   $return["status"] = true;
   $return["message"] = "";
   $return["data"] = commerce_veritrans_token_get($GLOBALS['user']->uid);
-  
+
   $count_token = count($return["data"]);
   if($count_token < 1){
     //if empty token then return empty array
     $return["status"] = false;
     $return["data"] = null;
   }
-  
+
   return $return;
 }

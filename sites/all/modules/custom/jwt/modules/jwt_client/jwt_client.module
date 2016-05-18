@@ -149,7 +149,6 @@ function jwt_client_jwt_auth_verified($claims) {
         }
       }
     }
-
     // Check scope client.
     // 1. Check whether scope client is available and enabled.
     // 2. Scope client has been checked with scope current no need further.
@@ -165,7 +164,7 @@ function jwt_client_jwt_auth_verified($claims) {
       $query->entityCondition('entity_type', 'user')
         ->propertyCondition('mail', $aud)
         ->propertyCondition('status', 1)
-        ->propertyOrderBy('uid', DESC);
+        ->propertyOrderBy('uid', 'DESC');
       $result = $query->execute();
       // Load the user account.
       if (!empty($result) && isset($result['user']) && !empty($result['user'])) {
@@ -174,6 +173,26 @@ function jwt_client_jwt_auth_verified($claims) {
       else {
         $account = user_load_by_mail($aud);
       }
+      // Check device mail: compare it with aud.
+      try {
+        $device_wrapper = entity_metadata_wrapper('device', $did);
+        $device_mail = $device_wrapper->device_mail->value();
+        // Check if token mail is not the same with device mail.
+        if (!empty($device_mail)
+          && $device_mail != $aud
+        ) {
+          return services_error(t('Invalid User'), 401);
+        }
+      }
+      catch (EntityMetadataWrapperException $exp) {
+        // Log this condition.
+        watchdog('jwt_client', 'Device Token with invalid device mail. Debug: <pre>@debug</pre>', array(
+          '@debug' => $exp->getTraceAsString(),
+        ), WATCHDOG_ERROR);
+        // This means: device is not available.
+        return services_error(t('Invalid User'), 401);
+      }
+
       // Check if can get user id.
       if ($account === FALSE || (isset($account->uid) && $account->uid == 0)) {
         // Create user dummy: set up the user fields.

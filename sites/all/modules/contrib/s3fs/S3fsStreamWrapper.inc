@@ -109,8 +109,8 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
   public function __construct() {
     // Since S3fsStreamWrapper is always constructed with the same inputs (the
     // file URI is not part of construction), we store the constructed settings
-    // statically. This is important for performance because Drupal
-    // re-constructs stream wrappers very often.
+    // statically. This is important for performance because the way Drupal's
+    // APIs are used causes stream wrappers to be frequently re-constructed.
     $settings = &drupal_static('S3fsStreamWrapper_constructed_settings');
     if ($settings !== NULL) {
       $this->config = $settings['config'];
@@ -122,6 +122,8 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
       $this->constructed = TRUE;
       return;
     }
+
+    // Begin uncached construction.
     $this->config = _s3fs_get_config();
 
     if (empty($this->config['bucket'])) {
@@ -311,7 +313,7 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
     // In case we're on Windows, replace backslashes with forward-slashes.
     // Note that $uri is the unaltered value of the File's URI, while
     // $s3_key may be changed at various points to account for implementation
-    // details on the S3 side (e.g. root_folder, s3fs-public).
+    // details on the S3 side (e.g. root_folder, s3fs_public_folder).
     $s3_key = str_replace('\\', '/', file_uri_target($this->uri));
 
     // If this is a private:// file, it must be served through the
@@ -343,7 +345,7 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
         if (substr($s3_key, -4) == '.css') {
           // Send requests for public CSS files to /s3fs-css/path/to/file.css.
           // Users must set that path up in the webserver config as a proxy into
-          // their S3 bucket's s3fs-public/ folder.
+          // their S3 bucket's s3fs_public_folder.
           return "{$GLOBALS['base_url']}/s3fs-css/" . drupal_encode_path($s3_key);
         }
         else if (substr($s3_key, -3) == '.js') {
@@ -353,8 +355,9 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
         }
       }
 
-      // public:// files are stored in S3 inside the s3fs-public/ folder.
-      $s3_key = "s3fs-public/$s3_key";
+      // public:// files are stored in S3 inside the s3fs_public_folder.
+      $public_folder = !empty($this->config['public_folder']) ? $this->config['public_folder'] : 's3fs-public';
+      $s3_key = "{$public_folder}/$s3_key";
     }
 
     // Set up the URL settings as speciied in our settings page.
@@ -1393,13 +1396,15 @@ class S3fsStreamWrapper implements DrupalStreamWrapperInterface {
     $params['Bucket'] = $this->config['bucket'];
     $params['Key'] = file_uri_target($uri);
 
-    // public:// file are all placed in the s3fs-public/ folder.
+    // public:// file are all placed in the s3fs_public_folder.
+    $public_folder = !empty($this->config['public_folder']) ? $this->config['public_folder'] : 's3fs-public';
+    $private_folder = !empty($this->config['private_folder']) ? $this->config['private_folder'] : 's3fs-private';
     if (file_uri_scheme($uri) == 'public') {
-      $params['Key'] = "s3fs-public/{$params['Key']}";
+      $params['Key'] = "$public_folder/{$params['Key']}";
     }
-    // private:// file are all placed in the s3fs-private/ folder.
+    // private:// file are all placed in the s3fs_private_folder.
     else if (file_uri_scheme($uri) == 'private') {
-      $params['Key'] = "s3fs-private/{$params['Key']}";
+      $params['Key'] = "$private_folder/{$params['Key']}";
     }
 
     // If it's set, all files are placed in the root folder.

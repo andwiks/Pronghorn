@@ -229,9 +229,13 @@ function radioButton() {
 }
 
 function accordion() {
+    $(".row.accordion .label").css('cursor','pointer');
     $(".accordion").each(function () {
         if ($(this).hasClass('active')) {
             $(this).children(".content").slideDown(300);
+        }
+        if ($(this).hasClass('deactive')) {
+            $(this).children(".content").hide();
         }
     });
 
@@ -239,9 +243,11 @@ function accordion() {
         if ($(this).parent('.accordion ').hasClass('active')) {
             $(this).parent('.accordion ').children(".content").slideUp(300);
             $(this).parent('.accordion ').removeClass('active');
+            $(this).children('.ico').html('+');
         } else {
             $(this).parent('.accordion ').children(".content").slideDown(300);
             $(this).parent('.accordion ').addClass('active');
+             $(this).children('.ico').html('-');
         }
     });
 }

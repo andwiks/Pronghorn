@@ -26,7 +26,7 @@ function apps_services_v2_transaction_data_favorite($order_id, $source){
 
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
 
   //validate order id, check if it actually owned by active user
@@ -213,7 +213,7 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
 
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
 
   //set variable container
@@ -306,7 +306,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
 
   //do not allow user anonymous to enter the service
   if(!isset($uid) || empty($uid)){
-    return services_error('Harap login terlebih dahulu', 406);
+    return services_error(t('Invalid User'), 401);
   }
 
   //set variable container

@@ -1,0 +1,111 @@
+<?php
+/**
+ * @file
+ * sepulsa_bulk_userpoint.module
+ *
+ * @desc
+ *   File sepulsa_bulk_userpoint.module
+ *   Created By : Antonius Ananto
+ *   Module Usage : To Bulk User Point Data To table
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_bulk_userpoint_menu() {
+  $items['admin/config/people/userpoints/bulk'] = array(
+    'title' => 'Add !points transaction (Bulk)',
+    'title arguments' => userpoints_translation(),
+    'description' => 'Admin Bulk add/delete userpoints',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_bulk_userpoint_bulk_form'),
+    'access callback' => array('userpoints_admin_access'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'sepulsa_bulk_userpoint.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ */
+function sepulsa_bulk_userpoint_menu_local_tasks_alter(&$data, $router_item, $root_path) {
+  // Add action link to add points on 'userpoints' administration pages.
+  if (strpos($root_path, 'admin/config/people/userpoints/') !== FALSE) {
+    // Don't display the action link on some pages like settings and
+    // approve or decline confirmation forms.
+    $blacklist = array('settings', 'approve', 'decline');
+    foreach ($blacklist as $blacklisted_path) {
+      if (strpos($root_path, $blacklisted_path) !== FALSE) {
+        return;
+      }
+    }
+    $item = menu_get_item('admin/config/people/userpoints/bulk');
+    // For the transaction view pages, we want to directly link to the
+    // user for this transaction.
+    if (arg(4) == 'transaction' && (arg(6) == 'view' || arg(6) == 'edit')) {
+      $transaction = userpoints_transaction_load(arg(5));
+      $item['href'] .= '/' . $transaction->uid;
+    }
+
+    if ($item['access']) {
+      $data['actions']['output'][] = array(
+        '#theme' => 'menu_local_action',
+        '#link' => $item,
+      );
+    }
+  }
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function _sepulsa_bulk_userpoint_finish().
+ *
+ * @param bool $success
+ *   Success flag.
+ * @param array $results
+ *   Result array.
+ * @param arary $operations
+ *   Error operations.
+ */
+function _sepulsa_bulk_userpoint_finish($success, $results, $operations) {
+  // Check if success flag.
+  if ($success) {
+    // Here we do something meaningful with the results.
+    drupal_set_message(t('Bulk userpoint success.'));
+  }
+  else {
+    // An error occurred: $operations contains the remained unprocessed.
+    $error_operation = reset($operations);
+    $message = t('An error occurred while processing %error_operation with arguments: @arguments', array(
+      '%error_operation' => $error_operation[0],
+      '@arguments' => print_r($error_operation[1], TRUE),
+    ));
+    drupal_set_message($message, 'error');
+  }
+}
+
+/**
+ * Function _sepulsa_bulk_userpoint_process().
+ *
+ * @param array $item
+ *   Array of: uid, points, tid, and description.
+ */
+function _sepulsa_bulk_userpoint_process($item) {
+  // Check item data: only process if data are correct.
+  if (isset($item['uid']) && !empty($item['uid'])
+    && isset($item['points']) && !empty($item['points'])
+    && isset($item['tid']) && !empty($item['tid'])
+  ) {
+    $params = array(
+      'uid' => $item['uid'],
+      'points' => $item['points'],
+      'tid' => $item['tid'],
+      'description' => isset($item['description']) ? $item['description'] : '-',
+    );
+    userpoints_userpointsapi($params);
+  }
+}

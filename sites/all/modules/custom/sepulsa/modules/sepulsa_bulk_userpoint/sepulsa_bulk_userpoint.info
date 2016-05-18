@@ -1,0 +1,5 @@
+name = Sepulsa Bulk Sepulsa Kredit
+description = Bulk Sepulsa Kredit
+core = "7.x"
+
+dependencies[] = userpoints

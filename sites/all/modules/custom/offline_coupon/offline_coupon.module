@@ -1,6 +1,9 @@
 <?php
 /**
  * @file
+ * offline_coupon.module
+ *
+ * @author dwi@sepulsa.com
  */
 
 /**
@@ -40,46 +43,35 @@ function offline_coupon_services_resources() {
             ),
           ),
         ),
-      )
+      ),
     ),
   );
 
   return $offline_coupon_resources;
 }
 
+/**
+ * Function offline_coupon_resource_redeem().
+ *
+ * @param string $code
+ *   String Merchant code or Order mail.
+ * @param int $voucher_id
+ *   Node ID.
+ */
 function offline_coupon_resource_redeem($code, $voucher_id) {
-  global $user;
-  // get voucher node
-  $voucher = entity_metadata_wrapper('node', $voucher_id);
-  if ($voucher) {
-    $voucher_code = $voucher
-        ->field_simple_coupon
-        ->field_product[0]
-        ->field_merchant_code
-        ->value();
-    // check publish, user and code
-    if ($voucher->author->getIdentifier() == $user->uid &&
-        $voucher->status->value() == 1) {
-      $v_code = array_map('trim',explode(",", $voucher_code));
-      if (!in_array(strtoupper($code), $v_code)) {
-        return services_error(t('Invalid merchant code'), 406);
-      }
-      $kode = (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : "";
-      $msg = "REDEEM BERHASIL!!!<br>";
-      $msg .= t("Kode diskon: ") . $kode;
-      $msg .= "<br>" . $voucher->title->value();
-      $voucher->status->set(0);
-      $voucher->title->set($voucher->title->value() . '-' . $code);
-      $voucher->save();
-      return $msg;
-    }
-    return services_error(t('Invalid Voucher'), 406);
+  // Call offline coupon redeem function.
+  $voucher = _offline_coupon_redeem($code, $voucher_id);
+  // Check if can get voucher data.
+  if (!empty($voucher)) {
+    // Do not mess around with this message: disturb iOS apps.
+    $msg = "REDEEM BERHASIL!!!<br>";
+    $msg .= t("Kode diskon: ") . $voucher['code'];
+    $msg .= "<br>" . $voucher['title'];
+    return $msg;
   }
-  else {
-    return services_error(t('Invalid Voucher'), 406);
-  }
+  // Other condition: Invalid Voucher.
+  return services_error(t('Invalid Voucher'), 406);
 }
-
 
 /**
  * Implements hook_forms().
@@ -97,19 +89,30 @@ function offline_coupon_forms($form_id, $args) {
   return $forms;
 }
 
-
-/* implement hook_form */
+/**
+ * Function offline_coupon_redeem_form().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ * @param int $voucher_id
+ *   Voucher ID.
+ *
+ * @return array
+ *   Form array.
+ */
 function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
   $form = array();
+
   $form['merchant_code'] = array(
     '#type' => 'textfield',
     '#size' => 10,
     '#maxlength' => 100,
     '#required' => FALSE,'#attributes' => array(
       'class' => array('input-text'),
-      'placeholder' => t('Merchant Code')
+      'placeholder' => t('Merchant Code'),
     ),
-
   );
 
   $form['voucher_id'] = array(
@@ -122,44 +125,101 @@ function offline_coupon_redeem_form($form, &$form_state, $voucher_id) {
     '#attributes' => array(
       'class' => array('btn', 'style1'),
     ),
-    '#value' => t('Redeem')
+    '#value' => t('Redeem'),
   );
 
   return $form;
 }
 
+/**
+ * Function offline_coupon_redeem_form_submit().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
 function offline_coupon_redeem_form_submit($form, &$form_state) {
-  global $user;
+  // Redeem the coupon.
+  $voucher = _offline_coupon_redeem($form_state['values']['merchant_code'], $form_state['values']['voucher_id']);
+  // Check the result.
+  if (!empty($voucher)) {
+    // Show message that redeem success.
+    drupal_set_message(t('REDEEM BERHASIL!!!<div class="voucher-code">Kode diskon: @code</div>@title', array(
+      '@code' => $voucher['code'],
+      '@title' => $voucher['title'],
+    )));
+  }
+  else {
+    // Other condition: give error message: Invalid voucher.
+    drupal_set_message(t('Invalid voucher.'), 'error');
+  }
+}
 
-  // get voucher node
-  $voucher = entity_metadata_wrapper('node', $form_state['values']['voucher_id']);
+/**
+ * Function _offline_coupon_redeem().
+ *
+ * @param string $code
+ *   Voucher merchant code or valid order mail address.
+ * @param int $voucher_id
+ *   Voucher node ID.
+ *
+ * @return mixed
+ *   Array of voucher data or FALSE.
+ */
+function _offline_coupon_redeem($code, $voucher_id) {
+  global $user;
+  // Define default value is_voucher_valid.
+  $is_voucher_valid = FALSE;
+  // Voucher ID must integer value.
+  $voucher_id = intval($voucher_id);
+  // Get voucher wrapper.
+  $voucher = entity_metadata_wrapper('node', $voucher_id);
   if ($voucher) {
-    $voucher_code = $voucher
+    // Checking:
+    // 1. Voucher is still published.
+    // 2. Voucher is owned by user.
+    if ($voucher->author->getIdentifier() == $user->uid
+      && $voucher->status->value() == 1
+    ) {
+      // Get voucher code.
+      $voucher_code = $voucher
         ->field_simple_coupon
         ->field_product[0]
         ->field_merchant_code
         ->value();
-    // check publish, user and code
-    if ($voucher->author->getIdentifier() == $user->uid &&
-        $voucher->status->value() == 1) {
-      $v_code = array_map('trim',explode(",", $voucher_code));
-      if (!in_array(strtoupper($form_state['values']['merchant_code']), $v_code)) {
-        drupal_set_message(t('Invalid merchant code.'), 'error');
-      } else {
-        $kode = (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : "";
-        $msg = "REDEEM BERHASIL!!!";
-        $msg .= "<div class='voucher-code'>" . t("Kode diskon: ") . $kode . "</div>";
-        $msg .= $voucher->title->value();
-        $voucher->status->set(0);
-        $voucher->title->set($voucher->title->value() . '-' . $form_state['values']['merchant_code']);
-        $voucher->save();
-        drupal_set_message($msg, 'status');
+      // Get merchant code.
+      $v_code = array_map('trim', explode(",", $voucher_code));
+      if (in_array(strtoupper($code), $v_code)) {
+        $is_voucher_valid = TRUE;
       }
-    } else {
-      drupal_set_message(t('Invalid voucher.'), 'error');
+      elseif (valid_email_address($code)) {
+        // Customer / merchant input using email.
+        // Get order id.
+        $order_id = $voucher
+          ->field_order_id
+          ->value();
+        // Get order wrapper.
+        $order_wrapper = entity_metadata_wrapper('commerce_order', $order_id);
+        // Caseless string comparison.
+        if (strcasecmp($order_wrapper->mail->value(), $code) == 0) {
+          $is_voucher_valid = TRUE;
+        }
+      }
+      // Check is voucher valid flag.
+      if ($is_voucher_valid) {
+        // Unpublish the voucher.
+        $voucher->status->set(0);
+        $voucher->title->set($voucher->title->value() . '-' . $code);
+        $voucher->save();
+        // Return array with voucher information.
+        return array(
+          'code' => (isset($voucher->field_unique_coupon_code)) ? $voucher->field_unique_coupon_code->value() : '',
+          'title' => $voucher->title->value(),
+        );
+      }
     }
-  } else {
-    drupal_set_message(t('Invalid voucher.'), 'error');
   }
-
+  // Other condition: return FALSE.
+  return FALSE;
 }

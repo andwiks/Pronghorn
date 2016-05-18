@@ -25,7 +25,5 @@ function sepulsa_s3fs_drush_command() {
 function drush_sepulsa_s3fs_copy_local()
 {
   _s3fs_copy_file_themes_to_s3();
-  watchdog('sepulsa_s3fs_copy_local', 'drush command: drush_sepulsa_s3fs_copy_local run!', array(
-    // '!device_account_id' => $device_uid,
-  ), WATCHDOG_INFO);
+  watchdog('sepulsa_s3fs_copy_local', 'drush command: drush_sepulsa_s3fs_copy_local run!', WATCHDOG_INFO);
 }

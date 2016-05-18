@@ -467,3 +467,4 @@ function _s3fs_refresh_cache_submit($form, &$form_state) {
 function _s3fs_copy_local_submit($form, &$form_state) {
   _s3fs_copy_file_system_to_s3($form_state['triggering_element']['#name']);
 }
+

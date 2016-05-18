@@ -270,7 +270,7 @@ class ReferralCampaignUIController extends EntityDefaultUIController {
         'title' => $ref->title,
         'start' => date('d M Y H:i:s', $ref->start),
         'end' => date('d M Y H:i:s', $ref->end),
-        'path' => $ref->path,
+        'path' => l($ref->path, $ref->path, array('attributes' => array('target' => '_blank'))),
         'operations' => $operations,
       );
     }

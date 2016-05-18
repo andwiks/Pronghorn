@@ -60,7 +60,13 @@ function sepulsa_referral_campaign_services_resource_request() {
     if ($list) {
       $return = array(
         'code' => _referral_uid2ref($user->uid),
-        'link_referral' => $base_url . '/' . $list[0]->path . '?code=' . _referral_uid2ref($user->uid),
+        'link_referral' => url($list[0]->path,
+          array(
+            'absolute' => TRUE,
+            'query' => array(
+              'code' => _referral_uid2ref($user->uid)
+            )
+          )),
       );
       return $return;
     }

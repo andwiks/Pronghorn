@@ -98,6 +98,60 @@ function sepulsa_referral_campaign_services_services_resources() {
  */
 
 /**
+ * Documentation callback for sepulsa_referral_campaign index.
+ */
+function sepulsa_referral_campaign_services_resource_index_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Index Referral code'),
+    '#description' => t('Index Referral code.'),
+    '#auth' => FALSE,
+    '#path' => 'sepulsa_referral_campaign',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/index  .json<br />GET',
+    // Example response. E.g., a JSON array.
+    '#response' => '// Return array all campaign.<br />[
+      {
+        "src_id": "2",
+        "title": "test 2",
+        "machine_name": "test_2",
+        "start": "1261085200",
+        "end": "1261171599",
+        "path": "admin",
+        "rules_name": "rules_order_referral",
+        "created": "1261120746",
+        "changed": "1261120746"
+      },
+      {
+        "src_id": "3",
+        "title": "test 3",
+        "machine_name": "test_3",
+        "start": "1461085200",
+        "end": "1461171599",
+        "path": "admin",
+        "rules_name": "rules_order_referral",
+        "created": "1461120746",
+        "changed": "1461120746"
+      }
+    ]',
+    // Errors.
+    '#errors' => array(
+      'invalid_uid' => array(
+        '#question' => '401 Unauthorized: Invalid UID.',
+        '#description' => t('Invalid UID.'),
+        '#response' => '["Invalid UID."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
  * Documentation callback for sepulsa_referral_campaign action request.
  */
 function sepulsa_referral_campaign_services_resource_request_doc() {
@@ -108,7 +162,7 @@ function sepulsa_referral_campaign_services_resource_request_doc() {
     '#auth' => FALSE,
     '#path' => 'sepulsa_referral_campaign/request',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/request  .json<br />POST token data application/json: {"uid":"1"}',
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/request  .json<br />POST',
     // Example response. E.g., a JSON array.
     '#response' => '// Return Referral code.<br />{
         "code": "6c6f6362",

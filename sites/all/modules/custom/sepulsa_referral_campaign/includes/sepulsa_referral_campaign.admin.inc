@@ -312,7 +312,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     $entity->machine_name = $machine_name;
     $entity->start = $start;
     $entity->end = $end;
-    $entity->path = $form_state['values']['path'];
+    $entity->path = url($form_state['values']['path'], array('absolute' => TRUE));
     $entity->rules_name = $form_state['values']['rules_name'];
     $entity->changed = strtotime('now');
     $entity->save();
@@ -334,7 +334,7 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
       'machine_name' => $machine_name,
       'start' => $start,
       'end' => $end,
-      'path' => $form_state['values']['path'],
+      'path' => url($form_state['values']['path'], array('absolute' => TRUE)),
       'flag_first_order' => $form_state['values']['flag_first_order'],
       'rules_name' => $form_state['values']['rules_name'],
       'rules_name_referral' => $form_state['values']['rules_name_referral'],

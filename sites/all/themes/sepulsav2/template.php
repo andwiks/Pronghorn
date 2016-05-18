@@ -262,6 +262,57 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
     $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
   }
+
+  if($form['#node']->uuid=='22ed402d-062b-40d8-81a3-8b85cabdf943'){
+    $form['#validate'][] = 'sepulsa_UOBacquisitioncampaign_validation';
+  }
+}
+
+function sepulsa_UOBacquisitioncampaign_validation(&$form, &$form_state)
+{
+  global $user;
+  $pattern_no_hp = '^((?:\+62|62)|0)[2-9]{1}[0-9]+$';
+  $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
+  $no_hp = $form_state['input']['submitted']['no_hp'];
+  $nama_lengkap = $form_state['input']['submitted']['nama_lengkap'];
+  $kode_pos = $form_state['input']['submitted']['kode_pos'];
+  $kota = $form_state['input']['submitted']['kota'];
+  $no_ktp = $form_state['input']['submitted']['no_ktp'];
+  $alamat_email = $form_state['input']['submitted']['alamat_email'];
+  $jenis_kelamin = $form_state['input']['submitted']['jenis_kelamin'];
+  $day_lahir = $form_state['input']['submitted']['tanggal_lahir']['day'];
+  $month_lahir = $form_state['input']['submitted']['tanggal_lahir']['month'];
+  $year_lahir = $form_state['input']['submitted']['tanggal_lahir']['year'];
+
+  if ( empty($nama_lengkap) ) {
+    form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
+  }
+  if (empty($no_hp) && !preg_match($pattern_no_hp, $no_hp)){
+    form_set_error('no_hp', t('No HP harus diawali +62, 62, atau 08'));
+  }
+  if ( empty($kode_pos) ) {
+    form_set_error('kode_pos', t('Kode pos harus diisi'));
+  }
+  if ( empty($kota) ) {
+    form_set_error('kota', t('Kota harus diisi'));
+  }
+
+  if ( empty($alamat_email) && !valid_email_address($alamat_email) ) {
+    form_set_error('alamat_email', t('Alamat email harus diisi'));
+  }
+  if ( empty($jenis_kelamin) ) {
+    form_set_error('jenis_kelamin', t('Pilih jenis kelamin'));
+  }
+  if ( empty($day_lahir) || empty($month_lahir) || empty($year_lahir) ) {
+    form_set_error('tanggal_lahir', t('Tanggal lahir harus diisi'));
+  }
+  if ( empty($no_ktp) ) {
+    form_set_error('no_ktp', t('No KTP harus diisi'));
+  }
+  if ( empty($term_agree) ) {
+    form_set_error('term_agree agree', t('Terms & Conditions harus disetujui'));
+  }
+
 }
 
 /**

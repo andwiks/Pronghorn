@@ -265,6 +265,7 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
 
   if($form['#node']->uuid=='22ed402d-062b-40d8-81a3-8b85cabdf943'){
     $form['#validate'][] = 'sepulsa_UOBacquisitioncampaign_validation';
+    kpr($form_state['input']['submitted']);
   }
 }
 

@@ -1,7 +1,0 @@
-<?php
-/**
- * @file
- * Code for the UOB acquisition campaign feature.
- */
-
-include_once 'uob_acquisition_campaign.features.inc';

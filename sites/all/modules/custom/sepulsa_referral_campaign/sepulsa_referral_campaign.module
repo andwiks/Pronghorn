@@ -95,12 +95,17 @@ function sepulsa_referral_campaign_getlist($active = NULL) {
   $query = db_select('sepulsa_referral_campaign', 'src');
   $query->fields('src');
   if (!is_null($active)) {
-    if ($active == 'active') {
-      $query->condition('src.start', REQUEST_TIME, '<=');
-      $query->condition('src.end', REQUEST_TIME, '>=');
+    if ($active == 'active' || $active == 'nonactive') {
+      if ($active == 'active') {
+        $query->condition('src.start', REQUEST_TIME, '<=');
+        $query->condition('src.end', REQUEST_TIME, '>=');
+      }
+      else {
+        $query->condition('src.end', REQUEST_TIME, '<=');
+      }
     }
     else {
-      $query->condition('src.end', REQUEST_TIME, '<=');
+      return 'invalid';
     }
   }
   $result = $query->execute();

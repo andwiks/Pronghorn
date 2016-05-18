@@ -360,6 +360,10 @@ function sepulsa_referral_campaign_commerce_order_presave($order) {
                 ->fields(array('flag' => 1, 'flag_timestamp' => REQUEST_TIME))
                 ->condition('ref_id', $details->ref_id, '=')
                 ->execute();
+        watchdog('sepulsa_referral_campaign',
+          'Update flag referral_campaign_details ref_id : @ref_id, flag : 1, flag_timestamp : @time',
+          array('@ref_id' => $details->ref_id, '@time' => REQUEST_TIME), WATCHDOG_NOTICE,
+          'update');
       }
     }
   }

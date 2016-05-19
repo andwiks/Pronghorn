@@ -179,6 +179,18 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
 
         // Check device status: blocked.
         if (empty($check['device_status'])) {
+
+          // Check mail verification status new_flag=0 (already merged).
+          $q_d_block = db_select('device', 'd');
+          $q_d_block->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
+          $q_d_block->condition('d.did', $did);
+          $q_d_block->condition('d.status', 0);
+          $q_d_block->condition('dmv.new_flag', 0, '=');
+          $device_block = $q_d_block->execute()->fetchAssoc();
+          if (!empty($device_block)) {
+            return services_error(t('Akses akun ini sudah dipindah untuk device lain.'), 401);
+          }
+          // Other condition.
           return services_error(t('Device has been blocked.'), 401);
         }
 
@@ -498,12 +510,9 @@ function device_services_resource_mail($mail = '') {
     $rdevice = $qdevice->execute()->fetchAssoc();
 
     if (!empty($rdevice)) {
-      $msg = 'Email ' . $mail . ' sudah terdaftar di device lain. Apakah Anda yakin ingin menggunakan email tersebut untuk device ini?';
-
       $msg = t('Email @email sudah terdaftar di device lain. Apakah Anda yakin ingin menggunakan email tersebut untuk device ini?',
         array('@email' => $mail)
       );
-
       return services_error($msg, 406);
     }
 

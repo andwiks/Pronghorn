@@ -266,6 +266,13 @@ function device_operate_load($op = '') {
         'title' => t('Reset OTP'),
       );
       break;
+
+    case 'resend_mail_verification':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Resend Mail Verification'),
+      );
+      break;
   }
   return !empty($operation) ? $operation : FALSE;
 }
@@ -493,4 +500,36 @@ function device_unblock($did) {
   $device_wrapper = entity_metadata_wrapper('device', $did);
   $device_wrapper->status->set(1);
   $device_wrapper->save();
+}
+
+
+/**
+ * Function resend_mail_verification().
+ *
+ * resend_mail_verification device.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_resend_mail_verification($did) {
+  // Check device_verification & device_mail_verification
+    $query_dmv = db_select('device', 'd');
+    $query_dmv->join('device_verification', 'dv', 'dv.did = d.did');
+    $query_dmv->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
+    $query_dmv->condition('d.did', $did, '=');
+    $query_dmv->condition('d.status', 1, '=');
+    $query_dmv->condition('dv.status', 1, '=');
+    $query_dmv->condition('dmv.status', 1, '!=');
+    $query_dmv->fields('d');
+    $query_dmv->addField('d', 'status', 'd_status');
+    $query_dmv->addField('dv', 'status', 'dv_status');
+    $query_dmv->addField('dmv', 'status', 'dmv_status');
+    $query_dmv->addField('dmv', 'mail');
+    $query_dmv->fields('dv', array('phone'));
+    $result_dmv = $query_dmv->execute()->fetchAssoc();
+
+  if(!empty($result_dmv['mail']) && !empty($result_dmv['did'])){
+    // drupal_set_message('kirim email pake: device_mail_verification_send_verification','status', FALSE);
+    device_mail_verification_send_verification($result_dmv['mail'],$result_dmv['did']);
+  }
 }

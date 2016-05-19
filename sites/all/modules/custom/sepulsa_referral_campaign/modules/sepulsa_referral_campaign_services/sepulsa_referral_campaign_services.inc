@@ -80,9 +80,11 @@ function sepulsa_referral_campaign_services_resource_request() {
           array(
             'absolute' => TRUE,
             'query' => array(
-              'code' => _referral_uid2ref($user->uid)
-            )
-          )),
+              'code' => _referral_uid2ref($user->uid),
+            ),
+          )
+        ),
+        'src_id' => $list[0]->src_id,
       );
       return $return;
     }

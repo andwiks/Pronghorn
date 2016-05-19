@@ -28,6 +28,21 @@ function sepulsa_referral_campaign_services_services_resources() {
             'token' => 'required',
           ),
         ),
+        'retrieve' => array(
+          'help' => 'retrieve Active Campaign',
+          'callback' => 'sepulsa_referral_campaign_services_resource_retrieve',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'args' => array(),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_retrieve_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+        ),
       ),
       'actions' => array(
         'request' => array(

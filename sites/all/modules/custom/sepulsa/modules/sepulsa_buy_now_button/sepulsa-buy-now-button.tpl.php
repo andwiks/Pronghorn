@@ -4,6 +4,11 @@
  * Sepulsa Buy Now Button TPL.
  */
 
+// Add css for this block only.
+drupal_add_css('sites/all/modules/custom/sepulsa/modules/sepulsa_buy_now_button/css/sepulsa-buy-now-button.css', array(
+  'weight' => 8,
+));
+
 $array_query = array();
 if (isset($_COOKIE['utm_source_cookie']) &&
   !empty($_COOKIE['utm_source_cookie'])) {

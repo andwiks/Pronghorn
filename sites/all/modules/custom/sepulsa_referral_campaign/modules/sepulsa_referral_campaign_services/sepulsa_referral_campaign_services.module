@@ -114,6 +114,33 @@ function sepulsa_referral_campaign_services_services_resources() {
           ),
           'args' => array(),
         ),
+        'status' => array(
+          'help' => 'Get uplink and downlink referral in spesific campaign.',
+          'callback' => 'sepulsa_referral_campaign_services_resource_status',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'sepulsa_referral_campaign_services',
+            'name' => 'sepulsa_referral_campaign_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'sepulsa_referral_campaign_services_resource_status_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+          'args' => array(
+            array(
+              'name' => 'id',
+              'type' => 'string',
+              'description' => 'A valid campaign ID.',
+              'source' => array(
+                'data' => 'id',
+                'param' => 'id',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
       ),
     ),
   );
@@ -352,4 +379,11 @@ function sepulsa_referral_campaign_services_resource_retrieve_doc() {
     ),
   );
   return $element;
+}
+
+/**
+ * Documentation callback for sepulsa_referral_campaign action status.
+ */
+function sepulsa_referral_campaign_services_resource_status_doc() {
+
 }

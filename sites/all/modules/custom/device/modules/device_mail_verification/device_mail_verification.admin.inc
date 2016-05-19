@@ -400,7 +400,7 @@ function device_mail_verification_admin_merge($mail = '', $device_did = '', $dev
     $dua = $device_uid;
   }
 
-  watchdog('Device Mail Verification',
+  watchdog('device_mail_verification',
           'Merge User Strategi !strategi ->  UID: !satu merge to !merge_to UID: !dua , changed UID commerce_order : !changed_uid_order',
           array(
             '!merge_to' => $merge_to,

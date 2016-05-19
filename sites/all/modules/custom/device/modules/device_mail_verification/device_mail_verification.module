@@ -171,6 +171,7 @@ function device_mail_verification_theme() {
  *   String update_uid.
  */
 function device_mail_verification_transfer_order($current_uid = '', $update_uid = '') {
+
   $result = array();
   // Get merge order status settings.
   $status = variable_get('device_mail_merge_order_status', array(
@@ -244,4 +245,60 @@ function device_mail_verification_transfer_order($current_uid = '', $update_uid 
     '@result' => print_r($result, TRUE),
     '@oids' => print_r($oids, TRUE),
   ), WATCHDOG_INFO);
+
+
+  // 1] move voucher $current_uid ke $update_uid | mis: uid 25790
+  $query_owned_coupon = new EntityFieldQuery();
+  $query_owned_coupon->entityCondition('entity_type', 'node')
+    // ->entityCondition('bundle', 'owned_unique_coupon') // ex. article
+    ->propertyCondition('uid', $current_uid) // node authored by a specific user
+    ->propertyCondition('status', 1); // published nodes
+  $result = $query_owned_coupon->execute();
+
+  $voucher_ids = array_keys($result['node']);
+
+  if(!empty($voucher_ids)){
+    foreach ($voucher_ids as $voucher_id) {
+      $voucher_wrapper = entity_metadata_wrapper('node', $voucher_id);
+      $voucher_wrapper->author->set($update_uid);
+      $voucher_wrapper->save();
+    }
+    // Log this condition.
+    watchdog('device_mail_verification', 'Transfer Voucher @cuid to @uuid. Voucher: <pre>@voucher</pre>', array(
+      '@cuid' => $current_uid,
+      '@uuid' => $update_uid,
+      '@voucher' => print_r($voucher_ids, TRUE),
+    ), WATCHDOG_INFO);
+  }
+
+  // 2] ambil userpoint dari $current_uid ke $update_uid
+  $current_uid_points = userpoints_get_current_points($current_uid, 'all');
+
+  if($current_uid_points >0 ){
+    $increase_point = array(
+      'uid' => $update_uid,
+      'points' => ($current_uid_points <= 0) ? 0 : $current_uid_points,
+      'tid' => 0,
+      'description' => 'Add userpoints from UID: '.$current_uid,
+    );
+    $set_increase_point = userpoints_userpointsapi($increase_point);
+
+    $decrease_point = array(
+      'uid' => $current_uid,
+      'points' => ($current_uid_points <= 0) ? 0 : -$current_uid_points,
+      'tid' => 0,
+      'description' => 'Move userpoints to UID: '.$update_uid,
+    );
+    $set_decrease_point = userpoints_userpointsapi($decrease_point);
+
+    // Log this condition.
+    watchdog('device_mail_verification', 'Transfer Points (@c_uid_points) @cuid to @uuid. Increase Points: <pre>@s_d_p</pre> Increase Points: <pre>@s_i_p</pre>', array(
+      '@cuid' => $current_uid,
+      '@uuid' => $update_uid,
+      '@c_uid_points' => $current_uid_points,
+      '@s_i_p' => print_r($set_increase_point, TRUE),
+      '@s_d_p' => print_r($set_decrease_point, TRUE),
+    ), WATCHDOG_INFO);
+  }
+
 }

@@ -56,8 +56,22 @@ function sepulsa_referral_campaign_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'desc_benefit' => array(
+        'description' => 'Description benefit for refer user',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
       'rules_name_referral' => array(
         'description' => 'Rules Name for referer user',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'desc_benefit_referral' => array(
+        'description' => 'Description benefit for referer user',
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,

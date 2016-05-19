@@ -51,7 +51,6 @@ return array (
                     'type' => 'string',
                     'location' => 'json',
                     'minLength' => 36,
-                    'maxLength' => 36,
                 ),
                 'InstanceIds' => array(
                     'type' => 'array',
@@ -61,8 +60,6 @@ return array (
                     'items' => array(
                         'name' => 'InstanceId',
                         'type' => 'string',
-                        'minLength' => 10,
-                        'maxLength' => 10,
                     ),
                 ),
             ),
@@ -110,8 +107,6 @@ return array (
                     'required' => true,
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
                 'Parameters' => array(
                     'type' => 'object',
@@ -193,8 +188,6 @@ return array (
                             ),
                             'InstanceId' => array(
                                 'type' => 'string',
-                                'minLength' => 10,
-                                'maxLength' => 10,
                             ),
                             'Parameters' => array(
                                 'type' => 'object',
@@ -330,8 +323,6 @@ return array (
                     'required' => true,
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
             ),
             'errorResponses' => array(
@@ -429,8 +420,6 @@ return array (
                     'required' => true,
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
             ),
             'errorResponses' => array(
@@ -698,13 +687,10 @@ return array (
                     'type' => 'string',
                     'location' => 'json',
                     'minLength' => 36,
-                    'maxLength' => 36,
                 ),
                 'InstanceId' => array(
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
                 'MaxResults' => array(
                     'type' => 'numeric',
@@ -786,13 +772,10 @@ return array (
                     'type' => 'string',
                     'location' => 'json',
                     'minLength' => 36,
-                    'maxLength' => 36,
                 ),
                 'InstanceId' => array(
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
                 'MaxResults' => array(
                     'type' => 'numeric',
@@ -941,8 +924,6 @@ return array (
                     'items' => array(
                         'name' => 'InstanceId',
                         'type' => 'string',
-                        'minLength' => 10,
-                        'maxLength' => 10,
                     ),
                 ),
                 'DocumentName' => array(
@@ -959,7 +940,6 @@ return array (
                 'Comment' => array(
                     'type' => 'string',
                     'location' => 'json',
-                    'maxLength' => 100,
                 ),
                 'Parameters' => array(
                     'type' => 'object',
@@ -979,12 +959,10 @@ return array (
                     'type' => 'string',
                     'location' => 'json',
                     'minLength' => 3,
-                    'maxLength' => 63,
                 ),
                 'OutputS3KeyPrefix' => array(
                     'type' => 'string',
                     'location' => 'json',
-                    'maxLength' => 500,
                 ),
             ),
             'errorResponses' => array(
@@ -1044,8 +1022,6 @@ return array (
                     'required' => true,
                     'type' => 'string',
                     'location' => 'json',
-                    'minLength' => 10,
-                    'maxLength' => 10,
                 ),
                 'AssociationStatus' => array(
                     'required' => true,
@@ -1068,11 +1044,9 @@ return array (
                         'Message' => array(
                             'required' => true,
                             'type' => 'string',
-                            'maxLength' => 1024,
                         ),
                         'AdditionalInfo' => array(
                             'type' => 'string',
-                            'maxLength' => 1024,
                         ),
                     ),
                 ),

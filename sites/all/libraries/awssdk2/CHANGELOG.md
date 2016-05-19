@@ -1,5 +1,44 @@
 # CHANGELOG
 
+## 2.8.30 - 2016-05-03
+
+* `Aws\Lambda` - Fixed bug in `UpdateFunctionCode`.
+
+## 2.8.29 - 2016-04-11
+
+* `Aws\Lambda` - Fixed bug in `UpdateFunctionCode`.
+
+## 2.8.28 - 2016-04-05
+
+* `Aws\Common` - Fixed a race condition caused by credentials expiring and being
+  refreshed after a request signature had been partially calculated.
+
+## 2.8.27 - 2016-01-29
+
+* Remove all 'maxLength' constraints from models. This validation will be
+  handled server-side.
+
+## 2.8.26 - 2016-01-29
+
+* `Aws\Ssm` - Added support for long EC2 instance IDs.
+
+## 2.8.25 - 2016-01-25
+
+* `Aws\AutoScaling` - Added support for setting and describing instance
+  protection status.
+* `Aws\CloudFront` - Added support using AWS ACM certificates with CloudFront
+  distributions.
+* `Aws\CloudFront` - Added support for new origin security features.
+* `Aws\CloudFront` - Added support for GZip compression.
+* `Aws\Ec2` - Added support for EC2 dedicated hosts.
+* `Aws\Ec2` - Added support for scheduled instances.
+* `Aws\Ec2` - Added support for DNS resolution of public hostnames to private IP
+  addresses when queried over ClassicLink. Additionally, private hosted zones
+  associated with your VPC can now be accessed from a linked EC2-Classic
+  instance.
+* `Aws\Ec2` - Added support for managed NATs.
+* `Aws\Ec2` - Added support for specifying encryption on CopyImage commands.
+
 ## 2.8.24 - 2015-11-16
 
 * `Aws\DeviceFarm` - Added support for managing projects, device pools, runs,
@@ -120,7 +159,7 @@
 ## 2.8.13 - 2015-07-09
 
 * `Aws\AutoScaling` - Added support for step policies.
-* `Aws\CodeCommit` - Added support for AWS CodeCommit, a secure, highly 
+* `Aws\CodeCommit` - Added support for AWS CodeCommit, a secure, highly
   scalable, managed source control service that hosts private Git repositories.
 * `Aws\CodePipeline` - Added support for AWS CodePipeline, a continuous delivery
   service that enables you to model, visualize, and automate the steps required
@@ -136,15 +175,15 @@
 ## 2.8.11 - 2015-06-24
 
 * `Aws\CloudFront` - Added support for configurable `MaxTTL` and `DefaultTTL`.
-* `Aws\ConfigService` - Added support for recording changes for specific 
+* `Aws\ConfigService` - Added support for recording changes for specific
   resource types.
-* `Aws\Ecs` - Added support for sorting, deregistering, and overriding 
+* `Aws\Ecs` - Added support for sorting, deregistering, and overriding
   environment variables for task definitions.
-* `Aws\Glacier` - Added support for the `AddTagsToVault`, `ListTagsForVault`, 
+* `Aws\Glacier` - Added support for the `AddTagsToVault`, `ListTagsForVault`,
   and `RemoveTagsFromVault` API operations.
-* `Aws\OpwWorks` - Added support for specifying agent versions to be used on 
+* `Aws\OpwWorks` - Added support for specifying agent versions to be used on
   instances.
-* `Aws\Redshift` - Added support for the `CreateSnapshotCopyGrant`, 
+* `Aws\Redshift` - Added support for the `CreateSnapshotCopyGrant`,
   `DescribeSnapshotCopyGrants`, and `DeleteSnapshotCopyGrant` API operations.
 * Fixed empty list serialization for Elastic Load Balancing and CloudFormation
   operations.
@@ -235,11 +274,11 @@ for details about any changes you may need to make to your code for this upgrade
 * `Aws\WorkSpaces` - Added support for the Amazon WorkSpaces service.
 * `Aws\Ecs` - Added support for the ECS service scheduler operations.
 * `Aws\S3` - Added support for the `getBucketNotificationConfiguration` and
-  `putBucketNotificationConfiguration` operations to the `S3Client` to replace 
+  `putBucketNotificationConfiguration` operations to the `S3Client` to replace
   the, now deprecated, `getBucketNotification` and `putBucketNotification`
   operations.
 * [BC] `Aws\Lambda` - Added support for the new AWS Lambda API, which has been
-  changed based on customer feedback during Lambda's preview period. 
+  changed based on customer feedback during Lambda's preview period.
 * `Aws\Common` - Deprecated "facades". They will not be present in Version 3 of
   the SDK.
 * `Aws\Common` - Added `getAwsErrorCode`, `getAwsErrorType` and `getAwsRequestId`

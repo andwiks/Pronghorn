@@ -30,6 +30,22 @@ function sepulsa_referral_campaign_services_resource_index() {
 }
 
 /**
+ * Function sepulsa_referral_campaign_services_resource_retrieve().
+ */
+function sepulsa_referral_campaign_services_resource_retrieve($id) {
+  global $user;
+  if ($user->uid > 0) {
+    // List sepulsa campaign.
+    $details = sepulsa_referral_campaign_load($id);
+    if (!empty($details)) {
+      return $details;
+    }
+    return services_error(t('Campaign is not active.'), 406);
+  }
+  return services_error(t('Invalid User.'), 401);
+}
+
+/**
  * Function sepulsa_referral_campaign_services_resource_getcampaign().
  */
 function sepulsa_referral_campaign_services_resource_getcampaign() {

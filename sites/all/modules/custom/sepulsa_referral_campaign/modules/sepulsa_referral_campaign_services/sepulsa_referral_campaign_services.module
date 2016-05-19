@@ -36,7 +36,19 @@ function sepulsa_referral_campaign_services_services_resources() {
             'module' => 'sepulsa_referral_campaign_services',
             'name' => 'sepulsa_referral_campaign_services',
           ),
-          'args' => array(),
+          'args' => array(
+            array(
+              'name' => 'id',
+              'type' => 'string',
+              'description' => 'Campaign ID',
+              'source' => array(
+                'data' => 'id',
+                'param' => 'id',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'GET',
+            ),
+          ),
           'access callback' => 'services_access_menu',
           'documentation callback' => 'sepulsa_referral_campaign_services_resource_retrieve_doc',
           'jwt' => array(
@@ -322,6 +334,11 @@ function sepulsa_referral_campaign_services_resource_retrieve_doc() {
     ]',
     // Errors.
     '#errors' => array(
+      'invalid_campaing_id' => array(
+        '#question' => '406 Not Acceptable: Campaign is not active.',
+        '#description' => t('Campaign is not active.'),
+        '#response' => '["Campaign is not active."]',
+      ),
       'invalid_uid' => array(
         '#question' => '401 Unauthorized: Invalid UID.',
         '#description' => t('Invalid UID.'),

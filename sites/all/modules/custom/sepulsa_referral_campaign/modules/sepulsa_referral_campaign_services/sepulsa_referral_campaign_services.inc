@@ -148,3 +148,96 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
   }
   return services_error(t('Invalid User.'), 401);
 }
+
+/**
+ * Function sepulsa_referral_campaign_services_resource_status().
+ */
+function sepulsa_referral_campaign_services_resource_status($id = '') {
+  global $user;
+  if ($user->uid > 0) {
+    // Check id from body service.
+    if ($id != '') {
+      // Get details campaign.
+      $details = sepulsa_referral_campaign_load($id);
+      // Check whether detail is exist or not.
+      if (!empty($details)) {
+        // Get uplink / downlink from campaign. (default mode : all)
+        $link = sepulsa_referral_camapign_getlink($id,
+          $details[0]->src_id);
+        if ($link) {
+          return $link;
+        }
+        return services_error(t('Invalid Mode link (uplink / downlink).'), 406);
+      }
+      return services_error(t('Invalid Campaign ID.'), 406);
+    }
+    return services_error(t('Invalid Campaign ID.'), 406);
+  }
+  return services_error(t('Invalid User.'), 401);
+}
+
+/**
+ * Function sepulsa_referral_camapign_getlink().
+ *
+ * @param string $uid
+ *   User ID.
+ * @param string $src_id
+ *   Campaign ID (src = sepulsa_referral_campaign [tablename]).
+ * @param string $mode
+ *   Mode for this function default : all , another mode uplink / downlink.
+ */
+function sepulsa_referral_camapign_getlink($uid, $src_id, $mode = 'all') {
+  switch ($mode) {
+    case 'uplink':
+      // Query for uplink user.
+      $query = db_select('referral_campaign_details', 'rcd');
+      $query->fields('rcd');
+      $query->condition('rcd.uid', $uid);
+      $query->condition('rcd.src_id', $src_id);
+      $result = $query->execute();
+      foreach ($result as $key => $value) {
+        $return['uplink'][] = $value;
+      }
+      break;
+
+    case 'downlink':
+      // Query for downlink user.
+      $query = db_select('referral_campaign_details', 'rcd');
+      $query->fields('rcd');
+      $query->condition('rcd.referral_uid', $uid);
+      $query->condition('rcd.src_id', $src_id);
+      $result = $query->execute();
+      foreach ($result as $key => $value) {
+        $return['downlink'][] = $value;
+      }
+      break;
+
+    case 'all':
+      // Query for uplink user.
+      $query = db_select('referral_campaign_details', 'rcd');
+      $query->fields('rcd');
+      $query->condition('rcd.uid', $uid);
+      $query->condition('rcd.src_id', $src_id);
+      $result = $query->execute();
+      foreach ($result as $key => $value) {
+        $return['uplink'][] = $value;
+      }
+
+      // Query for downlink user.
+      $query = db_select('referral_campaign_details', 'rcd');
+      $query->fields('rcd');
+      $query->condition('rcd.referral_uid', $uid);
+      $query->condition('rcd.src_id', $src_id);
+      $result = $query->execute();
+      foreach ($result as $key => $value) {
+        $return['downlink'][] = $value;
+      }
+      break;
+
+    default:
+      $return = FALSE;
+      break;
+  }
+
+  return $return;
+}

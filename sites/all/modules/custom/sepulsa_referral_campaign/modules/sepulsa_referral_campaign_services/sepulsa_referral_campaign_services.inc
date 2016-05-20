@@ -162,14 +162,20 @@ function sepulsa_referral_campaign_services_resource_status($id = '') {
       // Check whether detail is exist or not.
       if (!empty($details)) {
         // Get uplink / downlink from campaign. (default mode : all)
-        $link = sepulsa_referral_camapign_getlink($id,
-          $details[0]->src_id);
-        if ($link) {
-          return $link;
+        $link = sepulsa_referral_campaign_getlink($user->uid,
+          $id);
+        if (!empty($link)) {
+          if ($link != 'invalid_mode') {
+            return $link;
+          }
+          return services_error(t('Invalid Mode link (uplink / downlink).'), 406);
         }
-        return services_error(t('Invalid Mode link (uplink / downlink).'), 406);
+        $msg = array(
+          'msg' => 'Empty result.',
+        );
+        return $msg;
       }
-      return services_error(t('Invalid Campaign ID.'), 406);
+      return services_error(t('Missing Argument Campaign ID.'), 406);
     }
     return services_error(t('Invalid Campaign ID.'), 406);
   }
@@ -177,7 +183,7 @@ function sepulsa_referral_campaign_services_resource_status($id = '') {
 }
 
 /**
- * Function sepulsa_referral_camapign_getlink().
+ * Function sepulsa_referral_campaign_getlink().
  *
  * @param string $uid
  *   User ID.
@@ -186,7 +192,7 @@ function sepulsa_referral_campaign_services_resource_status($id = '') {
  * @param string $mode
  *   Mode for this function default : all , another mode uplink / downlink.
  */
-function sepulsa_referral_camapign_getlink($uid, $src_id, $mode = 'all') {
+function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'all') {
   switch ($mode) {
     case 'uplink':
       // Query for uplink user.
@@ -235,7 +241,7 @@ function sepulsa_referral_camapign_getlink($uid, $src_id, $mode = 'all') {
       break;
 
     default:
-      $return = FALSE;
+      $return = 'invalid_mode';
       break;
   }
 

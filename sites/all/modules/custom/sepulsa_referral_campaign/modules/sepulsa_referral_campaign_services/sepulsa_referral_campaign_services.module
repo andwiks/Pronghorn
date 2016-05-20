@@ -42,11 +42,9 @@ function sepulsa_referral_campaign_services_services_resources() {
               'type' => 'string',
               'description' => 'Campaign ID',
               'source' => array(
-                'data' => 'id',
-                'param' => 'id',
+                'path' => 0,
               ),
               'optional' => FALSE,
-              'http_method' => 'GET',
             ),
           ),
           'access callback' => 'services_access_menu',
@@ -385,5 +383,82 @@ function sepulsa_referral_campaign_services_resource_retrieve_doc() {
  * Documentation callback for sepulsa_referral_campaign action status.
  */
 function sepulsa_referral_campaign_services_resource_status_doc() {
-
+  global $base_url;
+  $element = array(
+    '#name' => t('Check status uplink / downlink user.'),
+    '#description' => t('Check status uplink / downlink user.'),
+    '#auth' => TRUE,
+    '#path' => 'sepulsa_referral_campaign/status',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/status  .json<br />POST token data application/json: {"id":"2"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '// Return Boolean True.<br />{
+      "uplink": [
+        {
+          "ref_id": "1",
+          "src_id": "1",
+          "uid": "38055",
+          "referral_uid": "1",
+          "created": "1463712154",
+          "flag": "0",
+          "flag_timestamp": "0",
+          "host": "",
+          "http_referer": ""
+        }
+      ],
+      "downlink": [
+        {
+          "ref_id": "2",
+          "src_id": "1",
+          "uid": "2",
+          "referral_uid": "38055",
+          "created": "1463712154",
+          "flag": "0",
+          "flag_timestamp": "0",
+          "host": "",
+          "http_referer": ""
+        },
+        {
+          "ref_id": "3",
+          "src_id": "1",
+          "uid": "3",
+          "referral_uid": "38055",
+          "created": "1463712154",
+          "flag": "0",
+          "flag_timestamp": "0",
+          "host": "",
+          "http_referer": ""
+        }
+      ]
+    }',
+    // Errors.
+    '#errors' => array(
+      'invalid_uid' => array(
+        '#question' => '401 Unauthorized: Invalid UID.',
+        '#description' => t('Invalid UID.'),
+        '#response' => '["Invalid UID."]',
+      ),
+      'invalid_mode' => array(
+        '#question' => '406 Not Acceptable: Invalid Mode link (uplink / downlink).',
+        '#description' => t('Invalid Mode link (uplink / downlink).'),
+        '#response' => '["Invalid Mode link (uplink / downlink)."]',
+      ),
+      'missing_arg' => array(
+        '#question' => '406 Not Acceptable: Missing Argument Campaign ID.',
+        '#description' => t('Missing Argument Campaign ID.'),
+        '#response' => '["Missing Argument Campaign ID."]',
+      ),
+      'invalid_srcid' => array(
+        '#question' => '406 Not Acceptable: Invalid Campaign ID.',
+        '#description' => t('Invalid Campaign ID.'),
+        '#response' => '["Invalid Campaign ID."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
 }

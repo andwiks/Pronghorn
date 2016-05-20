@@ -249,6 +249,17 @@ function device_services_services_resources() {
               'optional' => FALSE,
               'http_method' => 'POST',
             ),
+            array(
+              'name' => 'confirm',
+              'type' => 'int',
+              'description' => 'Confirmation from app.',
+              'source' => array(
+                'data' => 'confirm',
+                'param' => 'confirm',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
           ),
         ),
         'logout' => array(

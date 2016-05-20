@@ -191,7 +191,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             return services_error(t('Akses akun ini sudah dipindah untuk device lain.'), 401);
           }
           // Other condition.
-          return services_error(t('Device has been blocked.'), 401);
+          return services_error(t('Device ini diblock, hubungi Customer Service.'), 401);
         }
 
         // Check device verication: unconfirmed or new.
@@ -489,7 +489,7 @@ function device_services_resource_verify($code = '') {
  * @return mixed
  *   TRUE or error message.
  */
-function device_services_resource_mail($mail = '') {
+function device_services_resource_mail($mail = '', $confirm = 0) {
   // Validate mail.
   if (valid_email_address($mail)) {
     // Validate device session.
@@ -509,7 +509,7 @@ function device_services_resource_mail($mail = '') {
     $qdevice->addField('dmv', 'mail');
     $rdevice = $qdevice->execute()->fetchAssoc();
 
-    if (!empty($rdevice)) {
+    if (!empty($rdevice) && empty($confirm)) {
       $msg = t('Email @email sudah terdaftar di device lain. Apakah Anda yakin ingin menggunakan email tersebut untuk device ini?',
         array('@email' => $mail)
       );

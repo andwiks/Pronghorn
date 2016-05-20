@@ -158,14 +158,17 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#maxlength' => 8,
   );
 
-  $active = array(0 => t('No'), 1 => t('Yes'));
+  $active = array(
+    0 => t('Get benefit in fisrt order ever'),
+    1 => t('Get benefit in first order every campaign'),
+    2 => t('Get benefit in every transaction'),
+  );
   // Sepulsa Referral Campaign timeout.
   $form['flag_first_order'] = array(
     '#type' => 'radios',
     '#title' => t('Referrer User get benefit in first order ?'),
     '#default_value' => (isset($referral->flag_first_order)) ? $referral->flag_first_order : 0,
     '#options' => $active,
-    '#description' => t('When it is no, benefit will send every transaction.'),
   );
 
   // Get rules compontents name and label.

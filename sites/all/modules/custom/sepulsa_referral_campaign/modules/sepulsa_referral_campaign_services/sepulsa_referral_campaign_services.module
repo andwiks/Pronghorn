@@ -157,7 +157,7 @@ function sepulsa_referral_campaign_services_resource_index_doc() {
   $element = array(
     '#name' => t('Index Referral code'),
     '#description' => t('Index Referral code.'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'sepulsa_referral_campaign',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa_referral_campaign/index  .json<br />GET',
@@ -211,7 +211,7 @@ function sepulsa_referral_campaign_services_resource_request_doc() {
   $element = array(
     '#name' => t('Request referral code'),
     '#description' => t('Generate referral code.'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'sepulsa_referral_campaign/request',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa_referral_campaign/request  .json<br />POST',
@@ -250,7 +250,7 @@ function sepulsa_referral_campaign_services_resource_register_doc() {
   $element = array(
     '#name' => t('Use referral code to register.'),
     '#description' => t('Use referral code to register in device.'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'sepulsa_referral_campaign/register',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa_referral_campaign/register  .json<br />POST token data application/json: {"code":"a1b2c3d4"}',
@@ -296,7 +296,7 @@ function sepulsa_referral_campaign_services_resource_getcampaign_doc() {
   $element = array(
     '#name' => t('Get active sepulsa referral camapaign.'),
     '#description' => t('Get active sepulsa referral camapaign.'),
-    '#auth' => FALSE,
+    '#auth' => TRUE,
     '#path' => 'sepulsa_referral_campaign/getcampaign',
     // Example request. E.g., a request URL, headers, and a JSON array.
     '#request_url' => $base_url . '/api/sepulsa_referral_campaign/getcampaign  .json',
@@ -339,10 +339,10 @@ function sepulsa_referral_campaign_services_resource_retrieve_doc() {
   $element = array(
     '#name' => t('Retrieve Referral code'),
     '#description' => t('Retrieve Referral code.'),
-    '#auth' => FALSE,
-    '#path' => 'sepulsa_referral_campaign/retrieve',
+    '#auth' => TRUE,
+    '#path' => 'sepulsa_referral_campaign/2',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/retrieve  .json<br />GET',
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/2  .json<br />GET',
     // Example response. E.g., a JSON array.
     '#response' => '// Return array active campaign.<br />[
       {

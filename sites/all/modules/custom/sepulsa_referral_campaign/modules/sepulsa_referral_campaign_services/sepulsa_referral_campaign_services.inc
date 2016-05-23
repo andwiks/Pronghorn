@@ -37,6 +37,12 @@ function sepulsa_referral_campaign_services_resource_index($active = NULL) {
  */
 function sepulsa_referral_campaign_services_resource_getcampaign() {
   global $user;
+  watchdog(
+    'sepulsa_referral_campaign_services',
+    'SERVER PARAMETER : <pre> @server_param </pre>',
+    array('@server_param' => print_r($_SERVER, TRUE)),
+    WATCHDOG_NOTICE,
+    'info');
   if ($user->uid > 0) {
     // Active sepulsa campaign.
     $list = sepulsa_referral_campaign_getlist('active');

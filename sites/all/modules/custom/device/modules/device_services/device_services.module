@@ -251,13 +251,13 @@ function device_services_services_resources() {
             ),
             array(
               'name' => 'confirm',
-              'type' => 'int',
-              'description' => 'Confirmation from app.',
+              'type' => 'bool',
+              'description' => 'Confirmation to merge device to already exist email.',
               'source' => array(
                 'data' => 'confirm',
                 'param' => 'confirm',
               ),
-              'optional' => FALSE,
+              'optional' => TRUE,
               'http_method' => 'POST',
             ),
           ),

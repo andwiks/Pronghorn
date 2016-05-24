@@ -608,6 +608,16 @@ function commerce_discount_fixed_amount(EntityDrupalWrapper $wrapper, $discount_
 function commerce_discount_percentage(EntityDrupalWrapper $wrapper, $discount_name) {
   $discount_wrapper = entity_metadata_wrapper('commerce_discount', $discount_name);
   $rate = $discount_wrapper->commerce_discount_offer->commerce_percentage->value();
+
+  // Get maximum discount amount.
+  try {
+    $maximum_discount_amount = $discount_wrapper->commerce_discount_offer->commerce_percentage_maximum->value();
+    $maximum_discount_amount = $maximum_discount_amount['amount'];
+  }
+  catch (EntityMetadataWrapperException $e) {
+    $maximum_discount_amount = 0;
+  }
+
   // Get the line item types to apply the discount to.
   $line_item_types = variable_get('commerce_discount_line_item_types', array('product' => 'product'));
 
@@ -640,6 +650,15 @@ function commerce_discount_percentage(EntityDrupalWrapper $wrapper, $discount_na
       }
 
       if ($calculated_discount) {
+        // Check maximum discount amount.
+        if (!empty($maximum_discount_amount)) {
+          // Check whether calculated discount reach maximum amount.
+          if ($calculated_discount > $maximum_discount_amount) {
+            // Set calculated discount to maximum discount amount.
+            $calculated_discount = $maximum_discount_amount;
+          }
+        }
+
         $discount_amount = array(
           'amount' => $calculated_discount * -1,
           'currency_code' => $wrapper->commerce_order_total->currency_code->value(),
@@ -673,6 +692,17 @@ function commerce_discount_percentage(EntityDrupalWrapper $wrapper, $discount_na
 
       $unit_price = commerce_price_wrapper_value($wrapper, 'commerce_unit_price', TRUE);
       $calculated_discount = $unit_price['amount'] * $rate * -1;
+
+      // Check maximum discount amount.
+      if (!empty($maximum_discount_amount)) {
+        // Calculated discount has negative value.
+        $maximum_discount_amount *= -1;
+        // Check whether calculated discount reach maximum amount.
+        if ($calculated_discount < $maximum_discount_amount) {
+          // Set calculated discount to maximum discount amount.
+          $calculated_discount = $maximum_discount_amount;
+        }
+      }
 
       $discount_amount = array(
         'amount' => $calculated_discount,

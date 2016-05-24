@@ -177,6 +177,16 @@ function commerce_discount_install_helper() {
     );
     field_create_field($field);
   }
+  if (empty($fields['commerce_percentage_maximum'])) {
+    // Add decimal field to the commerce discount offer "percentage" bundle.
+    $field = array(
+      'entity_types' => array('commerce_discount_offer'),
+      'field_name' => 'commerce_percentage_maximum',
+      'type' => 'commerce_price',
+      'locked' => TRUE,
+    );
+    field_create_field($field);
+  }
   if (empty($fields['commerce_discounts'])) {
     $field = array(
       'entity_types' => array('commerce_order'),
@@ -295,6 +305,23 @@ function commerce_discount_install_helper() {
     );
     field_create_instance($instance);
   }
+  if (empty($instances['commerce_discount_offer']['percentage']['commerce_percentage_maximum'])) {
+    $instance = array(
+      'field_name' => 'commerce_percentage_maximum',
+      'entity_type' => 'commerce_discount_offer',
+      'bundle' => 'percentage',
+      'label' => t('Maximum Amount'),
+      'description' => t('Zero means no maximum discount amount.'),
+      'required' => TRUE,
+      'default_value' => array(
+        array(
+          'amount' => 0,
+          'currency_code' => 'default',
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
   if (empty($instances['commerce_order']['commerce_order']['commerce_discounts'])) {
     $instance = array(
       'field_name' => 'commerce_discounts',
@@ -410,6 +437,7 @@ function commerce_discount_uninstall() {
   commerce_delete_field('commerce_discount_offer');
   commerce_delete_field('commerce_fixed_amount');
   commerce_delete_field('commerce_percentage');
+  commerce_delete_field('commerce_percentage_maximum');
   commerce_delete_field('commerce_discounts');
   commerce_delete_field('inline_conditions');
   commerce_delete_field('commerce_free_shipping');

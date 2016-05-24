@@ -108,7 +108,18 @@ class CommerceDiscountTestBase extends CommerceBaseTestCase {
         break;
 
       case 'percentage':
-        $offer_wrapper->commerce_percentage = $amount;
+        // Check percentage amount input.
+        if (is_array($amount)) {
+          // First amount is discount percentage.
+          $offer_wrapper->commerce_percentage = $amount[0];
+          // Second amount is discount percentage maximum amount.
+          $offer_wrapper->commerce_percentage_maximum->amount = $amount[1];
+        }
+        else {
+          $offer_wrapper->commerce_percentage = $amount;
+          $offer_wrapper->commerce_percentage_maximum->amount = 0;
+        }
+        $offer_wrapper->commerce_percentage_maximum->currency_code = 'USD';
         break;
 
       case 'free_products':
@@ -470,6 +481,35 @@ class CommerceDiscountTest extends CommerceDiscountTestBase {
   }
 
   /**
+   * Test percentage order discounts with maximum amount.
+   */
+  public function testCommerceDiscountPercentageMaximumAmountOrderDiscount() {
+    // Testing percentage discount.
+    // Create a percentage order discount of 5% with maximum amount $0.2.
+    $discount = $this->createDiscount('order_discount', 'percentage', array(5, 20));
+    // Create a completed order: with product value $10.
+    $order = $this->createDummyOrder($this->store_customer->uid, array($this->product->product_id => 1), 'completed');
+    // Recalculate discounts.
+    $order_wrapper = commerce_cart_order_refresh($order);
+
+    // Check if the maximum amount discount was applied on order total price.
+    $this->assertTrue($order_wrapper->commerce_order_total->amount->value() == 980, 'Percentage order discount with maximum amount is deducted correctly.');
+
+    // Disable the discount.
+    $discount->status = FALSE;
+    entity_save('commerce_discount', $discount);
+
+    // Re-save the order.
+    // Check if the discount was applied on the order total price.
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    $order_wrapper->save();
+
+    // Recalculate discounts.
+    $order_wrapper = commerce_cart_order_refresh($order);
+    $this->assertTrue($order_wrapper->commerce_order_total->amount->value() == 1000, "Percentage order discount with maximum amount is removed when it's not applicable.");
+  }
+
+  /**
    * Test Free products order discounts.
    */
   public function testCommerceDiscountFreeProductsOrderDiscount() {
@@ -537,6 +577,28 @@ class CommerceDiscountTest extends CommerceDiscountTestBase {
     $price_data = $line_item_wrapper->commerce_unit_price->data->value();
 
     $this->assertTrue($price_data['components'][1]['price']['amount'] == -50, 'Percentage product discount is added as a price component to the line item.');
+  }
+
+  /**
+   * Test percentage product discounts with maximum amount.
+   */
+  public function testCommerceDiscountPercentageMaximumAmountProductDiscount() {
+    // Create a percentage product discount of 5% with maximum amount $0.2.
+    $this->createDiscount('product_discount', 'percentage', array(5, 20));
+
+    // Create a completed order: with product value $10.
+    $order = $this->createDummyOrder($this->store_customer->uid, array($this->product->product_id => 1), 'completed');
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+
+    // Invoke line item price re-calculation.
+    $line_item = $order_wrapper->commerce_line_items->get(0)->value();
+    rules_invoke_event('commerce_product_calculate_sell_price', $line_item);
+
+    // Check if the maximum amount value discount was added.
+    $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $line_item);
+    $price_data = $line_item_wrapper->commerce_unit_price->data->value();
+
+    $this->assertTrue($price_data['components'][1]['price']['amount'] == -20, 'Percentage product discount with maximum amount is added as a price component to the line item.');
   }
 
   /**

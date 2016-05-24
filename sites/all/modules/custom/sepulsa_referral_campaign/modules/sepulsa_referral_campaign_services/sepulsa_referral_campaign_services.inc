@@ -13,16 +13,20 @@
 /**
  * Function sepulsa_referral_campaign_services_resource_index().
  */
-function sepulsa_referral_campaign_services_resource_index() {
+function sepulsa_referral_campaign_services_resource_index($active = NULL) {
   global $user;
   if ($user->uid > 0) {
     // List sepulsa campaign.
-    $list = sepulsa_referral_campaign_getlist();
+    $list = sepulsa_referral_campaign_getlist($active);
     if (!empty($list)) {
-      return $list;
+      if ($list != 'invalid') {
+        return $list;
+      }
+      return services_error(t('Invalid argument.'), 406);
     }
+    $msg_active = (is_null($active)) ? '' : $active;
     $return = array(
-      'msg' => 'There is no active campaign.',
+      'msg' => 'There is no ' . $msg_active . ' campaign.',
     );
     return $return;
   }
@@ -52,7 +56,7 @@ function sepulsa_referral_campaign_services_resource_getcampaign() {
   global $user;
   if ($user->uid > 0) {
     // Active sepulsa campaign.
-    $list = sepulsa_referral_campaign_getlist(TRUE);
+    $list = sepulsa_referral_campaign_getlist('active');
     if (!empty($list)) {
       return $list;
     }
@@ -72,7 +76,7 @@ function sepulsa_referral_campaign_services_resource_request() {
   global $user;
 
   if ($user->uid > 0) {
-    $list = sepulsa_referral_campaign_getlist(TRUE);
+    $list = sepulsa_referral_campaign_getlist('active');
     if ($list) {
       $return = array(
         'code' => _referral_uid2ref($user->uid),
@@ -102,7 +106,7 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
   if ($user->uid > 0) {
     if (!empty($code)) {
       // Get active campaign.
-      $list = sepulsa_referral_campaign_getlist(TRUE);
+      $list = sepulsa_referral_campaign_getlist('active');
       if (!empty($list)) {
         $referral_uid = _referral_ref2uid($code);
         $referral_user = user_load($referral_uid);

@@ -90,13 +90,23 @@ function sepulsa_referral_campaign_load_by_name($name) {
 /**
  * Funtion sepulsa_referral_campaign_getlist().
  */
-function sepulsa_referral_campaign_getlist($active = FALSE) {
+function sepulsa_referral_campaign_getlist($active = NULL) {
   $list = array();
   $query = db_select('sepulsa_referral_campaign', 'src');
   $query->fields('src');
-  if ($active) {
-    $query->condition('src.start', REQUEST_TIME, '<=');
-    $query->condition('src.end', REQUEST_TIME, '>=');
+  if (!is_null($active)) {
+    if ($active == 'active' || $active == 'nonactive') {
+      if ($active == 'active') {
+        $query->condition('src.start', REQUEST_TIME, '<=');
+        $query->condition('src.end', REQUEST_TIME, '>=');
+      }
+      else {
+        $query->condition('src.end', REQUEST_TIME, '<=');
+      }
+    }
+    else {
+      return 'invalid';
+    }
   }
   $result = $query->execute();
   foreach ($result as $key => $value) {

@@ -531,7 +531,7 @@ function device_verification_status($uid, $umail = '') {
       'd_status' => ($device->d_status == 1) ? 'active' : 'blocked',
       'dv_status' => ($device->dv_status == 1) ? 'confirmed' : 'not_confirmed',
       'dmv_status' => ($device->dmv_status == 1) ? 'verified' : 'not_verified',
-      'dmv_status' => ($device->dmv_new_flag == 0) ? 'merge_user' : 'new_user',
+      'dmv_new_flag' => ($device->dmv_new_flag == 0) ? 'merge_user' : 'new_user',
     ];
   }
 

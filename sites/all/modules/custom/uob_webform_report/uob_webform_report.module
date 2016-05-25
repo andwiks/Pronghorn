@@ -1,0 +1,64 @@
+<?php
+/**
+ * @file
+ * UOB webform report.
+ */
+
+/**
+ * Implements hook_cron().
+ */
+function uob_webform_report_cron() {
+
+  $filename = 'UOB-submission-' . date('YmdHi');
+
+  // Get webform node.
+  $node = node_load(295896);
+  // Generate webform result in excel format.
+  $export_info = webform_results_export($node, $format = 'excel', $options = array());
+  webform_results_download($node, $export_info);
+
+  // Send generated result excel file to configured email.
+  // Where $filepathname should contain the path to the file and,
+  // and $filename should contain the name of the file.
+  $attachment = array(
+    'filecontent' => $filepathname,
+    'filename' => $namefile,
+    'filemime' => 'application/pdf',
+  );
+  // Mail to & from.
+  $to = 'azul@sepulsa.com';
+  $from = 'ken@sepulsa.com';
+
+  $params = array(
+    'headers' => array('Content-Type' => 'text/html'),
+    'key' => 'test',
+    'subject' => 'UOB Campaign submission report per: ' . date('Y-m-d H:i'),
+    'body' => 'Attached file is UOB Campaign submission report per: ' . date('Y-m-d H:i'),
+    'attachment' => $attachment,
+  );
+
+  drupal_mail('uob_webform_report', 'uob_webform_send_report', $to, language_default(), $params, $from, $send = TRUE);
+
+  watchdog('uob_webform_report',
+    'Generate UOB webform submisssion : @current_date  The file : <pre>@files</pre> ',
+    array(
+      '@current_date' => $current_date,
+      '@files' => print_r($filename, TRUE),
+    ),
+    WATCHDOG_INFO
+  );
+
+}
+
+/**
+ * Implements hook_mail().
+ */
+function uob_webform_report_mail($key, &$message, $params) {
+  $message['subject'] = $params['subject'];
+  $message['body'][] = $params['body'];
+
+  // Add attachment when available.
+  if (isset($params['attachment'])) {
+    $message['params']['attachments'][] = $params['attachment'];
+  }
+}

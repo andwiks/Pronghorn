@@ -156,30 +156,34 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
 /**
  * Function sepulsa_referral_campaign_services_resource_status().
  */
-function sepulsa_referral_campaign_services_resource_status($id = '') {
+function sepulsa_referral_campaign_services_resource_status($id = NULL) {
   global $user;
   if ($user->uid > 0) {
     // Check id from body service.
-    if ($id != '') {
+    if (is_null($id)) {
+      // Get active campaign.
+      $details = sepulsa_referral_campaign_getlist('active');
+      $id = $details[0]->src_id;
+    }
+    else {
       // Get details campaign.
       $details = sepulsa_referral_campaign_load($id);
-      // Check whether detail is exist or not.
-      if (!empty($details)) {
-        // Get uplink / downlink from campaign. (default mode : all)
-        $link = sepulsa_referral_campaign_getlink($user->uid,
-          $id);
-        if (!empty($link)) {
-          if ($link != 'invalid_mode') {
-            return $link;
-          }
-          return services_error(t('Invalid Mode link (uplink / downlink).'), 406);
+    }
+    // Check whether detail is exist or not.
+    if (!empty($details)) {
+      // Get uplink / downlink from campaign. (default mode : all)
+      $link = sepulsa_referral_campaign_getlink($user->uid,
+        $id);
+      if (!empty($link)) {
+        if ($link != 'invalid_mode') {
+          return $link;
         }
-        $msg = array(
-          'msg' => 'Empty result.',
-        );
-        return $msg;
+        return services_error(t('Invalid Mode link (uplink / downlink).'), 406);
       }
-      return services_error(t('Missing Argument Campaign ID.'), 406);
+      $msg = array(
+        'msg' => 'Empty result.',
+      );
+      return $msg;
     }
     return services_error(t('Invalid Campaign ID.'), 406);
   }

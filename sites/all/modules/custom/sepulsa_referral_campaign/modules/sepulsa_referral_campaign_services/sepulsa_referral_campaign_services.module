@@ -145,7 +145,7 @@ function sepulsa_referral_campaign_services_services_resources() {
                 'data' => 'id',
                 'param' => 'id',
               ),
-              'optional' => FALSE,
+              'optional' => TRUE,
               'http_method' => 'POST',
             ),
           ),

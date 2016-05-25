@@ -163,7 +163,6 @@ function sepulsa_referral_campaign_services_resource_status($id = NULL) {
     if (is_null($id)) {
       // Get active campaign.
       $details = sepulsa_referral_campaign_getlist('active');
-      $id = $details[0]->src_id;
     }
     else {
       // Get details campaign.
@@ -171,6 +170,9 @@ function sepulsa_referral_campaign_services_resource_status($id = NULL) {
     }
     // Check whether detail is exist or not.
     if (!empty($details)) {
+      if (is_null($id)) {
+        $id = $details[0]->src_id;
+      }
       // Get uplink / downlink from campaign. (default mode : all)
       $link = sepulsa_referral_campaign_getlink($user->uid,
         $id);

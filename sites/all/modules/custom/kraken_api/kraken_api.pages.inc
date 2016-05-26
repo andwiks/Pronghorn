@@ -21,7 +21,9 @@ function kraken_api_notification_callback() {
 
   if (!empty($body)) {
     $payload = drupal_json_decode($body);
-    watchdog('kraken', '<pre>' . print_r($payload, TRUE) . '</pre>', array(), WATCHDOG_DEBUG);
+    watchdog('kraken_api', 'Kraken Notification Callback: <pre>@payload</pre>', array(
+      '@payload' => print_r($payload, TRUE),
+    ), WATCHDOG_DEBUG);
 
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'commerce_line_item');

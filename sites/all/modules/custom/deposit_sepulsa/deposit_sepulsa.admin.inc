@@ -146,7 +146,7 @@ function deposit_sepulsa_confirm_process_form($form = array(), &$form_state = ar
   $msg .= ' </div>';
   $form = confirm_form($form,
                       t('Are you sure want to process this order ?'),
-                      'admin/commerce/tools/deposit/process-manual',
+                      'admin/commerce/tools/deposit/process',
                       $msg);
   $form['actions']['submit']['#submit'] = array('deposit_sepulsa_confirm_process_submit');
   return $form;

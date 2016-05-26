@@ -25,11 +25,12 @@ function deposit_sepulsa_menu() {
     'file' => 'system.admin.inc',
     'file path' => drupal_get_path('module', 'system'),
     'type' => MENU_NORMAL_ITEM,
+    'weight' => 10,
   );
 
-  $items['admin/commerce/tools/deposit/process-manual'] = array(
-    'title' => 'Proses Manual',
-    'description' => 'Proses Manual Deposit Sepulsa.',
+  $items['admin/commerce/tools/deposit/process'] = array(
+    'title' => 'Process Manual',
+    'description' => 'Process Manual Deposit Sepulsa.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('deposit_sepulsa_wizard_form'),
     'access arguments' => array('use deposit tools'),

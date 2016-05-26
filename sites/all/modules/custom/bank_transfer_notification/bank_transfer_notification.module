@@ -1,0 +1,164 @@
+<?php
+/**
+ * @file
+ * bank_transfer_notification.module
+ */
+
+/**
+ * Impelements hook_menu().
+ */
+function bank_transfer_notification_menu() {
+  $items = array();
+
+  // Administration pages.
+  $items['admin/config/system/bank-transfer-notification'] = array(
+    'title' => 'Bank Transfer Notification',
+    'description' => 'Configuration time to send email',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bank_transfer_notification_form'),
+    'access arguments' => array('access administration pages'),
+  );
+
+  return $items;
+}
+
+/**
+ * Impelements hook_form().
+ */
+function bank_transfer_notification_form($form, &$form_state) {
+
+  $form['bank_transfer_notification_hour'] = array(
+    '#type' => 'textfield',
+    '#title' => 'Notify user ... hour after order. *(max : 3 hour)',
+    '#size' => 1,
+    '#maxlength' => 1,
+    '#default_value' => variable_get('bank_transfer_notification_hour', 2),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_cron().
+ */
+function bank_transfer_notification_cron() {
+  $queue = DrupalQueue::get('queue_bank_transfer_notification');
+  $query = "SELECT a.order_id, b.amount, a.mail 
+              FROM commerce_order a
+            INNER JOIN commerce_payment_transaction b ON a.order_id = b.order_id
+            LEFT OUTER JOIN bank_transfer_notification_queue c ON a.order_id = c.order_id
+            WHERE (a.status = 'pending' || a.status = 'processing') 
+              AND b.payment_method = 'bank_transfer' 
+              AND from_unixtime(a.created) + INTERVAL " . variable_get('bank_transfer_notification_hour', 2) . " HOUR < NOW() 
+              AND from_unixtime(a.created) > NOW() - INTERVAL 12 HOUR
+              AND c.id is null";
+  $result = db_query($query);
+  foreach ($result as $row) {
+    $order = commerce_order_load($row->order_id);
+    if ($order->status == 'pending' || $order->status == 'processing') {
+      $queue->createItem($order);
+    }
+  }
+}
+
+/**
+ * Implements hook_cron_queue_info().
+ */
+function bank_transfer_notification_cron_queue_info() {
+  $queues = array();
+  $queues['queue_bank_transfer_notification'] = array(
+    'worker callback' => 'bank_transfer_notification_send_email',
+    'time' => 60,
+  );
+  return $queues;
+}
+
+/**
+ * Function to invoke rules.
+ */
+function bank_transfer_notification_send_email($order) {
+  // Make sure these orders have not received email notification.
+  $exist_order_id = db_query_range("SELECT order_id FROM {bank_transfer_notification} WHERE order_id = :order_id", 0, 1, array('order_id' => $order->order_id))->fetchField();
+
+  if (empty($exist_order_id)) {
+    $payment = commerce_payment_method_instance_load($order->data['payment_method']);
+    $order->account_owner = '';
+    $order->account_number = '';
+    $order->account_bank = '';
+    $order->account_branch = '';
+    $order->policy = '';
+    if (!empty($payment['settings']['details']['account_owner'])) {
+      $order->account_owner = $payment['settings']['details']['account_owner'];
+    }
+    if (!empty($payment['settings']['details']['account_number'])) {
+      $order->account_number = $payment['settings']['details']['account_number'];
+    }
+    if (!empty($payment['settings']['details']['account_bank'])) {
+      $order->account_bank = $payment['settings']['details']['account_bank'];
+    }
+    if (!empty($payment['settings']['details']['account_branch'])) {
+      $order->account_branch = $payment['settings']['details']['account_branch'];
+    }
+    if (!empty($payment['settings']['policy'])) {
+      $order->policy = $payment['settings']['policy'];
+    }
+    rules_invoke_all('bank_transfer_notification_queue_email', $order);
+    db_insert('bank_transfer_notification')
+    ->fields(array('order_id' => $order->order_id, 'status' => 1))
+    ->execute();
+  }
+}
+
+/**
+ * Implements hook_token_info().
+ */
+function bank_transfer_notification_token_info() {
+  $info['tokens']['commerce-order']['account_owner'] = array(
+    'name' => t('Account Owner'),
+    'description' => t('Bank Account Owner'),
+  );
+  $info['tokens']['commerce-order']['account_number'] = array(
+    'name' => t('Account Number'),
+    'description' => t('Bank Account Number'),
+  );
+  $info['tokens']['commerce-order']['account_bank'] = array(
+    'name' => t('Bank Account'),
+    'description' => t('Bank Account'),
+  );
+  $info['tokens']['commerce-order']['account_branch'] = array(
+    'name' => t('Account Branch'),
+    'description' => t('Bank Account Branch'),
+  );
+  $info['tokens']['commerce-order']['policy'] = array(
+    'name' => t('Bank Policy'),
+    'description' => t('Bank Policy'),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_tokens().
+ */
+function bank_transfer_notification_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  if ($type == 'commerce-order' && !empty($data['commerce-order'])) {
+    $node = $data['commerce-order'];
+    if (isset($tokens['account_owner'])) {
+      $replacements[$tokens['account_owner']] = $node->account_owner;
+    }
+    if (isset($tokens['account_number'])) {
+      $replacements[$tokens['account_number']] = $node->account_number;
+    }
+    if (isset($tokens['account_bank'])) {
+      $replacements[$tokens['account_bank']] = $node->account_bank;
+    }
+    if (isset($tokens['account_branch'])) {
+      $replacements[$tokens['account_branch']] = $node->account_branch;
+    }
+    if (isset($tokens['policy'])) {
+      $replacements[$tokens['policy']] = $node->policy;
+    }
+  }
+  return $replacements;
+}

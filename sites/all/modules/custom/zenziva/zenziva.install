@@ -1,0 +1,31 @@
+<?php
+/**
+ * @file
+ * zenziva.install
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function zenziva_install() {
+  // Set default variable setting.
+  variable_set('zenziva_settings', array(
+    'target' => 'https://reguler.zenziva.net/apps/smsapi.php',
+    'userkey' => '',
+    'passkey' => '',
+    'type' => 'dc',
+    'balance' => 'https://reguler.zenziva.net/apps/smsapibalance.php',
+    'ssl_verify' => FALSE,
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function zenziva_uninstall() {
+  variable_del('zenziva_settings');
+}

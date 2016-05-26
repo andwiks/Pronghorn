@@ -1,0 +1,249 @@
+<?php
+/**
+ * @file
+ * device.install
+ *
+ * @author andreas@sepulsa.com
+ *
+ * IMEI (15 decimal digits: 14 digits plus a check digit) or IMEISV (16 digits).
+ * Apple ID is valid email address (maximum 254 chars).
+ * Phone number: https://en.wikipedia.org/wiki/E.164.
+ *
+ * Schema device:
+ * * device_id: int primary key
+ * * imei: varchar 254
+ * * phone: varchar 16
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function device_schema() {
+  // Device main table.
+  $schema['device'] = array(
+    'description' => 'Stores device data.',
+    'fields' => array(
+      'did' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique device ID.',
+      ),
+      'imei' => array(
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Unique device IMEI or Apple ID.',
+      ),
+      'phone' => array(
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Device phone number.',
+      ),
+      'label' => array(
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Device custom label.',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp for when device was created.',
+      ),
+      'access' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp for previous time device accessed the site.',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'size' => 'tiny',
+        'description' => 'Whether the device is active(1) or blocked(0).',
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+        'description' => 'Drupal user ID.',
+      ),
+      'push_id' => array(
+        'type' => 'text',
+        'not null' => FALSE,
+        'description' => 'ID Push Notification ( GCM / APN )',
+      ),
+      'agent' => array(
+        'type' => 'varchar',
+        'length' => 254,
+        'not null' => FALSE,
+        'default' => '',
+        'description' => 'Agent Device.',
+      ),
+      'data' => array(
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'A serialized array of name value pairs that are related to the device. Any form values posted during device edit are stored and are loaded into the $device object during device_load().',
+      ),
+    ),
+    'indexes' => array(
+      'access' => array('access'),
+      'created' => array('created'),
+      'phone' => array('phone'),
+      'imei' => array('imei'),
+    ),
+    'primary key' => array('did'),
+    'foreign keys' => array(
+      'user' => array(
+        'table' => 'users',
+        'columns' => array('uid' => 'uid'),
+      ),
+    ),
+  );
+
+  // Device session table.
+  $schema['device_sessions'] = array(
+    'description' => "Drupal's session handlers read and write into the sessions table. Each record represents a device session, either anonymous or authenticated.",
+    'fields' => array(
+      'did' => array(
+        'description' => 'The {device}.did corresponding to a session.',
+        'type' => 'int',
+        'not null' => FALSE,
+        'default' => 0,
+      ),
+      'asid' => array(
+        'description' => 'Access session ID.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+      ),
+      'rsid' => array(
+        'description' => 'Refresh session ID.',
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'atimestamp' => array(
+        'description' => 'The Unix timestamp for access session.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'rtimestamp' => array(
+        'description' => 'The Unix timestamp for refresh session.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array(
+      'did',
+    ),
+    'foreign keys' => array(
+      'session_device' => array(
+        'table' => 'device',
+        'columns' => array('did' => 'did'),
+      ),
+    ),
+  );
+
+  // Device verification.
+  $schema['device_verification'] = array(
+    'description' => 'Stores data about the device verification.',
+    'fields' => array(
+      'dv_id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'phone' => array(
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Device phone number.',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timeout' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'status' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => '0 = new, 1 = confirmed, 2 = unconfirmed (i.e. after timeout)',
+      ),
+      'hash' => array(
+        'type' => 'varchar',
+        'length' => 8,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Device random code for verification.',
+      ),
+    ),
+    'primary key' => array('dv_id', 'did', 'phone'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function device_install() {
+  // Set default device variables.
+  variable_set('device_session_timeout', array(
+    'refresh' => '+30 days',
+    'access' => '+1 hour',
+  ));
+  variable_set('device_verification_timeout', '+30 minutes');
+  variable_set('device_verification_hash', array(
+    'before' => '',
+    'prefix' => '',
+    'pattern' => 1,
+    'length' => 6,
+    'suffix' => '',
+    'after' => '',
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function device_uninstall() {
+  // Delete device variables.
+  variable_del('device_session_timeout');
+  variable_del('device_verification_timeout');
+  variable_del('device_verification_hash');
+  // Delete entity device.
+  field_attach_delete_bundle('device', 'device');
+  // Delete entity device verification.
+  field_attach_delete_bundle('device_verification', 'device_verification');
+}

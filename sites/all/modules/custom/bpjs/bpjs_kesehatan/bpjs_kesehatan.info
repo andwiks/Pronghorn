@@ -1,0 +1,6 @@
+name = "BPJS Kesehatan"
+description = "BPJS Kesehatan product."
+core = "7.x"
+package = "Sepulsa"
+
+dependencies[] = kraken_api

@@ -98,6 +98,8 @@ section.h_middle_top input[type=submit], input[type=button] {
    padding: 10px;
    font-size: 14px;
    height: 65px;
+   width: 38%;
+   height: auto;
 }
 .form.style_1 input[type=text] {font-size: 12px;}
 
@@ -450,7 +452,7 @@ section.std_content .voucher .c_left .grid_voucher_order table {width: 260px}
 section.std_content .voucher .c_left .grid_voucher_order table tr td:last-child {width: 30px;}
 section.std_content .voucher .c_left .grid_voucher_order table tr td{  padding: 8px 7px;font-size: 13px;line-height: 16px}
 section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position: absolute;bottom: -60px}
-section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position: absolute;top: 60px;}
+/*section.std_content .voucher .c_left .grid_voucher_order tfoot .add_bt {position: absolute;top: 60px;}*/
 section.std_content .voucher .c_left .grid_voucher_order p {
     width: 250px;
     margin: 90px auto 20px;
@@ -624,11 +626,13 @@ section.h_middle_top .home_tab .nav_tab a.active
 {
     width:86%;
     margin:0 auto;
+    width: 100%;
 }
 
 .topup-notes
 {
     width: 100%;
+    width: 60%;
 }
 
 .commerce_coupon #edit-commerce-coupon-coupon-add--2, .commerce_coupon #edit-commerce-coupon-coupon-add
@@ -842,4 +846,345 @@ section.banner .caption
 section.banner .bx-viewport
 {
     left:0 !important;
+}
+
+
+section.h_middle_top .form-bpjs .form-field input.remove {
+    top: 6px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    -ms-border-radius: 40px;
+    -o-border-radius: 40px;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new
+{
+    top: 6px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    -webkit-border-radius: 40px;
+    -moz-border-radius: 40px;
+    -ms-border-radius: 40px;
+    -o-border-radius: 40px;
+    background: transparent !important;
+    color: #129d4a !important;
+}
+/*revamp header*/
+
+header .wrapper
+{
+    position: relative;
+}
+
+header .logo
+{
+    left: 0;
+    top: 0;
+    margin: 20px 0 10px 0;
+}
+
+header .logo img
+{
+    margin: 0;
+}
+
+header .nav_mobile
+{
+    right: 0;
+}
+
+.header-img
+{
+    height: 490px;
+}
+
+section.h_middle_top {
+    top: -405px;
+    height: 390px;
+    width: 100%;
+    margin-bottom: -390px;
+    padding: 0;
+}
+
+section.h_middle_top .home_tab
+{
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+section.banner .caption
+{
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 80px;
+    text-align: center;
+    padding: 0;
+    display: none;
+}
+
+section.h_middle_top .home_tab .form input[type=text] {
+    width: 100%;
+}
+
+section.h_middle_top .home_tab .nav_tab a
+{
+    width: 25%;
+    padding:25px 0 0 0;
+}
+
+.home header
+{
+    border: none !important;
+}
+
+section.h_middle_top .home_tab .form input[type=text]
+{
+    padding-left: 40px;
+    padding-right: 10px;
+    height: 45px;
+}
+
+/* promotion area */
+section.promo_banner .img-slider img {
+    display: block !important;
+    margin: 0 auto;
+    max-width: 120px;
+    height: auto;
+    right: 0;
+    left: 0;
+    position: relative;
+    top: 0;
+}
+
+section.promo_banner .slide img 
+{
+    display: none;
+}
+
+.custom-content span.headline {
+    font-size: 22px;
+    margin: 10px 0;
+    display: block;
+}
+
+.custom-content
+{
+    margin-top:0;
+    position: relative;
+    width: 90%;
+    margin: 0 auto;
+    padding: 0;
+    left: 0;
+    top: 0 !important;
+}
+
+.custom-content h2
+{
+    font-size: 32px;
+    margin: 15px 0 30px 0;
+}
+
+.custom-content .highlight
+{
+    font-size:24px;
+}
+
+.custom-content .img-slider
+{
+    margin-bottom:25px;
+}
+
+.slide_content {
+    position: absolute;
+    height: 210px;
+    max-height: 210px;
+    top: 0;
+}
+
+.bx-wrapper .bx-pager
+{
+    bottom: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+section#front_first .bx-wrapper
+{
+    margin-bottom: 0;
+}
+
+/* voucher page */
+section.std_content .voucher .c_left .grid_voucher_order table {
+    width: 80%;
+}
+
+.not-front header
+{
+    height: 60px;
+}
+
+.not-front header .logo
+{
+    margin: 10px 0 0 10px;
+}
+
+.not-front header .logo img
+{
+    margin:0;
+}
+
+header .nav_mobile
+{
+    right: 0px;
+}
+
+#mobile_banner
+{
+    top:55px;
+    display: none;
+}
+
+/* USP */
+section.h_keuntungan .usp-content h5 {
+    display: none;
+}
+
+section.h_keuntungan .box p {
+    color: #797979 !important;
+}
+
+.usp-content
+{
+    display: block;
+}
+
+section.h_keuntungan .usp-content
+{
+    background: none;
+    width: auto;
+    padding: 0;
+    height: auto;
+    margin: auto;
+    position: relative;
+    display: block;
+}
+
+section.h_keuntungan .box .image
+{
+    height: 80px;
+    width: 80px;
+    line-height: 80px;
+    margin: 0;
+    transform: scale(0.8);
+    float: left;
+}
+
+section.h_keuntungan .box h5
+{
+    text-align: left;
+}
+
+section.h_keuntungan .box {
+    width: auto;
+    height: auto;
+    float: none;
+    padding: 10px 0 15px 0;
+    margin: 0 auto 10px auto !important;
+    cursor: auto;
+}
+
+section.h_keuntungan .wrapper_2 {
+    width: 440px;
+}
+
+/* perbaikan theme */
+section.h_middle_top .form-bpjs .form-field input.add-new {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 0;
+    right: 0;
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove
+{
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    top: 0;
+    right: 0;
+}
+
+/* blog */
+#frameBlog #inner #right_column,
+#frameBlog #inner #left_column {
+    width: 100%;
+}
+
+#frameBlog #right_column .views-row
+{
+    margin-left: 45px;
+}
+
+#frameBlog #right_column .content
+{
+    margin: 0 auto;
+}
+
+/* footer */
+footer .footer-partner {
+    float: none;
+    margin: 15px auto 5px auto;
+    text-align: center;
+}
+footer .footer-partner table {
+    margin:0 auto;
+}
+
+#block-menu-menu-sidebar2 ul li:before
+{
+    content: none;
+}
+
+footer ul.menu {
+    text-align: center;
+}
+
+#block-menu-menu-sidebar2 ul li {
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+#block-menu-menu-sidebar2 ul li a {
+    text-decoration: underline;
+}
+
+footer .right .box {
+    width: 95% !important;
+    margin: 0 auto 10px auto;
+    text-align: center;
+}
+
+footer .right .box h6 {
+    font-size: 12px;
+}
+
+/* UOB */
+.uob-snk .uob-snk-content
+{
+    margin:10px;
+}
+
+#edit-submitted-term-agree label.option {
+    width: 90%;
 }

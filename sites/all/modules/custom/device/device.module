@@ -1,0 +1,535 @@
+<?php
+/**
+ * @file
+ * device.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Device Phone Pattern.
+ * @var string
+ */
+define('DEVICE_PHONE_PATTERN', '#^08\d{6,14}$#');
+
+/**
+ * Device IMEI Pattern.
+ * @var string
+ */
+define('DEVICE_IMEI_PATTERN', '#^\d{14,16}$#');
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function device_menu() {
+  $items = array();
+  // Administration pages.
+  $items['admin/config/devices'] = array(
+    'title' => 'Devices',
+    'description' => 'Configure devices.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  // Device setting page.
+  $items['admin/config/devices/settings'] = array(
+    'title' => 'Settings',
+    'description' => 'Device settings page.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_settings'),
+    'access arguments' => array('administer devices'),
+    'file' => 'device.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // Device listing pages.
+  $items['admin/devices'] = array(
+    'title' => 'Devices',
+    'description' => 'Manage devices.',
+    'page callback' => 'device_list',
+    'access arguments' => array('administer devices'),
+    'file' => 'device.admin.inc',
+  );
+  $items['admin/devices/list'] = array(
+    'title' => 'List',
+    'description' => 'Find and manage device interacting with your site.',
+    'access arguments' => array('administer devices'),
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'device.admin.inc',
+  );
+  $items['admin/devices/%device_operate/%device'] = array(
+    'title' => 'Device Operation',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_operate_confirm', 2, 3),
+    'access arguments' => array('administer devices'),
+    'file' => 'device.admin.inc',
+  );
+
+  // Page for user to view devices.
+  $items['user/%user/device'] = array(
+    'title' => 'Device',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_user_form', 1),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+    'file' => 'device.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items['user/%user/device/%device/edit'] = array(
+    'title' => 'Device',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_user_edit_form', 1, 3),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+    'file' => 'device.pages.inc',
+  );
+
+  $items['user/%user/device/%device/delete'] = array(
+    'title' => 'Device',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_user_delete_form', 1, 3),
+    'access callback' => 'user_edit_access',
+    'access arguments' => array(1),
+    'file' => 'device.pages.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function device_permission() {
+  return array(
+    'administer devices' => array(
+      'title' => t('Administer devices'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Remove old device sessions.
+ */
+function device_cron() {
+  // Get variable device session timeout.
+  $device_session_timeout = variable_get('device_session_timeout', array(
+    'refresh' => '+30 days',
+    'access' => '+1 hour',
+  ));
+  // Define time now.
+  $now = time();
+  // Check if device session need flush.
+  if (isset($device_session_timeout['refresh']) && !empty($device_session_timeout['refresh'])) {
+    // Delete old refresh device sessions.
+    $device_session_timeout['refresh'] = str_replace('+', '-', $device_session_timeout['refresh']);
+    $sessions = db_delete('device_sessions')
+      ->condition('rtimestamp', strtotime($device_session_timeout['refresh'], $now), '<')
+      ->execute();
+  }
+  // Query to get device verification timeout.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'device_verification')
+    ->propertyCondition('status', 0)
+    ->propertyCondition('timeout', $now, '<');
+  $result = $query->execute();
+
+  // Check the result.
+  if (!empty($result)) {
+    // Looping foreach device.
+    foreach ($result['device_verification'] as $dv_id => $dv_data) {
+      $wrapper = entity_metadata_wrapper('device_verification', $dv_id);
+      $wrapper->status->set(2);
+      $wrapper->save();
+    }
+  }
+  // Log this condition.
+  watchdog('device', 'Device Cron is running. Debug:<pre>Session: @sess<br /> Verification: @verification</pre>', array(
+    '@sess' => print_r($sessions, TRUE),
+    '@verification' => isset($result['device_verification']) ? count($result['device_verification']) : 0,
+  ), WATCHDOG_INFO);
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function device_entity_info() {
+  $info['device'] = array(
+    'label' => t('Device'),
+    'plural label' => t('Devices'),
+    'controller class' => 'EntityAPIController',
+    'entity class' => 'Entity',
+    'base table' => 'device',
+    'label callback' => 'entity_class_label',
+    'language callback' => 'device_language',
+    'uri callback' => 'entity_class_uri',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'did',
+      'label' => 'label',
+    ),
+    'access callback' => 'devices_access',
+    'bundles' => array(
+      'device' => array(
+        'label' => t('Device'),
+        'admin' => array(
+          'path' => 'admin/config/devices/settings',
+          'access arguments' => array('administer devices'),
+        ),
+      ),
+    ),
+  );
+
+  $info['device_verification'] = array(
+    // A human readable label to identify our entity.
+    'label' => t('Device Verification'),
+    // The controller for our Entity: use Entity API controller.
+    'controller class' => 'EntityAPIController',
+    'entity class' => 'Entity',
+    // The table for this entity defined in hook_schema()
+    'base table' => 'device_verification',
+    // Make use the class' label() and uri() implementation by default.
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    // IF fieldable == FALSE, we can't attach fields.
+    'fieldable' => FALSE,
+    // entity_keys tells the controller what database fields are used for key
+    // functions. It is not required if we don't have bundles or revisions.
+    // Here we do not support a revision, so that entity key is omitted.
+    'entity keys' => array(
+      // The 'id' (basic_id here) is the unique id.
+      'id' => 'dv_id',
+    ),
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_load().
+ */
+function device_load($did) {
+  // Get jwt config by id.
+  $entity = entity_load('device', array($did));
+  if (isset($entity[$did]) && !empty($entity[$did])) {
+    return $entity[$did];
+  }
+  return FALSE;
+}
+
+/**
+ * Implements hook_load().
+ */
+function device_operate_load($op = '') {
+  $operation = array();
+  switch ($op) {
+    case 'delete':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Delete'),
+      );
+      break;
+
+    case 'block':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Block'),
+      );
+      break;
+
+    case 'unblock':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Unblock'),
+      );
+      break;
+
+    case 'resend':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Resend OTP'),
+      );
+      break;
+
+    case 'reset':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Reset OTP'),
+      );
+      break;
+
+    case 'resend_mail_verification':
+      $operation = array(
+        'name' => $op,
+        'title' => t('Resend Mail Verification'),
+      );
+      break;
+  }
+  return !empty($operation) ? $operation : FALSE;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function device_access().
+ *
+ * @param string $op
+ *   Entity operation.
+ * @param object $entity
+ *   Entity data.
+ * @param string $account
+ *   Supposed to be user object.
+ * @param string $entity_type
+ *   Entity type.
+ *
+ * @return bool
+ *   Allow access or not.
+ */
+function device_access($op, $entity = NULL, $account = NULL, $entity_type = '') {
+  // @todo: check user roles.
+  return TRUE;
+}
+
+/**
+ * Function device_language().
+ *
+ * @param string $entity_type
+ *   Entity type.
+ * @param object $entity
+ *   Entity data.
+ *
+ * @return string
+ *   Language code.
+ */
+function device_language($entity_type, $entity) {
+  // Since device is not language aware, use default language.
+  return language_default('language');
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function device_generate_hash().
+ *
+ * @return string
+ *   Hash code for device verification.
+ */
+function device_generate_hash() {
+  // Get device hash settings.
+  $settings = variable_get('device_verification_hash', array(
+    'before' => '',
+    'prefix' => '',
+    'pattern' => 1,
+    'length' => 4,
+    'suffix' => '',
+    'after' => '',
+  ));
+  // Define default hash output.
+  $hash = '';
+  // Looping until reach hash length.
+  for ($i = 0; $i < $settings['length']; $i++) {
+    // Generate random based on pattern.
+    switch ($settings['pattern']) {
+      case 2:
+        // Alphanumeric lowercase:
+        // a. lowercase: 97 - 122.
+        // b. digit: 48 - 57.
+        do {
+          $random = rand(48, 122);
+        } while ($random > 57 && $random < 97);
+        break;
+
+      case 3:
+        // Alphanumeric uppercase:
+        // a. uppercase: 65 - 90.
+        // b. digit: 48 - 57.
+        do {
+          $random = rand(48, 90);
+        } while ($random > 57 && $random < 65);
+        break;
+
+      case 4:
+        // Alphanumeric randomcase.
+        // a. lowercase: 97 - 122.
+        // b. updatecase: 65 - 90.
+        // c. digit: 48 - 57.
+        do {
+          $random = rand(48, 122);
+        } while (($random > 57 && $random < 65) || ($random > 90 && $random < 97));
+        break;
+
+      case 1:
+      default:
+        // Digit only: 48 - 57.
+        $random = rand(48, 57);
+        break;
+    }
+    // Concatenate generated character.
+    $hash .= chr($random);
+  }
+  // Return hash string.
+  return $hash;
+}
+
+/**
+ * Function device_generate_hash_message().
+ *
+ * @param string $hash
+ *   Hash code generated from device_generate_hash().
+ *
+ * @return string
+ *   Full hash/code message for device verification.
+ */
+function device_generate_hash_message($hash) {
+  // Get device hash settings.
+  $settings = variable_get('device_verification_hash', array(
+    'before' => '',
+    'prefix' => '',
+    'pattern' => 1,
+    'length' => 4,
+    'suffix' => '',
+    'after' => '',
+  ));
+  // Check hash code length.
+  if (strlen($hash) < $settings['length']) {
+    // Add zero padding: possible all zero.
+    $hash = str_pad($hash, $settings['length'], '0', STR_PAD_BOTH);
+  }
+  else {
+    $hash = substr($hash, 0, $settings['length']);
+  }
+  // Generate full hash message.
+  $message = t('@before @prefix@code@suffix @after', array(
+    '@before' => $settings['before'],
+    '@prefix' => $settings['prefix'],
+    '@code' => $hash,
+    '@suffix' => $settings['suffix'],
+    '@after' => $settings['after'],
+  ));
+  // Return trimmed message.
+  return trim($message);
+}
+
+/**
+ * Function device_send_verification_message().
+ *
+ * @param string $target
+ *   Device verification target.
+ * @param string $hash
+ *   Verification code.
+ */
+function device_send_verification_message($target, $hash) {
+  // Target and message must not empty.
+  if (!empty($target) && !empty($hash)) {
+    // Send SMS via zenziva, without queueing.
+    zenziva_api($target, device_generate_hash_message($hash));
+  }
+  // Log this condition.
+  watchdog('device', 'Device Verification Send to @target (@hash).', array(
+    '@target' => $target,
+    '@hash' => $hash,
+  ), WATCHDOG_INFO);
+}
+
+/**
+ * Function device_delete().
+ *
+ * Delete device and device verification entity and device session.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_delete($did) {
+  // Delete device entity.
+  entity_delete('device', $did);
+  // Delete device verification entity.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'device_verification')
+    ->propertyCondition('did', $did);
+  $result = $query->execute();
+  // Check the result.
+  if (!empty($result)) {
+    foreach ($result['device_verification'] as $dv_id => $dv_data) {
+      entity_delete('device_verification', $dv_id);
+    }
+  }
+  // Delete device session.
+  db_delete('device_sessions')->condition('did', $did)->execute();
+}
+
+/**
+ * Function device_block().
+ *
+ * Block device and delete device session.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_block($did) {
+  // Update device status to blocked.
+  $device_wrapper = entity_metadata_wrapper('device', $did);
+  $device_wrapper->status->set(0);
+  $device_wrapper->save();
+  // Delete device session.
+  db_delete('device_sessions')->condition('did', $did)->execute();
+}
+
+/**
+ * Function device_unblock().
+ *
+ * Unblock device.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_unblock($did) {
+  // Update device status to blocked.
+  $device_wrapper = entity_metadata_wrapper('device', $did);
+  $device_wrapper->status->set(1);
+  $device_wrapper->save();
+}
+
+
+/**
+ * Function resend_mail_verification().
+ *
+ * resend_mail_verification device.
+ *
+ * @param int $did
+ *   Device ID.
+ */
+function device_resend_mail_verification($did) {
+  // Check device_verification & device_mail_verification
+    $query_dmv = db_select('device', 'd');
+    $query_dmv->join('device_verification', 'dv', 'dv.did = d.did');
+    $query_dmv->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
+    $query_dmv->condition('d.did', $did, '=');
+    $query_dmv->condition('d.status', 1, '=');
+    $query_dmv->condition('dv.status', 1, '=');
+    $query_dmv->condition('dmv.status', 1, '!=');
+    $query_dmv->fields('d');
+    $query_dmv->addField('d', 'status', 'd_status');
+    $query_dmv->addField('dv', 'status', 'dv_status');
+    $query_dmv->addField('dmv', 'status', 'dmv_status');
+    $query_dmv->addField('dmv', 'mail');
+    $query_dmv->fields('dv', array('phone'));
+    $result_dmv = $query_dmv->execute()->fetchAssoc();
+
+  if(!empty($result_dmv['mail']) && !empty($result_dmv['did'])){
+    // drupal_set_message('kirim email pake: device_mail_verification_send_verification','status', FALSE);
+    device_mail_verification_send_verification($result_dmv['mail'],$result_dmv['did']);
+  }
+}

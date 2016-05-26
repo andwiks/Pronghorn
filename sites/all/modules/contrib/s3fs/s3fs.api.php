@@ -34,8 +34,7 @@
  *
  * @param string $s3_file_path
  *   The path to the file within your S3 bucket. This includes the prefixes
- *   which might be added (e.g. s3fs-public/ for public:// files, or the
- *   S3FS Root Folder setting).
+ *   which might be added, e.g. the Public Folder and/or Root Folder settings.
  *
  * @return array
  *   The modified array of configuration items.

@@ -32,12 +32,10 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
   if ($form_id == "sepulsa_phone_form") {
     $form['phone']['#title'] = NULL;
     $form['phone']['#attributes']['class'] = array('input-text', 'full-width');
-    $form['phone']['#attributes']['placeholder'] = t('Masukkan Nomor Handphone (mis. 081234567890)');
-    $form['phone']['#suffix'] = '<p></p>';
+    $form['phone']['#attributes']['placeholder'] = t('Masukkan No.Telepon/Bolt Anda (mis. 081234567890)');
 
     $form['operator']['#title'] = NULL;
     $form['operator']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Operator');
-    $form['operator']['#suffix'] = '<p></p>';
 
     $form['card_type']['#title'] = NULL;
     $form['card_type']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => 'Pilihan Kartu');
@@ -115,13 +113,16 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
       $form['account']['#title'] = NULL;
       $form['account']['login']['mail']['#title_display'] = 'invisible';
       $form['account']['login']['mail']['#attributes'] = array('class' => array('input-text', 'full-width'), 'placeholder' => t('Email Address'));
-      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong>'.t('Put Email Address').'</strong></h4>';
+      $form['account']['login']['#prefix'] = '<div class="cart-collaterals box"> <h4><strong> 1. '.t('Put Email Address').'</strong></h4>';
       $form['account']['login']['#suffix'] = '</div>';
+      $secondno = "2. ";
+    } else {
+      $secondno = "";
     }
 
     $form['commerce_payment']['#title'] = NULL;
     $form['commerce_payment']['#prefix'] = '<div id="commerce-payment-ajax-wrapper">';
-    $form['commerce_payment']['#prefix'] .= '<h4><strong>'.t('Payment Options').'</strong></h4>';
+    $form['commerce_payment']['#prefix'] .= '<h4><strong>'. $secondno . t('Payment Options').'</strong></h4>';
     $form['commerce_payment']['#suffix'] = '</div>';
 
     $form['commerce_payment']['payment_method']['#process'] = array('form_process_radios', 'sepulsav2_process_radios_payment_method');
@@ -261,6 +262,105 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
     $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
   }
+
+  // Check for UOB Webform #118536367.
+  if(isset($form['#node']->uuid) && $form['#node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943') {
+    $form['#validate'][] = 'sepulsa_UOBacquisitioncampaign_validation';
+  }
+}
+
+function sepulsa_UOBacquisitioncampaign_validation(&$form, &$form_state)
+{
+  global $user;
+  $pattern_no_hp = '/^(\+62|0)[1-9]{9,11}$/';
+
+  $telkomsel = "^(\\+62|\\+0|0|62)8(1[123]|52|53|21|22|23)[0-9]{5,9}$";
+  $simpati = "^(\\+62|\\+0|0|62)8(1[123]|2[12])[0-9]{5,9}$";
+  $as = "^(\\+62|\\+0|0|62)8(52|53|23)[0-9]{5,9}$";
+  $indosat = "^(\\+62815|0815|62815|\\+0815|\\+62816|0816|62816|\\+0816|\\+62858|0858|62858|\\+0814|\\+62814|0814|62814|\\+0814)[0-9]{5,9}$";
+  $im3  = "^(\\+62855|0855|62855|\\+0855|\\+62856|0856|62856|\\+0856|\\+62857|0857|62857|\\+0857)[0-9]{5,9}$";
+  $xl = "^(\\+62817|0817|62817|\\+0817|\\+62818|0818|62818|\\+0818|\\+62819|0819|62819|\\+0819|\\+62859|0859|62859|\\+0859|\\+0878|\\+62878|0878|62878|\\+0877|\\+62877|0877|62877)[0-9]{5,9}$";
+
+
+  $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
+  $no_hp = $form_state['input']['submitted']['no_hp'];
+  $nama_lengkap = $form_state['input']['submitted']['nama_lengkap'];
+  $kode_pos = $form_state['input']['submitted']['kode_pos'];
+  $kota = $form_state['input']['submitted']['kota'];
+  $no_ktp = $form_state['input']['submitted']['no_ktp'];
+  $alamat_email = $form_state['input']['submitted']['alamat_email'];
+  $jenis_kelamin = $form_state['input']['submitted']['jenis_kelamin'];
+  $day_lahir = $form_state['input']['submitted']['tanggal_lahir']['day'];
+  $month_lahir = $form_state['input']['submitted']['tanggal_lahir']['month'];
+  $year_lahir = $form_state['input']['submitted']['tanggal_lahir']['year'];
+
+  if ( empty($nama_lengkap) ) {
+    form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
+  }
+  if (empty($no_hp) && !preg_match($pattern_no_hp, $no_hp)){
+    form_set_error('no_hp', t('No HP harus diawali +62, 62, atau 08'));
+  }
+  if ( empty($kode_pos) ) {
+    form_set_error('kode_pos', t('Kode pos harus diisi'));
+  }
+  if ( empty($kota) ) {
+    form_set_error('kota', t('Kota harus diisi'));
+  }
+
+  if ( empty($alamat_email) && !valid_email_address($alamat_email) ) {
+    form_set_error('alamat_email', t('Alamat email harus diisi'));
+  }
+  if ( empty($jenis_kelamin) ) {
+    form_set_error('jenis_kelamin', t('Pilih jenis kelamin'));
+  }
+  if ( empty($day_lahir) || empty($month_lahir) || empty($year_lahir) ) {
+    form_set_error('tanggal_lahir', t('Tanggal lahir harus diisi'));
+  }
+  if ( empty($no_ktp) ) {
+    form_set_error('no_ktp', t('No KTP harus diisi'));
+  }
+  if ( empty($term_agree) ) {
+    form_set_error('term_agree agree', t('Terms & Conditions harus disetujui'));
+  }
+
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for bpjs_kesehatan_form().
+ */
+function sepulsav2_form_bpjs_kesehatan_form_alter(&$form, &$form_state, $form_id) {
+  $action = drupal_parse_url($form['#action']);
+  if (empty($action['fragment'])) {
+    $form['#action'] .= '#bpjs-kesehatan';
+  }
+
+  $form['#attached']['css'][] = path_to_theme() . '/css/bpjs-kesehatan.css';
+
+  $form['field_phone_number']['#title_display'] = 'invisible';
+  $form['field_phone_number']['#attributes']['placeholder'] = $form['field_phone_number']['#title'];
+
+  foreach (element_children($form['line_items']) as $delta => $child) {
+    $form['line_items'][$child]['field_customer_number']['#title_display'] = 'invisible';
+    $form['line_items'][$child]['field_customer_number']['#attributes']['placeholder'] = $form['line_items'][$child]['field_customer_number']['#title'];
+    $form['line_items'][$child]['field_customer_number']['#attributes']['class'][] = 'customer-number';
+
+    if ($delta == count(element_children($form['line_items'])) - 1) {
+      unset($form['line_items'][$child]['remove']);
+    }
+    else {
+      $form['line_items'][$child]['remove']['#value'] = '-';
+      $form['line_items'][$child]['remove']['#attributes']['class'][] = 'remove';
+      $form['line_items'][$child]['remove']['#attributes']['title'] = 'Hapus No Pelanggan';
+    }
+  }
+
+  $form['actions']['new']['#value'] = '+';
+  $form['actions']['new']['#attributes']['class'][] = 'add-new';
+  $form['actions']['submit']['#attributes']['style'] = 'float:right; background-color:#ccc !important; color: #000';
+  $form['actions']['submit']['#attributes']['class'][] = 'enabled inactive';
+  $form['actions']['submit']['#attributes']['title'] = 'Tambah No Pelanggan';
+
+  $form['actions']['charge']['#attributes']['style'] = 'float:right';
 }
 
 /**
@@ -310,7 +410,6 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
       case 'electricity_prepaid':
         $form['product_id']['#attributes']['class'][] = 'input-text';
         $form['product_id']['#attributes']['class'][] = 'full-width';
-        $form['product_id']['#suffix'] = '<p></p>';
 
         $form['line_item_fields']['#weight'] = 0;
 
@@ -318,18 +417,18 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
-        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+        $form['line_item_fields']['electricity_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'meter-number';
 
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
-        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
-
+        $form['line_item_fields']['electricity_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'phone-number';
 
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'enabled';
         $form['submit']['#attributes']['class'][] = 'pull-right';
         $form['submit']['#attributes']['style'][] = 'float:right;';
 
@@ -352,11 +451,11 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['#action'] .= '#pln';
         break;
 
+      case 'bpjs_kesehatan':
       case 'biznet':
       case 'multifinance':
         $form['product_id']['#attributes']['class'][] = 'input-text';
         $form['product_id']['#attributes']['class'][] = 'full-width';
-        $form['product_id']['#suffix'] = '<p></p>';
 
         $form['line_item_fields']['#weight'] = 0;
 
@@ -365,35 +464,42 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
-        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'customer-number';
 
         if (!empty($form['description'])) {
-          $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
+          $form['description']['#prefix'] = '<div class="info-pulsa">';
           $form['description']['#suffix'] = '</div>';
           $form['description']['#weight'] = 1;
         }
 
+        if (!empty($form['line_item_fields']['payment_period'])) {
+          $form['line_item_fields']['payment_period'][LANGUAGE_NONE]['#title_display'] = 'invisible';
+        }
+
+        $form['product_id']['#suffix'] = '<p></p>';
+
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'enabled';
         $form['submit']['#attributes']['class'][] = 'pull-right';
         $form['submit']['#attributes']['style'][] = 'float:right;';
         $form['submit']['#weight'] = 3;
 
-        $form['submit']['#states'] = array(
+        // States for submit and charge button.
+        $states = array(
           'enabled' => array(
-            'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
+            'form#' . $form['#id'] . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
           ),
         );
+
+        $form['submit']['#states'] = $states;
         // Add charge state: if available.
-        if (isset($form['charge']) && !empty($form['charge'])) {
-          $form['charge']['#states'] = array(
-            'enabled' => array(
-              'form#commerce-cart-add-to-cart-form-' . $form_state['line_item']->type . ' input[name="line_item_fields[field_customer_number][' . LANGUAGE_NONE . '][0][value]"]' => array('empty' => FALSE),
-            ),
-          );
+        if (!empty($form['charge'])) {
+          $form['charge']['#states'] = $states;
         }
-        $form['#action'] .= '#' . $form_state['line_item']->type;
+
+        $form['#action'] .= '#' . drupal_html_id($form_state['line_item']->type);
         break;
 
       case 'pln_prepaid':
@@ -403,28 +509,34 @@ function sepulsav2_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_stat
 
         $form['line_item_fields']['#weight'] = 0;
 
+        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title'] = t('No. Handphone (misal: 08123456789)');
+
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'] = t('No. Meter PLN (11 digit misal: 14224251XXX)');
+
         $form['line_item_fields']['field_customer_number']['#weight'] = -10;
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
+        $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'meter-number';
         $form['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
 
-        $form['line_item_fields']['field_phone_number']['#weight'] = -5;
+        $form['line_item_fields']['field_phone_number']['#weight'] = -15;
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title'];
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-text';
         $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'full-width';
-        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#suffix'] = '<p></p>';
+        $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'phone-number';
 
         if (!empty($form['description'])) {
-          $form['description']['#prefix'] = '<div style="border: 1px solid; padding: 1em; margin: 15px 0px; font-size: 1.2em; clear: both;">';
+          $form['description']['#prefix'] = '<div class="info-pulsa">';
           $form['description']['#suffix'] = '</div>';
         }
 
         $form['submit']['#value'] = t('Add to cart', array(), array('context' => 'multipaid_product'));
         $form['submit']['#attributes']['class'][] = 'btn';
         $form['submit']['#attributes']['class'][] = 'style1';
+        $form['submit']['#attributes']['class'][] = 'enabled';
         $form['submit']['#attributes']['class'][] = 'pull-right';
 
         $form['submit']['#weight'] = 3;
@@ -558,7 +670,14 @@ function sepulsav2_preprocess_html(&$variables) {
 /**
  * Implements hook_preprocess_page().
  */
-function sepulsav2_preprocess_page(&$variables) {
+function sepulsav2_preprocess_page(&$variables, $hook) {
+  // UOB Webform.
+  if (isset($variables['node']->uuid)
+    && $variables['node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943'
+  ) {
+    $variables['theme_hook_suggestions'][] = 'page__node__' . str_replace('-', '_', $variables['node']->uuid);
+  }
+
   if (drupal_is_front_page()) {
     if (isset($_POST['form_id']) && $_POST['form_id'] == 'commerce_cart_add_to_cart_form') {
       $variables['active_tab'] = 'token_reload';
@@ -797,6 +916,11 @@ function sepulsav2_status_messages($variables) {
  */
 function sepulsav2_theme($existing, $type, $theme, $path) {
   return array(
+    'bpjs_kesehatan_form' => array(
+      'render element' => 'form',
+      'path' => $path . '/templates/form',
+      'template' => 'bpjs-kesehatan-form',
+    ),
     'commerce_checkout_form_checkout' => array(
       'render element' => 'form',
       'path' => $path . '/templates/checkout',
@@ -942,4 +1066,40 @@ function sepulsav2_process_radios_payment_method($element) {
   }
 
   return $element;
+}
+
+/**
+ * Implements hook_webform_component_render_alter().
+ */
+function sepulsav2_webform_component_render_alter(&$element, &$component) {
+  if ($element['#type'] == 'date') {
+    $element['#process'][] = 'sepulsav2_webform_expand_date';
+  }
+}
+
+/**
+ * Process function to re-order the elements in the date widget.
+ */
+function sepulsav2_webform_expand_date($element) {
+  $element['day']['#weight'] = 0;
+  $element['month']['#weight'] = 1;
+  $element['year']['#weight'] = 2;
+  return $element;
+}
+
+// Replace string on line item admin_fee.
+function sepulsav2_preprocess_views_view(&$vars) {
+  if($vars["name"]=="commerce_cart_summary") {
+    $fee ='
+      <td class="product-subtotal">
+        <span class="amount"><strong>0  IDR</strong></span>
+      </td>
+    ';
+    $new_fee ='
+      <td class="product-subtotal">
+        <span class="amount"><strong>'.t('FREE').'</strong></span>
+      </td>
+    ';
+    $vars['footer'] = str_replace($fee, $new_fee, $vars['footer']);
+  }
 }

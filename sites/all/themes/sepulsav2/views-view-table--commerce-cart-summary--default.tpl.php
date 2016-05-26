@@ -35,10 +35,22 @@
 <?php endif; ?>
 <tbody>
   <?php foreach ($rows as $row_count => $row): ?>
+
     <tr class="cart_item">
       <?php foreach ($row as $field => $content): ?>
+
         <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
-          <?php print $content; ?>
+          <?php
+            // Replace 0 IDR with text FREE.
+            $total[$field] = strip_tags($content);
+
+            if($field=='commerce_unit_price_1' && $total[$field]=='0  IDR'){
+              print t('FREE');
+            }else{
+              print $content;
+            }
+
+          ?>
         </td>
       <?php endforeach; ?>
     </tr>

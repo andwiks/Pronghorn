@@ -1,0 +1,323 @@
+<?php
+/**
+ * @file
+ * jwt_client.module
+ *
+ * @author andreas@sepulsa.com
+ * @todo: check user_login_finalize().
+ */
+
+/**
+ * JWT Client config menu path.
+ * @var string
+ */
+define('JWT_CLIENT_CONFIG_MENU_PATH', 'admin/config/services/jwt/client');
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function jwt_client_menu() {
+  $items = array();
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH] = array(
+    'title' => 'Client',
+    'description' => 'JWT client page',
+    'page callback' => 'jwt_client_list',
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/list'] = array(
+    'title' => 'List',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/add'] = array(
+    'title' => 'Add',
+    'description' => 'Add JWT client page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_client_form'),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/%jwt_client'] = array(
+    'title' => 'Edit',
+    'description' => 'Edit JWT client page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_client_form', 5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/%jwt_client/delete'] = array(
+    'title' => 'Delete',
+    'description' => 'Delete JWT client page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('jwt_client_delete_form', 5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/%jwt_client/enable'] = array(
+    'title' => 'Enable',
+    'description' => 'Enable JWT client configuration',
+    'page callback' => 'jwt_client_enable',
+    'page arguments' => array(5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+  );
+
+  $items[JWT_CLIENT_CONFIG_MENU_PATH . '/%jwt_client/disable'] = array(
+    'title' => 'Disable',
+    'description' => 'Disable JWT client configuration',
+    'page callback' => 'jwt_client_disable',
+    'page arguments' => array(5),
+    'access arguments' => array('administer jwt'),
+    'file' => 'jwt_client.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_load().
+ */
+function jwt_client_load($client) {
+  // Validate Client ID.
+  $client = intval($client);
+  // Get data from static variables.
+  $config = &drupal_static(__FUNCTION__ . '_' . $client);
+  // Check the config data.
+  if (!isset($config)) {
+    // Load jwt config from cache.
+    if ($cache = cache_get('jwt:client:' . $client)) {
+      $config = $cache->data;
+    }
+    else {
+      // Get jwt client config by id.
+      $entity = entity_load('jwt_client', array($client));
+      if (isset($entity[$client]) && !empty($entity[$client])) {
+        $config = $entity[$client];
+        $config->resources = unserialize($config->resources);
+        cache_set('jwt:client:' . $client, $config, 'cache');
+      }
+    }
+  }
+  // Check whether can get config data.
+  return is_object($config) && !empty($config) ? $config : FALSE;
+}
+
+/**
+ * Implements hook_jwt_auth_verified().
+ */
+function jwt_client_jwt_auth_verified($claims) {
+  // Check claim data.
+  if (isset($claims['scope']) && isset($claims['did']) && isset($claims['jti'])) {
+    // Get claim did.
+    $did = $claims['did']->getValue();
+    // Get claim jti.
+    $jti = $claims['jti']->getValue();
+    // Get scope.
+    $scope = $claims['scope']->getValue();
+    // Get current scope.
+    $scope_current = jwt_auth_scope();
+
+    // Define scope client.
+    $scope_client = FALSE;
+    // Looping foreach jwt client configuration.
+    foreach ($scope as $client_name => $client_operation) {
+      $client = jwt_client_load_by_name($client_name);
+      if ($client !== FALSE) {
+        // Looping foreach scope current.
+        foreach ($scope_current as $current_resource => $current_operation) {
+          // Check scope current with client resource.
+          if (isset($client->resources[$current_resource])) {
+            $intersect = array_intersect_assoc($client->resources[$current_resource], $current_operation);
+            if (isset($client->resources[$current_resource])
+              && !empty($intersect)
+            ) {
+              $scope_client = $client;
+              break 2;
+            }
+          }
+        }
+      }
+    }
+    // Check scope client.
+    // 1. Check whether scope client is available and enabled.
+    // 2. Scope client has been checked with scope current no need further.
+    if ($scope_client !== FALSE
+      && isset($scope->{$scope_client->name})
+      && !empty($scope->{$scope_client->name})
+    ) {
+      // @todo: check if previously user has uid has previous session.
+      // Get jwt audience.
+      $aud = $claims['aud']->getValue();
+      // Get active user account based on aud (mail).
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'user')
+        ->propertyCondition('mail', $aud)
+        ->propertyCondition('status', 1)
+        ->propertyOrderBy('uid', 'DESC');
+      $result = $query->execute();
+      // Load the user account.
+      if (!empty($result) && isset($result['user']) && !empty($result['user'])) {
+        $account = user_load(key($result['user']));
+      }
+      else {
+        $account = user_load_by_mail($aud);
+      }
+      // Check device mail: compare it with aud.
+      try {
+        $device_wrapper = entity_metadata_wrapper('device', $did);
+        $device_mail = $device_wrapper->device_mail->value();
+        // Check if token mail is not the same with device mail.
+        if (!empty($device_mail)
+          && $device_mail != $aud
+        ) {
+          return services_error(t('Invalid User'), 401);
+        }
+      }
+      catch (EntityMetadataWrapperException $exp) {
+        // Log this condition.
+        watchdog('jwt_client', 'Device Token with invalid device mail. Debug: <pre>@debug</pre>', array(
+          '@debug' => $exp->getTraceAsString(),
+        ), WATCHDOG_ERROR);
+        // This means: device is not available.
+        return services_error(t('Invalid User'), 401);
+      }
+
+      // Check if can get user id.
+      if ($account === FALSE || (isset($account->uid) && $account->uid == 0)) {
+        // Create user dummy: set up the user fields.
+        $account = new stdClass();
+        $account->is_new = TRUE;
+        $account->name = preg_replace('#\@#', '_', $aud);
+        $account->mail = $aud;
+        $account->pass = user_password();
+        $account->status = 1;
+        $account->init = $aud;
+        $account->roles = array(
+          DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+        );
+        $account = user_save($account);
+      }
+      // Start drupal session.
+      drupal_session_start();
+      // Save this session.
+      drupal_save_session(TRUE);
+      // Set session id with current jti value.
+      session_id($jti);
+      // Set fake cookie name.
+      $_COOKIE[session_name()] = TRUE;
+      // Get global user object.
+      global $user, $is_https;
+      if ($user->uid == 0 && $account->uid > 0) {
+        // Load user and store it on global user object.
+        $user = $account;
+        // Save the user to services original user.
+        services_set_server_info('original_user', $user);
+      }
+      // Check current sessions.
+      // @todo: this is dangerrous.
+      $current = db_select('sessions', 's')->fields('s')->condition($is_https ? 'ssid' : 'sid', $jti)->execute()->fetchAll();
+      if (empty($current) || $current[0]->uid != $account->uid) {
+        drupal_session_commit();
+      }
+      // Reset: populate session again.
+      session_reset();
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function jwt_client_entity_info() {
+  $info['jwt_client'] = array(
+    // A human readable label to identify our entity.
+    'label' => t('JWT Client'),
+    // The controller for our Entity: use Entity API controller.
+    'controller class' => 'EntityAPIController',
+    // The table for this entity defined in hook_schema()
+    'base table' => 'jwt_client',
+    // Make use the class' label() and uri() implementation by default.
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    // IF fieldable == FALSE, we can't attach fields.
+    'fieldable' => FALSE,
+    // entity_keys tells the controller what database fields are used for key
+    // functions. It is not required if we don't have bundles or revisions.
+    // Here we do not support a revision, so that entity key is omitted.
+    'entity keys' => array(
+      // The 'id' (basic_id here) is the unique id.
+      'id' => 'cid',
+      'label' => 'label',
+    ),
+    'access callback' => 'jwt_client_access',
+    'bundles' => array(
+      'jwt_client' => array(
+        'label' => t('JWT Client'),
+        'admin' => array(
+          'path' => JWT_CLIENT_CONFIG_MENU_PATH,
+          'access arguments' => array('administer jwt'),
+        ),
+      ),
+    ),
+  );
+
+  return $info;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function jwt_client_load_by_name().
+ *
+ * @param string $name
+ *   JWT config machine name.
+ *
+ * @return mixed
+ *   JWT config object or FALSE if not found.
+ */
+function jwt_client_load_by_name($name) {
+  // Search for jwt client config name.
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'jwt_client')
+  ->propertyCondition('name', $name);
+  $result = $query->execute();
+  // Check the result.
+  if (!empty($result)) {
+    return jwt_client_load(key($result['jwt_client']));
+  }
+  // Other condition return FALSE.
+  return FALSE;
+}
+
+/**
+ * Function jwt_client_access().
+ *
+ * @param string $op
+ *   Entity operation.
+ * @param object $entity
+ *   Entity data.
+ * @param string $account
+ *   Supposed to be user object.
+ * @param string $entity_type
+ *   Entity type.
+ *
+ * @return bool
+ *   Allow access or not.
+ */
+function jwt_client_access($op, $entity = NULL, $account = NULL, $entity_type = '') {
+  // @todo: check user roles.
+  return TRUE;
+}

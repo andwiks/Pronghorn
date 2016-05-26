@@ -15,11 +15,15 @@ $(document).ready(function () {
         minSlides:1,
         maxSlides: 3,
         marginSlide: 7
-    });// carousel voucher 
+    });// carousel voucher
+
+    $(".promo_banner .slider > .slide").length
 
     $(".promo_banner .slider").bxSlider({
-        auto: true,
-        mode: 'fade'
+        auto: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        mode: 'fade',
+        pager: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        controls : ($(".promo_banner .slider > .slide").length > 1) ? true: false
     });// carousel voucher vendor
 
 
@@ -35,9 +39,9 @@ $(document).ready(function () {
     homeTab(); //tab switch at home
     kreditTab(); //tab switch at home
     dropTransaksi(); //drop transaksi combobox
-    dropDownHeader(); //dropdown menu 
-    dropDownCart(); //dropdown menu 
-    popupLogin(); //open popup login    
+    dropDownHeader(); //dropdown menu
+    dropDownCart(); //dropdown menu
+    popupLogin(); //open popup login
     stepIsiPulsa();//toogle show nextstep(isi pulsa)
     radioButton(); //radio button custom
     accordion(); //  accordion other content (faq & etc)
@@ -80,11 +84,18 @@ $(document).ready(function () {
     });
     hoverShare(); // hover share blog
 
-    
     $(".banner").click(function (event) {
       if(event.target != $('div.a')[0])
-        /*alert('You clicked the body!');*/
         $("#shopping-cart").fadeOut();
     });
+
+    if(webform_UOB_campaign!=null && anonym==1){
+        openPop(".wrap_popup#login");
+        $('#login .box_popup .close').hide();
+
+        $('#login #user-login-form a[href="/user/password"]').attr("href", forgot_destination);
+        $('#login a[href="/user/register"]').attr("href", register_destination);
+
+    }
 
 });

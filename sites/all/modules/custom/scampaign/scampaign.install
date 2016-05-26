@@ -8,7 +8,7 @@
  * Implements hook_schema().
  */
 function scampaign_schema() {
-  $schema['scampaign'] = array(    
+  $schema['scampaign'] = array(
     'description' => 'Storing Campaign Link id, status and promo',
     'fields' => array(
       'id' => array(
@@ -29,14 +29,14 @@ function scampaign_schema() {
         'description' => 'Campaign Name Tag',
         'type' => 'varchar',
         'length' => 255,
-        'not null' => true,
+        'not null' => TRUE,
         'default' => '',
       ),
       'rules_name' => array(
         'description' => 'Rules Name',
         'type' => 'varchar',
         'length' => 255,
-        'not null' => true,
+        'not null' => TRUE,
         'default' => '',
       ),
       'email' => array(
@@ -48,6 +48,6 @@ function scampaign_schema() {
     ),
     'primary key' => array('id'),
   );
-    
+
   return $schema;
 }

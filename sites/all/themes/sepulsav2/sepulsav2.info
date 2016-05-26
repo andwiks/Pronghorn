@@ -2,6 +2,7 @@ name = Sepulsa V2
 description = Sepulsa Initial theme
 core = 7.x
 
+regions[page_img_header] = Page Image Header
 regions[page_top] = Page top
 regions[page_bottom] = Page bottom
 regions[content] = Content
@@ -30,6 +31,7 @@ stylesheets[all][] = css/jquery.bxslider.css
 stylesheets[all][] = css/reset.css
 stylesheets[all][] = css/style.css
 stylesheets[all][] = css/theme.css
+stylesheets[all][] = css/revamp_header.css
 stylesheets[screen and (min-width:0px) and (max-width:1170px)][] = css/stylemedia768.css
 stylesheets[screen and (min-width:480px) and (max-width:767px)][] = css/stylemedia480.css
 stylesheets[screen and (min-width:0px) and (max-width:479px)][] = css/stylemedia320.css

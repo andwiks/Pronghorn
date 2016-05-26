@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * sepulsa.module
+ * Handle page callback.
  *
  * @author andre4s_y
  *
@@ -45,8 +45,51 @@ function sepulsa_front_page() {
     $order = commerce_cart_order_load($user->uid);
     // Check whether order is not empty.
     if (!empty($order)) {
-      // For now, always empty cart when visit homepage.
-      commerce_cart_order_empty($order);
+      // Check for any payment transaction.
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_payment_transaction')
+        ->propertyCondition('order_id', $order->order_id, '=')
+        ->range(0, 1);
+      $result = $query->execute();
+      // Order has no payment transaction.
+      if (empty($result)) {
+        // Empty cart when visit homepage.
+        commerce_cart_order_empty($order);
+      }
+      else {
+        // Check for success payment transaction.
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'commerce_payment_transaction')
+          ->propertyCondition('order_id', $order->order_id, '=')
+          ->propertyCondition('status', COMMERCE_PAYMENT_STATUS_SUCCESS, '=')
+          ->range(0, 1);
+        $result = $query->execute();
+        // Order has success payment transaction.
+        if (!empty($result)) {
+          // Check order balance.
+          $balance = commerce_payment_order_balance($order);
+          // Check order status.
+          $order_complete = in_array($order->status, array(
+            'checkout_complete', 'pending', 'processing', 'completed', 'invoiced',
+          ));
+          // Check whether balance is empty.
+          if (isset($balance['amount']) && empty($balance['amount'])) {
+            // Balance is empty: check order status.
+            if (!$order_complete) {
+              // Order not complete: update status to pending.
+              commerce_order_status_update($order, 'pending', FALSE, TRUE, t('Automatic pending status: visit frontpage and payment success.'));
+            }
+          }
+          else {
+            // Balance is not empty: notify CS.
+            drupal_mail('sepulsa', 'order_not_complete_front', 'satpam.cs@sepulsa.com', language_default(), array(
+              'order' => $order,
+            ), variable_get('site_mail', 'admin@example.com'), TRUE);
+          }
+        }
+        // Assign new order ID.
+        commerce_cart_order_new($order->uid);
+      }
     }
   }
   // Get sepulsa phone form.
@@ -97,7 +140,7 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     0 => t('Select Packet'),
   );
 
-  // Define default packet description
+  // Define default packet description.
   $desc = "";
   // Check previous form state.
   $phone = (isset($form_state['input']['phone']) && !empty($form_state['input']['phone'])) ? $form_state['input']['phone'] : '';
@@ -115,24 +158,23 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
         ORDER BY a.created DESC";
     $result = db_query($query, array(':uid' => $user->uid));
     foreach ($result as $row) {
-    $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
+      $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
     }
     $existing_phone = sepulsa_get_existing_number();
     foreach ($existing_phone as $value) {
-    $existing_phone_options[$value] = $value;
+      $existing_phone_options[$value] = $value;
     }
     if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
-    $existing_phone_options['0'] = t('Topup another number');
-    $form['existing_phone'] = array(
-      '#type' => 'select',
-      '#title' => '',
-      '#options' => $existing_phone_options,
-      //'#suffix' => '<div>&nbsp;</div>',
-      '#validated' => TRUE,
-      '#attributes' => array(
-      'class' => array('full-width'),
-      ),
-    );
+      $existing_phone_options['0'] = t('Topup another number');
+      $form['existing_phone'] = array(
+        '#type' => 'select',
+        '#title' => '',
+        '#options' => $existing_phone_options,
+        '#validated' => TRUE,
+        '#attributes' => array(
+          'class' => array('full-width'),
+        ),
+      );
     }
   }
 
@@ -145,10 +187,8 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     '#autocomplete_path' => 'sepulsa/autocomplete/phone',
     '#attributes' => array(
       'pattern' => '[0-9]*',
-    'style'=>'margin-top: 15px;'
+      'style' => 'margin-top: 15px;',
     ),
-    // '#prefix' => '<div id="phone-sepulsa" style="display: inline;">',
-    // '#suffix' => 'test</div>',
   );
   if ($data_packet) {
     $form['phone']['#autocomplete_path'] = 'sepulsa/autocomplete/data';
@@ -202,8 +242,6 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     '#default_value' => (isset($operator)) ? $operator : 0,
     '#options' => $operator_options,
     '#disabled' => TRUE,
-    // '#prefix' => '<div id="operator-sepulsa" style="display: none;">',
-    // '#suffix' => '</div>',
   );
 
   // Check whether operator input already available.
@@ -230,7 +268,7 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     '#validated' => TRUE,
   );
 
-  // Data package information
+  // Data package information.
   $data_info = "";
   foreach ($descs as $key => $desc) {
     if ($desc != '') {
@@ -238,7 +276,7 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
     }
   }
   $form['data_info'] = array(
-    '#markup' => $data_info
+    '#markup' => $data_info,
   );
   // Define add to cart: currently as markup.
   // Check autocomplete for cart.
@@ -340,7 +378,7 @@ function sepulsa_phone_form_validate($form, &$form_state) {
   $order = commerce_cart_order_load($GLOBALS['user']->uid);
   if (empty($order)) {
     $order = commerce_cart_order_new($GLOBALS['user']->uid);
-    $order->data ['last_cart_refresh'] = REQUEST_TIME;
+    $order->data['last_cart_refresh'] = REQUEST_TIME;
   }
   else {
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
@@ -472,9 +510,6 @@ function sepulsa_autocomplete_prefix($string, $count = 4, $data_packet = FALSE) 
  *
  * @param string $string
  *   Phone number input by user.
- *
- * @return string
- *   JSON output.
  */
 function sepulsa_autocomplete_phone_number($string = '', $data_packet = FALSE) {
   $matches = array();

@@ -278,6 +278,14 @@ function commerce_checkout_services_resource_process($checkout) {
       // Get checkout form array.
       $form = drupal_build_form('commerce_checkout_form_checkout', $form_state);
 
+      // Adjustment for mail with plus sign.
+      if (isset($input['account']['login']['mail']) && isset($checkout['account[login][mail]'])
+        && $input['account']['login']['mail'] != $checkout['account[login][mail]']
+      ) {
+        // Plus signed detected as space: bring the original mail input.
+        $input['account']['login']['mail'] = $checkout['account[login][mail]'];
+      }
+
       // Set form state values.
       $form_state['values'] = $input;
       $form_state['values']['commerce_payment']['payment_methods'] = commerce_checkout_services_resource_pane_retrieve('commerce_payment', 'payment_methods', '#value');
@@ -322,12 +330,12 @@ function commerce_checkout_services_resource_process($checkout) {
 
       // Get order object.
       $order = $form_state['order'];
-      
+
       //stripos($order->field_app["und"][0]["value"],'ios') is a workaround to fix issues with missing discount code in live environment from ios order
       if(isset($order->field_app["und"][0]["value"]) && stripos($order->field_app["und"][0]["value"],'ios') !== false){
         return $order;
       }
-      
+
       // Return order object.
       return order_services_order($order);
     }

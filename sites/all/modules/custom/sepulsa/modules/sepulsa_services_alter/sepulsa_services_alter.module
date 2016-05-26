@@ -1,0 +1,62 @@
+<?php
+/**
+ * @file
+ * sepulsa_services_alter.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_request_postprocess_alter().
+ */
+function sepulsa_services_alter_services_request_postprocess_alter($controller, $args, &$result) {
+  // Get setting to alter endpoints.
+  $settings = variable_get('sepulsa_services_alter_endpoints', array());
+  // Get current service endpoint name.
+  $endpoint_name = services_get_server_info('endpoint');
+  // Load service endpoint data.
+  $endpoint = services_endpoint_load($endpoint_name);
+  // Only for specific endpoint name.
+  if (isset($endpoint->name)
+    && isset($settings[$endpoint->name])
+    && !empty($settings[$endpoint->name])
+  ) {
+    // Check if already altered.
+    if (!(is_array($result)
+      && array_key_exists('status', $result)
+      && array_key_exists('message', $result)
+      && array_key_exists('data', $result)
+    )) {
+      // Change result structure.
+      $result = array(
+        'status' => TRUE,
+        'message' => drupal_get_messages(),
+        'data' => (empty($result)) ? NULL : $result,
+      );
+    }
+    // Check for empty data.
+    if (isset($result['data']) && empty($result['data']) && !is_null($result['data'])) {
+      $result['data'] = NULL;
+    }
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_services_alter_menu() {
+  $items = array();
+  $items['admin/config/services/sepulsa'] = array(
+    'title' => 'Sepulsa Services',
+    'description' => 'Sepulsa services additional configuration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_services_alter_settings_form'),
+    'access arguments' => array('administer services'),
+    'file' => 'sepulsa_services_alter.admin.inc',
+  );
+  return $items;
+}

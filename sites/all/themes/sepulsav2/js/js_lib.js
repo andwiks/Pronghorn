@@ -101,28 +101,28 @@ $.fn.placeHolder = function (e) {
 function homeTab() {
     //init
     var hash = window.location.hash.substr(1);
-    if (hash=='multifinance')
-    {
-        $(".home_tab .content_tab #target_4").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.finance').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
+
+    if (hash === '' || hash === 'undefined') {
+        hash = 'pulsa';
     }
-    else if (hash=='biznet')
-    {
-        $(".home_tab .content_tab #target_3").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.bolt').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
-    }
-    else if (hash=='pln')
-    {
-        $(".home_tab .content_tab #target_2").css('display', 'block');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.listrik').parent().addClass('active');
-        $('section.h_middle_top .home_tab .nav_tab a span.ico.pulsa').parent().removeClass('active');
-    }
-    else
-    {
-        var target = $(".home_tab .nav_tab a.active").attr('target');
-        $(".home_tab .content_tab #" + target).css('display', 'block');
+
+        /* perbaikan hash yang tidak dikenali */
+
+        if (hash === 'bpjs' || hash === 'bpjs-kesehatan') {
+            hash = 'bpjs-kesehatan';
+        }
+
+            var categories = [ "pln", "biznet", "bpjs-kesehatan", "multifinance" ];
+            found = $.inArray(hash, categories);
+
+        if (found !== 0) {
+            hash = 'pulsa';
+        }
+
+    if ($('.home_tab .content_tab #' + hash) !== 'undefined') {
+        $('.home_tab .content_tab #' + hash).css('display', 'block');
+        $('section.h_middle_top .home_tab .nav_tab a[target=' + hash + ']').addClass('active');
+        $('section.h_middle_top .home_tab .nav_tab a[target=' + hash + ']').siblings().removeClass('active');
     }
 
     $(".home_tab .nav_tab a").click(function (e) {
@@ -229,9 +229,13 @@ function radioButton() {
 }
 
 function accordion() {
+    $(".row.accordion .label").css('cursor','pointer');
     $(".accordion").each(function () {
         if ($(this).hasClass('active')) {
             $(this).children(".content").slideDown(300);
+        }
+        if ($(this).hasClass('deactive')) {
+            $(this).children(".content").hide();
         }
     });
 
@@ -239,9 +243,11 @@ function accordion() {
         if ($(this).parent('.accordion ').hasClass('active')) {
             $(this).parent('.accordion ').children(".content").slideUp(300);
             $(this).parent('.accordion ').removeClass('active');
+            $(this).children('.ico').html('+');
         } else {
             $(this).parent('.accordion ').children(".content").slideDown(300);
             $(this).parent('.accordion ').addClass('active');
+             $(this).children('.ico').html('-');
         }
     });
 }
@@ -332,15 +338,21 @@ function menuMobile() {
         e.preventDefault();
         $(this).parent().children(".box_drop").slideToggle(300);
     });
+
+
+    $(".mobile-download .close").click(function (e) {
+        e.preventDefault();
+        $(".mobile-download").css('display', 'none');
+    });
 }
 
 function randomTheme() {
-    if ($("body").hasClass('home')) {
+    /*if ($("body").hasClass('home')) {
         var class_rand = ['', 'blue', 'green', 'red'];
         var random = Math.floor((Math.random() * 4) + 0);
 
         $("body").addClass(class_rand[random]);
-    }
+    }*/
 }
 
 function stepIsiPulsa() {

@@ -1,0 +1,17 @@
+name = Facebook Tracking Pixel
+description = Manage Facebook Tracking pixels
+core = 7.x
+php = 5.4
+files[] = tests/facebook_tracking_pixel.test
+files[] = tests/facebook_tracking_pixel.tracking.test
+files[] = tests/facebook_tracking_pixel.user.test
+files[] = tests/facebook_tracking_pixel.commerce.test
+package = Statistics
+configure = admin/config/system/facebook_tracking_pixel
+
+; Information added by Drupal.org packaging script on 2016-04-03
+version = "7.x-1.0-beta2"
+core = "7.x"
+project = "facebook_tracking_pixel"
+datestamp = "1459682340"
+

@@ -1,0 +1,10 @@
+; $Id$
+name = Apps Services v2 Get Payment List
+description = Service to Get Payment List from pronghorn
+package = Apps Services v2
+version = 0.1
+core = 7.x
+dependencies[] = commerce_checkout
+dependencies[] = order_services
+dependencies[] = services
+dependencies[] = services_documentation

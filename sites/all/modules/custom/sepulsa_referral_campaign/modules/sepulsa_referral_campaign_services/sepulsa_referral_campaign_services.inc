@@ -211,14 +211,14 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
     case 'uplink':
       // Query for uplink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
+      $query->join('users', 'u', 'rcd.uid = u.uid');
       $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
-      $query->join('device', 'd', 'd.uid = rcd.referral_uid');
+      $query->join('device', 'd', 'd.uid = rcd.uid');
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
       $query->fields('src', array('desc_benefit_referral'));
-      $query->condition('rcd.referral_uid', $uid);
+      $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
       foreach ($result as $key => $value) {
@@ -229,14 +229,14 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
     case 'downlink':
       // Query for downlink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->join('users', 'u', 'rcd.uid = u.uid');
+      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
       $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
-      $query->join('device', 'd', 'd.uid = rcd.uid');
+      $query->join('device', 'd', 'd.uid = rcd.referral_uid');
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
       $query->fields('src', array('desc_benefit'));
-      $query->condition('rcd.uid', $uid);
+      $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
       foreach ($result as $key => $value) {
@@ -247,14 +247,14 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
     case 'all':
       // Query for uplink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
+      $query->join('users', 'u', 'rcd.uid = u.uid');
       $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
-      $query->join('device', 'd', 'd.uid = rcd.referral_uid');
+      $query->join('device', 'd', 'd.uid = rcd.uid');
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
       $query->fields('src', array('desc_benefit_referral'));
-      $query->condition('rcd.referral_uid', $uid);
+      $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
       foreach ($result as $key => $value) {
@@ -263,14 +263,14 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
 
       // Query for downlink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->join('users', 'u', 'rcd.uid = u.uid');
+      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
       $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
-      $query->join('device', 'd', 'd.uid = rcd.uid');
+      $query->join('device', 'd', 'd.uid = rcd.referral_uid');
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
       $query->fields('src', array('desc_benefit'));
-      $query->condition('rcd.uid', $uid);
+      $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
       foreach ($result as $key => $value) {

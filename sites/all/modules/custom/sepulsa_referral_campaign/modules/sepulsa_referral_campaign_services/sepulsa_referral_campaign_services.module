@@ -148,6 +148,17 @@ function sepulsa_referral_campaign_services_services_resources() {
               'optional' => TRUE,
               'http_method' => 'POST',
             ),
+            array(
+              'name' => 'mode',
+              'type' => 'string',
+              'description' => 'Mode ( downlink[default] | uplink | all)',
+              'source' => array(
+                'data' => 'mode',
+                'param' => 'mode',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
           ),
         ),
       ),
@@ -401,46 +412,22 @@ function sepulsa_referral_campaign_services_resource_status_doc() {
     '#auth' => TRUE,
     '#path' => 'sepulsa_referral_campaign/status',
     // Example request. E.g., a request URL, headers, and a JSON array.
-    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/status  .json<br />POST token data application/json: {"id":"2"}',
+    '#request_url' => $base_url . '/api/sepulsa_referral_campaign/status  .json<br />POST token data application/json: {"id":"2", "mode":"downlink"}',
     // Example response. E.g., a JSON array.
     '#response' => '// Return Boolean True.<br />{
-      "uplink": [
-        {
-          "ref_id": "1",
-          "src_id": "1",
-          "uid": "38055",
-          "referral_uid": "1",
-          "created": "1463712154",
-          "flag": "0",
-          "flag_timestamp": "0",
-          "host": "",
-          "http_referer": ""
-        }
-      ],
-      "downlink": [
-        {
-          "ref_id": "2",
-          "src_id": "1",
-          "uid": "2",
-          "referral_uid": "38055",
-          "created": "1463712154",
-          "flag": "0",
-          "flag_timestamp": "0",
-          "host": "",
-          "http_referer": ""
-        },
-        {
-          "ref_id": "3",
-          "src_id": "1",
-          "uid": "3",
-          "referral_uid": "38055",
-          "created": "1463712154",
-          "flag": "0",
-          "flag_timestamp": "0",
-          "host": "",
-          "http_referer": ""
-        }
-      ]
+      "status": true,
+      "message": [],
+      "data": {
+        "downlink": [
+          {
+            "mail": "andreas+test23@sepulsa.com",
+            "init": "08122545393",
+            "flag": "0",
+            "flag_timestamp": "0",
+            "desc_benefit": "test"
+          }
+        ]
+      }
     }',
     // Errors.
     '#errors' => array(

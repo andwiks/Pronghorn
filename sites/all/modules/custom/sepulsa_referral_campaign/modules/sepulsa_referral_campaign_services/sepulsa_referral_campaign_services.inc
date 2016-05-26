@@ -156,7 +156,7 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
 /**
  * Function sepulsa_referral_campaign_services_resource_status().
  */
-function sepulsa_referral_campaign_services_resource_status($id = NULL) {
+function sepulsa_referral_campaign_services_resource_status($id = NULL, $mode = NULL) {
   global $user;
   if ($user->uid > 0) {
     // Check id from body service.
@@ -173,9 +173,13 @@ function sepulsa_referral_campaign_services_resource_status($id = NULL) {
       if (is_null($id)) {
         $id = $details[0]->src_id;
       }
-      // Get uplink / downlink from campaign. (default mode : all)
-      $link = sepulsa_referral_campaign_getlink($user->uid,
-        $id);
+      // Get uplink / downlink from campaign. (default mode : downlink)
+      if (!is_null($mode)) {
+        $link = sepulsa_referral_campaign_getlink($user->uid, $id, $mode);
+      }
+      else {
+        $link = sepulsa_referral_campaign_getlink($user->uid, $id);
+      }
       if (!empty($link)) {
         if ($link != 'invalid_mode') {
           return $link;
@@ -202,12 +206,16 @@ function sepulsa_referral_campaign_services_resource_status($id = NULL) {
  * @param string $mode
  *   Mode for this function default : all , another mode uplink / downlink.
  */
-function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'all') {
+function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
   switch ($mode) {
     case 'uplink':
       // Query for uplink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->fields('rcd');
+      $query->join('users', 'u', 'rcd.uid = u.uid');
+      $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
+      $query->fields('u', array('mail', 'init'));
+      $query->fields('rcd', array('flag', 'flag_timestamp'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -219,7 +227,11 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'all') {
     case 'downlink':
       // Query for downlink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->fields('rcd');
+      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
+      $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
+      $query->fields('u', array('mail', 'init'));
+      $query->fields('rcd', array('flag', 'flag_timestamp'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -231,7 +243,11 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'all') {
     case 'all':
       // Query for uplink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->fields('rcd');
+      $query->join('users', 'u', 'rcd.uid = u.uid');
+      $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
+      $query->fields('u', array('mail', 'init'));
+      $query->fields('rcd', array('flag', 'flag_timestamp'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -241,7 +257,11 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'all') {
 
       // Query for downlink user.
       $query = db_select('referral_campaign_details', 'rcd');
-      $query->fields('rcd');
+      $query->join('users', 'u', 'rcd.referral_uid = u.uid');
+      $query->join('sepulsa_referral_campaign', 'src', 'rcd.src_id = src.src_id');
+      $query->fields('u', array('mail', 'init'));
+      $query->fields('rcd', array('flag', 'flag_timestamp'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();

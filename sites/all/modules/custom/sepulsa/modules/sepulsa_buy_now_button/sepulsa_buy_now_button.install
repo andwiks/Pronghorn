@@ -1,0 +1,15 @@
+<?php
+/**
+ * @file
+ * sepulsa_buy_now_button.install
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function sepulsa_buy_now_button_uninstall() {
+  // Delete unused variables.
+  variable_del('sepulsa_buy_now_button_utm_source');
+  variable_del('sepulsa_buy_now_button_utm_medium');
+  variable_del('sepulsa_buy_now_button_utm_campaign');
+}

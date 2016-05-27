@@ -1492,3 +1492,23 @@ section.h_middle_top {
     position: relative;
     top: 0;
 }
+
+/* UOB */
+.uob-snk
+{
+    border-right: none;
+}
+
+.uob-snk .uob-snk-content
+{
+    margin:10px;
+}
+
+#edit-submitted-term-agree label.option {
+    width: 90%;
+}
+
+.uob-form .webform-container-inline label
+{
+    width: 100%;
+}

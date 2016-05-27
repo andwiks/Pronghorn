@@ -1,0 +1,4 @@
+name = Buy Now Button Module
+description = A custom blog for buy now button.
+core = 7.x
+package = Sepulsa

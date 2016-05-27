@@ -22,7 +22,6 @@
  *   Access and refresh token or error message.
  */
 function device_services_resource_request($imei = '', $phone = '', $agent = '') {
-  // return [$imei,$phone,$agent];
   // Check input imei and phone.
   if (!empty($imei) && !empty($phone) && !empty($agent)) {
     // 1. Validate phone number.
@@ -114,8 +113,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         ), WATCHDOG_DEBUG);
 
         // Return token.
-        // $token['device'] = $entity;
-
         return $token;
       }
       else {
@@ -186,8 +183,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           return services_error(t('Device has been blocked.'), 401);
         }
 
-        // return $check;
-
         // Check device verication: unconfirmed or new.
         // Confirmed but no / expired refresh token.
         if ($check['dv_status'] == 2 || $check['dv_status'] == 0
@@ -237,7 +232,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             'jti' => session_id(),
             'did' => $did,
             'aud' => $imei,
-            'check' => $check,
           ));
           // Send verification message.
           device_send_verification_message($phone, $check['dv_hash']);
@@ -291,9 +285,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             'did' => $did,
             'aud' => $user->mail,
           ));
-
-          $token['check'] = $check;
-
           // Generate refresh token.
           $token['refresh'] = device_services_generate_token('refresh', array(
             'jti' => $check['refresh'],
@@ -356,11 +347,21 @@ function device_services_resource_verify($code = '') {
           // Delete drupal session also.
           db_delete('sessions')->condition($is_https ? 'ssid' : 'sid', $session['asid'])->execute();
 
-          // Search for old active user.
-          $account = db_select('users', 'u')->fields('u')
-            ->condition('init', $session['device']->phone)
-            ->condition('status', 1)
-            ->execute()->fetch();
+          if (isset($session['device']->uid) && !empty($session['device']->uid)
+            && isset($session['device']->status) && $session['device']->status == 1) {
+            // Search for old active user using device uid.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('uid', $session['device']->uid)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
+          else {
+            // Search for old active user.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('init', $session['device']->phone)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
 
           // Check if user is empty.
           if (empty($account)) {

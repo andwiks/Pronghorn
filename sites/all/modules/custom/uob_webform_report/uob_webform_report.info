@@ -1,5 +1,6 @@
 name = "UOB webform report"
-description = "Automatically download latest UOB webform submission then send it to an email"
+description = "Generate latest UOB webform submission & send it to UOB representatif email"
 core = "7.x"
 
 dependencies[] = webform
+dependencies[] = views

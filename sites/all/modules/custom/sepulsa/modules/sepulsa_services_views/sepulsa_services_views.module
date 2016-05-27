@@ -1,12 +1,17 @@
 <?php
-/*
-* Implement hook_services_views_execute_view_alter().
-*/
+/**
+ * @file
+ * sepulsa_services_views.module
+ *
+ * @author azul@sepulsa.com
+ */
+
+/**
+ * Implements hook_services_views_execute_view_alter().
+ */
 function sepulsa_services_views_services_views_execute_view_alter(&$output, $view) {
   global $user;
   $uid = $user->uid;
-
-  watchdog("info", "hook altered!");
 
   if ($view->name == 'user_offline_owned_coupon' && $view->current_display == 'user_offline_owned_coupon') {
     $paged_output = array(
@@ -17,7 +22,6 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
     $output = $paged_output;
   }
 
-
   if ($view->name == 'user_owned_coupon' && $view->current_display == 'user_owned_coupon') {
     $paged_output = array(
       'results' => $output,
@@ -26,8 +30,4 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
     );
     $output = $paged_output;
   }
-
-  /*
-  user_owned_coupon
-   */
 }

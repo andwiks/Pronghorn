@@ -5,6 +5,41 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function uob_webform_report_menu() {
+  $items['admin/config/system/uob_submission_report'] = array(
+    'title' => 'UOB Submission Report',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('uob_webform_report_form'),
+    'access arguments' => array('administer'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Admin form to configure uob_submission_report.
+ */
+function uob_webform_report_form($form, &$form_state) {
+  $form['uob_mail_to'] = array(
+    '#type' => 'textfield',
+    '#title' => t('UOB Send Report To'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('uob_mail_to', 'spicreditcard@uob.co.id'),
+  );
+  $form['uob_mail_from'] = array(
+    '#type' => 'textfield',
+    '#title' => t('UOB Send From'),
+    '#required' => TRUE,
+    '#default_value' => variable_get('uob_mail_from', 'ken@sepulsa.com'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
  * Implements hook_cron().
  */
 function uob_webform_report_cron() {
@@ -41,8 +76,8 @@ function uob_webform_report_cron() {
       'filemime' => 'application/vnd.ms-excel',
     );
     // Mail to & from.
-    $to = 'azul@sepulsa.com';
-    $from = 'ken@sepulsa.com';
+    $to = variable_get('uob_mail_to', 'spicreditcard@uob.co.id');
+    $from = variable_get('uob_mail_from', 'ken@sepulsa.com');
     $current_date = date('d-m-Y H:i');
 
     $params = array(

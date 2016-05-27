@@ -205,16 +205,16 @@ function device_settings($form = array(), $form_state = array()) {
 function device_list() {
   // Define table header.
   $header = array(
-    array('data' => t('ID'), 'field' => 'dev.did'),
+    array('data' => t('ID'), 'field' => 'devir.did'),
     array('data' => t('IMEI'), 'field' => 'dev.imei'),
     array('data' => t('Phone'), 'field' => 'dev.phone'),
-    array('data' => t('Label'), 'field' => 'dev.label'),
     array('data' => t('Created'), 'field' => 'dev.created'),
     array('data' => t('Access'), 'field' => 'dev.access'),
-    array('data' => t('Status'), 'field' => 'dev.status'),
+    array('data' => t('Device Status'), 'field' => 'dev.status'),
     array('data' => t('User'), 'field' => 'dev.uid'),
-    array('data' => t('Mail')),
-    array('data' => t('Verification'), 'field' => 'devir.status'),
+    array('data' => t('User Mail')),
+    array('data' => t('OTP Confirmation'), 'field' => 'devir.status'),
+    array('data' => t('Mail Verification'), 'field' => 'mail_verification'),
     array('data' => t('Timeout<br/>(Hash)'), 'field' => 'devir.timeout'),
     array('data' => t('Operations')),
   );
@@ -252,9 +252,12 @@ function device_list() {
   // Query to get promo data.
   $query = db_select('device', 'dev')->extend('PagerDefault')->extend('TableSort');
   $query->join('device_verification', 'devir', 'devir.did = dev.did');
+  $query->leftJoin('device_mail_verification', 'dmv', 'dmv.did = dev.did');
   $query->fields('dev')->addField('devir', 'status', 'verification');
+  $query->addField('dmv', 'status', 'mail_verification');
   $query->addField('devir', 'hash');
   $query->addField('devir', 'timeout', 'timeout');
+
   if (isset($search['imei'])) {
     $query->condition('dev.imei', $search['imei']);
   }
@@ -281,6 +284,7 @@ function device_list() {
         'href' => 'admin/devices/delete/' . $row->did,
       ),
     );
+
     // Check if device still need verification.
     if (!empty($row->timeout)) {
       $links[] = array(
@@ -292,6 +296,15 @@ function device_list() {
         'href' => 'admin/devices/reset/' . $row->did,
       );
     }
+
+    // Add operation links for Resend Mail Verification
+    if ($row->mail_verification !=1 && $row->status==1 && $row->verification==1) {
+      $links[] = array(
+        'title' => t('Resend Mail Verification'),
+        'href' => 'admin/devices/resend_mail_verification/' . $row->did,
+      );
+    }
+
     // Check ctools module.
     if (module_exists('ctools')) {
       // Include ctools dropdown.theme.
@@ -323,6 +336,17 @@ function device_list() {
       $verification = t('New');
     }
 
+    // Define verification mail_verification string.
+    if ($row->mail_verification == 2) {
+      $mail_verification = t('Timeout');
+    }
+    elseif ($row->mail_verification == 1) {
+      $mail_verification = t('Verified');
+    }
+    else {
+      $mail_verification = t('Unverified');
+    }
+
     // Load user object if necessary.
     $mail = '-';
     if ($row->uid > 0) {
@@ -332,17 +356,20 @@ function device_list() {
       }
     }
 
+
     // Append row to the rows container.
+    // DateTime Warning https://www.drupal.org/node/1874768
     $rows[] = array(
       'data' => array(
-        $row->did, $row->imei, $row->phone, $row->label,
-        format_date($row->created, 'short'),
-        (!empty($row->access)) ? format_date($row->access, 'short') : '-',
+        $row->did, $row->imei, $row->phone, /*$row->label,*/
+        format_date(intval($row->created), 'short'),
+        (!empty($row->access)) ? format_date(intval($row->access), 'short') : '-',
         ($row->status > 0) ? t('Active') : '<strong>' . t('Blocked') . '</strong>',
         l($row->uid, 'user/' . $row->uid, array(
           'attributes' => array('target' => '_blank'),
         )), $mail,
         $verification,
+        $mail_verification,
         (!empty($row->timeout) ? format_date($row->timeout, 'short') . '<br /><strong>' . $row->hash . '</strong>' : t('none')),
         $operations,
       ),
@@ -593,6 +620,10 @@ function device_operate_confirm_submit($form, &$form_state) {
       $dv_wrapper->hash->set($hash);
       $dv_wrapper->save();
       device_send_verification_message($dv_wrapper->phone->value(), $hash);
+      break;
+
+    case 'resend_mail_verification':
+      device_resend_mail_verification($form_state['values']['did']);
       break;
   }
   // Notify the admin.

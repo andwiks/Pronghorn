@@ -114,6 +114,10 @@ function commerce_cart_services_resource_add($product) {
       $types = commerce_line_item_types();
       // Check input type: by default product.
       $line_item_type = (isset($product['type']) && isset($types[$product['type']])) ? $product['type'] : 'product';
+      // Adjustment for deposit sepulsa.
+      if (isset($commerce_product->type) && $commerce_product->type == 'deposit') {
+        $line_item_type = 'deposit_sepulsa';
+      }
       // Create new line item based on product above.
       $line_item = commerce_product_line_item_new($commerce_product, $quantity, 0, array(), $line_item_type);
       // Get line item wrapper.

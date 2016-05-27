@@ -9,3 +9,6 @@ sites/*/private
 .buildpath*
 .settings*
 .DS_Store
+sites/sites.php
+
+sites/pronghorn.dd

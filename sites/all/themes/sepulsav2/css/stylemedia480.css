@@ -1178,3 +1178,13 @@ footer .right .box {
 footer .right .box h6 {
     font-size: 12px;
 }
+
+/* UOB */
+.uob-snk .uob-snk-content
+{
+    margin:10px;
+}
+
+#edit-submitted-term-agree label.option {
+    width: 90%;
+}

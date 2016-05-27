@@ -347,11 +347,21 @@ function device_services_resource_verify($code = '') {
           // Delete drupal session also.
           db_delete('sessions')->condition($is_https ? 'ssid' : 'sid', $session['asid'])->execute();
 
-          // Search for old active user.
-          $account = db_select('users', 'u')->fields('u')
-            ->condition('init', $session['device']->phone)
-            ->condition('status', 1)
-            ->execute()->fetch();
+          if (isset($session['device']->uid) && !empty($session['device']->uid)
+            && isset($session['device']->status) && $session['device']->status == 1) {
+            // Search for old active user using device uid.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('uid', $session['device']->uid)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
+          else {
+            // Search for old active user.
+            $account = db_select('users', 'u')->fields('u')
+              ->condition('init', $session['device']->phone)
+              ->condition('status', 1)
+              ->execute()->fetch();
+          }
 
           // Check if user is empty.
           if (empty($account)) {

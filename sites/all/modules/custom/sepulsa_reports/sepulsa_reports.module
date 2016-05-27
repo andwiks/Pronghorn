@@ -5,18 +5,23 @@
  *
  * @author ananto@sepulsa.com
  */
- 
+
+/**
+ * Hook Implementations.
+ */
+
  /**
  * Implements hook_menu().
  */
 function sepulsa_reports_menu() {
   $items = array();
-  
+
   $items['admin/commerce/sepulsa_reports'] = array(
     'title' => 'Sepulsa Reports',
     'description' => 'View Sepulsa Reports.',
     'access arguments' => array('access sepulsa reports'), // Inherited by children.
     'page callback' => 'sepulsa_reports_dashboard',
+    'file' => 'sepulsa_reports.dashboard.inc',
     'weight' => -30,
   );
   $items['admin/commerce/sepulsa_reports/dashboard'] = array(
@@ -35,14 +40,22 @@ function sepulsa_reports_menu() {
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
   );
-  
-  return $items;
-}
 
-function sepulsa_reports_dashboard() {
-  $render = "Test Report";
-  
-  return $render;
+  $items['admin/commerce/sepulsa_reports/voucher'] = array(
+    'title' => 'Voucher Report',
+    'description' => 'View voucher reports.',
+    'access arguments' => array('access sepulsa reports'),
+    'page callback' => 'sepulsa_reports_voucher_check',
+    'file' => 'sepulsa_reports.voucher.inc',
+  );
+
+  $items['admin/commerce/sepulsa_reports/voucher/basic'] = array(
+    'title' => 'Basic',
+    'description' => 'View Sepulsa Reports.',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+
+  return $items;
 }
 
 /**

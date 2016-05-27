@@ -22,7 +22,6 @@
  *   Access and refresh token or error message.
  */
 function device_services_resource_request($imei = '', $phone = '', $agent = '') {
-  // Return [$imei,$phone,$agent];
   // Check input imei and phone.
   if (!empty($imei) && !empty($phone) && !empty($agent)) {
     // 1. Validate phone number.
@@ -112,6 +111,8 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           '@verification' => print_r($entity_verification, TRUE),
           '@token' => print_r($token, TRUE),
         ), WATCHDOG_DEBUG);
+
+        // Return token.
         return $token;
       }
       else {
@@ -179,7 +180,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
 
         // Check device status: blocked.
         if (empty($check['device_status'])) {
-
           // Check mail verification status new_flag=0 (already merged).
           $q_d_block = db_select('device', 'd');
           $q_d_block->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
@@ -243,7 +243,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             'jti' => session_id(),
             'did' => $did,
             'aud' => $imei,
-            'check' => $check,
           ));
           // Send verification message.
           device_send_verification_message($phone, $check['dv_hash']);
@@ -297,8 +296,6 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
             'did' => $did,
             'aud' => $user->mail,
           ));
-
-          $token['check'] = $check;
 
           // Generate refresh token.
           $token['refresh'] = device_services_generate_token('refresh', array(

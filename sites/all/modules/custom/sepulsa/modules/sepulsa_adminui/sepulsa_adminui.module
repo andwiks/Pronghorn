@@ -177,79 +177,79 @@ function sepulsa_adminui_tools_order_process_continue($order_id, $total, &$conte
   $context['message'] = t('Loading order @oid', array('@oid' => $order_id));
 
   // Process the order here.
-  // Get kraken biller success data.
-  $biller = _sepulsa_get_kraken_biller($order_id, TRUE);
-  if ($biller) {
-    // Get only latest data.
-    $biller = end($biller);
-    // Unserialize biller data.
-    $data = isset($biller->data) ? unserialize($biller->data) : array();
-    // Define post data.
-    if (strpos($biller->type, 'pln_prepaid') !== FALSE) {
-      // Define data for PLN Prepaid.
-      $post = array(
-        'meter_number' => $data['material_number'],
-        'data' => $data,
-        'token' => preg_replace('#\d{4}#', '$0 ', $data['token']),
-        'transaction_id' => $biller->transaction_id,
-        'type' => 'electricity',
-        'created' => $biller->created,
-        'changed' => $biller->created,
-        'customer_number' => $biller->customer_number,
-        'order_id' => $order_id,
-        'status' => $biller->transaction_status,
-        'price' => $biller->price,
-      );
-    }
-    else {
-      $post = array(
-        'data' => $data,
-        'transaction_id' => $biller->transaction_id,
-        'created' => $biller->created,
-        'changed' => $biller->created,
-        'order_id' => $order_id,
-        'status' => $biller->transaction_status,
-        'price' => $biller->price,
-      );
-      // Check for mobile topup.
-      if (strpos($biller->type, 'multi') === FALSE
-        && strpos($biller->type, 'bpjs') === FALSE
-      ) {
-        $post['type'] = 'mobile';
+  // Get kraken biller success data only.
+  $billers = _sepulsa_get_kraken_biller($order_id, TRUE);
+  if ($billers) {
+    // Looping foreach success biller.
+    foreach ($billers as $biller) {
+      // Unserialize biller data.
+      $data = isset($biller->data) ? unserialize($biller->data) : array();
+      // Define post data.
+      if (strpos($biller->type, 'pln_prepaid') !== FALSE) {
+        // Define data for PLN Prepaid.
+        $post = array(
+          'meter_number' => $data['material_number'],
+          'data' => $data,
+          'token' => preg_replace('#\d{4}#', '$0 ', $data['token']),
+          'transaction_id' => $biller->transaction_id,
+          'type' => 'electricity',
+          'created' => $biller->created,
+          'changed' => $biller->created,
+          'customer_number' => $biller->customer_number,
+          'order_id' => $order_id,
+          'status' => $biller->transaction_status,
+          'price' => $biller->price,
+        );
       }
-    }
-    global $base_url;
-    $url = $base_url . '/notification/kraken-api';
-    // Define option for http request.
-    $http_options = array(
-      'headers' => array(
-        'Content-Type' =>  'application/json',
-        'Accept' => 'application/json',
-      ),
-      'max_redirects' => 0,
-      'timeout' => (float) 60.0,
-      'method' => 'POST',
-      'data' => json_encode($post),
-    );
-    // Check if https.
-    if (strpos($url, 'https') !== FALSE) {
-      // Define stream context.
-      $http_options['context'] = stream_context_create(array(
-        'ssl' => array(
-          'verify_peer' => FALSE,
-          'verify_host' => FALSE,
+      else {
+        $post = array(
+          'data' => $data,
+          'transaction_id' => $biller->transaction_id,
+          'created' => $biller->created,
+          'changed' => $biller->created,
+          'order_id' => $order_id,
+          'status' => $biller->transaction_status,
+          'price' => $biller->price,
+        );
+        // Check for mobile topup.
+        if (strpos($biller->type, 'multi') === FALSE
+          && strpos($biller->type, 'bpjs') === FALSE
+        ) {
+          $post['type'] = 'mobile';
+        }
+      }
+      global $base_url;
+      $url = $base_url . '/notification/kraken-api';
+      // Define option for http request.
+      $http_options = array(
+        'headers' => array(
+          'Content-Type' => 'application/json',
+          'Accept' => 'application/json',
         ),
-      ));
+        'max_redirects' => 0,
+        'timeout' => (float) 60.0,
+        'method' => 'POST',
+        'data' => json_encode($post),
+      );
+      // Check if https.
+      if (strpos($url, 'https') !== FALSE) {
+        // Define stream context.
+        $http_options['context'] = stream_context_create(array(
+          'ssl' => array(
+            'verify_peer' => FALSE,
+            'verify_host' => FALSE,
+          ),
+        ));
+      }
+      // Do real HTTP Request.
+      $result = drupal_http_request($url, $http_options);
+      // Log the result.
+      watchdog('sepulsa_adminui', 'Sepulsa Continue Process Order Request HTTP Request. <pre>URL: @url</pre><pre>Options: @http</pre><pre>Result: @result</pre>', array(
+        '@url' => $url,
+        '@http' => print_r($http_options, TRUE),
+        '@result' => print_r($result, TRUE),
+      ), WATCHDOG_INFO, $order_id);
     }
-    // Do real HTTP Request.
-    $result = drupal_http_request($url, $http_options);
-    // Log the result.
-    watchdog('sepulsa_adminui', 'Sepulsa Continue Process Order Request HTTP Request. <pre>URL: @url</pre><pre>Options: @http</pre><pre>Result: @result</pre>', array(
-      '@url' => $url,
-      '@http' => print_r($http_options, TRUE),
-      '@result' => print_r($result, TRUE),
-    ), WATCHDOG_INFO, $order_id);
-
     // Store the success operation in result context.
     $context['results']['success'][$order_id] = l($order_id, 'admin/commerce/orders/' . $order_id, array(
       'attributes' => array('target' => '_blank'),
@@ -322,7 +322,7 @@ function _sepulsa_get_kraken_status($order_ids) {
       // Query to kraken_transaction.
       $query = db_select('kraken_transaction', 'kt');
       $query->fields('kt', array(
-        'transaction_id', 'status', 'order_id'
+        'transaction_id', 'status', 'order_id',
       ));
       $query->condition('kt.order_id', $order_ids, 'IN');
       $transactions = $query->execute()->fetchAll();

@@ -14,7 +14,7 @@
  * Function sepulsa_adminui_tools_order_processing().
  */
 function sepulsa_adminui_tools_order_processing() {
-  $pager = 50;
+  $pager = 200;
   // Define order table header.
   $order_header = array(
     'title' => array('data' => t('Order ID'), 'field' => 'co.order_id'),
@@ -74,6 +74,7 @@ function sepulsa_adminui_tools_order_processing() {
       'mobile_prepaid', 'pln_prepaid', 'multifinance', 'bpjs_kesehatan',
     ), 'IN');
     $query->condition('cpt.status', 'success');
+    $query->groupBy('co.order_id');
     $total_query = clone $query;
     $total = $total_query->countQuery()->execute()->fetchField();
     $orders = $query->limit($pager)

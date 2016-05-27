@@ -44,6 +44,7 @@ function uob_webform_report_form($form, &$form_state) {
  */
 function uob_webform_report_cron() {
   // Generate UOB webform submission result into a file.
+  $current_date = date('d-m-Y H:i');
   $filepath='public://';
   $filename = 'UOB_submission_report.xls';
   $view = views_get_view('uob_submission');
@@ -78,7 +79,6 @@ function uob_webform_report_cron() {
     // Mail to & from.
     $to = variable_get('uob_mail_to', 'spicreditcard@uob.co.id');
     $from = variable_get('uob_mail_from', 'ken@sepulsa.com');
-    $current_date = date('d-m-Y H:i');
 
     $params = array(
       'headers' => array('Content-Type' => 'text/html'),

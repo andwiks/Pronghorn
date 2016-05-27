@@ -1,0 +1,402 @@
+<?php
+/**
+ * @file
+ * sepulsa_adminui.module
+ *
+ * @author azul@sepulsa.com
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_adminui_menu() {
+  // Create menu to handle several sepulsa admin tools.
+  $items['admin/commerce/tools'] = array(
+    'title' => 'Tools',
+    'description' => 'Sepulsa Admin Tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle sepulsa order tools.
+  $items['admin/commerce/tools/order'] = array(
+    'title' => 'Order',
+    'description' => 'Order sepulsa tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle pending order manually.
+  $items['admin/commerce/tools/order/processing'] = array(
+    'title' => 'Process Manual',
+    'description' => 'Processing Manual Order Sepulsa.',
+    'page callback' => 'sepulsa_adminui_tools_order_processing',
+    'access arguments' => array('access adminui tools'),
+    'file' => 'sepulsa_adminui.order.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle pending order manually.
+  $items['admin/commerce/tools/order/processing/%'] = array(
+    'title' => 'Process Manual',
+    'description' => 'Processing Sepulsa order manually.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_adminui_tools_order_processing_form', 5),
+    'access arguments' => array('access adminui tools'),
+    'file' => 'sepulsa_adminui.order.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle sepulsa kraken tools.
+  $items['admin/commerce/tools/kraken'] = array(
+    'title' => 'Kraken',
+    'description' => 'Kraken sepulsa tools.',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle sepulsa kraken tools.
+  $items['admin/commerce/tools/kraken/data'] = array(
+    'title' => 'Data',
+    'description' => 'Kraken Data Sepulsa tools.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_adminui_kraken_data_form'),
+    'access arguments' => array('access adminui tools'),
+    'file' => 'sepulsa_adminui.kraken.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Create menu to handle sepulsa kraken tools.
+  $items['admin/commerce/tools/kraken/biller'] = array(
+    'title' => 'Biller',
+    'description' => 'Kraken Biller Data Sepulsa tools.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_adminui_kraken_biller_form'),
+    'access arguments' => array('access adminui tools'),
+    'file' => 'sepulsa_adminui.kraken.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function sepulsa_adminui_permission() {
+  return array(
+    'access adminui tools' => array(
+      'title' => t('Access AdminUI Tools'),
+      'description' => t('Perform manual job for Sepulsa.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function sepulsa_adminui_form_commerce_discount_form_alter(&$form, &$form_state, $form_id) {
+  // Only if discount is new.
+  if (isset($form_state['commerce_discount']->is_new)) {
+    // Set Discount status default to: Disabled.
+    $form['status']['#default_value'] = 0;
+  }
+  // Disable product discount option.
+  if (isset($form['commerce_discount_type']['#options']['product_discount'])) {
+    unset($form['commerce_discount_type']['#options']['product_discount']);
+  }
+  // Disable product free option.
+  if (isset($form['commerce_discount_fields']['commerce_discount_offer']['und']['form']['type']['#options']['free_products'])) {
+    unset($form['commerce_discount_fields']['commerce_discount_offer']['und']['form']['type']['#options']['free_products']);
+  }
+  // Emphasize: name description.
+  $form['component_title']['#required'] = TRUE;
+  $form['component_title']['#description'] = '<span style="font-weight: bold; color: red;">' . t('Warning: this name will be shown to customers!') . '<span>';
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function sepulsa_adminui_tools_processing_batch_finished().
+ *
+ * @param bool $success
+ *   Success flag.
+ * @param array $results
+ *   Result array.
+ * @param array $operations
+ *   Error operations.
+ */
+function sepulsa_adminui_tools_processing_batch_finished($success, $results, $operations) {
+  if ($success) {
+    drupal_set_message(t('Proccess @count order(s). !list', array(
+      '@count' => isset($results['success']) ? count($results['success']) : 0,
+      '!list' => theme_item_list(array(
+        'items' => isset($results['success']) ? $results['success'] : array(),
+        'title' => '',
+        'type' => 'ul',
+        'attributes' => array(),
+      )),
+    )));
+    if (isset($results['failed'])) {
+      drupal_set_message(t('Failed to proccess @count order(s). !list', array(
+        '@count' => count($results['failed']),
+        '!list' => theme_item_list(array(
+          'items' => $results['failed'],
+          'title' => '',
+          'type' => 'ul',
+          'attributes' => array(),
+        )),
+      )), 'error');
+    }
+  }
+  else {
+    $error_operation = reset($operations);
+    drupal_set_message(t('An error occurred while processing @operation with arguments : @args', array(
+      '@operation' => $error_operation[0],
+      '@args' => print_r($error_operation[0], TRUE),
+    )), 'error');
+  }
+}
+
+/**
+ * Function sepulsa_adminui_tools_order_process_continue().
+ *
+ * @param int $order_id
+ *   Order id.
+ * @param array $context
+ *   Batch context.
+ */
+function sepulsa_adminui_tools_order_process_continue($order_id, $total, &$context) {
+  // Define failed message.
+  $failed = '';
+  // Optional message displayed under the progressbar.
+  $context['message'] = t('Loading order @oid', array('@oid' => $order_id));
+
+  // Process the order here.
+  // Get kraken biller success data.
+  $biller = _sepulsa_get_kraken_biller($order_id, TRUE);
+  if ($biller) {
+    // Get only latest data.
+    $biller = end($biller);
+    // Unserialize biller data.
+    $data = isset($biller->data) ? unserialize($biller->data) : array();
+    // Define post data.
+    if (strpos($biller->type, 'pln_prepaid') !== FALSE) {
+      // Define data for PLN Prepaid.
+      $post = array(
+        'meter_number' => $data['material_number'],
+        'data' => $data,
+        'token' => preg_replace('#\d{4}#', '$0 ', $data['token']),
+        'transaction_id' => $biller->transaction_id,
+        'type' => 'electricity',
+        'created' => $biller->created,
+        'changed' => $biller->created,
+        'customer_number' => $biller->customer_number,
+        'order_id' => $order_id,
+        'status' => $biller->transaction_status,
+        'price' => $biller->price,
+      );
+    }
+    else {
+      $post = array(
+        'data' => $data,
+        'transaction_id' => $biller->transaction_id,
+        'created' => $biller->created,
+        'changed' => $biller->created,
+        'order_id' => $order_id,
+        'status' => $biller->transaction_status,
+        'price' => $biller->price,
+      );
+      // Check for mobile topup.
+      if (strpos($biller->type, 'multi') === FALSE
+        && strpos($biller->type, 'bpjs') === FALSE
+      ) {
+        $post['type'] = 'mobile';
+      }
+    }
+    global $base_url;
+    $url = $base_url . '/notification/kraken-api';
+    // Define option for http request.
+    $http_options = array(
+      'headers' => array(
+        'Content-Type' =>  'application/json',
+        'Accept' => 'application/json',
+      ),
+      'max_redirects' => 0,
+      'timeout' => (float) 60.0,
+      'method' => 'POST',
+      'data' => json_encode($post),
+    );
+    // Check if https.
+    if (strpos($url, 'https') !== FALSE) {
+      // Define stream context.
+      $http_options['context'] = stream_context_create(array(
+        'ssl' => array(
+          'verify_peer' => FALSE,
+          'verify_host' => FALSE,
+        ),
+      ));
+    }
+    // Do real HTTP Request.
+    $result = drupal_http_request($url, $http_options);
+    // Log the result.
+    watchdog('sepulsa_adminui', 'Sepulsa Continue Process Order Request HTTP Request. <pre>URL: @url</pre><pre>Options: @http</pre><pre>Result: @result</pre>', array(
+      '@url' => $url,
+      '@http' => print_r($http_options, TRUE),
+      '@result' => print_r($result, TRUE),
+    ), WATCHDOG_INFO, $order_id);
+
+    // Store the success operation in result context.
+    $context['results']['success'][$order_id] = l($order_id, 'admin/commerce/orders/' . $order_id, array(
+      'attributes' => array('target' => '_blank'),
+    ));
+    // Return gracefully.
+    return;
+  }
+  else {
+    $failed = t('No success biller data.');
+  }
+
+  // Other condition: store to failed operation in result context.
+  $context['results']['failed'][$order_id] = t('@oid: @failed', array(
+    '@oid' => $order_id,
+    '@failed' => $failed,
+  ));
+}
+
+/**
+ * Function _sepulsa_get_kraken_data().
+ *
+ * @return mixed
+ *   Database array or FALSE.
+ */
+function _sepulsa_get_kraken_data() {
+  $data = variable_get('sepulsa_adminui_kraken_data', array(
+    'host' => '',
+    'base' => '',
+    'user' => '',
+    'pass' => '',
+  ));
+  if (!empty($data['host']) && !empty($data['base']) && !empty($data['user'])
+    && !empty($data['pass'])
+  ) {
+    // Return database info array.
+    return array(
+      'database' => $data['base'],
+      'username' => $data['user'],
+      'password' => $data['pass'],
+      'host' => $data['host'],
+      'port' => 3306,
+      'driver' => 'mysql',
+    );
+  }
+  return FALSE;
+}
+
+/**
+ * Function _sepulsa_get_kraken_transaction_status().
+ *
+ * @param array $order_ids
+ *   List of order IDs.
+ *
+ * @return array
+ *   List of kraken transaction status.
+ */
+function _sepulsa_get_kraken_status($order_ids) {
+  $result = array();
+  // Get kraken data array.
+  $database = _sepulsa_get_kraken_data();
+  // Check requirement.
+  if (!empty($database) && !empty($order_ids)) {
+    // Encapsulate with try and catch.
+    try {
+      // Add database info.
+      Database::addConnectionInfo('KrakenConnect', 'default', $database);
+      // Connect to KrakenConnect.
+      db_set_active('KrakenConnect');
+
+      // Query to kraken_transaction.
+      $query = db_select('kraken_transaction', 'kt');
+      $query->fields('kt', array(
+        'transaction_id', 'status', 'order_id'
+      ));
+      $query->condition('kt.order_id', $order_ids, 'IN');
+      $transactions = $query->execute()->fetchAll();
+
+      // Set back to default database.
+      db_set_active();
+      // Check the result.
+      if (!empty($transactions)) {
+        // Looping foreach transaction.
+        foreach ($transactions as $transaction) {
+          $result[$transaction->order_id] = array(
+            'transaction_id' => $transaction->transaction_id,
+            'status' => $transaction->status,
+          );
+        }
+      }
+    }
+    catch (Exception $e) {
+      // Log this condition.
+      watchdog('sepulsa_adminui', 'Unable to connect to kraken database for get status with message: @message', array(
+        '@message' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
+    }
+  }
+  return $result;
+}
+
+/**
+ * Function _sepulsa_get_kraken_biller().
+ *
+ * @param int $order_id
+ *   Order ID.
+ * @param bool $success
+ *   Flag for success only biller data.
+ *
+ * @return array
+ *   Kraken biller data.
+ */
+function _sepulsa_get_kraken_biller($order_id, $success = FALSE) {
+  $result = array();
+  // Sanitize order id.
+  $order_id = intval($order_id);
+  // Get kraken data array.
+  $database = _sepulsa_get_kraken_data();
+  // Check requirement.
+  if (!empty($database)) {
+    // Encapsulate with try and catch.
+    try {
+      // Add database info.
+      Database::addConnectionInfo('KrakenConnect', 'default', $database);
+      // Connect to KrakenConnect.
+      db_set_active('KrakenConnect');
+
+      // Query to kraken_transaction.
+      $query = db_select('kraken_transaction', 'kt');
+      $query->join('kraken_biller', 'kb', 'kb.transaction_id = kt.transaction_id');
+      $query->fields('kb');
+      $query->addField('kt', 'status', 'transaction_status');
+      $query->condition('kt.order_id', $order_id);
+      // Check for flag success only.
+      if ($success) {
+        $query->condition('kb.status', 'success');
+      }
+      $result = $query->execute()->fetchAll();
+
+      // Set back to default database.
+      db_set_active();
+    }
+    catch (Exception $e) {
+      // Log this condition.
+      watchdog('sepulsa_adminui', 'Unable to connect to kraken database for get transaction with message: @message', array(
+        '@message' => $e->getMessage(),
+      ), WATCHDOG_ERROR);
+    }
+  }
+  return $result;
+}

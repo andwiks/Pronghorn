@@ -176,6 +176,7 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
           '#delta' => $delta,
           '#name' => 'line_items[' . $delta . '][remove]',
           '#remove' => TRUE,
+          '#attributes' => array('title'=>'Hapus No Pelanggan'),
           '#ajax' => array(
             'callback' => 'bpjs_kesehatan_form_ajax',
             'wrapper' => 'bpjs-kesehatan-form-wrapper',
@@ -205,6 +206,7 @@ function bpjs_kesehatan_form($form, &$form_state, $product_ids = array()) {
     '#type' => 'button',
     '#value' => t('Add new', array(), array('context' => __FUNCTION__)),
     '#new' => TRUE,
+    '#attributes' => array('title'=>'Tambah No Pelanggan'),
     '#ajax' => array(
       'callback' => 'bpjs_kesehatan_form_ajax',
       'wrapper' => 'bpjs-kesehatan-form-wrapper',

@@ -1,0 +1,370 @@
+<?php
+/**
+ * @file
+ * sepulsa_referral_campaign.module
+ *
+ * @author aizat
+ */
+
+// 30 items per page.
+define('SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE', 30);
+// Admin uri links.
+define('SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI', 'admin/content/referral_campaign/manage/');
+define('SEPULSA_REFERRAL_CAMPAIGN_ADMIN_CONTENT_SRC_URI', 'admin/content/referral_campaign');
+
+/**
+ * Implements hook_entity_info().
+ */
+function sepulsa_referral_campaign_entity_info() {
+  $entity['sepulsa_referral_campaign'] = array(
+    'label' => t('Referral Campaign'),
+    'controller class' => 'EntityAPIController',
+    'entity class' => 'ReferralSepulsa',
+    'base table' => 'sepulsa_referral_campaign',
+    'label callback' => 'sepulsa_referral_campaign_label_callback',
+    'uri callback' => 'sepulsa_referral_campaign_uri',
+    'fieldable' => TRUE,
+    'entity keys' => array(
+      'id' => 'src_id',
+    ),
+    'admin ui' => array(
+      'path' => 'admin/content/referral_campaign',
+      'controller class' => 'ReferralCampaignUIController',
+      'file' => 'includes/sepulsa_referral_campaign.admin.inc',
+    ),
+    'module' => 'sepulsa_referral_campaign',
+    'access callback' => 'sepulsa_referral_campaign_access_callback',
+    'load hook' => 'sepulsa_referral_campaign_load',
+    'bundles' => array(
+      'sepulsa_referral_campaign' => array(
+        'label' => t('Sepulsa Referral Campaign'),
+        'admin' => array(
+          'path' => 'admin/config/people/referral/sepulsa_referral_campaign',
+          'access arguments' => array('administer sepulsa_referral_campaign'),
+        ),
+      ),
+    ),
+    'views controller class' => 'EntityDefaultViewsController',
+  );
+
+  return $entity;
+}
+
+/**
+ * Menu autoloader for /sepulsa_referral_campaign.
+ */
+function sepulsa_referral_campaign_load($referral_id, $reset = FALSE) {
+  $referral = sepulsa_referral_campaign_load_multiple(array($referral_id), array(), $reset);
+  return reset($referral);
+}
+
+/**
+ * Load multiple sepulsa_referral_campaign based on certain conditions.
+ */
+function sepulsa_referral_campaign_load_multiple($referral_ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('sepulsa_referral_campaign', $referral_ids, $conditions, $reset);
+}
+
+/**
+ * Funtion sepulsa_referral_campaign_load_by_name().
+ *
+ * This funtion for search campaign by name.
+ *
+ * @param string $name
+ *   Campaign machine name.
+ */
+function sepulsa_referral_campaign_load_by_name($name) {
+  $query = new EntityFieldQuery();
+  $query
+    ->entityCondition('entity_type', 'sepulsa_referral_campaign')
+    ->propertyCondition('machine_name', 'campaign_' . $name);
+  $result = $query->execute();
+  // Check the result.
+  if (!empty($result)) {
+    return TRUE;
+  }
+  // Other condition return FALSE.
+  return FALSE;
+}
+
+/**
+ * Funtion sepulsa_referral_campaign_getlist().
+ */
+function sepulsa_referral_campaign_getlist($active = FALSE) {
+  $list = array();
+  $query = db_select('sepulsa_referral_campaign', 'src');
+  $query->fields('src');
+  if ($active) {
+    $query->condition('src.start', REQUEST_TIME, '<=');
+    $query->condition('src.end', REQUEST_TIME, '>=');
+  }
+  $result = $query->execute();
+  foreach ($result as $key => $value) {
+    $list[] = $value;
+  }
+  return $list;
+}
+
+/**
+ * Saves sepulsa_referral_campaign to database.
+ */
+function sepulsa_referral_campaign_save(sepulsa_referral_campaign $referral) {
+  return $referral->save();
+}
+
+/**
+ * Referral Campaign access callback.
+ */
+function sepulsa_referral_campaign_access_callback() {
+  if (user_is_anonymous() && !user_access('administer entities')) {
+    return FALSE;
+  }
+  else {
+    return TRUE;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function sepulsa_referral_campaign_menu() {
+  $items = array();
+  // Administration pages.
+  $items['admin/config/people/referral/sepulsa_referral_campaign'] = array(
+    'title'             => 'Referral Campaign',
+    'description'       => 'Configure Sepulsa Referral Campaign.',
+    'page callback'     => 'system_admin_menu_block_page',
+    'access arguments'  => array('access administration pages'),
+    'file'              => 'system.admin.inc',
+    'file path'         => drupal_get_path('module', 'system'),
+  );
+
+  // Sepulsa Referral Campaign setting page.
+  $items['admin/config/people/referral/sepulsa_referral_campaign/settings'] = array(
+    'title'             => 'Settings',
+    'description'       => 'Sepulsa Referral Campaign settings page.',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('sepulsa_referral_campaign_settings'),
+    'access arguments'  => array('administer sepulsa_referral_campaign'),
+    'file'              => 'includes/sepulsa_referral_campaign.admin.inc',
+  );
+
+  $items['admin/reports/sepulsa_referral_campaign'] = array(
+    'title'            => 'Referral Campaign Summary',
+    'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
+    'page callback'    => 'sepulsa_referral_campaign_summary_list',
+    'file'             => 'includes/sepulsa_referral_campaign.admin.inc',
+    'access arguments' => array('administer sepulsa_referral_campaign'),
+    'type'             => MENU_NORMAL_ITEM,
+  );
+
+  $items['admin/reports/sepulsa_referral_campaign/details/%/%'] = array(
+    'title'            => 'Referral Campaign Summary',
+    'description'      => 'Admin reports for the Sepulsa Referral Campaign.',
+    'page callback'    => 'sepulsa_referral_campaign_details_list',
+    'page arguments'   => array(4, 5),
+    'file'             => 'includes/sepulsa_referral_campaign.admin.inc',
+    'access arguments' => array('administer sepulsa_referral_campaign'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function sepulsa_referral_campaign_permission() {
+  return array(
+    'administer sepulsa_referral_campaign' => array(
+      'title' => t('Sepulsa Referral Campaign'),
+      'description' => t('Sepulsa Referral Campaign for mobile.'),
+    ),
+  );
+}
+
+/**
+ * ReferralSepulsa custom entity class.
+ */
+class ReferralSepulsa extends Entity {
+}
+
+/**
+ * Custom controller for the administrator UI.
+ */
+class ReferralCampaignUIController extends EntityDefaultUIController {
+
+  /**
+   * Admin form for searching and doing bulk operations.
+   */
+  public function overviewForm($form, &$form_state) {
+    $form['pager'] = array('#theme' => 'pager');
+
+    $header = array(
+      'src_id' => array('data' => t('Src ID'), 'field' => 'src_id'),
+      'title' => array('data' => t('Title'), 'field' => 'title'),
+      'start' => array('data' => t('Start Date'), 'field' => 'start'),
+      'end' => array('data' => t('End Date'), 'field' => 'end'),
+      'path' => array('data' => t('Path Static Page'), 'field' => 'path'),
+      'operations' => array('data' => t('Operations'), 'field' => 'operations'),
+    );
+
+    $options = array();
+    $search_term = !empty($_GET['search']) ? $_GET['search'] : NULL;
+
+    $query = new EntityFieldQuery();
+    $query
+      ->entityCondition('entity_type', 'sepulsa_referral_campaign');
+
+    if (!empty($search_term)) {
+      $query->propertyCondition('title', '%' . $search_term . '%', 'like');
+    }
+    // Check for sort order and sort key.
+    if (!empty($_GET['sort']) && !empty($_GET['order'])) {
+      $sort = strtoupper($_GET['sort']);
+      $order = strtolower($_GET['order']);
+      $order = str_replace(' ', '_', $order);
+      if ($order != 'operations') {
+        $query->propertyOrderBy($order, $sort);
+      }
+    }
+
+    $query->pager(SEPULSA_REFERRAL_CAMPAIGN_PER_PAGE);
+
+    $result = $query->execute();
+    $src_results = !empty($result['sepulsa_referral_campaign']) ? $result['sepulsa_referral_campaign'] : array();
+    $src_array = !empty($src_results) ? sepulsa_referral_campaign_load_multiple(array_keys($src_results)) : array();
+    foreach ($src_array as $referral_id => $ref) {
+      // Define operation link.
+      $links = array(
+        array(
+          'title' => t('Edit'),
+          'href' => SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI . $referral_id,
+        ),
+        array(
+          'title' => t('Delete'),
+          'href' => SEPULSA_REFERRAL_CAMPAIGN_SRC_MANAGE_URI . $referral_id . '/delete',
+        ),
+      );
+      // Check ctools module.
+      if (module_exists('ctools')) {
+        // Include ctools dropdown.theme.
+        ctools_include('dropbutton.theme');
+        // Generate ctools dropdown.
+        $operations = theme_links__ctools_dropbutton(array(
+          'class' => FALSE,
+          'image' => FALSE,
+          'title' => FALSE,
+          'attributes' => array(),
+          'links' => $links,
+        ));
+      }
+      else {
+        $operations = theme_links(array(
+          'links' => $links,
+          'attributes' => array(),
+          'heading' => array(),
+        ));
+      }
+      $options['src_id-' . $referral_id] = array(
+        'src_id' => $ref->src_id,
+        'title' => $ref->title,
+        'start' => date('d M Y H:i:s', $ref->start),
+        'end' => date('d M Y H:i:s', $ref->end),
+        'path' => l($ref->path, $ref->path, array('attributes' => array('target' => '_blank'))),
+        'operations' => $operations,
+      );
+    }
+
+    $form['search'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Basic Search'),
+      '#collapsible' => TRUE,
+      '#collapsed' => !empty($search_term) ? FALSE : TRUE,
+    );
+
+    $form['search']['search_text'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Search Title'),
+      '#default_value' => !empty($search_term) ? $search_term : '',
+    );
+
+    $form['search']['search_submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Search'),
+    );
+
+    $form['entities'] = array(
+      '#type' => 'tableselect',
+      '#header' => $header,
+      '#options' => $options,
+      '#attributes' => array('class' => array('entity-sort-table')),
+      '#empty' => t('There are no campaign.'),
+    );
+
+    return $form;
+  }
+
+}
+
+/**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_referral_campaign_commerce_order_presave($order) {
+  $details = array();
+  if ($order->status == 'invoiced') {
+    $benefit = FALSE;
+    $referral_details = db_select('referral_campaign_details', 'rcd');
+    $referral_details->join('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
+    $referral_details->fields('rcd', array('ref_id', 'uid', 'referral_uid'));
+    $referral_details->fields('src', array('rules_name',
+      'rules_name_referral',
+      'flag_first_order',
+    ));
+    $referral_details->condition('rcd.uid', $order->uid, '=');
+    $referral_details->condition('rcd.flag', 0, '=');
+    $referral_details->condition('src.start', REQUEST_TIME, '<=');
+    $referral_details->condition('src.end', REQUEST_TIME, '>=');
+    $result_ref = $referral_details->execute();
+    foreach ($result_ref as $result) {
+      $details = $result;
+    }
+    if (!empty($details)) {
+      // Check whether this campaign fire when first order.
+      if ($details->flag_first_order == 1) {
+        $first_order = db_select('commerce_order', 'co')
+              ->fields('co')
+              ->condition('uid', $order->uid, '=')
+              ->condition('order_id', $order->order_id, '<>')
+              ->execute();
+        // Check first order.
+        if ($first_order->rowCount() == 0) {
+          // Change benefit value.
+          $benefit = TRUE;
+        }
+      }
+      else {
+        // Change benefit value.
+        $benefit = TRUE;
+      }
+      // Check benefit.
+      if ($benefit) {
+        $account_uid = user_load($details->uid);
+        $account_referral_uid = user_load($details->referral_uid);
+
+        // Invoke rules.
+        rules_invoke_component($details->rules_name, $account_uid);
+        rules_invoke_component($details->rules_name_referral, $account_referral_uid);
+
+        // Change Flag in details.
+        db_update('referral_campaign_details')
+                ->fields(array('flag' => 1, 'flag_timestamp' => REQUEST_TIME))
+                ->condition('ref_id', $details->ref_id, '=')
+                ->execute();
+        watchdog('sepulsa_referral_campaign',
+          'Update flag referral_campaign_details ref_id : @ref_id, flag : 1, flag_timestamp : @time',
+          array('@ref_id' => $details->ref_id, '@time' => REQUEST_TIME), WATCHDOG_NOTICE,
+          'update');
+      }
+    }
+  }
+}

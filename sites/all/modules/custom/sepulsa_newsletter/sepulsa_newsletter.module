@@ -1,0 +1,349 @@
+<?php
+/**
+ * @file
+ * sepulsa_newsletter.module
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Impelements hook_menu().
+ */
+function sepulsa_newsletter_menu() {
+  // Administration pages.
+  $items['admin/reports/newsletter'] = array(
+    'title' => 'Newsletter',
+    'description' => 'Newsletter',
+    'page callback' => 'system_admin_menu_block_page',
+    'access arguments' => array('access administration pages'),
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // Administration pages.
+  $items['admin/config/people/newsletter/mailchimp/config'] = array(
+    'title' => 'Mailchimp Configuration',
+    'description' => 'Mailchimp Configuration.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_newsletter_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'sepulsa_newsletter.admin.inc',
+  );
+
+  $items['newsletter/webhook_mailchimp'] = array(
+    'page callback' => 'sepulsa_webhook_mailchimp',
+    'access callback' => TRUE,
+  );
+
+  $items['admin/config/people/newsletter/mailchimp/upload'] = array(
+    'title' => 'Mailchimp Import',
+    'description' => 'Import Subscriber / Unsubscriber in Mailchimp.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sepulsa_newsletter_import_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'sepulsa_newsletter.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Function sepulsa_webhook_mailchimp().
+ * @todo : define what going todo in mailchimp webhook.
+ */
+function sepulsa_webhook_mailchimp() {
+  // Define key webhook .
+  // See : https://us12.admin.mailchimp.com/lists/tools/webhooks?id=***
+  $sepulsa_key = variable_get('sepulsa_newsletter_webhook_key',
+    'dev19isokenoproblemooo!');
+
+  // Check key.
+  if (!isset($_GET['key'])) {
+    // If there is no key.
+    watchdog('sepulsa_newsletter',
+      'Mailchimp Webhook : No security key specified, ignoring request');
+  }
+  elseif ($_GET['key'] != $sepulsa_key) {
+    // Security key specified, but not correct.
+    watchdog('sepulsa_newsletter',
+      'Mailchimp Webhook : Security key specified, but not correct,
+      wanted: @sepulsa_key but received : @received',
+      array('@sepulsa_key' => $sepulsa_key, '@received' => $_GET['key']));
+  }
+  else {
+    // Process the request.
+    watchdog('sepulsa_newsletter',
+      'Mailchimp Webhook : Processing a @type request...',
+      array('@type' => $_POST['type']));
+    switch ($_POST['type']) {
+      case 'subscribe':
+        sepulsa_newsletter_mailchimp_subscribe($_POST['data']);
+        break;
+
+      case 'unsubscribe':
+        sepulsa_newsletter_mailchimp_unsubscribe($_POST['data']);
+        break;
+
+      case 'cleaned':
+        sepulsa_newsletter_mailchimp_cleaned($_POST['data']);
+        break;
+
+      case 'upemail':
+        sepulsa_newsletter_mailchimp_upemail($_POST['data']);
+        break;
+
+      case 'profile':
+        sepulsa_newsletter_mailchimp_profile($_POST['data']);
+        break;
+
+      default:
+        watchdog('sepulsa_newsletter',
+          'Mailchimp Webhook : @type request ignored',
+          array('@type' => $_POST['type']));
+    }
+  }
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function sepulsa_newsletter_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'sepulsa_newsletter') . '/includes/views',
+  );
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_subscribe().
+ *
+ * $data : data from webhook mailchimp.
+ */
+function sepulsa_newsletter_mailchimp_subscribe($data) {
+  $result = db_select('users', 'u');
+  $result->fields('u', array('uid'));
+  $result->condition('u.mail', $data['email']);
+  $result_fix = $result->execute()->fetchAssoc();
+  $user = user_load($result_fix['uid']);
+  $user->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'] = 1;
+  user_save($user);
+  watchdog('sepulsa_newsletter',
+    'Mailchimp Webhook : @email just subscribed!',
+    array('@email' => $data['email']));
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_unsubscribe().
+ *
+ * $data : data from webhook mailchimp.
+ */
+function sepulsa_newsletter_mailchimp_unsubscribe($data) {
+  $result = db_select('users', 'u');
+  $result->fields('u', array('uid'));
+  $result->condition('u.mail', $data['email']);
+  $result_fix = $result->execute()->fetchAssoc();
+  $user = user_load($result_fix['uid']);
+  $user->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'] = 0;
+  user_save($user);
+  watchdog('sepulsa_newsletter',
+    'Mailchimp Webhook : @email just unsubscribed!',
+    array('@email' => $data['email']));
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_cleaned().
+ *
+ * $data : data from webhook mailchimp.
+ */
+function sepulsa_newsletter_mailchimp_cleaned($data) {
+  watchdog('sepulsa_newsletter',
+    'Mailchimp Webhook : @email was cleaned from your list!',
+    array('@email' => $data['email']));
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_upemail().
+ *
+ * $data : data from webhook mailchimp.
+ */
+function sepulsa_newsletter_mailchimp_upemail($data) {
+  watchdog('sepulsa_newsletter',
+    'Mailchimp Webhook : @email changed their email address to @new_email !',
+    array('@email' => $data['old_email'], '@new_email' => $data['new_email']));
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_profile().
+ *
+ * $data : data from webhook mailchimp.
+ */
+function sepulsa_newsletter_mailchimp_profile($data) {
+  watchdog('sepulsa_newsletter',
+    'Mailchimp Webhook : @email updated their profile!',
+    array('@email' => $data['email']));
+}
+
+/**
+ * Function sepulsa_newsletter_mailchimp_api().
+ *
+ * $settings -> array (method, op, email, status)
+ */
+function sepulsa_newsletter_mailchimp_api($settings) {
+  // Untuk Edit subscribed / unsubscribed.
+  // URL API, us12 adalah key terakhir sebelum - di API KEY.
+  $url = variable_get('sepulsa_newsletter_api_url',
+    'https://us12.api.mailchimp.com/3.0/lists');
+  // ID List Member test : a38de08c0b.
+  // ID List Member prod : 2ae89eac82.
+  $id = variable_get('sepulsa_newsletter_id_member', 'a38de08c0b');
+
+  // Operation untuk mengambil list member.
+  $op = $settings['op'];
+
+  // MD5 Email yang akan di ganti.
+  $email = md5($settings['email']);
+
+  $data = array(
+    'email_address' => $settings['email'],
+    'status' => $settings['status'],
+  );
+
+  // Username Mailchimp.
+  $username_mailchimp = variable_get('sepulsa_newsletter_username',
+    'sepulsanews');
+  // Api Key Mailchimp.
+  // see : https://us12.admin.mailchimp.com/account/api/
+  $apikey_mailchimp = variable_get('sepulsa_newsletter_apikey',
+    '0cf0d5df56cc65702c6c5a7d404ac244');
+  // Application Mailchimp.
+  $application_mailchimp = variable_get('sepulsa_newsletter_appkey', 'us12');
+
+  // Define option for http request.
+  $http_options = array(
+    // Define Method.
+    'method' => $settings['method'],
+    'headers' => array(
+      'Content-Type' => 'application/json',
+      'Accept' => 'application/json',
+      // Define username:apikey.
+      'Authorization' => 'Basic ' . base64_encode($username_mailchimp .
+        ":" . $apikey_mailchimp . "-" . $application_mailchimp),
+    ),
+    // Define Data.
+    'data' => json_encode($data),
+  );
+  if ($settings['method'] == 'POST') {
+    $result = drupal_http_request($url . '/' . $id . '/' . $op, $http_options);
+  }
+  elseif ($settings['method'] == 'PUT') {
+    $result = drupal_http_request($url . '/' . $id . '/' . $op . '/' . $email, $http_options);
+  }
+  else {
+    unset($http_options['data']);
+    $result = drupal_http_request($url . '/' . $id . '/' . $op . '/' . $email, $http_options);
+  }
+
+  // print_r($result);
+  return $result;
+}
+
+/**
+ * Implements hook_user_presave().
+ */
+function sepulsa_newsletter_user_presave(&$edit, $account, $category) {
+  $result = 'HTTP request not sent';
+  if (!isset($edit['flag_newsletter_subscriber'])) {
+    if (isset($edit['field_newsletter_subscribers']) && !empty($edit['field_newsletter_subscribers'])) {
+      if ($edit['field_newsletter_subscribers']['und'][0]['value'] == 1) {
+        $status = 'subscribed';
+      }
+      else {
+        $status = 'unsubscribed';
+      }
+      if (isset($account->is_new) && !empty($account->is_new)) {
+        $settings = array(
+          'method' => 'POST',
+          'op' => 'members',
+          'email' => $edit['mail'],
+          'status' => $status,
+        );
+        $result = sepulsa_newsletter_mailchimp_api($settings);
+        watchdog('sepulsa_newsletter',
+          'Insert Newsletter : <pre> result : @result, </pre>',
+          array('@result' => print_r($result, TRUE)));
+      }
+      else {
+        $settings = array(
+          'method' => 'PUT',
+          'op' => 'members',
+          'email' => $edit['mail'],
+          'status' => $status,
+        );
+        $result = sepulsa_newsletter_mailchimp_api($settings);
+        watchdog('sepulsa_newsletter',
+          'Update Newsletter : <pre> result : @result, </pre>',
+          array('@result' => print_r($result, TRUE)));
+      }
+    }
+  }
+  else {
+    if ($edit['flag_newsletter_subscriber'] == 1) {
+      $status = 'subscribed';
+      $edit['field_newsletter_subscribers']['und'][0]['value'] = 1;
+    }
+    else {
+      $status = 'unsubscribed';
+      $edit['field_newsletter_subscribers']['und'][0]['value'] = 0;;
+    }
+
+    if (isset($account->is_new) && !empty($account->is_new)) {
+      $settings = array(
+        'method' => 'POST',
+        'op' => 'members',
+        'email' => $edit['mail'],
+        'status' => $status,
+      );
+      $result = sepulsa_newsletter_mailchimp_api($settings);
+      watchdog('sepulsa_newsletter',
+        'Insert Newsletter : <pre> result : @result, </pre>',
+        array('@result' => print_r($result, TRUE)));
+    }
+    else {
+      $settings = array(
+        'method' => 'PUT',
+        'op' => 'members',
+        'email' => $edit['mail'],
+        'status' => $status,
+      );
+      $result = sepulsa_newsletter_mailchimp_api($settings);
+      watchdog('sepulsa_newsletter',
+        'Update Newsletter : <pre> result : @result, </pre>',
+        array('@result' => print_r($result, TRUE)));
+    }
+  }
+}
+
+/**
+ * Implements hook_field_attach_form().
+ */
+function sepulsa_newsletter_field_attach_form($entity_type, $entity, &$form, &$form_state, $langcode) {
+  // Add a checkbox allowing a given field to be emptied.
+  // See hook_field_attach_submit() for the corresponding processing code.
+
+  $default_value = (isset($form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'])
+    && !empty($form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'])) ?
+  $form_state['user']->field_newsletter_subscribers[LANGUAGE_NONE][0]['value'] : variable_get('sepulsa_newsletter_subscribe_value', '0');
+
+  if ($entity_type == 'user') {
+    if ($form_state['build_info']['form_id'] == 'user_profile_form'
+      && !isset($form_state['build_info']['files'])) {
+      $form['flag_newsletter_subscriber'] = array(
+        '#type' => 'checkbox',
+        '#title' => "Newsletter Subscriber",
+        '#default_value' => $default_value,
+        '#return_value' => 1,
+      );
+    }
+  }
+}

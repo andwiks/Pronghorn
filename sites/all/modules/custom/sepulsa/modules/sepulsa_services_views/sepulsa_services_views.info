@@ -1,0 +1,6 @@
+name = "Sepulsa Services Views"
+description = "Sepulsa alter services views user_offline_owned_coupon & user_owned_coupon"
+core = "7.x"
+
+dependencies[] = device
+dependencies[] = services_views

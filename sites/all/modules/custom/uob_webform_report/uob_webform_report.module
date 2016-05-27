@@ -23,6 +23,15 @@ function uob_webform_report_cron() {
     );
   }
   if(!empty($file_saved)){
+    // Log the file
+    watchdog('uob_webform_report',
+      'Generate UOB webform submisssion : @current_date  The file : <pre>@files</pre> ',
+      array(
+        '@current_date' => $current_date,
+        '@files' => print_r($filepath.$filename, TRUE),
+      ),
+      WATCHDOG_INFO
+    );
     // Send email with attachment file to configured email.
     // Where $filepathname should contain the path to the file and,
     // and $filename should contain the name of the file.
@@ -44,16 +53,17 @@ function uob_webform_report_cron() {
       'attachment' => $attachment,
     );
 
-    drupal_mail('uob_webform_report', 'uob_webform_send_report', $to, language_default(), $params, $from, $send = TRUE);
-
-    watchdog('uob_webform_report',
-      'Generate UOB webform submisssion : @current_date  The file : <pre>@files</pre> ',
-      array(
-        '@current_date' => $current_date,
-        '@files' => print_r($filename, TRUE),
-      ),
-      WATCHDOG_INFO
-    );
+    $send = drupal_mail('uob_webform_report', 'uob_webform_send_report', $to, language_default(), $params, $from, $send = TRUE);
+    if($send){
+      watchdog('uob_webform_report',
+        'Generate UOB webform submisssion : @current_date  The file : <pre>@files</pre> ',
+        array(
+          '@current_date' => $current_date,
+          '@files' => print_r($filepath.$filename, TRUE),
+        ),
+        WATCHDOG_INFO
+      );
+    }
   } // End file saved check
 
 }

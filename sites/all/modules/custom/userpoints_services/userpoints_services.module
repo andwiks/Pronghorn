@@ -100,7 +100,7 @@ function _userpoints_services_total(){
   // Wrap around using try and catch.
   try {
     $totalamount = userpoints_get_current_points($user->uid, 'all');
-    return $totalamount;
+    return ['total' => $totalamount, 'device' => device_verification_status($user->uid) ];
   }
   catch (Exception $exception) {
     // Log this condition.

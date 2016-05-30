@@ -17,9 +17,8 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
     if(request_path()=='air/user_offline_owned_coupon'){
       $paged_output = array(
         'data' => $output,
-        'message' => '',
-        'uid' => $uid,
-        'status' => 200,
+        'message' => null,
+        'status' => true,
         'device' => device_verification_status($uid),
       );
     }
@@ -30,9 +29,8 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
     if(request_path()=='air/user_owned_coupon'){
       $paged_output = array(
         'data' => $output,
-        'message' => '',
-        'uid' => $uid,
-        'status' => 200,
+        'message' => null,
+        'status' => true,
         'device' => device_verification_status($uid),
       );
     }

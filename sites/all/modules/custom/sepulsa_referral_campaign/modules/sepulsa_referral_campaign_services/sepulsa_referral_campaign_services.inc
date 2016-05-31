@@ -116,7 +116,7 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
         if (!empty($referral_user)) {
           // Get UID in session.
           $uid = $user->uid;
-          if ($uid != $referral_user) {
+          if ($uid != $referral_uid) {
             // Check whether the user use referral code in the same campaign.
             $query = db_select('referral_campaign_details', 'rcd')
               ->fields('rcd')
@@ -127,7 +127,7 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
               // Check whether the user is her/his downlink.
               $query_check_downlink = db_select('referral_campaign_details', 'rcd')
                 ->fields('rcd')
-                ->condition('uid', $referral_user)
+                ->condition('uid', $referral_uid)
                 ->condition('referral_uid', $uid)
                 ->condition('src_id', $list[0]->src_id)
                 ->execute();

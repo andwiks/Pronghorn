@@ -39,6 +39,8 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
         $data[$k]->expired = $row->expired;
         if(empty($row->code)){
          $data[$k]->code = null;
+        }else{
+          $data[$k]->code = $row->code;
         }
         $data[$k]->detail = $row->detail;
         $data[$k]->node_field_data_field_simple_coupon_nid = $row->node_field_data_field_simple_coupon_nid;

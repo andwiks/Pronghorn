@@ -87,7 +87,7 @@ function sepulsa_referral_campaign_services_resource_request() {
             'query' => array(
               'code' => _referral_uid2ref($user->uid),
             ),
-          ),
+          )
         ),
         'description' => $list[0]->desc_camp,
         'tnc' => $list[0]->tnc,

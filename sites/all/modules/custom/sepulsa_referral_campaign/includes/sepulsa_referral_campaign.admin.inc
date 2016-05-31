@@ -83,6 +83,22 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#description' => t('A unique machine-readable name for the client configuration. It must only contain lowercase letters, numbers, and underscores.'),
   );
 
+  $form['desc_camp'] = array(
+    '#title' => t('Description of the campaign'),
+    '#type' => 'textarea',
+    '#default_value' => isset($referral->desc_camp) ? $referral->desc_camp : '',
+    '#description' => t('Description of the referral campaign.'),
+    '#required' => TRUE,
+  );
+
+  $form['tnc'] = array(
+    '#title' => t('Term And Condition'),
+    '#type' => 'textarea',
+    '#default_value' => isset($referral->tnc) ? $referral->tnc : '',
+    '#description' => t('Term and Condition of referral Campaign.'),
+    '#required' => TRUE,
+  );
+
   $form['active_time'] = array(
     '#type' => 'fieldset',
     '#title' => t('Configure Time of Campaign'),
@@ -175,8 +191,8 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   $rules = rules_get_components(TRUE, 'action');
   $form['rules_name'] = array(
     '#type' => 'select',
-    '#title' => t('Rules Action For Rererred User'),
-    '#description' => t('Rules Action to fire.'),
+    '#title' => t('Rules Action For Rererred User (downlink)'),
+    '#description' => t('Rules Action to fire'),
     '#options' => $rules,
     '#default_value' => isset($referral->rules_name) ? $referral->rules_name : '',
   );
@@ -193,8 +209,8 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   $rules = rules_get_components(TRUE, 'action');
   $form['rules_name_referral'] = array(
     '#type' => 'select',
-    '#title' => t('Rules Action For Referrer User'),
-    '#description' => t('Rules Action to fire for the Referer user.'),
+    '#title' => t('Rules Action For Referrer User (uplink)'),
+    '#description' => t('Rules Action to fire for the referer user'),
     '#options' => $rules,
     '#default_value' => isset($referral->rules_name_referral) ? $referral->rules_name_referral : '',
   );
@@ -330,6 +346,8 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     // Update sepulsa referral capaign: update entity.
     $entity = sepulsa_referral_campaign_load($form_state['values']['src_id']);
     $entity->title = $form_state['values']['title'];
+    $entity->desc_camp = $form_state['values']['desc_camp'];
+    $entity->tnc = $form_state['values']['tnc'];
     $entity->machine_name = $machine_name;
     $entity->start = $start;
     $entity->end = $end;
@@ -355,6 +373,8 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     // Sepulsa referral capaign is new: create new entity.
     $entity = entity_get_controller('sepulsa_referral_campaign')->create(array(
       'title' => $form_state['values']['title'],
+      'desc_camp' => $form_state['values']['desc_camp'],
+      'tnc' => $form_state['values']['tnc'],
       'machine_name' => $machine_name,
       'start' => $start,
       'end' => $end,

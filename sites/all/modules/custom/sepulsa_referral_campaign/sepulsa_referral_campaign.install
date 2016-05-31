@@ -25,6 +25,18 @@ function sepulsa_referral_campaign_schema() {
         'not null' => TRUE,
         'default' => '',
       ),
+      'desc_camp' => array(
+        'description' => 'Description of the campaign',
+        'type' => 'text',
+        'not null' => FASLE,
+        'size' => 'big',
+      ),
+      'tnc' => array(
+        'description' => 'Term and condition of the campaign',
+        'type' => 'text',
+        'not null' => FASLE,
+        'size' => 'big',
+      ),
       'machine_name' => array(
         'description' => 'Machine name of referral campaign',
         'type' => 'varchar',

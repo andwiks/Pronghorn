@@ -130,6 +130,23 @@ function pln_prepaid_preprocess_page(&$variables) {
   }
 }
 
+/**
+ * Implements hook_menu().
+ */
+function pln_prepaid_menu() {
+  // Administration pages.
+  $items['admin/config/system/pln_settings'] = array(
+    'title' => 'Pln Admin Fee',
+    'description' => 'Configure default PLN admin Fee.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pln_prepaid_settings_form'),
+    'access arguments' => array('access administration pages'),
+    'file' => 'pln_prepaid.admin.inc',
+  );
+
+  return $items;
+}
+
 function pln_prepaid_add_to_cart_form_validate(&$form, &$form_state) {
   if ($form_state['submitted']) {
     $customer_number = $form_state['values']['line_item_fields']['field_customer_number'][LANGUAGE_NONE][0]['value'];
@@ -195,13 +212,14 @@ function pln_prepaid_payment_line_item($line_item_wrapper) {
  * Implements hook_commerce_cart_line_item_refresh().
  */
 function pln_prepaid_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
-  watchdog('pln_prepaid', 'line item @type : <pre> @line </pre>', array('@type' => $line_item->type, '@line' => print_r($order_wrapper,TRUE)), WATCHDOG_NOTICE, 'link');
-  // echo "<pre>";
-  // print_r($order_wrapper);die();
-
   if ($line_item->type == 'pln_prepaid') {
-    module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
-    commerce_fees_apply($order_wrapper, 'admin_fee', 2500, 'IDR');
-    watchdog('pln_prepaid', 'hit this $type: <pre> @line </pre>', array('@type' => $line_item->type, '@line' => print_r($order_wrapper,TRUE)), WATCHDOG_NOTICE, 'link');
+    // module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
+    // commerce_fees_apply($order_wrapper, 'admin_fee', variable_get('pln_admin_fee', 0), 'IDR');
+
+    $discount_amount['amount'] = 20000;
+    $discount_amount['currency_code'] = 'IDR';
+
+    module_load_include('inc', 'commerce_discount', 'commerce_discount.rules');
+    commerce_discount_add_line_item($order_wrapper, 'discount_cobain_mantap', $discount_amount);
   }
 }

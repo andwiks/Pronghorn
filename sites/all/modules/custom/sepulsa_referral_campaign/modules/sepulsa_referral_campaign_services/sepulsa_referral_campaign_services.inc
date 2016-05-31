@@ -230,7 +230,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit_referral'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -248,7 +248,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -266,7 +266,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit_referral'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -282,7 +282,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();

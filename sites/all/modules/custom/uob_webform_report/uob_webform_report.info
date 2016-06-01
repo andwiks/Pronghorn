@@ -1,0 +1,8 @@
+name = "UOB webform report"
+description = "Generate latest UOB webform submission & send it to UOB representatif email"
+core = "7.x"
+
+dependencies[] = webform
+dependencies[] = views
+dependencies[] = webform_mysql_views
+dependencies[] = views_data_export

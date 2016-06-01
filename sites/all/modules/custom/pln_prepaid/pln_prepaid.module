@@ -213,13 +213,19 @@ function pln_prepaid_payment_line_item($line_item_wrapper) {
  */
 function pln_prepaid_commerce_cart_line_item_refresh($line_item, $order_wrapper) {
   if ($line_item->type == 'pln_prepaid') {
-    // module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
-    // commerce_fees_apply($order_wrapper, 'admin_fee', variable_get('pln_admin_fee', 0), 'IDR');
+    // echo "<pre>";
+    module_load_include('inc', 'commerce_fees', 'commerce_fees.rules');
+    commerce_fees_apply($order_wrapper, 'admin_fee', variable_get('pln_admin_fee', 0), 'IDR');
+    // print_r(commerce_order_load($order_wrapper->value()->order_number));
+    // echo "<br>";
 
-    $discount_amount['amount'] = 20000;
+
+    $discount_amount['amount'] = 200;
     $discount_amount['currency_code'] = 'IDR';
 
     module_load_include('inc', 'commerce_discount', 'commerce_discount.rules');
     commerce_discount_add_line_item($order_wrapper, 'discount_cobain_mantap', $discount_amount);
+    // $order_wrapper->save();
+    // print_r($order_wrapper);die();
   }
 }

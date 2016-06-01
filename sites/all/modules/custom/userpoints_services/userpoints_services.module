@@ -75,6 +75,14 @@ function _userpoints_services_list(){
 			);
     }
     $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
+
+    $userpoints = array(
+      'data' => $userpoints,
+      'message' => NULL,
+      'status' => TRUE,
+      'device' => device_verification_status($user->uid),
+    );
+
     return $userpoints;
   }
   catch (Exception $exception) {
@@ -97,8 +105,13 @@ function _userpoints_services_total(){
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
   try {
-    $totalamount = userpoints_get_current_points($user->uid, 'all');   
-    return $totalamount;
+    $totalamount = userpoints_get_current_points($user->uid, 'all');
+    return [
+      'data' => $totalamount,
+      'message' => NULL,
+      'status' => TRUE,
+      'device' => device_verification_status($user->uid),
+    ];
   }
   catch (Exception $exception) {
     // Log this condition.

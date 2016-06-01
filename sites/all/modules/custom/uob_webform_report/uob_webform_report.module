@@ -59,15 +59,6 @@ function uob_webform_report_cron() {
     );
   }
   if(!empty($file_saved)){
-    // Log the file
-    watchdog('uob_webform_report',
-      'Generate UOB webform submisssion : @current_date  The file : <pre>@files</pre> ',
-      array(
-        '@current_date' => $current_date,
-        '@files' => print_r($filepath.$filename, TRUE),
-      ),
-      WATCHDOG_INFO
-    );
     // Send email with attachment file to configured email.
     // Where $filepathname should contain the path to the file and,
     // and $filename should contain the name of the file.
@@ -85,23 +76,20 @@ function uob_webform_report_cron() {
 
     $params = array(
       'headers' => array('Content-Type' => 'text/html'),
-      'key' => 'test',
       'subject' => 'UOB Campaign submission report: ' . $current_date,
       'body' => 'Below is download link UOB Campaign submission report: ' . $current_date. ' <br>' . $download_link,
       'attachment' => $attachment,
     );
 
-    $send = drupal_mail('uob_webform_report', 'uob_webform_send_report', $to, language_default(), $params, $from, $send = TRUE);
-    if($send){
-      watchdog('uob_webform_report',
-        'Send email to: ' . $to . ' with file: '.$filename,
-        array(
-          '@to' => $to,
-          '@files' => print_r($filepath.$filename, TRUE),
-        ),
-        WATCHDOG_INFO
-      );
-    }
+    $send = drupal_mail('uob_webform_report', 'uob_webform_send_report', $to, language_default(), $params, $from, TRUE);
+    watchdog('uob_webform_report',
+      'UOB report send to: @to with file: !files',
+      array(
+        '@to' => $to,
+        '!files' => file_create_url($filepath.$filename),
+      ),
+      WATCHDOG_INFO
+    );
   } // End file saved check
 }
 
@@ -109,11 +97,13 @@ function uob_webform_report_cron() {
  * Implements hook_mail().
  */
 function uob_webform_report_mail($key, &$message, $params) {
-  $message['subject'] = $params['subject'];
-  $message['body'][] = $params['body'];
+  if($key=='uob_webform_send_report'){
+    $message['subject'] = $params['subject'];
+    $message['body'][] = $params['body'];
 
-  // Add attachment when available.
-  if (isset($params['attachment'])) {
-    $message['params']['attachments'][] = $params['attachment'];
+    // Add attachment when available.
+    if (isset($params['attachment'])) {
+      $message['params']['attachments'][] = $params['attachment'];
+    }
   }
 }

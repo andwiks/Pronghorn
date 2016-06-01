@@ -180,7 +180,18 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
 
         // Check device status: blocked.
         if (empty($check['device_status'])) {
-          return services_error(t('Device has been blocked.'), 401);
+          // Check mail verification status new_flag=0 (already merged).
+          $q_d_block = db_select('device', 'd');
+          $q_d_block->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
+          $q_d_block->condition('d.did', $did);
+          $q_d_block->condition('d.status', 0);
+          $q_d_block->condition('dmv.new_flag', 0, '=');
+          $device_block = $q_d_block->execute()->fetchAssoc();
+          if (!empty($device_block)) {
+            return services_error(t('Akses akun ini sudah dipindah untuk device lain.'), 401);
+          }
+          // Other condition.
+          return services_error(t('Device ini diblock, hubungi Customer Service.'), 401);
         }
 
         // Check device verication: unconfirmed or new.
@@ -484,11 +495,33 @@ function device_services_resource_verify($code = '') {
  * @return mixed
  *   TRUE or error message.
  */
-function device_services_resource_mail($mail = '') {
+function device_services_resource_mail($mail = '', $confirm = 0) {
   // Validate mail.
   if (valid_email_address($mail)) {
     // Validate device session.
     $session = device_services_default_session_auth('mail');
+
+    // Check if email already on device that merged to user.
+    $qdevice = db_select('device', 'd');
+    $qdevice->join('device_verification', 'dv', 'dv.did = d.did');
+    $qdevice->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
+    $qdevice->condition('d.did', $session['device']->did, '!=');
+    $qdevice->condition('dmv.mail', $mail, '=');
+    $qdevice->condition('dmv.new_flag', 0, '=');
+    $qdevice->fields('d', array('did', 'imei'));
+    $qdevice->fields('dv', array('phone'));
+    $qdevice->addField('dmv', 'status', 'dmv_status');
+    $qdevice->addField('dmv', 'new_flag', 'dmv_new_flag');
+    $qdevice->addField('dmv', 'mail');
+    $rdevice = $qdevice->execute()->fetchAssoc();
+
+    if (!empty($rdevice) && empty($confirm)) {
+      $msg = t('Email @email sudah terdaftar di device lain. Apakah Anda yakin ingin menggunakan email tersebut untuk device ini?',
+        array('@email' => $mail)
+      );
+      return services_error($msg, 406);
+    }
+
     if ($session !== FALSE) {
       // Get device wrapper.
       $device_wrapper = entity_metadata_wrapper('device', $session['device']);

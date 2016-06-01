@@ -158,14 +158,17 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
     '#maxlength' => 8,
   );
 
-  $active = array(0 => t('No'), 1 => t('Yes'));
+  $active = array(
+    0 => t('Get benefit in fisrt order ever'),
+    1 => t('Get benefit in first order every campaign'),
+    2 => t('Get benefit in every transaction'),
+  );
   // Sepulsa Referral Campaign timeout.
   $form['flag_first_order'] = array(
     '#type' => 'radios',
     '#title' => t('Referrer User get benefit in first order ?'),
     '#default_value' => (isset($referral->flag_first_order)) ? $referral->flag_first_order : 0,
     '#options' => $active,
-    '#description' => t('When it is no, benefit will send every transaction.'),
   );
 
   // Get rules compontents name and label.
@@ -173,25 +176,43 @@ function sepulsa_referral_campaign_form($form, &$form_state, $referral = NULL) {
   $form['rules_name'] = array(
     '#type' => 'select',
     '#title' => t('Rules Action For Rererred User'),
-    '#description' => t('Rules Action to fire'),
+    '#description' => t('Rules Action to fire.'),
     '#options' => $rules,
     '#default_value' => isset($referral->rules_name) ? $referral->rules_name : '',
+  );
+
+  $form['desc_benefit'] = array(
+    '#title' => t('Benefit Description For Rererred User'),
+    '#type' => 'textfield',
+    '#default_value' => isset($referral->desc_benefit) ? $referral->desc_benefit : '',
+    '#description' => t('Description Benefit For Rererred User.'),
+    '#required' => TRUE,
+    '#maxlength' => 254,
   );
 
   $rules = rules_get_components(TRUE, 'action');
   $form['rules_name_referral'] = array(
     '#type' => 'select',
     '#title' => t('Rules Action For Referrer User'),
-    '#description' => t('Rules Action to fire for the referer user'),
+    '#description' => t('Rules Action to fire for the Referer user.'),
     '#options' => $rules,
     '#default_value' => isset($referral->rules_name_referral) ? $referral->rules_name_referral : '',
+  );
+
+  $form['desc_benefit_referral'] = array(
+    '#title' => t('Benefit Description For Referrer User'),
+    '#type' => 'textfield',
+    '#default_value' => isset($referral->desc_benefit_referral) ? $referral->desc_benefit_referral : '',
+    '#description' => t('Description Benefit For Referer User.'),
+    '#required' => TRUE,
+    '#maxlength' => 254,
   );
 
   $form['path'] = array(
     '#title' => t('Path Static Page'),
     '#type' => 'textfield',
     '#default_value' => isset($referral->path) ? $referral->path : '',
-    '#description' => t('Define path static page for campaign. e.g. : referral_campaign/mobile'),
+    '#description' => t('Define path static page for campaign. e.g. : referral_campaign/mobile.'),
     '#required' => TRUE,
     '#maxlength' => 254,
   );
@@ -314,6 +335,9 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
     $entity->end = $end;
     $entity->path = url($form_state['values']['path'], array('absolute' => TRUE));
     $entity->rules_name = $form_state['values']['rules_name'];
+    $entity->desc_benefit = $form_state['values']['desc_benefit'];
+    $entity->rules_name_referral = $form_state['values']['rules_name_referral'];
+    $entity->desc_benefit_referral = $form_state['values']['desc_benefit_referral'];
     $entity->changed = strtotime('now');
     $entity->save();
     drupal_set_message(t('Referral Campaign ID : @id has been saved.',
@@ -337,7 +361,9 @@ function sepulsa_referral_campaign_form_submit($form, &$form_state) {
       'path' => url($form_state['values']['path'], array('absolute' => TRUE)),
       'flag_first_order' => $form_state['values']['flag_first_order'],
       'rules_name' => $form_state['values']['rules_name'],
+      'desc_benefit' => $form_state['values']['desc_benefit'],
       'rules_name_referral' => $form_state['values']['rules_name_referral'],
+      'desc_benefit_referral' => $form_state['values']['desc_benefit_referral'],
       'created' => strtotime('now'),
       'changed' => strtotime('now'),
     ));

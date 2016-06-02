@@ -1,0 +1,4 @@
+name = Sepulsa Bundle
+description = Provides Sepulsa product bundles.
+package = Sepulsa
+core = 7.x

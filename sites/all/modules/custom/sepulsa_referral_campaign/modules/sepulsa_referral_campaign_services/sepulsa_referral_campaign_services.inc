@@ -91,7 +91,7 @@ function sepulsa_referral_campaign_services_resource_request() {
         ),
         'description' => $list[0]->desc_camp,
         'tnc' => $list[0]->tnc,
-        'benefit' => $list[0]->rules_name_referral,
+        'benefit' => $list[0]->desc_benefit_referral,
       );
       return $return;
     }

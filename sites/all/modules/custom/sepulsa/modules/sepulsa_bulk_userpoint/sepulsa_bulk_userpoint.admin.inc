@@ -28,7 +28,7 @@ function sepulsa_bulk_userpoint_bulk_form($form = array(), &$form_state = array(
   $form['fid'] = array(
     '#type' => 'managed_file',
     '#title' => t('File to Bulk Transaction'),
-    '#description' => '"username" , "points(+/- without . or ,)"',
+    '#description' => '"username" , "points(+/- without . or ,)", "[optional:reason]", "[optional:reference order_id]"',
     '#upload_location' => 'private://',
     '#upload_validators' => array(
       'file_validate_extensions' => array('csv'),
@@ -66,6 +66,7 @@ function sepulsa_bulk_userpoint_bulk_form($form = array(), &$form_state = array(
  *   Form state array.
  */
 function sepulsa_bulk_userpoint_bulk_form_submit($form, &$form_state) {
+  global $user;
   // Check if there is file id.
   if (!empty($form_state['values']['fid'])) {
     // Load file object.
@@ -80,13 +81,20 @@ function sepulsa_bulk_userpoint_bulk_form_submit($form, &$form_state) {
           // Check if can get valid uid.
           if (!empty($uid)) {
             $item = array(
+              'uname' => (isset($data[0]) && !empty($data[0])) ? $data[0] : 'unknown',
               'uid' => $uid,
+              'approver' => $user->uid,
               'points' => $data[1],
               'tid' => $form_state['values']['tid'],
               'description' => t('[BULK] @reason', array(
                 '@reason' => (isset($data[2]) && !empty($data[2]) ? $data[2] : 'No Reason'),
               )),
             );
+            // Check for entity id.
+            if (isset($data[3]) && !empty($data[3])) {
+              $item['entity_type'] = 'commerce_order';
+              $item['entity_id'] = intval($data[3]);
+            }
             $operations[] = array(
               '_sepulsa_bulk_userpoint_process',
               array($item),

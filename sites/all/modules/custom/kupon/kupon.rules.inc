@@ -58,7 +58,7 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
     $product = commerce_product_load($line_item->data['context']['product_ids'][0]);
     $expiry = field_get_items('commerce_product', $product, 'field_expiry_date');
 
-    if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) && 
+    if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE]) &&
         ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique' ||
         $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique' )) {
         //$unique_nid = db_query_range("SELECT nid FROM {node} WHERE uid = 1 AND type = 'owned_unique_coupon'", 0, 1)->fetchField();
@@ -74,8 +74,12 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
             );
             $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry[0]['value'];
             node_save($node);
-        } else {
-            drupal_set_message($node_coupon->title.' is out of stock', 'error');
+        }
+        else {
+          $order = commerce_load($line_item->order_id);
+          drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
+            'order' => $order,
+          ), variable_get('site_mail', 'admin@example.com'), TRUE);
         }
     } else {
         $node = new stdClass();
@@ -104,6 +108,5 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
         $node = node_submit($node); // Prepare node for saving
         node_save($node);
     }
-    //drupal_set_message( "Node with nid " . $node->nid . " saved!\n");
   }
 }

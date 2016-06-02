@@ -80,7 +80,8 @@ function sepulsa_referral_campaign_services_resource_request() {
     if ($list) {
       $return = array(
         'code' => _referral_uid2ref($user->uid),
-        'link_referral' => url($list[0]->path,
+        'link_referral' => url(
+          $list[0]->path,
           array(
             'absolute' => TRUE,
             'query' => array(
@@ -88,7 +89,9 @@ function sepulsa_referral_campaign_services_resource_request() {
             ),
           )
         ),
-        'src_id' => $list[0]->src_id,
+        'description' => $list[0]->desc_camp,
+        'tnc' => $list[0]->tnc,
+        'benefit' => $list[0]->desc_benefit_referral,
       );
       return $return;
     }
@@ -113,7 +116,7 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
         if (!empty($referral_user)) {
           // Get UID in session.
           $uid = $user->uid;
-          if ($uid != $referral_user) {
+          if ($uid != $referral_uid) {
             // Check whether the user use referral code in the same campaign.
             $query = db_select('referral_campaign_details', 'rcd')
               ->fields('rcd')
@@ -121,24 +124,34 @@ function sepulsa_referral_campaign_services_resource_register($code = '') {
               ->condition('src_id', $list[0]->src_id)
               ->execute();
             if ($query->rowCount() == 0) {
-              // Set data for referral_campaign_details.
-              $array_insert = array(
-                'src_id' => $list[0]->src_id,
-                'uid' => $uid,
-                'referral_uid' => $referral_uid,
-                'created' => REQUEST_TIME,
-                'host' => ip_address(),
-                'http_referer' => $_SERVER['HTTP_REFERER'],
-              );
-              // Insert data to referral_campaign_details.
-              db_insert('referral_campaign_details')
-                ->fields($array_insert)
+              // Check whether the user is her/his downlink.
+              $query_check_downlink = db_select('referral_campaign_details', 'rcd')
+                ->fields('rcd')
+                ->condition('uid', $referral_uid)
+                ->condition('referral_uid', $uid)
+                ->condition('src_id', $list[0]->src_id)
                 ->execute();
-              watchdog('sepulsa_referral_campaign_services',
-                'Insert Data to referral_campaign_details : <pre> @data </pre>',
-                array('@data' => print_r($array_insert, TRUE)),
-                WATCHDOG_NOTICE, 'info');
-              return TRUE;
+              if ($query_check_downlink->rowCount() == 0) {
+                // Set data for referral_campaign_details.
+                $array_insert = array(
+                  'src_id' => $list[0]->src_id,
+                  'uid' => $uid,
+                  'referral_uid' => $referral_uid,
+                  'created' => REQUEST_TIME,
+                  'host' => ip_address(),
+                  'http_referer' => $_SERVER['HTTP_REFERER'],
+                );
+                // Insert data to referral_campaign_details.
+                db_insert('referral_campaign_details')
+                  ->fields($array_insert)
+                  ->execute();
+                watchdog('sepulsa_referral_campaign_services',
+                  'Insert Data to referral_campaign_details : <pre> @data </pre>',
+                  array('@data' => print_r($array_insert, TRUE)),
+                  WATCHDOG_NOTICE, 'info');
+                return TRUE;
+              }
+              return services_error(t('Cannot use your downlink referral code'), 406);
             }
             return services_error(t('Referral code has been used in this campaign.'), 406);
           }
@@ -217,7 +230,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit_referral'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -235,7 +248,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -253,7 +266,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit_referral'));
+      $query->fields('src', array('desc_benefit'));
       $query->condition('rcd.uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();
@@ -269,7 +282,7 @@ function sepulsa_referral_campaign_getlink($uid, $src_id, $mode = 'downlink') {
       $query->fields('u', array('mail'));
       $query->fields('d', array('phone'));
       $query->fields('rcd', array('flag', 'flag_timestamp'));
-      $query->fields('src', array('desc_benefit'));
+      $query->fields('src', array('desc_benefit_referral'));
       $query->condition('rcd.referral_uid', $uid);
       $query->condition('rcd.src_id', $src_id);
       $result = $query->execute();

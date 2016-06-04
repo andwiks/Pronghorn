@@ -48,7 +48,6 @@ function userpoints_services_services_resources() {
  */
 function _userpoints_services_list(){
   global $user;
-  $uid = $user->uid;
   $userpoints_detail = [];
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
@@ -104,7 +103,6 @@ function _userpoints_services_list(){
  */
 function _userpoints_services_total(){
   global $user;
-  $uid = $user->uid;
   $userpoints_detail = [];
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.

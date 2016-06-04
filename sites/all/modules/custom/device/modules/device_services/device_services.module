@@ -249,6 +249,17 @@ function device_services_services_resources() {
               'optional' => FALSE,
               'http_method' => 'POST',
             ),
+            array(
+              'name' => 'confirm',
+              'type' => 'bool',
+              'description' => 'Confirmation to merge device to already exist email.',
+              'source' => array(
+                'data' => 'confirm',
+                'param' => 'confirm',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
           ),
         ),
         'logout' => array(

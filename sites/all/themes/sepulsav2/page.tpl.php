@@ -28,7 +28,7 @@
     <?php print render($page['content']); ?>
   </div>
 </section>
-<?php elseif ($node->type == 'blog') : ?>
+<?php elseif (isset($node->type) && $node->type == 'blog') : ?>
 
 <div id="fb-root"></div>
 <script>(function(d, s, id) {

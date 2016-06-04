@@ -76,7 +76,7 @@ function _userpoints_services_list(){
     }
     $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
 
-    if(strpos(request_path(),'air')==0){
+    if(strpos(request_path(),'air')!==FALSE){
       $userpoints = array(
         'data' => $userpoints,
         'message' => null,
@@ -110,7 +110,7 @@ function _userpoints_services_total(){
   try {
     $totalamount = userpoints_get_current_points($user->uid, 'all');
 
-    if(strpos(request_path(),'air')==0){
+    if(strpos(request_path(),'air')!==FALSE){
       return [
         'data' => $totalamount,
         'message' => null,

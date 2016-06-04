@@ -77,14 +77,14 @@ function _userpoints_services_list(){
     }
     $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
 
-    $userpoints['device'] = device_verification_status($user->uid);
-
-    $userpoints = array(
-      'data' => $userpoints,
-      'message' => null,
-      'status' => true,
-      'device' => device_verification_status($uid),
-    );
+    if(request_path()=='air/userpoints/userpoints_total'){
+      $userpoints = array(
+        'data' => $userpoints,
+        'message' => null,
+        'status' => true,
+        'device' => device_verification_status($uid),
+      );
+    }
 
     return $userpoints;
   }
@@ -110,12 +110,17 @@ function _userpoints_services_total(){
   // Wrap around using try and catch.
   try {
     $totalamount = userpoints_get_current_points($user->uid, 'all');
-    return [
-      'data' => $totalamount,
-      'message' => null,
-      'status' => true,
-      'device' => device_verification_status($uid),
-    ];
+
+    if(request_path()=='air/userpoints/userpoints_total'){
+      return [
+        'data' => $totalamount,
+        'message' => null,
+        'status' => true,
+        'device' => device_verification_status($uid),
+      ];
+    }else{
+      return $totalamount;
+    }
   }
   catch (Exception $exception) {
     // Log this condition.

@@ -76,7 +76,7 @@ function _userpoints_services_list(){
     }
     $userpoints = ['userpoints_total' => $totalamount, 'userpoints_detail' => $userpoints_detail];
 
-    if(request_path()=='air/userpoints/userpoints_list.json'){
+    if(strpos(request_path(),'air')==0){
       $userpoints = array(
         'data' => $userpoints,
         'message' => null,
@@ -104,12 +104,13 @@ function _userpoints_services_list(){
 function _userpoints_services_total(){
   global $user;
   $userpoints_detail = [];
+
   if ($user->uid == 0) return services_error(t('Invalid User'), 406);
   // Wrap around using try and catch.
   try {
     $totalamount = userpoints_get_current_points($user->uid, 'all');
 
-    if(request_path()=='air/userpoints/userpoints_total.json'){
+    if(strpos(request_path(),'air')==0){
       return [
         'data' => $totalamount,
         'message' => null,

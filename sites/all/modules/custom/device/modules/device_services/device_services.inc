@@ -507,7 +507,7 @@ function device_services_resource_mail($mail = '', $confirm = 0) {
     $qdevice->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
     $qdevice->condition('d.did', $session['device']->did, '!=');
     $qdevice->condition('dmv.mail', $mail, '=');
-    $qdevice->condition('dmv.new_flag', 0, '=');
+    $qdevice->condition('dmv.status', 1, '=');
     $qdevice->fields('d', array('did', 'imei'));
     $qdevice->fields('dv', array('phone'));
     $qdevice->addField('dmv', 'status', 'dmv_status');
@@ -530,6 +530,7 @@ function device_services_resource_mail($mail = '', $confirm = 0) {
       // Check current mail: no change.
       if (empty($device_mail)
         || (!empty($device_mail) && $device_mail != $mail)
+        || $confirm == 1
       ) {
         // Send verification mail.
         $send_verify = device_mail_verification_send_verification($mail, $session['device']->did);

@@ -1,0 +1,670 @@
+<?php
+
+/**
+ * Set Credit Option Payment List Page
+ */
+function apps_services_v2_payment_list_menu() {
+    $items['admin/config/services/apps_services_v2/apps_services_v2_payment_list_credit'] = array(
+        'title'             => 'Service Payment List Credit V2 Configuration',
+        'description'       => 'Configure page for Service Payment List Credit V2',
+        'page callback'     => 'drupal_get_form',
+        'page arguments'    => array('apps_services_v2_payment_list_credit_setting_form'),
+        'access arguments'  => array('access_apps_services_v2_payment_list_credit_config'),
+        'type'              => MENU_NORMAL_ITEM,
+        'file'              => 'apps_services_v2_payment_list.admin.inc',
+    );  
+
+    return $items;
+}
+
+/**
+ * create permission
+ */
+function apps_services_v2_payment_list_permission() {
+    return array(
+        'access_apps_services_v2_payment_list_credit_config' => array(
+            'title'         => t('Accessing Service Payment List V2 Configuration'),
+            'description'   => t('Accessing Service Payment List V2 Configuration.')
+        ),
+    );
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function apps_services_v2_payment_list_services_resources() {
+    return array(
+        'checkout_v2' => array(
+            'actions' => array(
+                'payment_list' => array(
+                    'help' => 'Get Payment List',
+                    'callback' => 'apps_services_v2_payment_list_data',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_payment_list',
+                        'name' => 'apps_services_v2_payment_list',
+                    ),
+                    'documentation callback' => 'apps_services_v2_payment_list_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+                'payment' => array(
+                    'help' => 'Update and Refresh Payment Method of Orders',
+                    'callback' => 'apps_services_v2_payment_list_checkout_payment',
+                    'file' => array(
+                        'type' => 'inc',
+                        'module' => 'apps_services_v2_payment_list',
+                        'name' => 'apps_services_v2_payment_list',
+                    ),
+                    'documentation callback' => 'apps_services_v2_payment_list_checkout_payment_doc',
+                    'access callback' => 'services_access_menu',
+                    'args' => array(
+                      array(
+                        'name' => 'payment_method',
+                        'type' => 'string',
+                        'description' => 'Selected payment method',
+                        'source' => array(
+                          'data' => 'payment_method',
+                          'param' => 'payment_method',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'use_credit',
+                        'type' => 'int',
+                        'description' => 'Toggle for using credit or not',
+                        'source' => array(
+                          'data' => 'use_credit',
+                          'param' => 'use_credit',
+                        ),
+                        'default value' => 5,
+                        'optional' => TRUE,
+                        'http_method' => 'POST',
+                      ),
+                      array(
+                        'name' => 'source',
+                        'type' => 'string',
+                        'description' => 'the source of the request',
+                        'source' => array(
+                          'data' => 'source',
+                          'param' => 'source',
+                        ),
+                        'optional' => FALSE,
+                        'http_method' => 'POST',
+                      ),
+                    ),
+                ),
+            ),
+        ),
+    );
+}
+
+/**
+ * Function apps_services_v2_payment_list_checkout_payment_doc().
+ *
+ * Documentation callback for checkout payment.
+ */
+function apps_services_v2_payment_list_checkout_payment_doc() {
+  global $base_url;
+  $response = '
+    {
+    "status": true,
+    "message": "",
+    "data": {
+      "order_number": "163693",
+      "revision_id": "694409",
+      "revision_uid": "43",
+      "mail": "ananto.sql@gmail.com",
+      "status": "cart",
+      "log": "Created as a shopping cart order.",
+      "revision_timestamp": 1457683429,
+      "revision_hostname": "::1",
+      "data": {
+        "last_cart_refresh": 1457683429,
+        "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+      },
+      "order_id": "163693",
+      "type": "commerce_order",
+      "uid": "43",
+      "created": "1452485185",
+      "changed": 1457683429,
+      "hostname": "182.253.73.224",
+      "commerce_line_items": [
+        {
+          "line_item_id": "662332",
+          "order_id": "163693",
+          "type": "mobile_prepaid",
+          "line_item_label": "BLT200",
+          "quantity": "1.00",
+          "created": "1452485185",
+          "changed": "1452485185",
+          "data": [],
+          "commerce_unit_price": {
+            "amount": "200000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": "200000",
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": "200000",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "base_price",
+                  "price": {
+                    "amount": 200000,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_product": {
+            "revision_id": "434",
+            "sku": "BLT200",
+            "title": "Rp 200.000",
+            "revision_uid": "0",
+            "status": "1",
+            "log": "",
+            "revision_timestamp": "1445061047",
+            "data": false,
+            "product_id": "182",
+            "type": "pulsa",
+            "language": "und",
+            "uid": "102",
+            "created": "1440644604",
+            "changed": "1445061047",
+            "commerce_price": {
+              "und": [
+                {
+                  "amount": "200000",
+                  "currency_code": "IDR",
+                  "data": {
+                    "components": []
+                  }
+                }
+              ]
+            },
+            "field_api_provider": {
+              "und": [
+                {
+                  "value": "kraken"
+                }
+              ]
+            },
+            "field_credit_amount": {
+              "und": [
+                {
+                  "value": "200000"
+                }
+              ]
+            },
+            "field_package_code": {
+              "und": [
+                {
+                  "value": "28"
+                }
+              ]
+            },
+            "field_data_packet": {
+              "und": [
+                {
+                  "value": "0"
+                }
+              ]
+            },
+            "field_deskripsi": [],
+            "rdf_mapping": []
+          },
+          "commerce_display_path": "",
+          "field_phone_number": "9991289663",
+          "field_topup_status": "7",
+          "field_topup_data": [
+            ""
+          ],
+          "field_line_item_status": "pending",
+          "rdf_mapping": [],
+          "id": 0
+        },
+        {
+          "type": "fee",
+          "order_id": "163693",
+          "quantity": 1,
+          "data": [],
+          "line_item_id": "668603",
+          "line_item_label": "PAYMENT CODE",
+          "created": 1457683429,
+          "changed": 1457683429,
+          "commerce_unit_price": {
+            "amount": "693",
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "payment_code",
+                  "price": {
+                    "amount": "693",
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": 693,
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "payment_code",
+                  "price": {
+                    "amount": 693,
+                    "currency_code": "IDR",
+                    "data": []
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "id": 1
+        },
+        {
+          "type": "userpoints",
+          "quantity": 1,
+          "line_item_id": "668604",
+          "order_id": "163693",
+          "line_item_label": "User credit",
+          "created": 1457683429,
+          "changed": 1457683429,
+          "data": [],
+          "commerce_userpoints_discount_txn": null,
+          "commerce_unit_price": {
+            "amount": -100,
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "userpoints",
+                  "price": {
+                    "amount": -100,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "commerce_total": {
+            "amount": -100,
+            "currency_code": "IDR",
+            "data": {
+              "components": [
+                {
+                  "name": "userpoints",
+                  "price": {
+                    "amount": -100,
+                    "currency_code": "IDR",
+                    "data": {
+                      "components": []
+                    }
+                  },
+                  "included": true
+                }
+              ]
+            }
+          },
+          "id": 2
+        }
+      ],
+      "commerce_order_total": {
+        "amount": 200593,
+        "currency_code": "IDR",
+        "data": {
+          "components": [
+            {
+              "name": "base_price",
+              "price": {
+                "amount": 200000,
+                "currency_code": "IDR",
+                "data": []
+              },
+              "included": true
+            },
+            {
+              "name": "payment_code",
+              "price": {
+                "amount": 693,
+                "currency_code": "IDR",
+                "data": []
+              },
+              "included": true
+            },
+            {
+              "name": "userpoints",
+              "price": {
+                "amount": -100,
+                "currency_code": "IDR",
+                "data": {
+                  "components": []
+                }
+              },
+              "included": true
+            }
+          ]
+        }
+      },
+      "commerce_customer_billing": [],
+      "field_commerce_billy_cancel_date": [],
+      "field_commerce_billy_i_date": [],
+      "commerce_coupons": [],
+      "commerce_discounts": [],
+      "field_order_source": {
+        "und": [
+          {
+            "value": "Web",
+            "format": null,
+            "safe_value": "Web"
+          }
+        ]
+      },
+      "field_imei": [],
+      "field_utm_source": {
+        "und": [
+          {
+            "value": "website",
+            "format": null,
+            "safe_value": "website"
+          }
+        ]
+      },
+      "field_utm_medium": {
+        "und": [
+          {
+            "value": "campaign_page",
+            "format": null,
+            "safe_value": "campaign_page"
+          }
+        ]
+      },
+      "field_utm_campaign": {
+        "und": [
+          {
+            "value": "crazy_deal_indosat",
+            "format": null,
+            "safe_value": "crazy_deal_indosat"
+          }
+        ]
+      },
+      "field_app": [],
+      "rdf_mapping": []
+    }
+  }
+  ';
+  $element = array(
+    '#name' => 'Payment Checkout Refresh/Update',
+    '#description' => 'Update and Refresh Payment Method of Orders.',
+    '#auth' => FALSE,
+    '#path' => 'checkout_v2/payment',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/checkout_v2/payment.json<br />'
+    . 'POST data application/json: { "payment_method": "bank_transfer|commerce_payment_mandiri_bank_transfer", "use_credit" : 1, "source": "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+      'invalid_order' => array(
+        '#question' => '406 Invalid Order',
+        '#description' => 'User does not have valid order.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Function apps_services_v2_payment_list_doc().
+ *
+ * Documentation callback for payment data list.
+ */
+function apps_services_v2_payment_list_doc() {
+  global $base_url;
+  $response = '
+    {
+    "status": true,
+    "message": "",
+    "data": [
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "credit_card",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
+            },
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": ""
+          },
+          "echannel": {
+            "instruction": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "prefix": "",
+          "url": "https://api.sandbox.veritrans.co.id/v2",
+          "client_key": "VT-client-OKrCpIwqRkMEeBxC",
+          "js": "https://api.sandbox.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_commerce_veritrans",
+        "weight": null,
+        "title": "Kartu Kredit / Debit",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|commerce_payment_commerce_veritrans"
+      },
+      {
+        "method_id": "bank_transfer",
+        "settings": {
+          "details": {
+            "account_owner": "PT Sepulsa Teknologi Indonesia",
+            "account_number": "2063137111",
+            "account_iban": "",
+            "bank_code_appellation": "",
+            "bank_code": "",
+            "account_swift": "",
+            "account_bank": "BCA",
+            "account_branch": "Thamrin"
+          },
+          "subject_oid": 0,
+          "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_bca_bank_transfer",
+        "weight": 5,
+        "title": "BCA Bank Transfer",
+        "type": "payment_option",
+        "payment_code": "bank_transfer|commerce_payment_bca_bank_transfer"
+      },
+      {
+        "method_id": "bank_transfer",
+        "settings": {
+          "details": {
+            "account_owner": "PT Sepulsa Teknologi Indonesia",
+            "account_number": "168 0000 696482",
+            "account_iban": "",
+            "bank_code_appellation": "",
+            "bank_code": "",
+            "account_swift": "",
+            "account_bank": "Mandiri",
+            "account_branch": "Jakarta Galeria Niaga Mediterania"
+          },
+          "subject_oid": 0,
+          "policy": "Pastikan anda melakukan transfer ke rekening sesuai dengan pilihan bank. Transfer yang tidak sesuai tidak akan diproses.\r\n<p style=\"color: red; font-weight: bolder;\">\r\nMohon lakukan pembayaran melalui internet/mobile banking atau melalui teller di bank pilihan kamu ke akun tersebut di atas dalam jangka waktu kurang dari 3 jam.<br>\r\nJika tidak pesanan kamu akan dibatalkan.\r\n</p>\r\nBelum punya kartu kredit? Pilih yang tawarkan banyak diskon dan reward di <strong><a href=\"https://www.cekaja.com/wizard/kartu-kredit\" target=\"_blank\">sini</a></strong>",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "commerce_payment_mandiri_bank_transfer",
+        "weight": 6,
+        "title": "Mandiri Bank Transfer",
+        "type": "payment_option",
+        "payment_code": "bank_transfer|commerce_payment_mandiri_bank_transfer"
+      },
+      {
+        "method_id": "commerce_veritrans",
+        "settings": {
+          "type": "credit_card",
+          "credit_card": {
+            "card_types": {
+              "visa": "visa",
+              "mastercard": "mastercard",
+              "amex": 0,
+              "discover": 0,
+              "dc": 0,
+              "dci": 0,
+              "cb": 0,
+              "jcb": 0,
+              "maestro": 0,
+              "visaelectron": 0,
+              "laser": 0,
+              "solo": 0,
+              "switch": 0
+            },
+            "bank": "mandiri",
+            "type": "twoclick",
+            "3ds": 1,
+            "bin_promo": "548988,542640,524125,410504,410505,451249,523026,524069,548415,466574,466573,457512,471293,522787,524495,524609,426098,426097"
+          },
+          "echannel": {
+            "instruction": {
+              "value": "",
+              "format": "full_"
+            }
+          },
+          "prefix": "",
+          "url": "https://api.veritrans.co.id/v2",
+          "client_key": "VT-client-Sg9Bq6erOvQmiFtz",
+          "js": "https://api.veritrans.co.id/v2/assets/js/veritrans.min.js",
+          "sepulsa_campaign": {
+            "value": "",
+            "format": "full_"
+          }
+        },
+        "rule_name": "rules_bni_credit_card",
+        "weight": 9,
+        "title": "BNI Credit Card",
+        "type": "payment_option",
+        "payment_code": "commerce_veritrans|rules_bni_credit_card"
+      },
+      {
+        "payment_code": "use_sepulsa_credit_option",
+        "amount": 100,
+        "formatted_amount": "100",
+        "currency_code": "IDR"
+      }
+    ]
+  }
+  ';
+  $element = array(
+    '#name' => 'Payment List Apps Service',
+    '#description' => 'Get Payment List for Apps Service.',
+    '#auth' => FALSE,
+    '#path' => 'checkout_v2/payment_list',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/air/checkout_v2/payment_list.json<br />'
+    . 'POST data application/json: { "source" : "android" }',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+	  'missing_argument' => array(
+        '#question' => '401 Unauthorized : Missing required argument',
+        '#description' => 'When drupal detect that the user missed some of the input required.',
+        '#response' => '
+        [
+          "Missing required argument"
+        ]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => 'Drupal server can not handle the request. Drupal will output nothing.',
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}

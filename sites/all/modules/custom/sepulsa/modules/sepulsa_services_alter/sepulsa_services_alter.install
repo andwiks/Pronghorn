@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ * sepulsa_services_alter.install
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Implements hook_install().
+ */
+function sepulsa_services_alter_install() {
+  variable_set('sepulsa_services_alter_endpoints', array());
+  variable_set('sepulsa_services_alter_error', array());
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function sepulsa_services_alter_uninstall() {
+  variable_del('sepulsa_services_alter_endpoints');
+  variable_del('sepulsa_services_alter_error');
+}

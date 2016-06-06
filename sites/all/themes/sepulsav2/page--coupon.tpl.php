@@ -22,9 +22,11 @@ $theme_path = $base_url . '/' . path_to_theme();
 <?php print render($title_suffix); ?>
     <div class="wrapper_2 voucher ">
       <?php print $messages; ?>
-        <div class="c_left">
+        <div class="c_left custom-voucher">
         <?php print render($page['right']); ?>
         </div>
+        <?php
+        /*
         <div class="c_right">
             <div class="grid_promo_bank">
                 <?php print render($page['promo']); ?>
@@ -32,6 +34,8 @@ $theme_path = $base_url . '/' . path_to_theme();
             <div class="atau"><!--<span><?php print t('atau'); ?></span>--></div>
             <a href="<?php print url("checkout"); ?>" class="bt_next" ><?php print t('LANJUT KE PEMBAYARAN'); ?></a>
         </div>
+        */
+        ?>
         <div class="clear"></div>
 
         <div class="wrapper_2">

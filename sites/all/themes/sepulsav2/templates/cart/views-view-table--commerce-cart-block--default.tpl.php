@@ -39,7 +39,17 @@
       <tr <?php if ($row_classes[$row_count]) { print 'class="' . implode(' ', $row_classes[$row_count]) .'"';  } ?>>
         <?php foreach ($row as $field => $content): ?>
           <td <?php if ($field_classes[$field][$row_count]) { print 'class="'. $field_classes[$field][$row_count] . '" '; } ?><?php print drupal_attributes($field_attributes[$field][$row_count]); ?>>
-            <?php print $content; ?>
+          <?php 
+
+            $total[$field] = strip_tags($content);
+
+            if($field=='commerce_total' && $total[$field]=='0  IDR'){
+              print t('FREE');
+            }else{
+              print $content;
+            }
+
+          ?>
           </td>
         <?php endforeach; ?>
       </tr>
@@ -49,13 +59,19 @@
   <tfoot>
     <tr>
       <th><?php print t('TOTAL PAYMENT'); ?></th>
-      <th colspan="2">
+      <th>
         <?php print commerce_currency_format($order_total['amount'], $order_total['currency_code']); ?>
+      </th>
+      <th>
         <a href="<?php print url("checkout"); ?>" class="add_bt"><?php print t('Proses'); ?></a>
       </th>
     </tr>
   </tfoot>
 </table>
+<?php
+/*
 <p>
-  <?php print t('* Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.'); ?>
+  print t('* Pemilihan Voucher diskon tidak berlaku <b>kelipatan</b>. Maksimal 3 Voucher Diskon tiap kali transaksi.');
 </p>
+*/
+?>

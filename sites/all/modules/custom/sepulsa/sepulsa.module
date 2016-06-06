@@ -17,8 +17,6 @@ function sepulsa_menu() {
   $items = array();
 
   $items['sepulsa'] = array(
-    //'title' => 'Recharge Your Phone',
-    //no need to put title on front page
     'description' => 'Sepulsa Front Page',
     'page callback' => 'sepulsa_front_page',
     'access callback' => TRUE,
@@ -26,8 +24,6 @@ function sepulsa_menu() {
   );
 
   $items['sepulsa/data'] = array(
-    //'title' => 'Recharge Your Phone',
-    //no need to put title on front page
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sepulsa_phone_form', TRUE),
     'access callback' => TRUE,
@@ -41,11 +37,21 @@ function sepulsa_menu() {
     'page arguments' => array(2),
     'access callback' => TRUE,
     'file' => 'sepulsa.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['sepulsa/autocomplete/sepulsa/%/%/%/%'] = array(
+    'title' => 'Sepulsa Autocomplete Entity Reference',
+    'page callback' => 'sepulsa_autocomplete_entityreference',
+    'page arguments' => array(2, 3, 4, 5, 6),
+    'access callback' => 'entityreference_autocomplete_access_callback',
+    'access arguments' => array(2, 3, 4, 5),
+    'type' => MENU_CALLBACK,
   );
 
   $items['admin/commerce/config/sepulsa'] = array(
-    'title' => t('Sepulsa'),
-    'description' => t('Sepulsa related configuration'),
+    'title' => 'Sepulsa',
+    'description' => 'Sepulsa related configuration',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('sepulsa_settings_form'),
     'access arguments' => array('configure store'),
@@ -64,7 +70,7 @@ function sepulsa_menu_alter(&$items) {
 }
 
 /**
- * Implement hook_form_FORM_ID_alter().
+ * Implements hook_form_FORM_ID_alter() for commerce_cart_add_to_cart_form().
  */
 function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
   // Get sepulsa settings.
@@ -80,6 +86,219 @@ function sepulsa_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state,
     );
     // Add submit function to check for charge redirection.
     $form['#submit'][] = 'sepulsa_add_to_cart_charge_form_submit';
+  }
+}
+
+/**
+ * Implements hook_mail().
+ */
+function sepulsa_mail($key, &$message, $params) {
+  // Check mail key.
+  switch ($key) {
+    // Customer order has invoice but unable to assign voucher.
+    case 'order_voucher_unable_to_assign':
+      // Define message array.
+      $message['subject'] = t('Order Voucher Need Check from @site-name', array(
+        '@site-name' => variable_get('site_name', 'Drupal'),
+      ));
+      $message['body'][] = t('User !uid (@mail) order @oid (@status) has voucher still not assigned. Order need to be checked.', array(
+        '!uid' => l($params['order']->uid, 'user/' . $params['order']->uid),
+        '@mail' => $params['order']->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+      ));
+      // Log this condition.
+      watchdog('sepulsa', 'User @uid (@mail) order @oid (@status) has voucher still not assigned. Order Debug: <pre>@debug</pre>', array(
+        '@uid' => $params['order']->uid,
+        '@mail' => $params['order']->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+        '@debug' => print_r($params['order'], TRUE),
+      ), WATCHDOG_INFO);
+      break;
+
+    // Customer has order not complete and go to front, need CS to check.
+    case 'order_not_complete_front':
+      // Get global user object.
+      global $user;
+      // Define message array.
+      $message['subject'] = t('Order Need Check from @site-name', array(
+        '@site-name' => variable_get('site_name', 'Drupal'),
+      ));
+      $message['body'][] = t('User @name (@mail) still has order @oid (@status) not complete but already paid. User access front page with that order. Order need to be checked.', array(
+        '@name' => $user->name,
+        '@mail' => $params['order']->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+      ));
+      // Log this condition.
+      watchdog('sepulsa', 'User @name (@mail) still has order @oid (@status) not complete but already paid. User access front page with that order. Order Debug: <pre>@debug</pre>', array(
+        '@name' => $user->name,
+        '@mail' => $params['order']->mail,
+        '@oid' => $params['order']->order_id,
+        '@status' => $params['order']->status,
+        '@debug' => print_r($params['order'], TRUE),
+      ), WATCHDOG_INFO);
+      break;
+  }
+}
+
+/**
+ * Implements hook_commerce_cart_order_empty().
+ */
+function sepulsa_commerce_cart_order_empty($order) {
+  // Clean up data payment method.
+  if (isset($order->data['payment_method']) && !empty($order->data['payment_method'])) {
+    unset($order->data['payment_method']);
+  }
+  // Clean-up task to remove fees & userpoints when cart is emptied.
+  $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+  // Create line item delete container.
+  $line_items_to_delete = array();
+  // Looping foreach order line items.
+  foreach ($order_wrapper->commerce_line_items as $delta => $line_item_wrapper) {
+    // Check if line item belong to fee or userpoints.
+    if (in_array($line_item_wrapper->getBundle(), array('fee', 'userpoints'))) {
+      $price = $line_item_wrapper->commerce_unit_price->value();
+      foreach ($price['data']['components'] as $component) {
+        if (in_array($component['name'], array(
+          'admin_fee', 'payment_code', 'userpoints',
+        ))) {
+          // Store its ID for later deletion and remove the reference from the
+          // line item reference field.
+          $line_items_to_delete[] = $line_item_wrapper->line_item_id->value();
+          $order_wrapper->commerce_line_items->offsetUnset($delta);
+        }
+      }
+    }
+  }
+
+  // Delete line items: only if available for delete.
+  if (!empty($line_items_to_delete)) {
+    commerce_line_item_delete_multiple($line_items_to_delete);
+  }
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function sepulsa_field_widget_info() {
+  $widgets['sepulsa_autocomplete'] = array(
+    'label' => t('Autocomplete (Sepulsa style)'),
+    'description' => t('An autocomplete text field.'),
+    'field types' => array('entityreference'),
+    'settings' => array(
+      'match_operator' => 'CONTAINS',
+      'size' => 60,
+      // We don't have a default here, because it's not the same between
+      // the two widgets, and the Field API doesn't update default
+      // settings when the widget changes.
+      'path' => '',
+    ),
+    'behaviors' => array(
+      'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+    ),
+  );
+
+  return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function sepulsa_field_widget_settings_form($field, $instance) {
+  $widget = $instance['widget'];
+  $settings = $widget['settings'] + field_info_widget_settings($widget['type']);
+
+  $form = array();
+
+  if ($widget['type'] == 'sepulsa_autocomplete') {
+    $form['match_operator'] = array(
+      '#type' => 'select',
+      '#title' => t('Autocomplete matching'),
+      '#default_value' => $settings['match_operator'],
+      '#options' => array(
+        'STARTS_WITH' => t('Starts with'),
+        'CONTAINS' => t('Contains'),
+      ),
+      '#description' => t('Select the method used to collect autocomplete suggestions. Note that <em>Contains</em> can cause performance issues on sites with thousands of nodes.'),
+    );
+    $form['size'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Size of textfield'),
+      '#default_value' => $settings['size'],
+      '#element_validate' => array('_element_validate_integer_positive'),
+      '#required' => TRUE,
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function sepulsa_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  // Ensure that the entity target type exists before displaying the widget.
+  $entity_info = entity_get_info($field['settings']['target_type']);
+  if (empty($entity_info)) {
+    return;
+  }
+  $entity_type = $instance['entity_type'];
+  $entity = isset($element['#entity']) ? $element['#entity'] : NULL;
+  $handler = entityreference_get_selection_handler($field, $instance, $entity_type, $entity);
+
+  if ($instance['widget']['type'] == 'sepulsa_autocomplete') {
+    $entity_ids = array();
+    $entity_labels = array();
+
+    // Build an array of entities ID.
+    foreach ($items as $item) {
+      $entity_ids[] = $item['target_id'];
+    }
+
+    // Load those entities and loop through them to extract their labels.
+    $entities = entity_load($field['settings']['target_type'], $entity_ids);
+
+    foreach ($entities as $entity_id => $entity_item) {
+      $label = $handler->getLabel($entity_item);
+      $key = "$label ($entity_id)";
+      // Labels containing commas or quotes must be wrapped in quotes.
+      if (strpos($key, ',') !== FALSE || strpos($key, '"') !== FALSE) {
+        $key = '"' . str_replace('"', '""', $key) . '"';
+      }
+      $entity_labels[] = $key;
+    }
+
+    // Prepare the autocomplete path.
+    if (!empty($instance['widget']['settings']['path'])) {
+      $autocomplete_path = $instance['widget']['settings']['path'];
+    }
+    else {
+      $autocomplete_path = 'sepulsa/autocomplete/sepulsa';
+    }
+
+    $autocomplete_path .= '/' . $field['field_name'] . '/' . $instance['entity_type'] . '/' . $instance['bundle'] . '/';
+    // Use <NULL> as a placeholder in the URL when we don't have an entity.
+    // Most webservers collapse two consecutive slashes.
+    $id = 'NULL';
+    if ($entity) {
+      list($eid) = entity_extract_ids($entity_type, $entity);
+      if ($eid) {
+        $id = $eid;
+      }
+    }
+    $autocomplete_path .= $id;
+
+    $element += array(
+      '#type' => 'textfield',
+      '#maxlength' => 1024,
+      '#default_value' => implode(', ', $entity_labels),
+      '#autocomplete_path' => $autocomplete_path,
+      '#size' => $instance['widget']['settings']['size'],
+      '#element_validate' => array('_entityreference_autocomplete_tags_validate'),
+    );
+    return $element;
   }
 }
 
@@ -156,7 +375,7 @@ function sepulsa_get_packet($nid, $data_packet = FALSE) {
       if (!empty($product->status) && $field_data_packet == $data_packet) {
         // Get product price for sorting/future use.
         $price = field_get_items('commerce_product', $product, 'commerce_price');
-        // Get product description
+        // Get product description.
         $desc = "";
         if (isset($product->field_deskripsi[LANGUAGE_NONE][0]['value'])) {
           $desc = $product->field_deskripsi[LANGUAGE_NONE][0]['value'];
@@ -266,10 +485,216 @@ function sepulsa_get_existing_number() {
 			ORDER BY a.created DESC";
   $result = db_query($query, array(':uid' => $user->uid));
   foreach ($result as $row) {
-	$existing_number[] = $row->field_phone_number_value;
+    $existing_number[] = $row->field_phone_number_value;
   }
 
   return $existing_number;
+}
+
+/**
+ * Function sepulsa_get_all_pulsa_data().
+ *
+ * @param string $mode
+ *   String 'all', 'active', 'inactive'.
+ *
+ * @return array
+ *   Pulsa array.
+ */
+function sepulsa_get_all_pulsa_data($mode = 'all') {
+  // Declare static operators variable.
+  $products = &drupal_static(__FUNCTION__ . ':' . $mode, NULL);
+
+  // If already defined, and not empty, then return it.
+  if (isset($products) && !empty($products)) {
+    return $products;
+  }
+
+  // Get databases data from cache.
+  $cache = cache_get('sepulsa_all_pulsa_data:' . $mode, 'cache');
+  // Check whether cache is available.
+  if (empty($cache)) {
+    // Define default operators array.
+    $products = array();
+    // Get all node bundle pulsa.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'pulsa')
+      ->propertyCondition('status', NODE_PUBLISHED);
+    $result = $query->execute();
+    if (!empty($result['node'])) {
+      foreach ($result['node'] as $node) {
+        // Get node wrapper.
+        $node_wrapper = entity_metadata_wrapper('node', $node->nid);
+        // Get node title.
+        $node_title = $node_wrapper->title->value();
+        // Get products reference.
+        $node_products = $node_wrapper->field_product->value();
+        // Check if product is available.
+        foreach ($node_products as $product) {
+          $product_data = $node_title . ' ' . $product->title . ' [' . $product->sku . ']';
+          switch ($mode) {
+            case 'inactive':
+              if (empty($product->status)) {
+                $products[$product->product_id] = '[INACTIVE] ' . $product_data;
+              }
+              break;
+
+            case 'active':
+              if (!empty($product->status)) {
+                $products[$product->product_id] = $product_data;
+              }
+              break;
+
+            case 'all';
+            default:
+              $products[$product->product_id] = $product_data;
+              break;
+          }
+        }
+      }
+    }
+    // Store it inside cache.
+    cache_set('sepulsa_all_pulsa_data:' . $mode, $products, 'cache', CACHE_TEMPORARY);
+  }
+  else {
+    $products = $cache->data;
+  }
+
+  // Return products array.
+  return $products;
+}
+
+/**
+ * Function sepulsa_get_all_coupon_data().
+ *
+ * @param string $mode
+ *   Coupon mode.
+ */
+function sepulsa_get_all_coupon_data($mode = 'all') {
+  // Declare static operators variable.
+  $products = &drupal_static(__FUNCTION__ . ':' . $mode, NULL);
+
+  // If already defined, and not empty, then return it.
+  if (isset($products) && !empty($products)) {
+    return $products;
+  }
+
+  // Get databases data from cache.
+  $cache = cache_get('sepulsa_all_coupon_data:' . $mode, 'cache');
+  // Check whether cache is available.
+  if (empty($cache)) {
+    // Define default operators array.
+    $products = array();
+    // Get all node bundle pulsa.
+    $query = new EntityFieldQuery();
+    $query->entityCondition('entity_type', 'node')
+      ->entityCondition('bundle', 'coupon')
+      ->propertyCondition('status', NODE_PUBLISHED);
+    $result = $query->execute();
+    if (!empty($result['node'])) {
+      foreach ($result['node'] as $node) {
+        // Get node wrapper.
+        $node_wrapper = entity_metadata_wrapper('node', $node->nid);
+        // Get products reference.
+        $node_products = $node_wrapper->field_product->value();
+        // Check if product is available.
+        foreach ($node_products as $product) {
+          $product_data = $product->title . ' [' . $product->sku . ']';
+          switch ($mode) {
+            case 'inactive':
+              if (empty($product->status)) {
+                $products[$product->product_id] = '[INACTIVE] ' . $product_data;
+              }
+              break;
+
+            case 'active':
+              if (!empty($product->status)) {
+                $products[$product->product_id] = $product_data;
+              }
+              break;
+
+            case 'all';
+            default:
+              $products[$product->product_id] = $product_data;
+              break;
+          }
+        }
+      }
+    }
+    // Store it inside cache.
+    cache_set('sepulsa_all_coupon_data:' . $mode, $products, 'cache', CACHE_TEMPORARY);
+  }
+  else {
+    $products = $cache->data;
+  }
+
+  // Return products array.
+  return $products;
+}
+
+/**
+ * Function sepulsa_check_multi().
+ */
+function sepulsa_check_multi() {
+  // Get sepulsa settings.
+  $settings = variable_get('sepulsa_settings', array());
+  // Check if multipaid is disabled.
+  if (!(isset($settings['multipaid_product'])
+    && !empty($settings['multipaid_product'])
+  )) {
+    // Get global user object.
+    global $user;
+    // Get cart order.
+    $order = commerce_cart_order_load($user->uid);
+    // Check whether order is not empty.
+    if (!empty($order)) {
+      // Check for any payment transaction.
+      $query = new EntityFieldQuery();
+      $query->entityCondition('entity_type', 'commerce_payment_transaction')
+        ->propertyCondition('order_id', $order->order_id, '=')
+        ->range(0, 1);
+      $result = $query->execute();
+      // Order has no payment transaction.
+      if (empty($result)) {
+        // Empty cart when visit homepage.
+        commerce_cart_order_empty($order);
+      }
+      else {
+        // Check for success payment transaction.
+        $query = new EntityFieldQuery();
+        $query->entityCondition('entity_type', 'commerce_payment_transaction')
+          ->propertyCondition('order_id', $order->order_id, '=')
+          ->propertyCondition('status', COMMERCE_PAYMENT_STATUS_SUCCESS, '=')
+          ->range(0, 1);
+        $result = $query->execute();
+        // Order has success payment transaction.
+        if (!empty($result)) {
+          // Check order balance.
+          $balance = commerce_payment_order_balance($order);
+          // Check order status.
+          $order_complete = in_array($order->status, array(
+            'checkout_complete', 'pending', 'processing', 'completed', 'invoiced',
+          ));
+          // Check whether balance is empty.
+          if (isset($balance['amount']) && empty($balance['amount'])) {
+            // Balance is empty: check order status.
+            if (!$order_complete) {
+              // Order not complete: update status to pending.
+              commerce_order_status_update($order, 'pending', FALSE, TRUE, t('Automatic pending status: visit frontpage and payment success.'));
+            }
+          }
+          else {
+            // Balance is not empty: notify CS.
+            drupal_mail('sepulsa', 'order_not_complete_front', 'satpam.cs@sepulsa.com', language_default(), array(
+              'order' => $order,
+            ), variable_get('site_mail', 'admin@example.com'), TRUE);
+          }
+        }
+        // Assign new order ID.
+        commerce_cart_order_new($order->uid);
+      }
+    }
+  }
 }
 
 /**
@@ -304,4 +729,90 @@ function sepulsa_add_to_cart_charge_form_submit($form, &$form_state) {
       ),
     );
   }
+}
+
+/**
+ * Function sepulsa_autocomplete_entityreference().
+ *
+ * Menu callback: autocomplete the label of an entity.
+ *
+ * @param string $type
+ *   The widget type: sepulsa.
+ * @param string $field_name
+ *   The name of the entity-reference field.
+ * @param string $entity_type
+ *   The entity type.
+ * @param string $bundle_name
+ *   The bundle name.
+ * @param string $entity_id
+ *   Optional; The entity ID the entity-reference field is attached to.
+ *   Defaults to ''.
+ * @param string $string
+ *   The label of the entity to query by.
+ */
+function sepulsa_autocomplete_entityreference($type, $field_name, $entity_type, $bundle_name, $entity_id = '', $string = '') {
+  $field = field_info_field($field_name);
+  $instance = field_info_instance($entity_type, $field_name, $bundle_name);
+  $entity_labels = $matches = array();
+
+  $entity = NULL;
+  if ($entity_id !== 'NULL') {
+    $entity = entity_load_single($entity_type, $entity_id);
+    $has_view_access = (entity_access('view', $entity_type, $entity) !== FALSE);
+    $has_update_access = (entity_access('update', $entity_type, $entity) !== FALSE);
+    if (!$entity || !($has_view_access || $has_update_access)) {
+      return MENU_ACCESS_DENIED;
+    }
+  }
+
+  $handler = entityreference_get_selection_handler($field, $instance, $entity_type, $entity);
+
+  if (isset($handler->field['settings']['target_type'])
+    && $handler->field['settings']['target_type'] == 'commerce_product'
+    && isset($handler->field['settings']['handler_settings']['target_bundles']['pulsa'])
+  ) {
+    if ($handler->field['settings']['handler_settings']['target_bundles']['pulsa']) {
+      // Get all sepulsa pulsa data.
+      $pulsa = sepulsa_get_all_pulsa_data('active');
+      // Looping pulsa data.
+      foreach ($pulsa as $id => $data) {
+        if (stripos($data, $string) === FALSE) {
+          unset($pulsa[$id]);
+        }
+      }
+      // Define entity_labels container.
+      $entity_labels['pulsa'] = $pulsa;
+    }
+    if ($handler->field['settings']['handler_settings']['target_bundles']['coupon']) {
+      // Get all sepulsa coupon data.
+      $coupon = sepulsa_get_all_coupon_data('all');
+      // Looping pulsa data.
+      foreach ($coupon as $id => $data) {
+        if (stripos($data, $string) === FALSE) {
+          unset($coupon[$id]);
+        }
+      }
+      // Define entity_labels container.
+      $entity_labels['coupon'] = $coupon;
+    }
+  }
+  else {
+    // Get an array of matching entities.
+    $entity_labels = $handler->getReferencableEntities($string, $instance['widget']['settings']['match_operator'], 10);
+  }
+  // Loop through the products and convert them into autocomplete output.
+  foreach ($entity_labels as $values) {
+    foreach ($values as $entity_id => $label) {
+      $key = "$label ($entity_id)";
+      // Strip things like starting/trailing white spaces, line breaks and tags.
+      $key = preg_replace('/\s\s+/', ' ', str_replace("\n", '', trim(decode_entities(strip_tags($key)))));
+      // Names containing commas or quotes must be wrapped in quotes.
+      if (strpos($key, ',') !== FALSE || strpos($key, '"') !== FALSE) {
+        $key = '"' . str_replace('"', '""', $key) . '"';
+      }
+      $matches[$key] = '<div class="reference-autocomplete">' . $label . ' (' . $entity_id . ')</div>';
+    }
+  }
+
+  drupal_json_output($matches);
 }

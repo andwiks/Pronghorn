@@ -1,0 +1,192 @@
+<?php
+/**
+ * @file
+ * Create table sepulsa_referral_campaign.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function sepulsa_referral_campaign_schema() {
+  $schema = array();
+
+  $schema['sepulsa_referral_campaign'] = array(
+    'description' => 'Sepulsa Referral Campaign table for Entity',
+    'fields' => array(
+      'src_id' => array(
+        'description' => 'Primary Key for referral campaign',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Title of referral campaign',
+        'type' => 'varchar',
+        'length' => '254',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'desc_camp' => array(
+        'description' => 'Description of the campaign',
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+      ),
+      'tnc' => array(
+        'description' => 'Term and condition of the campaign',
+        'type' => 'text',
+        'not null' => FALSE,
+        'size' => 'big',
+      ),
+      'machine_name' => array(
+        'description' => 'Machine name of referral campaign',
+        'type' => 'varchar',
+        'length' => '254',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'start' => array(
+        'description' => 'Start date referral campaign',
+        'type' => 'int',
+        'not null' => TRUE,
+      ),
+      'end' => array(
+        'description' => 'End date referral campaign',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'path' => array(
+        'description' => 'Path static page for referral campaign',
+        'type' => 'varchar',
+        'length' => '254',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rules_name' => array(
+        'description' => 'Rules Name',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'desc_benefit' => array(
+        'description' => 'Description benefit for refer user',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rules_name_referral' => array(
+        'description' => 'Rules Name for referer user',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'desc_benefit_referral' => array(
+        'description' => 'Description benefit for referer user',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'flag_first_order' => array(
+        'description' => 'Rules Fire in first order',
+        'type' => 'int',
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'Created timestamp',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+      'changed' => array(
+        'description' => 'Changed timestamp',
+        'type' => 'int',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('src_id'),
+    'indexes' => array(
+      'search_idx' => array('title', 'machine_name'),
+    ),
+  );
+
+  $schema['referral_campaign_details'] = array(
+    'description' => 'Referral Campaign table for referral details data.',
+    'fields' => array(
+      'ref_id' => array(
+        'description' => 'Primary Key for referral details',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'src_id' => array(
+        'description' => 'Sepulsa Referral Campaign ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'description' => 'The {users}.uid of the user who was invited.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'referral_uid' => array(
+        'description' => 'The {users}.uid of the referer.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'created' => array(
+        'description' => 'UNIX timestamp for when the user was registered.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'flag' => array(
+        'description' => 'Flag for referral benefit.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'flag_timestamp' => array(
+        'description' => 'UNIX timestamp for when the user get benefit.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'count_benefit' => array(
+        'description' => 'Count of Benefit given.',
+        'type' => 'int',
+        'length' => 3,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'host' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'Network address.',
+      ),
+      'http_referer' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'URL of referer site.',
+      ),
+    ),
+    'primary key' => array('ref_id'),
+    'indexes' => array('referral_uid' => array('referral_uid')),
+  );
+
+  return $schema;
+}

@@ -96,8 +96,14 @@ function commerce_coupon_services_resource_remove($coupon_id, $order_id = NULL, 
   $order = empty($order_id) ? commerce_cart_order_load($uid) : commerce_order_load($order_id);
   $coupon = commerce_coupon_load($coupon_id);
 
-  commerce_coupon_remove_coupon_from_order($order, $coupon);
-  commerce_cart_order_refresh($order);
+  // Get order status: in cart.
+  $statuses = commerce_order_statuses(array('cart' => TRUE));
+  $statuses = array_keys($statuses);
+  // Can remove coupon if order status is in cart.
+  if (in_array($order->status, $statuses)) {
+    commerce_coupon_remove_coupon_from_order($order, $coupon);
+    commerce_cart_order_refresh($order);
+  }
 
   return 'Coupon removed from order';
 }

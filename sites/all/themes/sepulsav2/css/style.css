@@ -465,10 +465,12 @@ section.h_middle_top .home_tab .nav_tab a span.ico{
     bottom: -12px;
     margin: 0 5px 0 0;
 }
-section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../images/material/calculator_ico.png) no-repeat left top;}
-section.h_middle_top .home_tab .nav_tab a span.ico.bolt{background:url(../images/material/signal_ico.png) no-repeat left top;}
-section.h_middle_top .home_tab .nav_tab a span.ico.finance{background:url(../images/material/finance_ico.png) no-repeat left top;}
-section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../images/material/lightning_ico.png) no-repeat left top;}
+section.h_middle_top .home_tab .nav_tab a span.ico.pulsa{background:url(../images/material/ico_phone.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bolt{background:url(../images/material/ico_biznet.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.finance{background:url(../images/material/ico_finance.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.listrik{background:url(../images/material/ico_pln.png) no-repeat left center;}
+section.h_middle_top .home_tab .nav_tab a span.ico.bpjs{background:url(../images/material/ico_bpjs.png) no-repeat left center;}
+
 section.h_middle_top .home_tab .nav_tab a:last-child{border-right: none;}
 
 section.h_middle_top .home_tab .nav_tab a.active,
@@ -2483,6 +2485,7 @@ label[for='edit-commerce-payment-payment-details-veritrans-code2']
     padding: 10px 15px;
     color: #fff;
     margin-bottom: 5px;
+    height: 100%;
 }
 
 #webform-client-form-4907 .form-item {
@@ -3922,3 +3925,19 @@ section.banner .bx-wrapper a.bx-prev {background-position: bottom left;left: -40
 section.banner .bx-wrapper a.bx-next {background-position: top left;right: -40px}
 section.banner .bx-wrapper a.bx-prev:hover {background-position:bottom right;}
 section.banner .bx-wrapper a.bx-next:hover {background-position:top right;}
+
+.form-text.error {
+    border: 2px solid red;
+    background: #ebebeb !important;
+}
+
+.only-large
+{
+    display: block !important;
+}
+
+.only-small
+{
+    display: none !important;
+}
+

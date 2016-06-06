@@ -1,0 +1,8 @@
+; $Id$
+name = Apps Services v2 Transaction Data
+description = Service Process Data Transaction Like Favorite History and Home Listing
+package = Apps Services v2
+version = 0.1
+core = 7.x
+dependencies[] = services
+dependencies[] = services_documentation

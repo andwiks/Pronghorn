@@ -1,0 +1,7 @@
+name = "Sepulsa Newsletter"
+description = "Sepulsa Newsletter"
+core = "7.x"
+package = "Sepulsa"
+configure = "admin/config/people/newsletter/mailchimp/config"
+dependencies[] = "views"
+dependencies[] = "views_data_export"

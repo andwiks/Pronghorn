@@ -1,0 +1,60 @@
+<?php
+/**
+ * @file
+ * sepulsa_services_views.module
+ *
+ * @author azul@sepulsa.com
+ */
+
+/**
+ * Implements hook_services_views_execute_view_alter().
+ */
+function sepulsa_services_views_services_views_execute_view_alter(&$output, $view) {
+  global $user;
+  $uid = $user->uid;
+
+  if ($view->name == 'user_offline_owned_coupon' && $view->current_display == 'user_offline_owned_coupon') {
+    if(request_path()=='air/user_offline_owned_coupon'){
+      $paged_output = array(
+        'data' => $output,
+        'message' => null,
+        'status' => true,
+        'device' => device_verification_status($uid),
+      );
+    }
+    $output = $paged_output;
+  }
+
+  if ($view->name == 'user_owned_coupon' && $view->current_display == 'user_owned_coupon') {
+    if(request_path()=='air/user_owned_coupon'){
+
+      $data = array();
+      $data[] = (object)[];
+
+      foreach($output as $k => $row){
+
+        $data[$k]->nid = $row->nid;
+        $data[$k]->title = $row->title;
+        $data[$k]->image = $row->image;
+        $data[$k]->expired = $row->expired;
+        if(empty($row->code)){
+         $data[$k]->code = null;
+        }else{
+          $data[$k]->code = $row->code;
+        }
+        $data[$k]->detail = $row->detail;
+        $data[$k]->node_field_data_field_simple_coupon_nid = $row->node_field_data_field_simple_coupon_nid;
+        $data[$k]->field_coupon_tnc = $row->field_coupon_tnc;
+      }
+
+
+      $paged_output = array(
+        'data' => $data,
+        'message' => null,
+        'status' => true,
+        'device' => device_verification_status($uid),
+      );
+    }
+    $output = $paged_output;
+  }
+}

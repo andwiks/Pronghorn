@@ -1,0 +1,179 @@
+<?php
+/**
+ * @file
+ * jwt_resources.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_services_resources().
+ */
+function jwt_resources_services_resources() {
+  $jwt_resources = array(
+    'jwt' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => 'Request JWT secret / public key.',
+          'callback' => 'jwt_resources_retrieve',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'jwt_resources',
+            'name' => 'jwt_resources',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'jwt_resources_retrieve_doc',
+          'args' => array(
+            array(
+              'name' => 'type',
+              'optional' => TRUE,
+              'source' => array(
+                'param' => 'type',
+                'path' => 0,
+              ),
+              'type' => 'string',
+              'description' => 'The type of jwt config need to get.',
+              'default value' => 'key',
+              'http_method' => 'GET',
+            ),
+          ),
+        ),
+      ),
+      'actions' => array(
+        'verify' => array(
+          'help' => 'Verify JWT string.',
+          'callback' => 'jwt_resources_verify',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'jwt_resources',
+            'name' => 'jwt_resources',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'jwt_resources_verify_doc',
+          'args' => array(
+            array(
+              'name' => 'token',
+              'type' => 'string',
+              'description' => 'A test JWT string.',
+              'source' => array(
+                'data' => 'token',
+                'param' => 'token',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  return $jwt_resources;
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Documentation callback for jwt operation retrieve key.
+ */
+function jwt_resources_retrieve_doc() {
+  global $base_url;
+  $response = '
+    [
+      secret
+    ]
+      or
+    [
+      "-----BEGIN PUBLIC KEY-----\r\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDdlatRjRjogo3WojgGHFHYLugd\r\nUWAY9iR3fy4arWNA1KoS8kVw33cJibXr8bvwUAUparCwlvdbH6dvEOfou0/gCFQs\r\nHUfQrSDv+MuSUMAe8jzKE4qW+jK+xQU9a03GUnKHkkle+Q0pX/g6jXZ7r1/xAK5D\r\no2kQ+X5xK9cipRgEKwIDAQAB\r\n-----END PUBLIC KEY-----"
+    ]
+  ';
+  $element = array(
+    '#name' => t('Key Resource'),
+    '#description' => t('Get secret / public key.'),
+    '#auth' => FALSE,
+    '#path' => 'jwt/key',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/jwt/key',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'not_found' => array(
+        '#question' => '404 Not Found',
+        '#description' => t('JWT secret / public key can not be found.'),
+        '#response' => '["Key Not Found"]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for jwt action verify.
+ */
+function jwt_resources_verify_doc() {
+  global $base_url;
+  $response = '
+    [
+      true|false
+    ]
+  ';
+  $element = array(
+    '#name' => t('Verify Resouce'),
+    '#description' => t('Verify JWT string.'),
+    '#auth' => TRUE,
+    '#path' => 'jwt/verify',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/jwt/verify.json<br />POST token data application/json: {"token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.W10.SW98LOeSDzfDquVC94WSR7MwSbl7Ib4-Po-CPD27BSrj3eAFsV7bUL4NmV8xCtk5qu_a_3z4MMCGszwVnSMGVhuj6xvKy36A0NEYWBCIhGx1hzqOJQ3ccQK6IlDO7Jy1qhZkH8H2dQ4VP7X_bCEytwYjDdqH_l9dPeftEJiz220"}',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Resource prefix.
+    // Errors.
+    '#errors' => array(
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function jwt_resources_get_config().
+ *
+ * Get JWT config object for current endpoint authentication.
+ *
+ * @return mixed
+ *   JWT config object or FALSE if failed.
+ */
+function jwt_resources_get_config() {
+  // Get current service endpoint name.
+  $endpoint_name = services_get_server_info('endpoint');
+  // Load service endpoint data.
+  $endpoint = services_endpoint_load($endpoint_name);
+  // Check whether auth is using jwt and config has already set.
+  if (isset($endpoint->authentication['jwt_auth']['config'])
+    && !empty($endpoint->authentication['jwt_auth']['config'])
+  ) {
+    return jwt_config_load($endpoint->authentication['jwt_auth']['config']);
+  }
+  // Other condition: return FALSE.
+  return FALSE;
+}

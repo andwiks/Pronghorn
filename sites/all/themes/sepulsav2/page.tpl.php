@@ -4,13 +4,23 @@
  * page.tpl.php
  *
  * @author dwi@sepulsa.com
+ *
  * @since July 23th 2015.
  */
 ?>
-<?php if ($node->type == 'campaign_page'): ?>
+
+<?php if (!empty($page['page_img_header'])): ?>
+<section class="page_img_header">
+  <?php print render($page['page_img_header']); ?>
+</section>
+<?php endif; ?>
+
+<?php if (isset($node->type) && ($node->type == 'campaign_page' || $node->type == 'bundling')) : ?>
 <section class="std_content">
   <div class="wrapper_2 other after_clear">
-    <?php print $messages; ?>
+  	<?php if ($node->type == 'campaign_page'): ?>
+    	<?php print $messages; ?>
+    <?php endif; ?>
     <?php if ($title): ?>
       <h2><?php print $title ?></h2>
     <?php endif; ?>
@@ -18,7 +28,7 @@
     <?php print render($page['content']); ?>
   </div>
 </section>
-<?php elseif ($node->type == 'blog') : ?>
+<?php elseif (isset($node->type) && $node->type == 'blog') : ?>
 
 <div id="fb-root"></div>
 <script>(function(d, s, id) {
@@ -31,16 +41,16 @@
 
 <section id="frameBlog">
     <div class="wrapper">
-        
+
         <div id="inner" class="clearfix">
-            <div id="left_column">      
+            <div id="left_column">
                 <?php print render($title_prefix); ?>
                 <?php print $messages; ?>
-                
+
                 <?php if ($title): ?>
                   <h1><?php print $title ?></h1>
                 <?php endif; ?>
-                
+
                 <?php print render($title_suffix); ?>
                 <?php if ($tabs): ?>
                   <div class="tabs">
@@ -68,10 +78,10 @@
             <?php if (!empty($page['sidebar_first'])): ?>
             <div id="right_column">
                <?php print render($page['sidebar_first']); ?>
-            </div> 
-            <?php endif; ?>           
+            </div>
+            <?php endif; ?>
         </div>
-        
+
     </div>
 </section>
 <?php else: ?>

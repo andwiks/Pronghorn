@@ -1,0 +1,779 @@
+<?php
+/**
+ * @file
+ * device_services.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function device_services_menu() {
+  $items['admin/config/devices/services'] = array(
+    'title' => 'Services',
+    'description' => 'Configure default behavior of device services.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_services_settings'),
+    'access arguments' => array('administer devices'),
+    'file' => 'device_services.admin.inc',
+  );
+  $items['admin/config/devices/services/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_services_resources().
+ */
+function device_services_services_resources() {
+  $device_services = array(
+    // Session management: retrieve, index, delete.
+    'session' => array(
+      'operations' => array(
+        'index' => array(
+          'help' => 'List session from a user',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'callback' => 'device_services_resource_session_index',
+          'args' => array(),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_session_index_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+        ),
+        'retrieve' => array(
+          'help' => 'Retrieve a session',
+          'callback' => 'device_services_resource_session_retrieve',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_session_retrieve_doc',
+          'jwt' => array(
+            'token' => 'optional',
+          ),
+          'args' => array(
+            array(
+              'name' => 'sid',
+              'type' => 'string',
+              'description' => 'The session of the device to retrieve.',
+              'source' => array(
+                'path' => 0,
+              ),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'delete' => array(
+          'help' => 'Delete a session',
+          'callback' => 'device_services_resource_session_delete',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_session_delete_doc',
+          'jwt' => array(
+            'token' => 'optional',
+          ),
+          'args' => array(
+            array(
+              'name' => 'sid',
+              'type' => 'string',
+              'description' => 'The session of the device to delete.',
+              'source' => array(
+                'path' => 0,
+              ),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+      ),
+    ),
+    'device' => array(
+      'operations' => array(
+        'retrieve' => array(
+          'help' => 'Retrieve a device',
+          'callback' => 'device_services_resource_retrieve',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_retrieve_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+          'args' => array(
+            array(
+              'name' => 'did',
+              'type' => 'int',
+              'description' => 'The did of the device to retrieve.',
+              'source' => array(
+                'path' => 0,
+              ),
+              'optional' => FALSE,
+            ),
+          ),
+        ),
+        'index' => array(
+          'help' => 'List device from a user',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'callback' => 'device_services_resource_index',
+          'args' => array(),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_index_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+        ),
+      ),
+      'actions' => array(
+        'request' => array(
+          'help' => 'Request device access and refresh token.',
+          'callback' => 'device_services_resource_request',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_request_doc',
+          'jwt' => array(
+            'token' => 'optional',
+          ),
+          'args' => array(
+            array(
+              'name' => 'imei',
+              'type' => 'string',
+              'description' => 'A valid device imei.',
+              'source' => array(
+                'data' => 'imei',
+                'param' => 'imei',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'phone',
+              'type' => 'string',
+              'description' => 'A valid device phone number.',
+              'source' => array(
+                'data' => 'phone',
+                'param' => 'phone',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'agent',
+              'type' => 'string',
+              'description' => 'A valid device agent.',
+              'source' => array(
+                'data' => 'agent',
+                'param' => 'agent',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+        'verify' => array(
+          'help' => 'Verify device code.',
+          'callback' => 'device_services_resource_verify',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_verify_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+          'args' => array(
+            array(
+              'name' => 'code',
+              'type' => 'string',
+              'description' => 'A valid device code.',
+              'source' => array(
+                'data' => 'code',
+                'param' => 'code',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+        'mail' => array(
+          'help' => 'Associate device with email address.',
+          'callback' => 'device_services_resource_mail',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_mail_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+          'args' => array(
+            array(
+              'name' => 'mail',
+              'type' => 'string',
+              'description' => 'A valid email address.',
+              'source' => array(
+                'data' => 'mail',
+                'param' => 'mail',
+              ),
+              'optional' => FALSE,
+              'http_method' => 'POST',
+            ),
+            array(
+              'name' => 'confirm',
+              'type' => 'bool',
+              'description' => 'Confirmation to merge device to already exist email.',
+              'source' => array(
+                'data' => 'confirm',
+                'param' => 'confirm',
+              ),
+              'optional' => TRUE,
+              'http_method' => 'POST',
+            ),
+          ),
+        ),
+        'logout' => array(
+          'help' => 'Logout device.',
+          'callback' => 'device_services_resource_logout',
+          'file' => array(
+            'type' => 'inc',
+            'module' => 'device_services',
+            'name' => 'device_services',
+          ),
+          'access callback' => 'services_access_menu',
+          'documentation callback' => 'device_services_resource_logout_doc',
+          'jwt' => array(
+            'token' => 'required',
+          ),
+          'args' => array(),
+        ),
+      ),
+    ),
+  );
+  return $device_services;
+}
+
+/**
+ * Callback functions.
+ */
+
+/**
+ * Documentation callback for device action request.
+ */
+function device_services_resource_request_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Request token resource'),
+    '#description' => t('Create request to register device.'),
+    '#auth' => TRUE,
+    '#path' => 'device/request',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device/request  .json<br />POST token data application/json: {"imei":"1234567812345678", "phone":"08122545393"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '// First request without header Authorization bearer: refresh token.<br />{"access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJhbmRyZWFzLVRoaW5rUGFkLVQ0MjAiLCJzY29wZSI6eyJkZXZpY2UiOiJ2ZXJpZnkifSwianRpIjoiTFpEMWFJXzZhSDJocU5zSF8zU19TZ1pGVHNpSWxKN25sQ1oyb2t4R29WMCIsImV4cCI6IjIwMTYtMDItMTlUMTU6Mjc6NDIrMDc6MDAiLCJuYmYiOiIyMDE2LTAyLTE5VDE0OjI3OjQyKzA3OjAwIiwiYXVkIjoiMTIzNDU2NzgxMjM0NTY3OCIsImlhdCI6IjIwMTYtMDItMTlUMTQ6Mjc6NDIrMDc6MDAiLCJkaWQiOjN9.ovrdffA0oXtqZrt44DF9a_bh7FtiKhDG0NPEtQbAG7ZY1g8s_DEzAivPt7JuJCaNtA9e-JNtRiHHGbehRbzeywTHxa9ZQ8dQH58kIkXpGt16bpYz5QH8Zcf5zIV5cwhSV9h_52wZwhsvAZtHHTDO57uJPeE1Vu8IdJhuDsAKIF0"}<br />// Second request with header Authorization bearer: refresh token.<br />{"access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJhbmRyZWFzLVRoaW5rUGFkLVQ0MjAiLCJzY29wZSI6eyJwcm9uZ2hvcm4iOiIqIiwiZGV2aWNlIjoibWFpbCJ9LCJqdGkiOiJtb3I5c1loWjhud0VOOWR3X0I2WWhLdDZiWUt0Z29VSzFnRkw3NGsyNkFrIiwiZXhwIjoiMjAxNi0wMi0xOVQyMzo0Nzo1MiswNzowMCIsIm5iZiI6IjIwMTYtMDItMTlUMjI6NDc6NTIrMDc6MDAiLCJhdWQiOiIxMjM0NTY3ODEyMzQ1Njc4IiwiaWF0IjoiMjAxNi0wMi0xOVQyMjo0Nzo1MiswNzowMCIsImRpZCI6M30.buiDxovYDYH0-l1jqYpNVKHChNJXz6k7KHVluSXA8SWs_wl9kWZFe3_KxXWDr_-OeqzbQhHGZtOHzeo0bf7pCTvGYSg5H7QZeLS1_U21qfQZDotI3qRCmv8JHu9440yWTsvZNmHuP9m8aDtUtBJPyl15aCMaJK5JVQKznCuFB7U","refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJhbmRyZWFzLVRoaW5rUGFkLVQ0MjAiLCJqdGkiOiIzNUN4czd2VDRiMjVLN0NYWHZFTzhSMmZsNEdLNTdSRGJ1VU9QUDE0a09TVUZOSDZRcXNpMm9WUnBGZVEyNVZPRHNST1VkZmgwdWczYVk4RkxtOHVUUSIsImV4cCI6IjIwMTYtMDMtMjBUMjI6NDc6NTIrMDc6MDAiLCJuYmYiOiIyMDE2LTAyLTE5VDIyOjQ3OjUyKzA3OjAwIiwiYXVkIjoiMTIzNDU2NzgxMjM0NTY3OCIsImlhdCI6IjIwMTYtMDItMTlUMjI6NDc6NTIrMDc6MDAiLCJkaWQiOjN9.GiG1D0rsyGQ8u8QnCamv2FhZqjE_V1hPUR9JvyqHWwnXQNMC8stmJTDJhtBJ44dC60qrTXcpySaqyw7vh-12VRVHEj_3ohClQ6rzeh5aM2O4yB5Voufdwep6kg8NISS88W2_B2Shj9NnthrzDke8Iw2WsrpLqDK-bVFaMqyD6ps"}',
+    // Errors.
+    '#errors' => array(
+      'device_blocked' => array(
+        '#question' => '401 Unauthorized: Device has been blocked.',
+        '#description' => t('Device has been block by admin.'),
+        '#response' => '["Device has been blocked."]',
+      ),
+      'invalid_request' => array(
+        '#question' => '406 Not Acceptable: Invalid request.',
+        '#description' => t('Invalid device request. Check input post data.'),
+        '#response' => '["Invalid request."]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument phone|imei',
+        '#description' => t('Required argument: imei and phone number.'),
+        '#response' => '["Missing required argument phone|imei"]',
+      ),
+      'invalid_json' => array(
+        '#question' => '400: Invalid JSON.',
+        '#description' => t('Invalid device request. Check input post data format JSON.'),
+        '#response' => '["Invalid JSON."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device action verify.
+ */
+function device_services_resource_verify_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Verify device resource'),
+    '#description' => t('Verify device by inputting OTP.'),
+    '#auth' => TRUE,
+    '#path' => 'device/verify',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device/verify  .json<br />POST token data application/json: {"code":"1234"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '{"access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJhbmRyZWFzLVRoaW5rUGFkLVQ0MjAiLCJzY29wZSI6eyJwcm9uZ2hvcm4iOiIqIiwiZGV2aWNlIjoibWFpbCJ9LCJqdGkiOiJtb3I5c1loWjhud0VOOWR3X0I2WWhLdDZiWUt0Z29VSzFnRkw3NGsyNkFrIiwiZXhwIjoiMjAxNi0wMi0yMFQwMDoyMjoxNiswNzowMCIsIm5iZiI6IjIwMTYtMDItMTlUMjM6MjI6MTYrMDc6MDAiLCJhdWQiOiIxMjM0NTY3ODEyMzQ1Njc4IiwiaWF0IjoiMjAxNi0wMi0xOVQyMzoyMjoxNiswNzowMCIsImRpZCI6M30.KWgOg6qx0u4JRtubSnioLYuvfo7jnmf6jpIxLN90AOqoxuNDuL5weU9aaQVWQtAgZRvTgcy4YF818F-eFGd2McDidtabKlL82r_HVXKuFv2R1WIqDQ0QoUJ-iShPdCe2s8SIRZAqamPB2QFXNLvBiGUsuG4SdY8QJbu3HGOKp6E","refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJhbmRyZWFzLVRoaW5rUGFkLVQ0MjAiLCJqdGkiOiJPeWc0ZVpScnZzV05fMjlvM0ZxeG15VGZXQWw2Q1VQZEdIR21wbHRjMmJZR2Q0aDRjWGp3OWhEaTR1OTBVNnFQVEctendGUllSN0Y5Tm9TNFVFd1lvdyIsImV4cCI6IjIwMTYtMDMtMjBUMjM6MjI6MTYrMDc6MDAiLCJuYmYiOiIyMDE2LTAyLTE5VDIzOjIyOjE2KzA3OjAwIiwiYXVkIjoiMTIzNDU2NzgxMjM0NTY3OCIsImlhdCI6IjIwMTYtMDItMTlUMjM6MjI6MTYrMDc6MDAiLCJkaWQiOjN9.g8sCFYCGpdREi1CH-V7Jx1DlVPHTAH0EGpuVS8HIiVL28toLstZsAyXZHEwyRPkaGEnQnxbf8rr2uIMuSCWQmgLWf0YPDKpzj2J3Kp775C_CFnCHTWHuscCLYVkAqGdQELIaa6DtLh7p_ZOEQqn1XXeepmxMh86NI9zNKm40Jz8"}',
+    // Errors.
+    '#errors' => array(
+      'invalid_verification' => array(
+        '#question' => '406 Not Acceptable: Invalid verification.',
+        '#description' => t('Invalid device verification. Check input post code.'),
+        '#response' => '["Invalid verification."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument code',
+        '#description' => t('Required argument: OTP code.'),
+        '#response' => '["Missing required argument code"]',
+      ),
+      'invalid_json' => array(
+        '#question' => '400: Invalid JSON.',
+        '#description' => t('Invalid device request. Check input post data format JSON.'),
+        '#response' => '["Invalid JSON."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device action mail.
+ */
+function device_services_resource_mail_doc() {
+  global $base_url;
+  $element = array(
+    '#name' => t('Mail device resource'),
+    '#description' => t('Input email address to device.'),
+    '#auth' => TRUE,
+    '#path' => 'device/mail',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device/mail  .json<br />POST token data application/json:{"mail":"andreas@sepulsa.com"}',
+    // Example response. E.g., a JSON array.
+    '#response' => '[true]',
+    // Errors.
+    '#errors' => array(
+      'email_already_registered' => array(
+        '#question' => '406 Not Acceptable: Email has already registered.',
+        '#description' => t('Invalid device mail input. Email address has already register for another device.'),
+        '#response' => '["Email has already registered."]',
+      ),
+      'invalid_mail_request' => array(
+        '#question' => '406 Not Acceptable: Invalid mail request.',
+        '#description' => t('Invalid device mail request. Check input post mail.'),
+        '#response' => '["Invalid mail request."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'missing_requirement' => array(
+        '#question' => '401 Unauthorized: Missing required argument mail',
+        '#description' => t('Required argument: mail (valid email address).'),
+        '#response' => '["Missing required argument mail"]',
+      ),
+      'invalid_json' => array(
+        '#question' => '400: Invalid JSON.',
+        '#description' => t('Invalid device request. Check input post data format JSON.'),
+        '#response' => '["Invalid JSON."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device operation retrieve.
+ */
+function device_services_resource_retrieve_doc() {
+  global $base_url;
+  $response = <<<EOD
+  {
+    "user": {
+      "uid": "7",
+      "name": "08122545393",
+      "pass": "DG42ZjkZri",
+      "mail": "andreas+test12@sepulsa.com",
+      "theme": "",
+      "signature": "",
+      "signature_format": null,
+      "created": "1455655953",
+      "access": "1456074506",
+      "login": "0",
+      "status": "1",
+      "timezone": null,
+      "language": "",
+      "picture": "0",
+      "init": "08122545393",
+      "data": false,
+      "roles": {
+        "2": "authenticated user"
+      }
+    },
+    "device": {
+      "did": "3",
+      "imei": "1234567812345678",
+      "phone": "08122545393",
+      "label": "08122545393",
+      "created": "1455655535",
+      "access": 1456074553,
+      "status": "1",
+      "uid": "7",
+      "data": "a:0:{}",
+      "field_test": {
+        "und": [
+          {
+            "email": "andreas+test12@sepulsa.com"
+          }
+        ]
+      },
+      "device_mail": []
+    },
+    "asid": "wbmxA9pKb9xCkdTh3RNpDuKD2rSErXm_kHuIeWPfW5I",
+    "atimeout": 1456077707
+  }
+EOD;
+  $element = array(
+    '#name' => t('Retrieve device resource'),
+    '#description' => t('Get device information.'),
+    '#auth' => TRUE,
+    '#path' => 'device/%did',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device/%did.json<br />GET data with device id as input.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has the same device id information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device operation index.
+ */
+function device_services_resource_index_doc() {
+  global $base_url;
+  $response = <<<EOD
+[
+  {
+    "did": "3",
+    "imei": "1234567812345678",
+    "phone": "08122545393",
+    "label": "08122545393",
+    "created": "1455655535",
+    "access": "1458452439",
+    "status": "1",
+    "uid": "7",
+    "data": "a:0:{}",
+    "field_test": {
+      "und": [
+        {
+          "email": "andreas+test12@sepulsa.com"
+        }
+      ]
+    },
+    "device_mail": {
+      "und": [
+        {
+          "email": "andreas+test1@sepulsa.com"
+        }
+      ]
+    }
+  }
+]
+EOD;
+  $element = array(
+    '#name' => t('List device resource'),
+    '#description' => t('Get list of device information.'),
+    '#auth' => TRUE,
+    '#path' => 'device',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device.json<br />GET data with device id as input.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has device uid information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device operation logout.
+ */
+function device_services_resource_logout_doc() {
+  global $base_url;
+  $response = <<<EOD
+  [
+      true
+  ]
+EOD;
+  $element = array(
+    '#name' => t('Device logut resource'),
+    '#description' => t('Device logout and remove sessions.'),
+    '#auth' => TRUE,
+    '#path' => 'device/logout',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/device/logout.json<br />POST with empty data.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has the same device id information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device session operation index.
+ */
+function device_services_resource_session_index_doc() {
+  global $base_url;
+  $response = <<<EOD
+[
+  {
+    "did": "7",
+    "asid": "x9SCosoMx17g4Utt2Aq_3Qa_xuqTL9dMYZohiz7NcBA",
+    "atimestamp": "1458690570"
+  }
+]
+EOD;
+  $element = array(
+    '#name' => t('List device session resource'),
+    '#description' => t('Get list of device access token session information.'),
+    '#auth' => TRUE,
+    '#path' => 'session',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/session.json.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has device uid information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device session operation retrieve.
+ */
+function device_services_resource_session_retrieve_doc() {
+  global $base_url;
+  $response = <<<EOD
+[
+  {
+    "did": "7",
+    "asid": "x9SCosoMx17g4Utt2Aq_3Qa_xuqTL9dMYZohiz7NcBA",
+    "atimestamp": "1458690570"
+  }
+]
+  or
+[
+  false
+]
+EOD;
+  $element = array(
+    '#name' => t('Retrieve device session resource'),
+    '#description' => t('Get device session information.'),
+    '#auth' => TRUE,
+    '#path' => 'session/%jti',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/session/%jti.json<br />GET data with device jti as input.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has the same device id information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Documentation callback for device session operation delete.
+ */
+function device_services_resource_session_delete_doc() {
+  global $base_url;
+  $response = <<<EOD
+[
+  true
+]
+EOD;
+  $element = array(
+    '#name' => t('Delete device session resource'),
+    '#description' => t('Delete device session.'),
+    '#auth' => TRUE,
+    '#path' => 'session/%jti',
+    // Example request. E.g., a request URL, headers, and a JSON array.
+    '#request_url' => $base_url . '/api/session/%jti.json<br />DEL data with device jti as input.<br />',
+    // Example response. E.g., a JSON array.
+    '#response' => $response,
+    // Errors.
+    '#errors' => array(
+      'device_not_found' => array(
+        '#question' => '404 Not found: Invalid device information.',
+        '#description' => t('This service only work if access token has the same device id information.'),
+        '#response' => '["Invalid device information."]',
+      ),
+      'invalid_access_token' => array(
+        '#question' => '406 Not Acceptable: Invalid Access Token.',
+        '#description' => t('Invalid device access token. Check JWT token expiration time.'),
+        '#response' => '["Invalid Access Token."]',
+      ),
+      'internal_server' => array(
+        '#question' => '500 Internal Server Error',
+        '#description' => t('Drupal server can not handle the request. Drupal will output nothing.'),
+        '#response' => '',
+      ),
+    ),
+  );
+  return $element;
+}
+
+/**
+ * Public functions.
+ */
+
+/**
+ * Function device_services_get_default_claims().
+ *
+ * Get array of JWT default claims.
+ *
+ * @return array
+ *   JWT Claim container key and value.
+ */
+function device_services_get_default_claims() {
+  // Load default device services claims variable.
+  $claims = variable_get('device_services_default_claims', array(
+    'iss' => gethostname(),
+    'sub' => '',
+    'aud' => '',
+  ));
+  // Filter claims for empty value.
+  $claims = array_filter($claims);
+  // Return default claims array.
+  return $claims;
+}

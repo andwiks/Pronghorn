@@ -1,0 +1,304 @@
+<?php
+/**
+ * @file
+ * Device mail verification.
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function device_mail_verification_menu() {
+  $items = array(
+    'device_mail/verification/%' => array(
+      'page callback' => 'device_mail_verification_link_confirm',
+      'page arguments' => array(2),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'device_mail_verification.inc',
+    ),
+  );
+  $items['admin/config/devices/device_mail_settings'] = array(
+    'title' => 'Mail Verification',
+    'description' => 'Configure default behavior of device mail.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_mail_verification_settings'),
+    'access arguments' => array('administer devices'),
+    'file' => 'device_mail_verification.admin.inc',
+  );
+  $items['admin/config/devices/device_mail_settings/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/devices/update_manual'] = array(
+    'title' => 'Update User Device',
+    'description' => 'Update User Device maually.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('device_mail_verification_wizard'),
+    'access arguments' => array('administer devices'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'device_mail_verification.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_mail().
+ */
+function device_mail_verification_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'verify':
+      $langcode = $message['language'];
+      $message['subject'] = variable_get('device_mail_subject', 'Verification of your mail at Sepulsa.com');
+      $message['body'][] = variable_get('device_mail_body',
+      'Please click on the following link to confirm this email address at Sepulsa.com');
+      $message['body'][] = url(
+        'device_mail/verification/' . $params['hash'],
+        array(
+          'absolute' => TRUE,
+        )
+      );
+      break;
+  }
+}
+
+/**
+ * Function device_mail_verification_send_verification().
+ */
+function device_mail_verification_send_verification($mail = '', $did = '') {
+
+  $hash = drupal_hash_base64(drupal_get_hash_salt() . drupal_random_bytes(16) . $mail);
+  $lang = language_default('language');
+  $send = drupal_mail(
+    'device_mail_verification',
+    'verify',
+    $mail,
+    $lang,
+    array(
+      'hash' => $hash,
+    )
+  );
+
+  if ($send) {
+    $created = time();
+    $timeout = variable_get('device_mail_timeout', 0);
+    $fields_insert = array(
+      'did' => $did,
+      'status' => 0,
+      'mail' => $mail,
+      'hash' => $hash,
+      'created' => $created,
+      'timeout' => $created + $timeout,
+    );
+
+    // Check mail has already registered.
+    $user = user_load_by_mail($mail);
+
+    if ($user === FALSE) {
+      $fields_insert['new_flag'] = 1;
+    }
+    else {
+      $fields_insert['new_flag'] = 0;
+    }
+    // Delete Data in device_mail_verification if device already have record.
+    db_delete('device_mail_verification')
+      ->condition('did', $did)
+      ->execute();
+
+    // Insert Data to device_mail_verification Table.
+    db_insert('device_mail_verification')
+      ->fields($fields_insert)
+      ->execute();
+
+    // Return true.
+    return TRUE;
+  }
+  else {
+    return FALSE;
+  }
+}
+
+/**
+ * Implements hook_cron().
+ */
+function device_mail_verification_cron() {
+  if (variable_get('device_mail_timeout', 0) != 0) {
+    $mail_result = db_select('device_mail_verification', 'e')
+        ->fields('e')
+        ->condition('status', 2, '=')
+        ->condition('timeout', REQUEST_TIME, '<')
+        ->execute();
+
+    while ($current_mail = $mail_result->fetchAssoc()) {
+      db_delete('device_mail_verification')
+          ->condition('did', $current_mail['did'], '=')
+          ->execute();
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function device_mail_verification_theme() {
+  // Get module theme path.
+  $module_theme_path = drupal_get_path('module', 'device_mail_verification') . '/theme';
+  // Return theme array.
+  return array(
+    'device_merge_confirm_form' => array(
+      'render element' => 'form',
+      'path' => $module_theme_path,
+      'template' => 'device-merge-confirm-form',
+    ),
+    'page__device_mail__verification' => array(
+      'path' => $module_theme_path,
+      'template' => 'page--device-mail--verification',
+    ),
+    'html__device_mail__verification' => array(
+      'path' => $module_theme_path,
+      'template' => 'html--device-mail--verification',
+    ),
+  );
+}
+
+/**
+ * Function device_mail_verification_transfer_order().
+ *
+ * @param string $current_uid
+ *   Sting current_uid.
+ * @param string $update_uid
+ *   String update_uid.
+ */
+function device_mail_verification_transfer_order($current_uid = '', $update_uid = '') {
+
+  $result = array();
+  // Get merge order status settings.
+  $status = variable_get('device_mail_merge_order_status', array(
+    'completed' => 'completed',
+    'pending' => 'pending',
+    'processing' => 'processing',
+    'invoiced' => 'invoiced',
+  ));
+  $status = array_filter($status);
+  $status = array_values($status);
+  // Define order id based on selected order status.
+  $subquery = db_select('commerce_order', 'cos');
+  $subquery->addField('cos', 'order_id');
+  $subquery->condition('cos.status', $status, 'IN');
+  $subquery->condition('cos.uid', $current_uid, '=');
+  $oids = $subquery->execute()->fetchAllAssoc('order_id', PDO::FETCH_ASSOC);
+
+  // Check if can get list of order ids.
+  if (!empty($oids)) {
+    // Transfer commerce order.
+    $result['commerce_order'] = db_update('commerce_order')
+      ->fields(array('uid' => $update_uid))
+      ->condition('uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
+    // Transfer commerce order revision.
+    $result['commerce_order_revision'] = db_update('commerce_order_revision')
+      ->fields(array('revision_uid' => $update_uid))
+      ->condition('revision_uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
+
+    // Define list of payment transaction id based on selected order id.
+    $payment_subquery = db_select('commerce_payment_transaction', 'cptt');
+    $payment_subquery->addField('cptt', 'transaction_id');
+    $payment_subquery->condition('cptt.order_id', $oids, 'IN');
+    $payment_subquery->condition('cptt.uid', $current_uid, '=');
+    $tids = $payment_subquery->execute()->fetchAllAssoc('transaction_id', PDO::FETCH_ASSOC);
+
+    if (!empty($tids)) {
+      // Transfer commerce payment transaction.
+      $result['commerce_payment_transaction'] = db_update('commerce_payment_transaction')
+        ->fields(array('uid' => $update_uid))
+        ->condition('uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+      // Transfer commerce payment transaction revision.
+      $result['commerce_payment_transaction_revision'] = db_update('commerce_payment_transaction_revision')
+        ->fields(array('revision_uid' => $update_uid))
+        ->condition('revision_uid', $current_uid, '=')
+        ->condition('transaction_id', $tids, 'IN')
+        ->execute();
+    }
+    // Transfer commerce veritrans token (saved cc).
+    $result['commerce_veritrans_token'] = db_update('commerce_veritrans_token')
+      ->fields(array('uid' => $update_uid))
+      ->condition('uid', $current_uid, '=')
+      ->condition('order_id', $oids, 'IN')
+      ->execute();
+  }
+
+  // ambil voucher current uid ke update uid
+  // ambil user point dari current uid ke update uid
+  // set null current uid
+
+
+  // Log this condition.
+  watchdog('device_mail_verification', 'Transfer Order @cuid to @uuid. Result: <pre>@result</pre> Order List: <pre>@oids</pre>.', array(
+    '@cuid' => $current_uid,
+    '@uuid' => $update_uid,
+    '@result' => print_r($result, TRUE),
+    '@oids' => print_r($oids, TRUE),
+  ), WATCHDOG_INFO);
+
+
+  // 1] move voucher $current_uid ke $update_uid | mis: uid 25790
+  $query_owned_coupon = new EntityFieldQuery();
+  $query_owned_coupon->entityCondition('entity_type', 'node')
+    // ->entityCondition('bundle', 'owned_unique_coupon') // ex. article
+    ->propertyCondition('uid', $current_uid) // node authored by a specific user
+    ->propertyCondition('status', 1); // published nodes
+  $result = $query_owned_coupon->execute();
+
+  $voucher_ids = array_keys($result['node']);
+
+  if(!empty($voucher_ids)){
+    foreach ($voucher_ids as $voucher_id) {
+      $voucher_wrapper = entity_metadata_wrapper('node', $voucher_id);
+      $voucher_wrapper->author->set($update_uid);
+      $voucher_wrapper->save();
+    }
+    // Log this condition.
+    watchdog('device_mail_verification', 'Transfer Voucher @cuid to @uuid. Voucher: <pre>@voucher</pre>', array(
+      '@cuid' => $current_uid,
+      '@uuid' => $update_uid,
+      '@voucher' => print_r($voucher_ids, TRUE),
+    ), WATCHDOG_INFO);
+  }
+
+  // 2] ambil userpoint dari $current_uid ke $update_uid
+  $current_uid_points = userpoints_get_current_points($current_uid, 'all');
+
+  if($current_uid_points >0 ){
+    $increase_point = array(
+      'uid' => $update_uid,
+      'points' => ($current_uid_points <= 0) ? 0 : $current_uid_points,
+      'tid' => 0,
+      'description' => 'Add userpoints from UID: '.$current_uid,
+    );
+    $set_increase_point = userpoints_userpointsapi($increase_point);
+
+    $decrease_point = array(
+      'uid' => $current_uid,
+      'points' => ($current_uid_points <= 0) ? 0 : -$current_uid_points,
+      'tid' => 0,
+      'description' => 'Move userpoints to UID: '.$update_uid,
+    );
+    $set_decrease_point = userpoints_userpointsapi($decrease_point);
+
+    // Log this condition.
+    watchdog('device_mail_verification', 'Transfer Points (@c_uid_points) @cuid to @uuid. Increase Points: <pre>@s_d_p</pre> Increase Points: <pre>@s_i_p</pre>', array(
+      '@cuid' => $current_uid,
+      '@uuid' => $update_uid,
+      '@c_uid_points' => $current_uid_points,
+      '@s_i_p' => print_r($set_increase_point, TRUE),
+      '@s_d_p' => print_r($set_decrease_point, TRUE),
+    ), WATCHDOG_INFO);
+  }
+
+}

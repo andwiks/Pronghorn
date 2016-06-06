@@ -83,6 +83,15 @@ function userpoints_sepulsa_apply(EntityDrupalWrapper $order_wrapper, $user = NU
   $point_amount = userpoints_get_current_points($user->uid, 'all');
   $order_total = $order_wrapper->commerce_order_total->amount->value();
   $amount = $order_total > $point_amount ? $point_amount : $order_total;
+  
+  /*
+   * apps_services_v2_payment_list_credit -- apps_services_v2_payment_list.module
+   * over ride and exclude kredit if the user set the use credit as false
+   */
+  if (module_exists('apps_services_v2_payment_list') && variable_get('apps_services_v2_payment_list_credit_option', 1) && isset($_SESSION["use_credit"]) && $_SESSION["use_credit"] == false) {
+    //exclude credit by over ride the recognized credit value into 0
+    $amount = 0;
+  }
 
   if ($amount) {
     $line_item = commerce_userpoints_discount_line_item_factory_new($order_wrapper->getIdentifier());
@@ -139,3 +148,70 @@ function userpoints_line_item_transaction($order, $line_item, $amount=0){
 	$result = userpoints_userpointsapi($userpoints_params);
   }
 }
+
+/**
+ * Implements hook_rules_condition_info().
+ */
+function userpoints_sepulsa_rules_condition_info() {
+  $conditions = array();
+
+  $conditions['userpoints_sepulsa_compare_points'] = array(
+    'label' => t('Sepulsa Kredit comparison'),
+    'parameter' => array(
+      'amount' => array(
+        'type' => 'text',
+        'label' => t('Amount'),
+        'description' => t('Sepulsa Kredit amount'),
+      ),
+      'user' => array(
+        'type' => 'user',
+        'label' => t('User'),
+        'description' => t('User order'),
+      ),
+      'operator' => array(
+        'type' => 'text',
+        'label' => t('Operator'),
+        'description' => t('The comparison operator.'),
+        'optional' => TRUE,
+        'default value' => 'equals',
+        'options list' => 'userpoints_sepulsa_comparison_operator_options_list',
+        'restriction' => 'input',
+      ),
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Value'),
+        'description' => t('comparison value'),
+      ),
+    ),
+    'group' => t('Sepulsa'),
+    'callbacks' => array(
+      'execute' => 'userpoints_sepulsa_compare_points',
+    ),
+  );
+
+  return $conditions;
+}
+
+function userpoints_sepulsa_comparison_operator_options_list() {
+  return drupal_map_assoc(array('<', '<=', '=', '>=', '>'));
+}
+
+function userpoints_sepulsa_compare_points($amount, $user, $operator, $value) {
+  $pointamount = userpoints_get_current_points($user->uid, 'all');
+  $totalamount = $amount + $pointamount;
+  switch ($operator) {
+    case '<':
+      return $totalamount < $value;
+    case '<=':
+      return $totalamount <= $value;
+    case '=':
+      return $totalamount == $value;
+    case '>=':
+      return $totalamount >= $value;
+    case '>':
+      return $totalamount > $value;
+  }
+
+  return TRUE;
+}
+

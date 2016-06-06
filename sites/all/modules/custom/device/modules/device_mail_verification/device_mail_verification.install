@@ -1,0 +1,132 @@
+<?php
+/**
+ * @file
+ * device_mail_verification.install
+ *
+ * @author aizat@sepulsa.com
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function device_mail_verification_schema() {
+  // Device verification.
+  $schema['device_mail_verification'] = array(
+    'description' => 'Stores data about the device mail verification.',
+    'fields' => array(
+      'dmv_id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'did' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'mail' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'status' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => '0 = Unverified, 1 = Verified, 2 = Timeout',
+      ),
+      'new_flag' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => '0 = Merge User, 1 = New User',
+      ),
+      'hash' => array(
+        'type' => 'text',
+        'size' => 'small',
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'timeout' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('dmv_id', 'did'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function device_mail_verification_enable() {
+  // Get all properties of device entity.
+  $properties = entity_get_all_property_info('device');
+
+  // Check field device mail.
+  if (!isset($properties['device_mail'])) {
+    // Create field: device_mail.
+    $field = array(
+      'entity_types' => array('device'),
+      'field_name' => 'device_mail',
+      'type' => 'text',
+      'cardinality' => 1,
+      'description' => 'Device email address.',
+    );
+    field_create_field($field);
+    // Create an instance and attach it to the commerce product entity.
+    $instance = array(
+      'field_name' => 'device_mail',
+      'entity_type' => 'device',
+      'description' => 'Device email address.',
+      'bundle' => 'device',
+      'label' => 'Device Email',
+      'widget' => array(
+        'settings' => array(
+          'size' => 254,
+        ),
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_install().
+ */
+function device_mail_verification_install() {
+  // Delete device variables.
+  variable_set('device_mail_timeout', (60 * 60 * 24));
+  variable_set('device_mail_subject', 'Verification of your mail at Sepulsa.com');
+  variable_set('device_mail_body', 'Please click on the following link to confirm this email address at Sepulsa.com');
+  variable_set('device_mail_redirect', '');
+  variable_set('device_mail_merge_order_status', array(
+    'completed' => 'completed',
+    'pending' => 'pending',
+    'processing' => 'processing',
+    'invoiced' => 'invoiced',
+  ));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function device_mail_verification_uninstall() {
+  // Delete device variables.
+  variable_del('device_mail_timeout');
+  variable_del('device_mail_subject');
+  variable_del('device_mail_body');
+  variable_del('device_mail_redirect');
+  variable_del('device_mail_merge_order_status');
+}

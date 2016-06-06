@@ -1,0 +1,7 @@
+name = "Sepulsa Referral Campaign"
+description = "Sepulsa Referral Campaign"
+core = "7.x"
+package = "Sepulsa"
+configure = "admin/config/people/referral/sepulsa_referral_campaign/settings"
+
+dependencies[] = entity

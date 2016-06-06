@@ -1,0 +1,115 @@
+section.h_middle_top .form-bpjs .form-field {
+  clear: both;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+section.h_middle_top .form-bpjs .form-field label {
+  font-weight: 600;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+section.h_middle_top .form-bpjs .form-field:after {
+  content: ' ';
+  display: block;
+  clear: both;
+}
+
+section.h_middle_top .form-bpjs .form-field input[type=text] {
+  /*
+  width: 90% !important;
+  float: left;
+  padding: 10px;
+  height: 50px;
+  background: none !important;
+  border: 1px solid #717171 !important;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 7px;
+  -o-border-radius: 7px;
+  color: #717171 !important;
+  */
+}
+
+section.h_middle_top .form-bpjs .form-field input.remove {
+  font-size: 22px;
+  line-height: 22px;
+
+  width: 46px;
+  height: 46px;
+  position: absolute;
+/*  top: 11px;
+  right: 14px;*/
+  margin: 0;
+  margin-left: 1%;
+  /*background: #c72127 !important;*/
+  background: transparent url("../images/material/trash_ico.png") no-repeat center !important;
+  text-indent: -9999px;
+  color: #fff;
+  border: 2px solid #c72127;
+  /*border-radius: 46px;
+  -webkit-border-radius: 46px;
+  -moz-border-radius: 46px;
+  -ms-border-radius: 46px;
+  -o-border-radius: 46px;*/
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  top: 0;
+  right: 0;
+}
+
+#bpjs-kesehatan .topup-notes {
+  /*width: 100%;
+  margin-top: 15px;*/
+}
+
+
+section.h_middle_top .form-bpjs .form-field input[type=text] {
+  background: none !important;
+}
+
+section.h_middle_top .form-bpjs .form-field input.add-new {
+  font-size: 22px;
+  line-height: 22px;
+
+  width: 46px;
+  height: 46px;
+  position: absolute;
+/*  top: 11px;
+  right: 14px;*/
+  margin: 0;
+  margin-left: 1%;
+  background: transparent !important;
+  color: #129d4a !important;
+  border: 2px solid #129d4a;
+/*  border-radius: 46px;
+  -webkit-border-radius: 46px;
+  -moz-border-radius: 46px;
+  -ms-border-radius: 46px;
+  -o-border-radius: 46px;*/
+
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  top: 0;
+  right: 0;
+}
+
+section.h_middle_top .form-bpjs .form-actions {
+  clear: none;
+}
+
+.form-bpjs .form-field input.add-new {
+    display: block !important;
+}

@@ -16,6 +16,11 @@
 User-agent: *
 Crawl-delay: 10
 # Directories
+# Disallow All Pivotal: https://www.pivotaltracker.com/story/show/117503215
+Disallow: /
+Disallow: *
+Disallow: */*
+#
 Disallow: /includes/
 Disallow: /misc/
 Disallow: /modules/

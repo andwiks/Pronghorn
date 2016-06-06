@@ -420,6 +420,7 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
 
   //get credit balance
   $return["credit_balance"] = userpoints_get_current_points($uid, 'all');
+  $return["device"] = device_verification_status($uid);
 
   return $return;
 }

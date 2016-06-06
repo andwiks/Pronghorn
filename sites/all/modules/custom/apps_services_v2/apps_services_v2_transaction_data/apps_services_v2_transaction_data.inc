@@ -291,6 +291,8 @@ function apps_services_v2_transaction_history_list($page, $size, $source){
     $return["data"] = null;
   }
 
+  $return["device"] = device_verification_status($uid);
+
   return $return;
 }
 

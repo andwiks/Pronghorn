@@ -59,7 +59,7 @@ function sepulsa_bundle_preprocess_node(&$variables) {
 /**
  * Implements hook_form_alter().
  */
-function sepulsa_bundle_form_alter(&$form, &$form_state, $form_id) {
+function sepulsa_bundle_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['line_item_fields']['#entity']->type)
     && $form['line_item_fields']['#entity']->type == 'bundling'
   ) {
@@ -275,4 +275,43 @@ function sepulsa_bundle_form_validate(&$form, &$form_state) {
 function sepulsa_bundle_form_submit($form, &$form_state) {
   // Redirect to coupon page if success.
   $form_state['redirect'] = 'coupon';
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function sepulsa_bundle_voucher_stock_status().
+ *
+ * @param object $bundle
+ *   Bundle commerce product object.
+ *
+ * @return bool
+ *   TRUE is OK. FALSE: one of voucher stock is empty.
+ */
+function sepulsa_bundle_voucher_stock_status($bundle) {
+  // Check for valid bundle commerce project object.
+  if (is_object($bundle) && !empty($bundle)) {
+    try {
+      $data_wrapper = entity_metadata_wrapper('commerce_product', $bundle);
+      $vouchers = $data_wrapper->field_bundling_voucher->value();
+      foreach ($vouchers as $voucher) {
+        $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);
+        $stock = (float) $voucher_wrapper->commerce_stock->value();
+        if ($stock < 1.00) {
+          return FALSE;
+        }
+      }
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      // Log this error.
+      watchdog('sepulsa_bundle', 'EntityMetadataWrapper exception in %function() @trace', array(
+        '%function' => __FUNCTION__,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR, request_uri());
+    }
+  }
+  // Other condition: TRUE => stock status is fine.
+  return TRUE;
 }

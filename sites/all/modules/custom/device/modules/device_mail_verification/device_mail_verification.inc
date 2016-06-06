@@ -208,7 +208,10 @@ function device_mail_verification_merge_user($current_mail) {
       $device_user_wrapper->save();
 
       // Send email to reset password.
-      $mail = _user_mail_notify('password_reset', $current_mail['mail']);
+      $new_user = user_load($device_uid);
+      if ($new_user) {
+        $mail = _user_mail_notify('password_reset', $new_user);
+      }
 
       watchdog('device_mail_verification', 'Merge User New User-> device_account : !device_account_id', array(
         '!device_account_id' => $device_uid,

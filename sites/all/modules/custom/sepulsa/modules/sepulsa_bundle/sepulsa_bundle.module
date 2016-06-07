@@ -117,6 +117,7 @@ function sepulsa_bundle_commerce_order_presave($order) {
           $counter = 1;
           $counter = isset($vouchers_counter[0]) && !empty($vouchers_counter[0]) ? $vouchers_counter[$key] : $counter;
           $counter = isset($vouchers_counter[$key]) && !empty($vouchers_counter[$key]) ? $vouchers_counter[$key] : $counter;
+          $counter = intval($counter);
           for ($i = $counter; $i > 0; $i--) {
             // Get voucher wrapper.
             $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);

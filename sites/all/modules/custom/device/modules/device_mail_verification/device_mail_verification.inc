@@ -447,18 +447,31 @@ function device_mail_merge_confirm_form_submit($form, &$form_state) {
     $device_wrapper->save();
   }
   else {
-    // Check if device did is not the same with web did.
-    if ($form_state['values']['device_did'] != $form_state['values']['web_did']) {
-      // Block Device User.
-      $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
+    if ($form_state['values']['strategi'] != 4) {
+      // Check if device did is not the same with web did.
+      if ($form_state['values']['device_did'] != $form_state['values']['web_did']) {
+        // Block Device User.
+        $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
+        $device_user_wrapper->status->set(0);
+        $device_user_wrapper->save();
+      }
+
+      // Add email to device_mail (Device Web).
+      $device_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
+      $device_wrapper->device_mail->set($form_state['values']['mail']);
+      $device_wrapper->save();
+    }
+    else {
+      // Block WEB Device.
+      $device_user_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
       $device_user_wrapper->status->set(0);
       $device_user_wrapper->save();
-    }
 
-    // Add email to device_mail (Device Web).
-    $device_wrapper = entity_metadata_wrapper('device', $form_state['values']['web_did']);
-    $device_wrapper->device_mail->set($form_state['values']['mail']);
-    $device_wrapper->save();
+      // Add email to device_mail (Current Device).
+      $device_wrapper = entity_metadata_wrapper('device', $form_state['values']['device_did']);
+      $device_wrapper->device_mail->set($form_state['values']['mail']);
+      $device_wrapper->save();
+    }
   }
 
   db_update('device_mail_verification')

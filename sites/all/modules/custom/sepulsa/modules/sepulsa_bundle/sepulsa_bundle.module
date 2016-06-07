@@ -42,7 +42,8 @@ function sepulsa_bundle_preprocess_page(&$variables) {
 function sepulsa_bundle_preprocess_node(&$variables) {
   if (isset($variables['type']) && $variables['type'] == 'bundling') {
     $output = '';
-    foreach (drupal_get_messages($display) as $type => $messages) {
+    $drupal_messages = drupal_get_messages();
+    foreach ($drupal_messages as $type => $messages) {
       if (count($messages) > 1) {
         foreach ($messages as $message) {
           $output .= $message . "<br />\n";

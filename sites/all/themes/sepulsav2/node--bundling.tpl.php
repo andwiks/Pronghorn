@@ -22,6 +22,9 @@ drupal_add_js('
       $("input[type=text]").change(function(){
         $(this).parents("form").find(":submit.input-btn").prop("disabled", this.value == "" ? true : false);
       });
+      $("input[type=text]").keyup(function(){
+        $(this).parents("form").find(":submit.input-btn").prop("disabled", this.value == "" ? true : false);
+      });
     });
   }(jQuery));
 ', 'inline');

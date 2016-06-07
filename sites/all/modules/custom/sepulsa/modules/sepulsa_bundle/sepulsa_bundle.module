@@ -82,8 +82,10 @@ function sepulsa_bundle_form_commerce_cart_add_to_cart_form_alter(&$form, &$form
  * Implements hook_commerce_order_presave().
  */
 function sepulsa_bundle_commerce_order_presave($order) {
-  // Check order status: invoice.
-  if ($order->status == 'invoice') {
+  // Check order status: invoiced.
+  $original_status = isset($order->original->status) ? $order->original->status : NULL;
+  // Check order status: only if previous order status is not invoiced.
+  if ($order->status == 'invoiced' && $original_status != 'invoiced') {
     $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
     // Define line item bundling container.
     $bundling = NULL;
@@ -107,72 +109,81 @@ function sepulsa_bundle_commerce_order_presave($order) {
         $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
         // Get vouchers.
         $vouchers = $product_wrapper->field_bundling_voucher->value();
+        // Get voucher count.
+        $vouchers_counter = $product_wrapper->field_bundling_voucher_count->value();
         // Looping foreach vouchers.
-        foreach ($vouchers as $voucher) {
-          // Get voucher wrapper.
-          $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);
-          // Get voucher expired date.
-          $expiry = $voucher_wrapper->field_expiry_date->value();
-          // Get node id for voucher.
-          $query = new EntityFieldQuery();
-          $query->entityCondition('entity_type', 'node');
-          $query->fieldCondition('field_product', 'product_id', $voucher->product_id);
-          $result = $query->execute();
-          if (!empty($result)) {
-            $node = reset($result['node']);
-            // Node load coupon.
-            $node_coupon = node_load($node->nid);
-            // Check coupon type.
-            if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE])
-              && ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique'
-              || $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique')
-            ) {
-              $query = "SELECT nid FROM {node} a, {field_data_field_simple_coupon} b "
-                . "WHERE a.nid=b.entity_id AND uid = 1 AND type IN ('owned_unique_coupon', 'offline_owned_unique') AND field_simple_coupon_target_id=" . $node->nid;
-              $unique_nid = db_query_range($query, 0, 1)->fetchField();
-              if ($unique_nid != NULL) {
-                $node = node_load($unique_nid);
+        foreach ($vouchers as $key => $voucher) {
+          // Get default voucher 1.
+          $counter = 1;
+          $counter = isset($vouchers_counter[0]) && !empty($vouchers_counter[0]) ? $vouchers_counter[$key] : $counter;
+          $counter = isset($vouchers_counter[$key]) && !empty($vouchers_counter[$key]) ? $vouchers_counter[$key] : $counter;
+          $counter = intval($counter);
+          for ($i = $counter; $i > 0; $i--) {
+            // Get voucher wrapper.
+            $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);
+            // Get voucher expired date.
+            $expiry = $voucher_wrapper->field_expiry_date->value();
+            // Get node id for voucher.
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node');
+            $query->fieldCondition('field_product', 'product_id', $voucher->product_id);
+            $result = $query->execute();
+            if (!empty($result)) {
+              $node = reset($result['node']);
+              // Node load coupon.
+              $node_coupon = node_load($node->nid);
+              // Check coupon type.
+              if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE])
+                && ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique'
+                || $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique')
+              ) {
+                $query = "SELECT nid FROM {node} a, {field_data_field_simple_coupon} b "
+                  . "WHERE a.nid=b.entity_id AND uid = 1 AND type IN ('owned_unique_coupon', 'offline_owned_unique') AND field_simple_coupon_target_id=" . $node->nid;
+                $unique_nid = db_query_range($query, 0, 1)->fetchField();
+                if ($unique_nid != NULL) {
+                  $node = node_load($unique_nid);
+                  $node->language = LANGUAGE_NONE;
+                  $node->uid = $order->uid;
+                  $node->field_order_id[$node->language][0] = array(
+                    'value' => $order->order_id,
+                  );
+                  $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry;
+                  node_save($node);
+                }
+                else {
+                  // Can not assign voucher: notify CS.
+                  drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
+                    'order' => $order,
+                  ), variable_get('site_mail', 'admin@example.com'), TRUE);
+                }
+              }
+              else {
+                $node = new stdClass();
+                $node->title = $node_coupon->title;
+                if ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_simple') {
+                  $node->type = 'offline_owned_simple';
+                }
+                else {
+                  $node->type = 'owned_simple_coupon';
+                }
                 $node->language = LANGUAGE_NONE;
-                $node->uid = $order->uid;
-                $node->field_order_id[$node->language][0] = array(
-                  'value' => $order->order_id,
+                $node->field_simple_coupon[$node->language][] = array(
+                  'target_id' => $node_coupon->nid,
+                  'target_type' => 'node',
                 );
-                $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry;
+                $node->field_owned_coupon_expiry[$node->language][] = array(
+                  'value' => $expiry,
+                  'timezone' => date_default_timezone(),
+                  'timezone_db' => date_default_timezone(),
+                  'date_type' => 'datestamp',
+                );
+                $node->field_order_id[$node->language][] = array(
+                  'value' => $line_item->order_id,
+                );
+                $node->uid = $order->uid;
+                $node = node_submit($node);
                 node_save($node);
               }
-              else {
-                // Can not assign voucher: notify CS.
-                drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
-                  'order' => $order,
-                ), variable_get('site_mail', 'admin@example.com'), TRUE);
-              }
-            }
-            else {
-              $node = new stdClass();
-              $node->title = $node_coupon->title;
-              if ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_simple') {
-                $node->type = 'offline_owned_simple';
-              }
-              else {
-                $node->type = 'owned_simple_coupon';
-              }
-              $node->language = LANGUAGE_NONE;
-              $node->field_simple_coupon[$node->language][] = array(
-                'target_id' => $node_coupon->nid,
-                'target_type' => 'node',
-              );
-              $node->field_owned_coupon_expiry[$node->language][] = array(
-                'value' => $expiry,
-                'timezone' => date_default_timezone(),
-                'timezone_db' => date_default_timezone(),
-                'date_type' => 'datestamp',
-              );
-              $node->field_order_id[$node->language][] = array(
-                'value' => $line_item->order_id,
-              );
-              $node->uid = $order->uid;
-              $node = node_submit($node);
-              node_save($node);
             }
           }
         }

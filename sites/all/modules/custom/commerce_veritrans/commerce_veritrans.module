@@ -137,12 +137,30 @@ function commerce_veritrans_menu() {
  * Implements hook_cron().
  */
 function commerce_veritrans_cron() {
+  $conditions = array(
+    'event' => 'commerce_payment_methods',
+    'plugin' => 'reaction rule',
+    'active' => TRUE,
+    'owner' => 'rules',
+  );
+  $commerce_payment_methods = entity_load('rules_config', FALSE, $conditions);
+  $rule = array();
+  foreach ($commerce_payment_methods as $key) {
+    $payment = commerce_payment_method_instance_load('commerce_veritrans|' . $key->name);
+    if (!empty($payment['settings'])) {
+      $settings = $payment['settings'];
+      if ($settings['type'] == 'bank_transfer' && !empty($settings['bank_transfer']['bank'])) {
+        $rule[] = 'commerce_veritrans|' . $key->name;
+      }
+    }
+  }
+
   $queue = DrupalQueue::get('commerce_veritrans_query_update');
   $result = db_select('commerce_payment_transaction', 'co')->extend('PagerDefault');
   $result->fields('co');
   $result->condition('co.status', 'pending');
   $result->condition('co.payment_method', 'commerce_veritrans');
-  $result->condition('co.instance_id', 'commerce_veritrans|rules_permata_virtual_account');
+  $result->condition('co.instance_id', ($rule), 'in');
   $result->limit(15);
   $result->orderBy('co.transaction_id', 'DESC');
   $query = $result->execute();
@@ -233,7 +251,8 @@ function commerce_veritrans_tokens($type, $tokens, array $data = array(), array 
 /**
  * Function commerce_veritrans_run_query_update().
  *
- * @param object trans.
+ * @param object $trans
+ *   Object Transaction.
  */
 function commerce_veritrans_run_query_update($trans) {
   // Get object order.

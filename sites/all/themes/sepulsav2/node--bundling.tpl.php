@@ -7,7 +7,7 @@
  */
 
 // Get current theme path.
-$theme_path = drupal_get_path('theme',$GLOBALS['theme']);
+$theme_path = drupal_get_path('theme', $GLOBALS['theme']);
 
 // Include bundling css.
 drupal_add_css($theme_path . '/css/bundling.css');
@@ -20,6 +20,9 @@ drupal_add_js('
         $(this).parents("form").find(":submit.input-btn").prop("disabled", this.value == "" ? true : false);
       });
       $("input[type=text]").change(function(){
+        $(this).parents("form").find(":submit.input-btn").prop("disabled", this.value == "" ? true : false);
+      });
+      $("input[type=text]").keyup(function(){
         $(this).parents("form").find(":submit.input-btn").prop("disabled", this.value == "" ? true : false);
       });
     });
@@ -53,9 +56,11 @@ drupal_add_js('
                 $data = commerce_product_load($product['product_id']);
                 $description = field_view_field('commerce_product', $data, 'field_bundling_description', 'default');
                 $bundling_banner = field_view_field('commerce_product', $data, 'field_bundling_banner', 'default');
+
                 // Check status, expiry date, and stock.
                 if ($data->status && REQUEST_TIME <= $data->field_expiry_date[LANGUAGE_NONE][0]['value']
                   && $data->commerce_stock[LANGUAGE_NONE][0]['value'] > 0
+                  && sepulsa_bundle_voucher_stock_status($data)
                 ) :
                   $voucher = commerce_product_load($data->field_bundling_voucher[LANGUAGE_NONE][0]['target_id']);
                   // Get fresh data from content field_product.

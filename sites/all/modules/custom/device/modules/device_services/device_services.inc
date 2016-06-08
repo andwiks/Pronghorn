@@ -181,12 +181,18 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
         // Check device status: blocked.
         if (empty($check['device_status'])) {
           // Check mail verification status new_flag=0 (already merged).
-          $q_d_block = db_select('device', 'd');
-          $q_d_block->join('device_mail_verification', 'dmv', 'dmv.did = d.did');
-          $q_d_block->condition('d.did', $did);
-          $q_d_block->condition('d.status', 0);
-          $q_d_block->condition('dmv.new_flag', 0, '=');
-          $device_block = $q_d_block->execute()->fetchAssoc();
+          $q_device = db_select('device', 'd');
+          $q_device->join('device_verification', 'dv', 'd.did = dv.did');
+          $q_device->leftJoin('device_mail_verification', 'dmv', 'dv.did = dmv.did');
+          $q_device->condition('d.did', $did, '=');
+          $q_device->condition('d.status', 0, '=');
+          $q_device->condition('dmv.status', 1, '=');
+          $q_device->fields('d', array('did', 'imei','phone','status'));
+          $q_device->addField('dmv', 'mail');
+          $q_device->addField('dv', 'status', 'dv_status');
+          $q_device->addField('dmv', 'status', 'dmv_status');
+          $q_device->addField('dmv', 'new_flag', 'dmv_new_flag');
+          $device_block = $q_device->execute()->fetchAssoc();
           if (!empty($device_block)) {
             return services_error(t('Akses akun ini sudah dipindah untuk device lain.'), 401);
           }

@@ -9,6 +9,45 @@
  */
 function commerce_veritrans_default_rules_configuration() {
   $configs = array();
+
+  $conditions = array(
+    'event' => 'commerce_payment_methods',
+    'plugin' => 'reaction rule',
+    'active' => TRUE,
+    'owner' => 'rules',
+  );
+  $commerce_payment_methods = entity_load('rules_config', FALSE, $conditions);
+  $rules = array();
+  foreach ($commerce_payment_methods as $key) {
+    $payment = commerce_payment_method_instance_load('commerce_veritrans|' . $key->name);
+    if (!empty($payment['settings'])) {
+      $settings = $payment['settings'];
+      if ($settings['type'] == 'bank_transfer' && !empty($settings['bank_transfer']['bank'])) {
+        $rules[] = $key->name;
+      }
+    }
+  }
+
+  for ($i = 0, $total = count($rules); $i < $total; $i++) {
+    if (!empty($value)) {
+      $value = '"value" : { "' . $rules[$i] . '" : "' . $rules[$i] . '"';
+    }
+    else {
+      $value .= ' , "value" : { "' . $rules[$i] . '" : "' . $rules[$i] . '"';
+    }
+  }
+
+  $value_rules = '';
+
+  for ($i = 0, $total = count($rules); $i < $total; $i++) {
+    if (empty($value_rules)) {
+      $value_rules = '"' . $rules[$i] . '" : "' . $rules[$i] . '"';
+    }
+    else {
+      $value_rules .= ' , "' . $rules[$i] . '" : "' . $rules[$i] . '"';
+    }
+  }
+
   $rule = '{ "rules_permata_virtual_account_notification" : {
       "LABEL" : "Permata Virtual Account Notification",
       "PLUGIN" : "reaction rule",
@@ -19,7 +58,7 @@ function commerce_veritrans_default_rules_configuration() {
       "IF" : [
         { "sepulsa_campaign_method_instance_comparison" : {
             "commerce_order" : [ "commerce_order" ],
-            "instance_ids" : { "value" : { "rules_permata_virtual_account" : "rules_permata_virtual_account" } }
+            "instance_ids" : { "value" : { ' . $value_rules . ' } }
           }
         }
       ],

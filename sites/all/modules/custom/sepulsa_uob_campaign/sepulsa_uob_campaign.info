@@ -1,0 +1,8 @@
+name = "Sepulsa UOB Campaign"
+description = "Separate UOB webform alter"
+core = "7.x"
+
+dependencies[] = webform
+dependencies[] = views
+dependencies[] = webform_mysql_views
+dependencies[] = views_data_export

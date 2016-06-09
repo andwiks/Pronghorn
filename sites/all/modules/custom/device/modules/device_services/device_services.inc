@@ -543,7 +543,7 @@ function device_services_resource_mail($mail = '', $confirm = 0) {
     $rdevice = $qdevice->execute()->fetchAssoc();
 
     if (!empty($rdevice) && empty($confirm)) {
-      $msg = t('Email @email sudah terdaftar di device lain. Apakah Anda yakin ingin menggunakan email tersebut untuk device ini?',
+      $msg = t('Email @email sudah terdaftar di device lain. Untuk melakukan pemindahan akun hubungi customer sercive (info@sepulsa.com)',
         array('@email' => $mail)
       );
       return services_error($msg, 406);

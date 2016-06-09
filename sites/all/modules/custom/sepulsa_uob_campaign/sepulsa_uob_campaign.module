@@ -51,19 +51,13 @@ function sepulsa_uob_campaign_form_webform_client_form_alter(&$form, &$form_stat
   }
 }
 
-function sepulsa_uob_campaign_validation(&$form, &$form_state)
+function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
 {
   global $user;
   // $pattern_no_hp = '/^(\+62|0)[1-9]{9,11}$/';
-  $pattern_no_hp = '^08[0-9]{9,}$';
-
-  $telkomsel = "^(\\+62|\\+0|0|62)8(1[123]|52|53|21|22|23)[0-9]{5,9}$";
-  $simpati = "^(\\+62|\\+0|0|62)8(1[123]|2[12])[0-9]{5,9}$";
-  $as = "^(\\+62|\\+0|0|62)8(52|53|23)[0-9]{5,9}$";
-  $indosat = "^(\\+62815|0815|62815|\\+0815|\\+62816|0816|62816|\\+0816|\\+62858|0858|62858|\\+0814|\\+62814|0814|62814|\\+0814)[0-9]{5,9}$";
-  $im3  = "^(\\+62855|0855|62855|\\+0855|\\+62856|0856|62856|\\+0856|\\+62857|0857|62857|\\+0857)[0-9]{5,9}$";
-  $xl = "^(\\+62817|0817|62817|\\+0817|\\+62818|0818|62818|\\+0818|\\+62819|0819|62819|\\+0819|\\+62859|0859|62859|\\+0859|\\+0878|\\+62878|0878|62878|\\+0877|\\+62877|0877|62877)[0-9]{5,9}$";
-
+  $pattern_no_hp = "/^08[0-9]{9,}$/";
+  $pattern_no_ktp = "/^\d{16}$/";
+  $pattern_kodepos = "/^\d{5}$/";
 
   $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
   $no_hp = $form_state['input']['submitted']['no_hp'];
@@ -84,34 +78,52 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state)
   if (empty($nama_lengkap)) {
     form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
   }
-  if (empty($no_hp) && !preg_match($pattern_no_hp, $no_hp)) {
+  if (empty($no_hp) ) {
     form_set_error('no_hp', t('No HP harus angka yang diawali 08 minimal 11 digit'));
   }
-  if (empty($kode_pos)) {
+  if(empty(preg_match($pattern_no_hp, $no_hp))){
+    form_set_error('no_hp', t('No HP harus angka yang diawali 08 minimal 11 digit'));
+  }
+  if (empty($kode_pos) ) {
     form_set_error('kode_pos', t('Kode pos harus diisi'));
+  }
+  if( empty(preg_match($pattern_kodepos, $kode_pos)) ){
+    form_set_error('kode_pos', t('Kode pos harus 5 digit angka'));
   }
   if (empty($kota)) {
     form_set_error('kota', t('Kota harus diisi'));
   }
 
   if (empty($alamat_email) && !valid_email_address($alamat_email) ) {
-    form_set_error('alamat_email', t('Alamat email harus diisi'));
+    form_set_error('alamat_email', t('Isilah alamat email yang valid'));
   }
   if (empty($jenis_kelamin)) {
     form_set_error('jenis_kelamin', t('Pilih jenis kelamin'));
   }
-  if (empty($day_lahir) || empty($month_lahir) || empty($year_lahir) ) {
-    form_set_error('tanggal_lahir', t('Tanggal lahir harus diisi'));
+
+  if(empty($year_lahir)){
+    form_set_error('tanggal_lahir[year]', t('Tahun pada tanggal lahir harus diisi'));
   }
-  if (empty($no_ktp)) {
-    form_set_error('no_ktp', t('No KTP harus diisi'));
+  if(empty($month_lahir)){
+    form_set_error('tanggal_lahir[month]', t('Bulan pada tanggal lahir harus diisi'));
+  }
+  if(empty($day_lahir)){
+    form_set_error('tanggal_lahir[day]', t('Hari pada tanggal lahir harus diisi'));
+  }
+  if (empty($no_ktp) ) {
+    form_set_error('no_ktp', t('Nomor KTP harus diisi'));
+  }
+  if(empty(preg_match($pattern_no_ktp, $no_ktp))){
+    form_set_error('no_ktp', t('Nomor KTP harus 16 digit angka'));
   }
   if (empty($term_agree)) {
     form_set_error('term_agree agree', t('Terms & Conditions harus disetujui'));
   }
-
 }
 
+function sepulsa_uob_campaign_message_alter(&$message){
+  dpm($message);
+}
 
 function sepulsa_uob_campaign_preprocess_page(&$vars, $hook) {
 

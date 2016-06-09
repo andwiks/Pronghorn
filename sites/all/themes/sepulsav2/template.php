@@ -618,6 +618,12 @@ function sepulsav2_preprocess_page(&$variables, $hook) {
       $variables['active_tab'] = 'topup';
     }
   }
+  // UOB Webform.
+  if (isset($variables['node']->uuid)
+    && $variables['node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943'
+  ) {
+-    $variables['theme_hook_suggestions'][] = 'page__node__' . str_replace('-', '_', $variables['node']->uuid);
+  }
 }
 
 /**

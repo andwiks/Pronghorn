@@ -398,28 +398,19 @@ function apps_services_v2_transaction_home_list($size, $favorite_only, $source){
   $order_container = apps_services_v2_transaction_change_format_order($order_container,"home");
 
   if(count($order_container)){
-    $return["status"] = true;
-    $return["message"] = "Order list halaman home pengguna";
-    $return["data"] = $order_container;
+    $return['status'] = TRUE;
+    $return['message'] = t('Order list halaman home pengguna');
+    $return['data'] = $order_container;
   }
-  else{
-    $return["status"] = false;
-    $return["message"] = null;
-    $return["data"] = null;
+  else {
+    $return['status'] = FALSE;
+    $return['message'] = NULL;
+    $return['data'] = NULL;
   }
-
-  //check if needed to include email request
-  //temporary disable email request api, since not used
-  /*$return["request_email"] = "";
-  if(isset($user->mail) && !empty($user->mail)){
-    $mail = explode("@", $user->mail);
-    if (isset($mail[1]) && !empty($mail[1]) && strpos($mail[1], '.dummy') !== false) {
-      $return["request_email"] = "Masukan email anda<br />untuk mendapatkan info-info dan fitur-fitur menarik";
-    }
-  }*/
 
   //get credit balance
-  $return["credit_balance"] = userpoints_get_current_points($uid, 'all');
+  $return['credit_balance'] = userpoints_get_current_points($uid, 'all');
+  $return['device'] = device_verification_status($uid);
 
   return $return;
 }

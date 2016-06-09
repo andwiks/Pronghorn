@@ -11,23 +11,58 @@
  */
 function sepulsa_services_views_services_views_execute_view_alter(&$output, $view) {
   global $user;
-  $uid = $user->uid;
 
-  if ($view->name == 'user_offline_owned_coupon' && $view->current_display == 'user_offline_owned_coupon') {
-    $paged_output = array(
-      'results' => $output,
-      'uid' => $uid,
-      'device' => device_verification_status($uid),
-    );
+  // Check from air service.
+  $request_path = request_path();
+  $air = (strpos($request_path, 'air') !== FALSE) ? TRUE : FALSE;
+
+  // Views: user_offline_owned_coupon.
+  if (isset($view->name) && isset($view->current_display)
+    && $view->name == 'user_offline_owned_coupon'
+    && $view->current_display == 'user_offline_owned_coupon'
+  ) {
+    // Only for air service.
+    if ($air) {
+      // Check whether output is empty: return NULL.
+      $output = empty($output) ? NULL : $output;
+      $paged_output = array(
+        'data' => $output,
+        'message' => NULL,
+        'status' => TRUE,
+        'device' => device_verification_status($user->uid),
+      );
+    }
     $output = $paged_output;
   }
 
-  if ($view->name == 'user_owned_coupon' && $view->current_display == 'user_owned_coupon') {
-    $paged_output = array(
-      'results' => $output,
-      'uid' => $uid,
-      'device' => device_verification_status($uid),
-    );
+  // Views: user_owned_coupon.
+  if (isset($view->name) && isset($view->current_display)
+    && $view->name == 'user_owned_coupon'
+    && $view->current_display == 'user_owned_coupon'
+  ) {
+    // Only for air service.
+    if ($air) {
+      $data = array();
+      $data[] = (object) [];
+      // Looping foreach output.
+      foreach ($output as $k => $row) {
+        $data[$k]->nid = $row->nid;
+        $data[$k]->title = $row->title;
+        $data[$k]->image = $row->image;
+        $data[$k]->expired = $row->expired;
+        $data[$k]->code = empty($row->code) ? NULL : $row->code;
+        $data[$k]->detail = $row->detail;
+        $data[$k]->node_field_data_field_simple_coupon_nid = $row->node_field_data_field_simple_coupon_nid;
+        $data[$k]->field_coupon_tnc = $row->field_coupon_tnc;
+      }
+      $data = empty($data) ? NULL : $data;
+      $paged_output = array(
+        'data' => $data,
+        'message' => NULL,
+        'status' => TRUE,
+        'device' => device_verification_status($user->uid),
+      );
+    }
     $output = $paged_output;
   }
 }

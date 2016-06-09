@@ -187,7 +187,7 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           $q_device->condition('d.did', $did, '=');
           $q_device->condition('d.status', 0, '=');
           $q_device->condition('dmv.status', 1, '=');
-          $q_device->fields('d', array('uid','did', 'imei','phone','status'));
+          $q_device->fields('d', array('uid', 'did', 'imei', 'phone', 'status'));
           $q_device->addField('dmv', 'mail');
           $q_device->addField('dv', 'status', 'dv_status');
           $q_device->addField('dmv', 'status', 'dmv_status');
@@ -195,29 +195,30 @@ function device_services_resource_request($imei = '', $phone = '', $agent = '') 
           $device_block = $q_device->execute()->fetchAssoc();
 
           $device_user = user_load($device_block['uid']);
-
-          if(empty($device_user) && !empty($device_block)){
+          // Device user not found: but there is device blocked.
+          if (empty($device_user) && !empty($device_block)) {
             return [
-              'message' => 'Device diblok tidak merge ke user, Silahkan hubungi Customer Service',
-              'data' => null,
-              'status' => false
-           ];
-          }
-          if(!empty($device_user) && strpos($device_user->mail, '.merged')!==FALSE ){
-            return [
-              'message' => 'Device diblok, Akses akun ini sudah dipindah untuk device lain. Silahkan hubungi Customer Service.',
-              'data' => null,
-              'status' => false
-           ];
-          }
-          if(!empty($device_block)){
-            return [
-              'message' => 'Device ini diblock, Silahkan hubungi Customer Service.',
-              'data' => null,
-              'status' => false
+              'message' => t('Device diblok tidak merge ke user, Silahkan hubungi Customer Service'),
+              'data' => NULL,
+              'status' => FALSE,
             ];
           }
-
+          // Device user is available, already merged.
+          if (!empty($device_user) && strpos($device_user->mail, '.merged') !== FALSE) {
+            return [
+              'message' => t('Device diblok, Akses akun ini sudah dipindah untuk device lain. Silahkan hubungi Customer Service.'),
+              'data' => NULL,
+              'status' => FALSE,
+            ];
+          }
+          // Device user blocked.
+          if (!empty($device_block)) {
+            return [
+              'message' => t('Device ini diblock, Silahkan hubungi Customer Service.'),
+              'data' => NULL,
+              'status' => FALSE,
+            ];
+          }
         }
 
         // Check device verication: unconfirmed or new.

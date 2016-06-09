@@ -289,7 +289,7 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
       $mail = _user_mail_notify('password_reset', $device_user);
     }
 
-    if ($strategi = 2) {
+    if ($strategi == 2) {
       // Update UID in commerce_order.
       device_mail_verification_transfer_order($web_uid, $device_uid);
     }

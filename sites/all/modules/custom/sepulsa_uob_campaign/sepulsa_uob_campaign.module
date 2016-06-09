@@ -58,6 +58,7 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
   $pattern_no_hp = "/^08[0-9]{9,}$/";
   $pattern_no_ktp = "/^\d{16}$/";
   $pattern_kodepos = "/^\d{5}$/";
+  $pattern_nama = "/^[a-zA-Z .\-]+$/i";
 
   $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
   $no_hp = $form_state['input']['submitted']['no_hp'];
@@ -77,6 +78,9 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
 
   if (empty($nama_lengkap)) {
     form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
+  }
+  if (empty(preg_match($pattern_nama,$nama_lengkap))) {
+    form_set_error('nama_lengkap', t('Nama lengkap harus diisi dengan huruf saja'));
   }
   if (empty($no_hp) ) {
     form_set_error('no_hp', t('No HP harus angka yang diawali 08 minimal 11 digit'));

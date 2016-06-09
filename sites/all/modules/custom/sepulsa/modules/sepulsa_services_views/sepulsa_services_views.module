@@ -35,6 +35,7 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
     $output = $paged_output;
   }
 
+
   // Views: user_owned_coupon.
   if (isset($view->name) && isset($view->current_display)
     && $view->name == 'user_owned_coupon'
@@ -55,6 +56,7 @@ function sepulsa_services_views_services_views_execute_view_alter(&$output, $vie
         $data[$k]->node_field_data_field_simple_coupon_nid = $row->node_field_data_field_simple_coupon_nid;
         $data[$k]->field_coupon_tnc = $row->field_coupon_tnc;
       }
+
       $data = empty($data) ? NULL : $data;
       $paged_output = array(
         'data' => $data,

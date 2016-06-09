@@ -1,0 +1,329 @@
+<?php
+/**
+ * @file
+ * sepulsa_bundle.module
+ *
+ * @author andreas@sepulsa.com
+ */
+
+/**
+ * Hook Implementations.
+ */
+
+/**
+ * Implements hook_node_view().
+ */
+function sepulsa_bundle_node_view($node, $view_mode, $langcode) {
+  // Only for bundling type.
+  if ($node->type == 'bundling') {
+    // Get node alias.
+    $alias = drupal_get_path_alias('node/' . $node->nid);
+    // Set get destination: in case there is redirection.
+    $_GET['destination'] = $alias;
+    // Check for multi product in the order.
+    sepulsa_check_multi();
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function sepulsa_bundle_preprocess_page(&$variables) {
+  if (isset($variables['node']->type)
+    && $variables['node']->type == 'bundling'
+  ) {
+    $variables['show_messages'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function sepulsa_bundle_preprocess_node(&$variables) {
+  if (isset($variables['type']) && $variables['type'] == 'bundling') {
+    $output = '';
+    $drupal_messages = drupal_get_messages();
+    foreach ($drupal_messages as $type => $messages) {
+      if (count($messages) > 1) {
+        foreach ($messages as $message) {
+          $output .= $message . "<br />\n";
+        }
+      }
+      else {
+        $output .= reset($messages);
+      }
+    }
+    $variables['messages'] = $output;
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function sepulsa_bundle_form_commerce_cart_add_to_cart_form_alter(&$form, &$form_state, $form_id) {
+  if (isset($form['line_item_fields']['#entity']->type)
+    && $form['line_item_fields']['#entity']->type == 'bundling'
+  ) {
+    // Add validate and submit functions.
+    $form['#validate'][] = 'sepulsa_bundle_form_validate';
+    $form['#submit'][] = 'sepulsa_bundle_form_submit';
+    // Change the view a little bit.
+    $form['product_id']['#attributes']['class'][] = 'hidden';
+    $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#size'] = 16;
+    $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#title_display'] = 'invisible';
+    $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['class'][] = 'input-box';
+    $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#attributes']['placeholder'] = t('Masukkan No.Telepon Anda');
+    $form['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#default_value'] = '';
+    $form['submit']['#attributes']['class'][] = 'input-btn';
+  }
+}
+
+/**
+ * Implements hook_commerce_order_presave().
+ */
+function sepulsa_bundle_commerce_order_presave($order) {
+  // Check order status: invoiced.
+  $original_status = isset($order->original->status) ? $order->original->status : NULL;
+  // Check order status: only if previous order status is not invoiced.
+  if ($order->status == 'invoiced' && $original_status != 'invoiced') {
+    $order_wrapper = entity_metadata_wrapper('commerce_order', $order);
+    // Define line item bundling container.
+    $bundling = NULL;
+    // Get order line items.
+    $order_line_items = $order_wrapper->commerce_line_items->value();
+    // Looping for each line items.
+    foreach ($order_line_items as $line_item) {
+      if ($line_item->type == 'bundling') {
+        $bundling = $line_item;
+        break;
+      }
+    }
+    // Check if there is bundling.
+    if (!empty($bundling)) {
+      try {
+        // Get line item wrapper.
+        $line_item_wrapper = entity_metadata_wrapper('commerce_line_item', $bundling);
+        // Get product.
+        $product = $line_item_wrapper->commerce_product->value();
+        // Get product wrapper.
+        $product_wrapper = entity_metadata_wrapper('commerce_product', $product);
+        // Get vouchers.
+        $vouchers = $product_wrapper->field_bundling_voucher->value();
+        // Get voucher count.
+        $vouchers_counter = $product_wrapper->field_bundling_voucher_count->value();
+        // Looping foreach vouchers.
+        foreach ($vouchers as $key => $voucher) {
+          // Get default voucher 1.
+          $counter = 1;
+          $counter = isset($vouchers_counter[0]) && !empty($vouchers_counter[0]) ? $vouchers_counter[$key] : $counter;
+          $counter = isset($vouchers_counter[$key]) && !empty($vouchers_counter[$key]) ? $vouchers_counter[$key] : $counter;
+          $counter = intval($counter);
+          for ($i = $counter; $i > 0; $i--) {
+            // Get voucher wrapper.
+            $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);
+            // Get voucher expired date.
+            $expiry = $voucher_wrapper->field_expiry_date->value();
+            // Get node id for voucher.
+            $query = new EntityFieldQuery();
+            $query->entityCondition('entity_type', 'node');
+            $query->fieldCondition('field_product', 'product_id', $voucher->product_id);
+            $result = $query->execute();
+            if (!empty($result)) {
+              $node = reset($result['node']);
+              // Node load coupon.
+              $node_coupon = node_load($node->nid);
+              // Check coupon type.
+              if (isset($node_coupon->field_coupon_type[LANGUAGE_NONE])
+                && ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'unique'
+                || $node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_unique')
+              ) {
+                $query = "SELECT nid FROM {node} a, {field_data_field_simple_coupon} b "
+                  . "WHERE a.nid=b.entity_id AND uid = 1 AND type IN ('owned_unique_coupon', 'offline_owned_unique') AND field_simple_coupon_target_id=" . $node->nid;
+                $unique_nid = db_query_range($query, 0, 1)->fetchField();
+                if ($unique_nid != NULL) {
+                  $node = node_load($unique_nid);
+                  $node->language = LANGUAGE_NONE;
+                  $node->uid = $order->uid;
+                  $node->field_order_id[$node->language][0] = array(
+                    'value' => $order->order_id,
+                  );
+                  $node->field_owned_coupon_expiry[$node->language][0]['value'] = $expiry;
+                  node_save($node);
+                }
+                else {
+                  // Can not assign voucher: notify CS.
+                  drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
+                    'order' => $order,
+                  ), variable_get('site_mail', 'admin@example.com'), TRUE);
+                }
+              }
+              else {
+                $node = new stdClass();
+                $node->title = $node_coupon->title;
+                if ($node_coupon->field_coupon_type[LANGUAGE_NONE][0]['value'] == 'offline_simple') {
+                  $node->type = 'offline_owned_simple';
+                }
+                else {
+                  $node->type = 'owned_simple_coupon';
+                }
+                $node->language = LANGUAGE_NONE;
+                $node->field_simple_coupon[$node->language][] = array(
+                  'target_id' => $node_coupon->nid,
+                  'target_type' => 'node',
+                );
+                $node->field_owned_coupon_expiry[$node->language][] = array(
+                  'value' => $expiry,
+                  'timezone' => date_default_timezone(),
+                  'timezone_db' => date_default_timezone(),
+                  'date_type' => 'datestamp',
+                );
+                $node->field_order_id[$node->language][] = array(
+                  'value' => $line_item->order_id,
+                );
+                $node->uid = $order->uid;
+                $node = node_submit($node);
+                node_save($node);
+              }
+            }
+          }
+        }
+      }
+      catch (EntityMetadataWrapperException $exc) {
+        // Can not assign voucher: notify CS.
+        drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
+          'order' => $order,
+        ), variable_get('site_mail', 'admin@example.com'), TRUE);
+        // Log this.
+        watchdog('sepulsa_bundle', 'Bundle Assign Voucher EntityMetadataWrapper exception in %function() @trace', array(
+          '%function' => __FUNCTION__,
+          '@trace' => $exc->getTraceAsString(),
+        ), WATCHDOG_ERROR, 'Invoice Order ' . $order->order_id);
+      }
+    }
+  }
+}
+
+/**
+ * Callback Functions.
+ */
+
+/**
+ * Function sepulsa_bundle_form_validate().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function sepulsa_bundle_form_validate(&$form, &$form_state) {
+  // Valid prefix flag.
+  $valid = FALSE;
+  $operator_name = '';
+  $product_title = '';
+  // Redirect to node alias if form error.
+  $form_state['redirect'] = drupal_get_path_alias($form['line_item_fields']['#entity']->data['context']['display_path']);
+
+  // Get product id.
+  if (isset($form_state['values']['product_id']) && !empty($form_state['values']['product_id'])) {
+    // Set as integer value.
+    $form_state['values']['product_id'] = intval($form_state['values']['product_id']);
+    // Get product wrapper.
+    $product_wrapper = entity_metadata_wrapper('commerce_product', $form_state['values']['product_id']);
+    // Get product title.
+    $product_title = $product_wrapper->title->value();
+    // Get operator data.
+    $operator = $product_wrapper->field_operator->value();
+    // Set operator name.
+    $operator_name = $operator->name;
+    // Operator wrapper.
+    $operator_wrapper = entity_metadata_wrapper('taxonomy_term', $operator);
+    // Get operator prefix.
+    $prefixes = $operator_wrapper->field_operator_prefix->value();
+    // Validate field phone number based on field operator.
+    foreach ($prefixes as $prefix) {
+      if (preg_match('#^' . $prefix . '#', $form_state['values']['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value'])) {
+        $valid = TRUE;
+        break;
+      }
+    }
+  }
+
+  // Check for valid flag.
+  if (!$valid || !preg_match('#^\d{8,14}$#', $form_state['values']['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value'])) {
+    // Set form error: only if not empty.
+    if (!empty($form_state['values']['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value'])) {
+      if (!empty($operator_name) && !empty($product_title)) {
+        form_set_error('product_id][' . $form_state['values']['product_id'], t('Invalid phone number for product @ptitle, need phone number with operator @opname.', array(
+          '@ptitle' => $product_title,
+          '@opname' => $operator_name,
+        )));
+      }
+      else {
+        form_set_error('product_id][' . $form_state['values']['product_id'], t('Invalid phone number.'));
+      }
+    }
+    // Emptying previous input.
+    $form_state['build_info']['args'][0]->field_phone_number[LANGUAGE_NONE][0]['value'] = '';
+    $form_state['complete form']['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value']['#value'] = '';
+    // Save data.
+    $form['error_data'] = array(
+      '#type' => 'value',
+      '#value' => array(
+        'product_id' => $form_state['values']['product_id'],
+        'field_phone_number' => $form_state['values']['line_item_fields']['field_phone_number'][LANGUAGE_NONE][0]['value'],
+      ),
+    );
+  }
+}
+
+/**
+ * Function sepulsa_bundle_form_submit().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ */
+function sepulsa_bundle_form_submit($form, &$form_state) {
+  // Redirect to coupon page if success.
+  $form_state['redirect'] = 'coupon';
+}
+
+/**
+ * Public Functions.
+ */
+
+/**
+ * Function sepulsa_bundle_voucher_stock_status().
+ *
+ * @param object $bundle
+ *   Bundle commerce product object.
+ *
+ * @return bool
+ *   TRUE is OK. FALSE: one of voucher stock is empty.
+ */
+function sepulsa_bundle_voucher_stock_status($bundle) {
+  // Check for valid bundle commerce project object.
+  if (is_object($bundle) && !empty($bundle)) {
+    try {
+      $data_wrapper = entity_metadata_wrapper('commerce_product', $bundle);
+      $vouchers = $data_wrapper->field_bundling_voucher->value();
+      foreach ($vouchers as $voucher) {
+        $voucher_wrapper = entity_metadata_wrapper('commerce_product', $voucher);
+        $stock = (float) $voucher_wrapper->commerce_stock->value();
+        if ($stock < 1.00) {
+          return FALSE;
+        }
+      }
+    }
+    catch (EntityMetadataWrapperException $exc) {
+      // Log this error.
+      watchdog('sepulsa_bundle', 'EntityMetadataWrapper exception in %function() @trace', array(
+        '%function' => __FUNCTION__,
+        '@trace' => $exc->getTraceAsString(),
+      ), WATCHDOG_ERROR, request_uri());
+    }
+  }
+  // Other condition: TRUE => stock status is fine.
+  return TRUE;
+}

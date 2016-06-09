@@ -90,13 +90,23 @@ function sepulsa_referral_campaign_load_by_name($name) {
 /**
  * Funtion sepulsa_referral_campaign_getlist().
  */
-function sepulsa_referral_campaign_getlist($active = FALSE) {
+function sepulsa_referral_campaign_getlist($active = NULL) {
   $list = array();
   $query = db_select('sepulsa_referral_campaign', 'src');
   $query->fields('src');
-  if ($active) {
-    $query->condition('src.start', REQUEST_TIME, '<=');
-    $query->condition('src.end', REQUEST_TIME, '>=');
+  if (!is_null($active)) {
+    if ($active == 'active' || $active == 'nonactive') {
+      if ($active == 'active') {
+        $query->condition('src.start', REQUEST_TIME, '<=');
+        $query->condition('src.end', REQUEST_TIME, '>=');
+      }
+      else {
+        $query->condition('src.end', REQUEST_TIME, '<=');
+      }
+    }
+    else {
+      return 'invalid';
+    }
   }
   $result = $query->execute();
   foreach ($result as $key => $value) {
@@ -313,57 +323,78 @@ function sepulsa_referral_campaign_commerce_order_presave($order) {
   $details = array();
   if ($order->status == 'invoiced') {
     $benefit = FALSE;
-    $referral_details = db_select('referral_campaign_details', 'rcd');
-    $referral_details->join('sepulsa_referral_campaign', 'src', 'src.src_id = rcd.src_id');
-    $referral_details->fields('rcd', array('ref_id', 'uid', 'referral_uid'));
-    $referral_details->fields('src', array('rules_name',
-      'rules_name_referral',
-      'flag_first_order',
-    ));
-    $referral_details->condition('rcd.uid', $order->uid, '=');
-    $referral_details->condition('rcd.flag', 0, '=');
-    $referral_details->condition('src.start', REQUEST_TIME, '<=');
-    $referral_details->condition('src.end', REQUEST_TIME, '>=');
-    $result_ref = $referral_details->execute();
-    foreach ($result_ref as $result) {
-      $details = $result;
+    // Check active campaign.
+    $referral_campaign = db_select('sepulsa_referral_campaign', 'src');
+    $referral_campaign->fields('src');
+    $referral_campaign->condition('src.start', REQUEST_TIME, '<=');
+    $referral_campaign->condition('src.end', REQUEST_TIME, '>=');
+    $result_src = $referral_campaign->execute();
+    foreach ($result_src as $result) {
+      $details_src = $result;
     }
-    if (!empty($details)) {
-      // Check whether this campaign fire when first order.
-      if ($details->flag_first_order == 1) {
-        $first_order = db_select('commerce_order', 'co')
-              ->fields('co')
-              ->condition('uid', $order->uid, '=')
-              ->condition('order_id', $order->order_id, '<>')
-              ->execute();
-        // Check first order.
-        if ($first_order->rowCount() == 0) {
-          // Change benefit value.
+    if (!empty($details_src)) {
+      $referral_details = db_select('referral_campaign_details', 'rcd');
+      $referral_details->fields('rcd');
+      $referral_details->condition('rcd.uid', $order->uid, '=');
+      $referral_details->condition('rcd.src_id', $details_src->src_id, '=');
+      // Check flag_first_order.
+      // If flag_first_order = 2 (Benefit in every transaction).
+      // No need to add conditions.
+      if ($details_src->flag_first_order != 2) {
+        $referral_details->condition('rcd.flag', 0, '=');
+      }
+      $result_ref = $referral_details->execute();
+      foreach ($result_ref as $result) {
+        $details = $result;
+      }
+      if (!empty($details)) {
+        if ($details_src->flag_first_order == 0) {
+          // First Order Ever.
+          $first_order = db_select('commerce_order', 'co')
+                ->fields('co')
+                ->condition('uid', $order->uid, '=')
+                ->condition('order_id', $order->order_id, '<>')
+                ->execute();
+          // Check first order.
+          if ($first_order->rowCount() == 0) {
+            // Change benefit value.
+            $benefit = TRUE;
+          }
+        }
+        else {
+          // First Transaction in every campaign. flag_first_order = 1.
+          // Every Transaction. flag_first_order = 2.
           $benefit = TRUE;
         }
-      }
-      else {
-        // Change benefit value.
-        $benefit = TRUE;
-      }
-      // Check benefit.
-      if ($benefit) {
-        $account_uid = user_load($details->uid);
-        $account_referral_uid = user_load($details->referral_uid);
 
-        // Invoke rules.
-        rules_invoke_component($details->rules_name, $account_uid);
-        rules_invoke_component($details->rules_name_referral, $account_referral_uid);
+        // Check benefit.
+        if ($benefit) {
+          $account_uid = user_load($details->uid);
+          $account_referral_uid = user_load($details->referral_uid);
 
-        // Change Flag in details.
-        db_update('referral_campaign_details')
-                ->fields(array('flag' => 1, 'flag_timestamp' => REQUEST_TIME))
-                ->condition('ref_id', $details->ref_id, '=')
-                ->execute();
-        watchdog('sepulsa_referral_campaign',
-          'Update flag referral_campaign_details ref_id : @ref_id, flag : 1, flag_timestamp : @time',
-          array('@ref_id' => $details->ref_id, '@time' => REQUEST_TIME), WATCHDOG_NOTICE,
-          'update');
+          // Invoke rules.
+          rules_invoke_component($details->rules_name, $account_uid);
+          rules_invoke_component($details->rules_name_referral, $account_referral_uid);
+
+          // Change Flag in details and count benefit.
+          db_update('referral_campaign_details')
+                  ->fields(array(
+                    'flag' => 1,
+                    'flag_timestamp' => REQUEST_TIME,
+                    'count_benefit' => $details->count_benefit + 1,
+                  ))
+                  ->condition('ref_id', $details->ref_id, '=')
+                  ->execute();
+          watchdog('sepulsa_referral_campaign',
+            'Update flag referral_campaign_details ref_id : @ref_id, flag : 1, count_benefit : @count_benefit,flag_timestamp : @time',
+            array(
+              '@ref_id' => $details->ref_id,
+              '@time' => REQUEST_TIME,
+              '@count_benefit' => $details->count_benefit + 1,
+            ),
+            WATCHDOG_NOTICE,
+            'update');
+        }
       }
     }
   }

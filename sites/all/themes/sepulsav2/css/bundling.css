@@ -1,0 +1,182 @@
+.font-bold
+{
+	font-weight: 800 !important;
+	font-family: 'robotomedium';
+}
+
+section.std_content .other h2
+{
+	display:none;
+}
+
+/* ini harap di take-out saja */
+.product-bundling .custom-alert
+{
+	padding:15px;
+	background: red;
+	color: #fff;
+	text-align:center;
+}
+
+.product-bundling
+{
+	background:#eeeeee;
+	padding:25px 0 45px 0;
+}
+
+.product-bundling-area
+{
+	margin:5px;	
+	text-align:center;
+}
+
+.product-bundling-title
+{
+	margin:5px 0 0 0;
+	text-align:center;
+}
+
+.product-bundling-title h1
+{
+    font-family: "robotoregular";
+   	font-size: 46px;
+   	line-height: 1.2;
+}
+
+.product-bundling-title p
+{
+   	font-size: 22px;
+}
+
+.product-bundling-title img
+{
+	height: 130px;
+	margin-bottom: -15px;
+}
+
+.product-bundling-box
+{
+	background: #fff;
+
+	padding:15px 25px;
+	margin:5px 28px;
+	margin-top:0;
+
+	text-align:center;
+
+    /*
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    */
+
+    -webkit-box-shadow: 3px 3px 3px 3px rgba(205,205,205,0.5);
+    -moz-box-shadow: 3px 3px 3px 3px rgba(205,205,205,0.5);
+    box-shadow: 3px 3px 3px 3px rgba(205,205,205,0.5);
+}
+
+.product-bundling-box p {
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
+    min-height: 60px;
+}
+
+.product-bundling-box .input-box
+{
+	width:100%;
+    border: none;
+    border-bottom: 1px solid #070000;
+    margin-bottom:10px;
+       padding: 10px 0;
+       text-align: center;
+}
+
+.product-bundling-box .commerce-add-to-cart .input-btn
+{    
+    background: #E12830;
+    color: #fff;
+    text-align: center;
+
+    margin-bottom: 10px;
+
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    -ms-border-radius: 10px;
+    -o-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.product-bundling-box .input-btn.disabled, 
+.product-bundling-box .input-btn[disabled], 
+.product-bundling-box input[type=submit][disabled=disabled], 
+.product-bundling-box button[disabled=disabled]
+{    
+       background: #b7b7b8 !important;
+    color: #666 !important;
+}
+
+.product-bundling-box ul li, .product-bundling-box ol li 
+{
+	text-align:left;
+}
+
+.product-bundling-tnc
+{
+	margin-top:35px;
+}
+
+section.std_content .wrapper_2
+{
+	width:100% !important;
+}
+
+section.std_content .header img
+{
+	width:100%;
+}
+
+/* responsive 320.css */
+@media screen and (min-width:0px) and (max-width:479px) {
+	.product-bundling-title h1
+	{
+	    font-family: "robotoregular";
+    	font-size: 32px;
+	}
+
+	.product-bundling-box
+	{
+		padding: 15px 25px;
+		margin:0 30px;
+	}
+}
+
+/* responsive 480.css */
+@media screen and (min-width:480px) and (max-width:767px) {
+	.product-bundling-title h1
+	{
+	    font-family: "robotoregular";
+    	font-size: 28px;
+	}
+
+	.product-bundling-box
+	{
+		padding: 15px 25px;
+	}
+}
+
+/* responsive 768.css */
+@media screen and (min-width:0px) and (max-width:1170px) {
+	.product-bundling-title h1
+	{
+	    font-family: "robotoregular";
+    	font-size: 32px;
+	}
+
+	.product-bundling-box
+	{
+		padding: 15px 25px;
+	}
+}

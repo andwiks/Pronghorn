@@ -22,7 +22,11 @@ $(document).ready(function () {
     $(".promo_banner .slider").bxSlider({
         auto: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
         mode: 'fade',
-        pager: ($(".promo_banner .slider > .slide").length > 1) ? true: false,
+        pager: false,
+        pause: 7000,
+        default: 4000,
+        autoHover: true,
+        tickerHover: true,
         controls : ($(".promo_banner .slider > .slide").length > 1) ? true: false
     });// carousel voucher vendor
 
@@ -89,12 +93,14 @@ $(document).ready(function () {
         $("#shopping-cart").fadeOut();
     });
 
-    if(webform_UOB_campaign!=null && anonym==1){
-        openPop(".wrap_popup#login");
-        $('#login .box_popup .close').hide();
+    if (typeof webform_UOB_campaign !== 'undefined' && typeof anonym !== 'undefined') {
+        if(anonym===1){
+            openPop(".wrap_popup#login");
+            $('#login .box_popup .close').hide();
 
-        $('#login #user-login-form a[href="/user/password"]').attr("href", forgot_destination);
-        $('#login a[href="/user/register"]').attr("href", register_destination);
+            $('#login #user-login-form a[href="/user/password"]').attr("href", forgot_destination);
+            $('#login a[href="/user/register"]').attr("href", register_destination);
+        }
 
     }
 

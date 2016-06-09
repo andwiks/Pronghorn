@@ -158,7 +158,9 @@ function pln_prepaid_add_to_cart_form_validate(&$form, &$form_state) {
       }
     }
     else {
-      form_set_error('inquiry', 'Please retry');
+      form_set_error('inquiry', t('Please retry', array(), array(
+        'context' => 'pln_prepaid',
+      )));
     }
   }
 }

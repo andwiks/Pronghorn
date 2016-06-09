@@ -33,65 +33,7 @@ function sepulsa_autocomplete($type, $string = '') {
  * Function sepulsa_front_page().
  */
 function sepulsa_front_page() {
-  // Get sepulsa settings.
-  $settings = variable_get('sepulsa_settings', array());
-  // Check if multipaid is disabled.
-  if (!(isset($settings['multipaid_product'])
-    && !empty($settings['multipaid_product'])
-  )) {
-    // Get global user object.
-    global $user;
-    // Get cart order.
-    $order = commerce_cart_order_load($user->uid);
-    // Check whether order is not empty.
-    if (!empty($order)) {
-      // Check for any payment transaction.
-      $query = new EntityFieldQuery();
-      $query->entityCondition('entity_type', 'commerce_payment_transaction')
-        ->propertyCondition('order_id', $order->order_id, '=')
-        ->range(0, 1);
-      $result = $query->execute();
-      // Order has no payment transaction.
-      if (empty($result)) {
-        // Empty cart when visit homepage.
-        commerce_cart_order_empty($order);
-      }
-      else {
-        // Check for success payment transaction.
-        $query = new EntityFieldQuery();
-        $query->entityCondition('entity_type', 'commerce_payment_transaction')
-          ->propertyCondition('order_id', $order->order_id, '=')
-          ->propertyCondition('status', COMMERCE_PAYMENT_STATUS_SUCCESS, '=')
-          ->range(0, 1);
-        $result = $query->execute();
-        // Order has success payment transaction.
-        if (!empty($result)) {
-          // Check order balance.
-          $balance = commerce_payment_order_balance($order);
-          // Check order status.
-          $order_complete = in_array($order->status, array(
-            'checkout_complete', 'pending', 'processing', 'completed', 'invoiced',
-          ));
-          // Check whether balance is empty.
-          if (isset($balance['amount']) && empty($balance['amount'])) {
-            // Balance is empty: check order status.
-            if (!$order_complete) {
-              // Order not complete: update status to pending.
-              commerce_order_status_update($order, 'pending', FALSE, TRUE, t('Automatic pending status: visit frontpage and payment success.'));
-            }
-          }
-          else {
-            // Balance is not empty: notify CS.
-            drupal_mail('sepulsa', 'order_not_complete_front', 'satpam.cs@sepulsa.com', language_default(), array(
-              'order' => $order,
-            ), variable_get('site_mail', 'admin@example.com'), TRUE);
-          }
-        }
-        // Assign new order ID.
-        commerce_cart_order_new($order->uid);
-      }
-    }
-  }
+  sepulsa_check_multi();
   // Get sepulsa phone form.
   $form = drupal_get_form('sepulsa_phone_form');
   // Return sepulsa phone form.
@@ -148,33 +90,36 @@ function sepulsa_phone_form($form, &$form_state, $data_packet = FALSE) {
   $phone = sepulsa_autocorrect_mobile_prefix($phone);
 
   if (!$data_packet) {
-    $query = "SELECT distinct(field_phone_number_value)
-        FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c
-        WHERE
-        a.order_id = b.order_id
-        AND b.line_item_id = c.entity_id
-        AND (a.status = 'completed' OR a.status = 'invoiced')
-        AND a.uid = :uid
-        ORDER BY a.created DESC";
-    $result = db_query($query, array(':uid' => $user->uid));
-    foreach ($result as $row) {
-      $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
-    }
-    $existing_phone = sepulsa_get_existing_number();
-    foreach ($existing_phone as $value) {
-      $existing_phone_options[$value] = $value;
-    }
-    if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
-      $existing_phone_options['0'] = t('Topup another number');
-      $form['existing_phone'] = array(
-        '#type' => 'select',
-        '#title' => '',
-        '#options' => $existing_phone_options,
-        '#validated' => TRUE,
-        '#attributes' => array(
-          'class' => array('full-width'),
-        ),
-      );
+    // Only for authenticated user.
+    if (!user_is_anonymous()) {
+      $query = "SELECT distinct(field_phone_number_value)
+          FROM commerce_order a, commerce_line_item b, field_data_field_phone_number c
+          WHERE
+          a.order_id = b.order_id
+          AND b.line_item_id = c.entity_id
+          AND (a.status = 'completed' OR a.status = 'invoiced')
+          AND a.uid = :uid
+          ORDER BY a.created DESC";
+      $result = db_query($query, array(':uid' => $user->uid));
+      foreach ($result as $row) {
+        $existing_phone_options[$row->field_phone_number_value] = $row->field_phone_number_value;
+      }
+      $existing_phone = sepulsa_get_existing_number();
+      foreach ($existing_phone as $value) {
+        $existing_phone_options[$value] = $value;
+      }
+      if (!(is_array($existing_phone_options) && empty($existing_phone_options))) {
+        $existing_phone_options['0'] = t('Topup another number');
+        $form['existing_phone'] = array(
+          '#type' => 'select',
+          '#title' => '',
+          '#options' => $existing_phone_options,
+          '#validated' => TRUE,
+          '#attributes' => array(
+            'class' => array('full-width'),
+          ),
+        );
+      }
     }
   }
 

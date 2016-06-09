@@ -15,10 +15,12 @@
 </section>
 <?php endif; ?>
 
-<?php if ($node->type == 'campaign_page'): ?>
+<?php if (isset($node->type) && ($node->type == 'campaign_page' || $node->type == 'bundling')) : ?>
 <section class="std_content">
   <div class="wrapper_2 other after_clear">
-    <?php print $messages; ?>
+  	<?php if ($node->type == 'campaign_page'): ?>
+    	<?php print $messages; ?>
+    <?php endif; ?>
     <?php if ($title): ?>
       <h2><?php print $title ?></h2>
     <?php endif; ?>
@@ -26,7 +28,7 @@
     <?php print render($page['content']); ?>
   </div>
 </section>
-<?php elseif ($node->type == 'blog') : ?>
+<?php elseif (isset($node->type) && $node->type == 'blog') : ?>
 
 <div id="fb-root"></div>
 <script>(function(d, s, id) {

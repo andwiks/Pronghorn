@@ -118,7 +118,7 @@ section.std_content .other h2
     color: #666 !important;
 }
 
-.product-bundling-box ul li
+.product-bundling-box ul li, .product-bundling-box ol li 
 {
 	text-align:left;
 }

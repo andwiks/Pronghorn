@@ -76,7 +76,7 @@ function kupon_create_owned_simple_coupon($line_item, $user) {
             node_save($node);
         }
         else {
-          $order = commerce_load($line_item->order_id);
+          $order = commerce_order_load($line_item->order_id);
           drupal_mail('sepulsa', 'order_voucher_unable_to_assign', 'satpam.cs@sepulsa.com', language_default(), array(
             'order' => $order,
           ), variable_get('site_mail', 'admin@example.com'), TRUE);

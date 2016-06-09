@@ -14,7 +14,7 @@
  * Function device_mail_verification_link_confirm().
  *
  * @param string $hash
- *   hash from email.
+ *   Hash from email.
  */
 function device_mail_verification_link_confirm($hash = NULL) {
   // Di sini akan ada merge user.
@@ -244,7 +244,7 @@ function device_mail_verification_merge_user($current_mail) {
  * @param string $web_uid
  *   Web UID.
  * @param string $merge_to
- *   device / web.
+ *   Device / web.
  */
 function device_mail_verification_merge($strategi = '', $mail = '', $device_did = '', $device_uid = '', $web_uid = '', $merge_to = '') {
   if ($merge_to == 'device') {
@@ -258,7 +258,7 @@ function device_mail_verification_merge($strategi = '', $mail = '', $device_did 
       // Get web user object.
       $web_user = $web_user_wrapper->value();
 
-      // Change email in user , where uid = $device_uid;
+      // Change email in user , where uid = $device_uid.
       $device_user_wrapper = entity_metadata_wrapper('user', $device_uid);
       $device_user_wrapper->mail->set($mail);
       $device_user_wrapper->save();

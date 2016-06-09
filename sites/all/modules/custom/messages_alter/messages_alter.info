@@ -1,0 +1,8 @@
+; $Id$
+name = Messages Alter
+description = This module adds a custom hook_message_alter().
+core = 7.x
+version = "7.x-1.1"
+
+files[] = lib/MessagesAlter.7.x-1.1.php
+files[] = lib/MessagesAlter.rookie.php

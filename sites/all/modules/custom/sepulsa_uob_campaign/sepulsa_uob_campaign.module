@@ -122,7 +122,19 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
 }
 
 function sepulsa_uob_campaign_message_alter(&$message){
-  dpm($message);
+  if(isset($message->messages['error'])){
+    foreach($message->messages['error'] as &$val) {
+      if(preg_match('@Year in Tanggal Lahir is missing.@',$val)){
+        $val='';
+      }
+      if(preg_match('@Month in Tanggal Lahir is missing.@',$val)){
+        $val='';
+      }
+      if(preg_match('@Day in Tanggal Lahir is missing.@',$val)){
+        $val='';
+      }
+    }
+  }
 }
 
 function sepulsa_uob_campaign_preprocess_page(&$vars, $hook) {

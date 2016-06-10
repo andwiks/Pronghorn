@@ -59,6 +59,7 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
   $pattern_no_ktp = "/^\d{16}$/";
   $pattern_kodepos = "/^\d{5}$/";
   $pattern_nama = "/^[a-zA-Z .\-]+$/i";
+  $pattern_kota = "/^[a-zA-Z .\-]+$/i";
 
   $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
   $no_hp = $form_state['input']['submitted']['no_hp'];

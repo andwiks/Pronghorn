@@ -2,7 +2,8 @@
 /**
  * @file
  * Sepulsa UOB webform campaign.
- * @author  azul@sepulsa.com
+ *
+ * @author azul@sepulsa.com
  */
 
 /**
@@ -37,31 +38,42 @@ function sepulsa_uob_campaign_form($form, &$form_state) {
     '#default_value' => variable_get('uob_mail_from', 'ken@sepulsa.com'),
   );
   $form['name']['uob_autosend'] = array(
-    '#type' =>'checkbox',
-    '#title'=>t('Autosend Submission'),
-    '#default_value' => variable_get('uob_autosend',FALSE),
+    '#type' => 'checkbox',
+    '#title' => t('Autosend Submission'),
+    '#default_value' => variable_get('uob_autosend', FALSE),
   );
 
   return system_settings_form($form);
 }
 
-function sepulsa_uob_campaign_form_webform_client_form_alter(&$form, &$form_state){
-  if($form['#node']->title=='UOB'){
+/**
+ * Implements hook_form_alter().
+ */
+function sepulsa_uob_campaign_form_webform_client_form_alter(&$form, &$form_state) {
+  if (isset($form['#node']->title) && $form['#node']->title == 'UOB') {
     $form['#validate'][] = 'sepulsa_uob_campaign_validation';
   }
 }
 
-function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
-{
+/**
+ * Function sepulsa_uob_campaign_validation().
+ *
+ * @param array $form
+ *   Form array.
+ * @param array $form_state
+ *   Form state array.
+ * @param array $vars
+ *   Variable array.
+ */
+function sepulsa_uob_campaign_validation(&$form, &$form_state, &$vars) {
   global $user;
-  // $pattern_no_hp = '/^(\+62|0)[1-9]{9,11}$/';
   $pattern_no_hp = "/^08[0-9]{9,}$/";
   $pattern_no_ktp = "/^\d{16}$/";
   $pattern_kodepos = "/^\d{5}$/";
   $pattern_nama = "/^[a-zA-Z .\-]+$/i";
   $pattern_kota = "/^[a-zA-Z .\-]+$/i";
 
-  $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
+  $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree']) == NULL) ? FALSE : TRUE;
   $no_hp = $form_state['input']['submitted']['no_hp'];
   $nama_lengkap = $form_state['input']['submitted']['nama_lengkap'];
   $kode_pos = $form_state['input']['submitted']['kode_pos'];
@@ -73,54 +85,54 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
   $month_lahir = $form_state['input']['submitted']['tanggal_lahir']['month'];
   $year_lahir = $form_state['input']['submitted']['tanggal_lahir']['year'];
 
-  if($user->uid==0){
+  if ($user->uid == 0) {
     form_set_error('', t('Silahkan login terlebih dahulu.'));
   }
 
   if (empty($nama_lengkap)) {
     form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
   }
-  if (empty(preg_match($pattern_nama,$nama_lengkap))) {
+  if (empty(preg_match($pattern_nama, $nama_lengkap))) {
     form_set_error('nama_lengkap', t('Nama lengkap harus diisi dengan huruf saja'));
   }
-  if (empty($no_hp) ) {
+  if (empty($no_hp)) {
     form_set_error('no_hp', t('No HP harus angka yang diawali 08 minimal 11 digit'));
   }
-  if(empty(preg_match($pattern_no_hp, $no_hp))){
+  if (empty(preg_match($pattern_no_hp, $no_hp))) {
     form_set_error('no_hp', t('No HP harus angka yang diawali 08 minimal 11 digit'));
   }
-  if (empty($kode_pos) ) {
+  if (empty($kode_pos)) {
     form_set_error('kode_pos', t('Kode pos harus diisi'));
   }
-  if( empty(preg_match($pattern_kodepos, $kode_pos)) ){
+  if (empty(preg_match($pattern_kodepos, $kode_pos))) {
     form_set_error('kode_pos', t('Kode pos harus 5 digit angka'));
   }
   if (empty($kota)) {
     form_set_error('kota', t('Kota harus diisi'));
   }
-  if (empty(preg_match($pattern_kota,$kota))) {
+  if (empty(preg_match($pattern_kota, $kota))) {
     form_set_error('kota', t('Kota harus diisi dengan huruf saja'));
   }
-  if (empty($alamat_email) && !valid_email_address($alamat_email) ) {
+  if (empty($alamat_email) && !valid_email_address($alamat_email)) {
     form_set_error('alamat_email', t('Isilah alamat email yang valid'));
   }
   if (empty($jenis_kelamin)) {
     form_set_error('jenis_kelamin', t('Pilih jenis kelamin'));
   }
 
-  if(empty($year_lahir)){
+  if (empty($year_lahir)) {
     form_set_error('tanggal_lahir[year]', t('Tahun pada tanggal lahir harus diisi'));
   }
-  if(empty($month_lahir)){
+  if (empty($month_lahir)) {
     form_set_error('tanggal_lahir[month]', t('Bulan pada tanggal lahir harus diisi'));
   }
-  if(empty($day_lahir)){
+  if (empty($day_lahir)) {
     form_set_error('tanggal_lahir[day]', t('Hari pada tanggal lahir harus diisi'));
   }
-  if (empty($no_ktp) ) {
+  if (empty($no_ktp)) {
     form_set_error('no_ktp', t('Nomor KTP harus diisi'));
   }
-  if(empty(preg_match($pattern_no_ktp, $no_ktp))){
+  if (empty(preg_match($pattern_no_ktp, $no_ktp))) {
     form_set_error('no_ktp', t('Nomor KTP harus 16 digit angka'));
   }
   if (empty($term_agree)) {
@@ -128,39 +140,26 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
   }
 }
 
-function sepulsa_uob_campaign_message_alter(&$message){
-  if(isset($message->messages['error'])){
-    foreach($message->messages['error'] as &$val) {
-      if(preg_match('@Year in Tanggal Lahir is missing.@',$val)){
-        $val='';
-      }
-      if(preg_match('@Month in Tanggal Lahir is missing.@',$val)){
-        $val='';
-      }
-      if(preg_match('@Day in Tanggal Lahir is missing.@',$val)){
-        $val='';
-      }
-    }
-  }
-}
-
+/**
+ * Implements hook_preprocess_page().
+ */
 function sepulsa_uob_campaign_preprocess_page(&$vars, $hook) {
 
   if (isset($vars['node']->title) && $vars['node']->title == 'UOB') {
-    $anonym = false;
-    if(!empty(user_is_anonymous())) {
-      $anonym = true;
+    $anonym = FALSE;
+    if (!empty(user_is_anonymous())) {
+      $anonym = TRUE;
     }
     $uobvars = [
-      'destination' => $destination,
+      'destination' => $vars['node']->title,
       'anonym' => $anonym,
-      'forgot_destination' => '/user/password?destination='.$destination,
-      'register_destination' => '/user/register?destination='.$destination,
+      'forgot_destination' => '/user/password?destination=' . $vars['node']->title,
+      'register_destination' => '/user/register?destination=' . $vars['node']->title,
     ];
 
     drupal_add_js(array('sepulsa_uob_campaign' => array('uobvars' => $uobvars)),
       array('type' => 'setting', 'scope' => 'header', 'weight' => 115));
 
     drupal_add_js(drupal_get_path('module', 'sepulsa_uob_campaign') . '/uob.js');
-    }
   }
+}

@@ -55,6 +55,14 @@ function sepulsa_reports_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
   );
 
+  $items['admin/commerce/sepulsa_reports/voucher/live'] = array(
+    'title' => 'Voucher Report Live',
+    'description' => 'View live voucher reports.',
+    'access arguments' => array('access sepulsa reports'),
+    'page callback' => 'sepulsa_reports_live_voucher_check',
+    'file' => 'sepulsa_reports.voucher.inc',
+  );
+
   return $items;
 }
 

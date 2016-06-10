@@ -262,67 +262,6 @@ function sepulsav2_form_alter(&$form, &$form_state, $form_id) {
     $form['checkout_completion_message']['message']['#theme'] = 'sepulsa_checkout_completion_message';
     $form['checkout_completion_message']['message']['#message'] = $form['checkout_completion_message']['message']['#markup'];
   }
-
-  // Check for UOB Webform #118536367.
-  if(isset($form['#node']->uuid) && $form['#node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943') {
-    $form['#validate'][] = 'sepulsa_UOBacquisitioncampaign_validation';
-  }
-}
-
-function sepulsa_UOBacquisitioncampaign_validation(&$form, &$form_state)
-{
-  global $user;
-  $pattern_no_hp = '/^(\+62|0)[1-9]{9,11}$/';
-
-  $telkomsel = "^(\\+62|\\+0|0|62)8(1[123]|52|53|21|22|23)[0-9]{5,9}$";
-  $simpati = "^(\\+62|\\+0|0|62)8(1[123]|2[12])[0-9]{5,9}$";
-  $as = "^(\\+62|\\+0|0|62)8(52|53|23)[0-9]{5,9}$";
-  $indosat = "^(\\+62815|0815|62815|\\+0815|\\+62816|0816|62816|\\+0816|\\+62858|0858|62858|\\+0814|\\+62814|0814|62814|\\+0814)[0-9]{5,9}$";
-  $im3  = "^(\\+62855|0855|62855|\\+0855|\\+62856|0856|62856|\\+0856|\\+62857|0857|62857|\\+0857)[0-9]{5,9}$";
-  $xl = "^(\\+62817|0817|62817|\\+0817|\\+62818|0818|62818|\\+0818|\\+62819|0819|62819|\\+0819|\\+62859|0859|62859|\\+0859|\\+0878|\\+62878|0878|62878|\\+0877|\\+62877|0877|62877)[0-9]{5,9}$";
-
-
-  $term_agree = (isset($form_state['input']['submitted']['term_agree']['agree'])==null) ? FALSE : TRUE;
-  $no_hp = $form_state['input']['submitted']['no_hp'];
-  $nama_lengkap = $form_state['input']['submitted']['nama_lengkap'];
-  $kode_pos = $form_state['input']['submitted']['kode_pos'];
-  $kota = $form_state['input']['submitted']['kota'];
-  $no_ktp = $form_state['input']['submitted']['no_ktp'];
-  $alamat_email = $form_state['input']['submitted']['alamat_email'];
-  $jenis_kelamin = $form_state['input']['submitted']['jenis_kelamin'];
-  $day_lahir = $form_state['input']['submitted']['tanggal_lahir']['day'];
-  $month_lahir = $form_state['input']['submitted']['tanggal_lahir']['month'];
-  $year_lahir = $form_state['input']['submitted']['tanggal_lahir']['year'];
-
-  if ( empty($nama_lengkap) ) {
-    form_set_error('nama_lengkap', t('Nama lengkap harus diisi'));
-  }
-  if (empty($no_hp) && !preg_match($pattern_no_hp, $no_hp)){
-    form_set_error('no_hp', t('No HP harus diawali +62, 62, atau 08'));
-  }
-  if ( empty($kode_pos) ) {
-    form_set_error('kode_pos', t('Kode pos harus diisi'));
-  }
-  if ( empty($kota) ) {
-    form_set_error('kota', t('Kota harus diisi'));
-  }
-
-  if ( empty($alamat_email) && !valid_email_address($alamat_email) ) {
-    form_set_error('alamat_email', t('Alamat email harus diisi'));
-  }
-  if ( empty($jenis_kelamin) ) {
-    form_set_error('jenis_kelamin', t('Pilih jenis kelamin'));
-  }
-  if ( empty($day_lahir) || empty($month_lahir) || empty($year_lahir) ) {
-    form_set_error('tanggal_lahir', t('Tanggal lahir harus diisi'));
-  }
-  if ( empty($no_ktp) ) {
-    form_set_error('no_ktp', t('No KTP harus diisi'));
-  }
-  if ( empty($term_agree) ) {
-    form_set_error('term_agree agree', t('Terms & Conditions harus disetujui'));
-  }
-
 }
 
 /**
@@ -671,13 +610,6 @@ function sepulsav2_preprocess_html(&$variables) {
  * Implements hook_preprocess_page().
  */
 function sepulsav2_preprocess_page(&$variables, $hook) {
-  // UOB Webform.
-  if (isset($variables['node']->uuid)
-    && $variables['node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943'
-  ) {
-    $variables['theme_hook_suggestions'][] = 'page__node__' . str_replace('-', '_', $variables['node']->uuid);
-  }
-
   if (drupal_is_front_page()) {
     if (isset($_POST['form_id']) && $_POST['form_id'] == 'commerce_cart_add_to_cart_form') {
       $variables['active_tab'] = 'token_reload';
@@ -685,6 +617,12 @@ function sepulsav2_preprocess_page(&$variables, $hook) {
     else {
       $variables['active_tab'] = 'topup';
     }
+  }
+  // UOB Webform.
+  if (isset($variables['node']->uuid)
+    && $variables['node']->uuid == '22ed402d-062b-40d8-81a3-8b85cabdf943'
+  ) {
+-    $variables['theme_hook_suggestions'][] = 'page__node__' . str_replace('-', '_', $variables['node']->uuid);
   }
 }
 

@@ -97,7 +97,9 @@ function sepulsa_uob_campaign_validation(&$form, &$form_state,&$vars)
   if (empty($kota)) {
     form_set_error('kota', t('Kota harus diisi'));
   }
-
+  if (empty(preg_match($pattern_kota,$kota))) {
+    form_set_error('kota', t('Kota harus diisi dengan huruf saja'));
+  }
   if (empty($alamat_email) && !valid_email_address($alamat_email) ) {
     form_set_error('alamat_email', t('Isilah alamat email yang valid'));
   }

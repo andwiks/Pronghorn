@@ -146,8 +146,7 @@ function sepulsa_uob_campaign_message_alter(&$message){
 
 function sepulsa_uob_campaign_preprocess_page(&$vars, $hook) {
 
-  $destination = $vars['node']->title;
-  if($destination=='UOB'){
+  if (isset($vars['node']->title) && $vars['node']->title == 'UOB') {
     $anonym = false;
     if(!empty(user_is_anonymous())) {
       $anonym = true;
